@@ -21,6 +21,7 @@ package dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA;
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
 import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.Node;
+import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.LightSwitch;
 
 
 network RealTimeNetworknonBeaconCSMA
@@ -29,6 +30,9 @@ network RealTimeNetworknonBeaconCSMA
         int numHosts;
         double AreaX @unit(m) = default(80m);
         double AreaY @unit(m) = default(40m);
+        double X @unit(m);
+        double Y @unit(m);
+        double Z @unit(m);
 
         double nodeSeparationX = default(0);
         double nodeSeparationY = default(0);
@@ -37,7 +41,14 @@ network RealTimeNetworknonBeaconCSMA
         //@display("i=background/green;is=vl;bgb=80,40;bgs=25,m;bgi=background/green,s;bgg=1,,black");
         @display("bgb=80,40;bgs=25,m");
     submodules:
-        fixhost[numHosts]: Node {
+        lightSwitch: LightSwitch {
+            parameters:
+                X = X;
+                Y = Y;
+                Z = Z;
+                @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=10,10");
+        }
+        lamps[numHosts]: Node {
             parameters:
                 numHosts = numHosts;
                 maxRow = maxRow;
@@ -47,7 +58,7 @@ network RealTimeNetworknonBeaconCSMA
 //				
 //                Hosts = numFixHosts;
 
-                @display("b=1,1,oval;i=device/pocketpc;p=8.44,0.92");
+                @display("b=1,1,oval;i=status/bulb;p=8.44,0.92");
         }
 
         channelControl: ChannelControl {
