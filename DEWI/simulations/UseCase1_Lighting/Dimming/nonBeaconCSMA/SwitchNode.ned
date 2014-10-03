@@ -89,9 +89,6 @@ module LightSwitch
         //Node Location
         mobility: StationaryMobility {
             parameters:
-                initialX = X;
-                initialY = Y;
-                initialZ = Z;
                 @display("p=152,368;i=block/cogwheel");
         }
                 //Notificationboard

@@ -16,7 +16,7 @@
 #include "AppBase.h"
 
 #include "UDPSocket.h"
-#include "../akaroa/include/akaroa.H"
+//#include "../akaroa/include/akaroa.H"
 
 
 //UDP Application: UDPBroadcstControl; see NED for more info

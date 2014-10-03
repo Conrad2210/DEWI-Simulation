@@ -24,15 +24,12 @@ import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.Node;
 import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.LightSwitch;
 
 
-network RealTimeNetworknonBeaconCSMA
+network Network
 {
     parameters:
         int numHosts;
         double AreaX @unit(m) = default(80m);
         double AreaY @unit(m) = default(40m);
-        double X @unit(m);
-        double Y @unit(m);
-        double Z @unit(m);
 
         double nodeSeparationX = default(0);
         double nodeSeparationY = default(0);
@@ -43,12 +40,9 @@ network RealTimeNetworknonBeaconCSMA
     submodules:
         lightSwitch: LightSwitch {
             parameters:
-                X = X;
-                Y = Y;
-                Z = Z;
                 @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=10,10");
         }
-        lamps[numHosts]: Node {
+        lamp[numHosts]: Node {
             parameters:
                 numHosts = numHosts;
                 maxRow = maxRow;
