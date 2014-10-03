@@ -1,0 +1,3 @@
+package dewi;
+
+@license(LGPL);
