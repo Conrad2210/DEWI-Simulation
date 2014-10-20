@@ -22,7 +22,6 @@
 #include "cmodule.h"
 #include <dirent.h>
 #include <ios>
-#include <dir.h>
 #include "DataFunctions.h"
 
 DataVector::DataVector(std::string name, std::string type) {
@@ -78,14 +77,22 @@ void DataVector::saveData(std::string Path)
     std::stringstream path;
 
     //set absolute path
+#ifdef WIN32
     path << Path << "\\" << Type << "\\" << Name;
+#elif linux
+    path << Path << "/" << Type << "/" << Name;
+#endif
 
     //make directories
 
     if(createDirectories(path.str()))
     {
         //Set path including fileName
+#ifdef WIN32
         path << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+#elif linux
+        path << "/" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+#endif
 
         //Open output file
         std::ofstream fout(path.str().c_str());

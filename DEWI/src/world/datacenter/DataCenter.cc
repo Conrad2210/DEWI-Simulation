@@ -68,13 +68,20 @@ void DataCenter::recordScalar(std::string Data,std::string Type, std::string Ind
     std::stringstream path;
 
     //create absolute path
+#ifdef WIN32
     path << ResultPath << "\\" << Type << "\\" << Index;
-
+#elif linux
+    path << ResultPath << "/" << Type << "/" << Index;
+#endif
     //Create Directories
     if(createDirectories(path.str()))
     {
         //Set path including file name
+#ifdef WIN32
         path << "\\" << Name << ".csv";
+#elif linux
+        path << "/" << Name << ".csv";
+#endif
 
         //open output file
         std::ofstream fout(path.str().c_str());
