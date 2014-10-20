@@ -29,6 +29,7 @@
 
 #include "AppBase.h"
 #include "UDPSocket.h"
+#include "DataCenter.h"
 
 
 /**
@@ -52,8 +53,10 @@ class INET_API UDPBroadcastBurst : public AppBase
     std::vector<IPvXAddress> destAddresses;
     IPvXAddress destAddr;
     int destAddrRNG;
-//    cOutVector *burstSent;
+    cOutVector *burstSent;
 //    cOutVector *msgSent;
+
+    DataCenter *center;
 
     typedef std::map<int,int> SourceSequence;
     SourceSequence sourceSequence;

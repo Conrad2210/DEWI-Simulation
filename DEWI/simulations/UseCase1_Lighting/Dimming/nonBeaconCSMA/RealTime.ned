@@ -22,6 +22,7 @@ import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
 import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.Node;
 import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.LightSwitch;
+import dewi.world.datacenter.DataCenter;
 
 
 network Network
@@ -40,7 +41,7 @@ network Network
     submodules:
         lightSwitch: LightSwitch {
             parameters:
-                @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=10,10");
+                @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=15.28,12.16");
         }
         lamp[numHosts]: Node {
             parameters:
@@ -52,19 +53,22 @@ network Network
 //				
 //                Hosts = numFixHosts;
 
-                @display("b=1,1,oval;i=status/bulb;p=8.44,0.92");
+                @display("b=1,1,oval;i=status/bulb;p=3.68,10.84");
         }
 
         channelControl: ChannelControl {
             parameters:
                 @display("p=0.68,0.56;i=misc/sun");
         }
+        DataCenter: DataCenter {
 
+            @display("p=5.52,0.6");
+        }
         configurator: IPv4NetworkConfigurator {
             config = xml("<config><interface hosts='*' address='10.x.x.x' netmask='255.x.x.x'/></config>");
             //            netmask="255.255.0.0";
             //            networkAddress="145.236.0.0";
-            @display("p=2.04,0.4");
+            @display("p=3.16,0.6");
         }
 }
 

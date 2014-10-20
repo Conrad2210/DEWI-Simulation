@@ -137,59 +137,72 @@ void csma802154::initialize(int stage)
         << " backoff method = " << par("backoffMethod").stringValue() << endl;
 
         EV << "finished csma init stage 1." << endl;
+        center = check_and_cast<DataCenter *>(center->getModuleByPath("DataCenter"));
     }
+
 }
 
 void csma802154::finish()
 {
     if (stats)
     {
-        std::stringstream a;
-            a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbTxFrames_"
-                    << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbTxFrames);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbRxFrames_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbRxFrames);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbDroppedFrames_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbDroppedFrames);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbMissedAcks_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbMissedAcks);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbRecvdAcks_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbRecvdAcks);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbTxAcks_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbTxAcks);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbDuplicates_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), nbDuplicates);
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_numCollision_"
-                << getParentModule()->getIndex();
-        recordScalar(a.str().c_str(), numCollision);
-        a.str("");
-                a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_nbRxFramesBroadcast_"
-                        << getParentModule()->getIndex();
-                recordScalar(a.str().c_str(), nbRxFramesBroadcast);
+
+        std::stringstream data,type,index,name;
+        data << nbTxFrames;
+        type << "txframes";
+        index << getParentModule()->getIndex();
+        name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
+        //Record ReSend messages
+        data.str("");
+        data << nbDroppedFrames;
+        type.str("");
+        type << "droppedframes";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
+        data.str("");
+        data << numCollision;
+        type.str("");
+        type << "collision";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
+        data.str("");
+        data << numCollision;
+        type.str("");
+        type << "collision";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
+
+
         if (nbBackoffs > 0)
         {
-            recordScalar("meanBackoff", backoffValues / nbBackoffs);
+            data.str("");
+            data << backoffValues / nbBackoffs;
+            type.str("");
+            type << "meanbackoff";
+            center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
         }
         else
         {
-            recordScalar("meanBackoff", 0);
+            data.str("");
+            data << 0;
+            type.str("");
+            type << "meanbackoff";
+            center->recordScalar(data.str(),type.str(),index.str(),name.str());
         }
-        recordScalar("nbBackoffs", nbBackoffs);
-        recordScalar("backoffDurations", backoffValues);
+
+        data.str("");
+        data << nbBackoffs;
+        type.str("");
+        type << "nbBackoffs";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+        data.str("");
+        data << backoffValues;
+        type.str("");
+        type << "backoffDurations";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
     }
 }
 

@@ -34,6 +34,9 @@
 #include <vector>
 #include <list>
 #include "Ieee802154Mac.h"
+#include "DataCenter.h"
+
+
 
 /**
  * @brief Generic CSMA Mac-Layer.
@@ -88,6 +91,7 @@ class  csma802154 : public Ieee802154Mac
      bool isMulticast;
      bool isPointToPoint;
   protected:
+     DataCenter *center;
     typedef std::list<Ieee802154Frame*> MacQueue;
 
     /** @name Different tracked statistics.*/

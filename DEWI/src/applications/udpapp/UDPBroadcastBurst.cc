@@ -121,6 +121,10 @@ void UDPBroadcastBurst::initialize(int stage)
         outOfOrderPkSignal = registerSignal("outOfOrderPk");
         dropPkSignal = registerSignal("dropPk");
     }
+    else if(stage == 3)
+    {
+        center = check_and_cast<DataCenter *>(center->getModuleByPath("DataCenter"));
+    }
 }
 
 IPvXAddress UDPBroadcastBurst::chooseDestAddr()
@@ -416,18 +420,21 @@ void UDPBroadcastBurst::generateBurst()
 void UDPBroadcastBurst::finish()
 {
 
-    std::stringstream a;
-    a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_BurstsSent_"
-            << getParentModule()->getIndex();
-    recordScalar(a.str().c_str(), (double)burstCounter);
-    a.str("");
-    a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_MSGSent_"
-            << getParentModule()->getIndex();
-    recordScalar(a.str().c_str(),  numSent);
-//    recordScalar("Total sent", numSent);
-//    recordScalar("Total received", numReceived);
-//    recordScalar("Total deleted", numDeleted);
-    AppBase::finish();
+    std::stringstream data,type,index,name;
+    data << burstCounter;
+    type << "burst";
+    index << getParentModule()->getIndex();
+    name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
+    center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
+    //Record ReSend messages
+    data.str("");
+    data << numSent;
+    type.str("");
+    type << "msgsent";
+    center->recordScalar(data.str(),type.str(),index.str(),name.str());
+
+
 }
 
 bool UDPBroadcastBurst::startApp(IDoneCallback *doneCallback)

@@ -63,24 +63,12 @@ void UDPBroadcastControl::initialize(int stage)
          */
         std::stringstream a;
         timeForCount = 0.0;
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_E2ED_"
-                << getParentModule()->getIndex() << "_" << ev.getConfigEx()->getFullName();
-        EndToEndDelay = new cOutVector(a.str().c_str());
+        a << getParentModule()->getIndex();
+        //EndToEndDelay = new cOutVector(a.str().c_str());
+        E2E = new DataVector(a.str(),"latency");
+        Hop = new DataVector(a.str(),"Hops");
 
-        a.str("");
-        a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_HopCount_"
-                << getParentModule()->getIndex() << "_" << ev.getConfigEx()->getFullName();
-        hopCount = new cOutVector(a.str().c_str());
 
-        a.str("");
-//        a << ev.getConfigEx()->getActiveConfigName() << "_"<< ev.getConfigEx()->getActiveRunNumber() << "_ReceivedMSG_" << getParentModule()->getIndex();
-//        ReceivedMessages = new cOutVector(a.str().c_str());
-//        a.str("");
-//        a << ev.getConfigEx()->getActiveConfigName() << "_"<< ev.getConfigEx()->getActiveRunNumber() << "_ReMSG_" << getParentModule()->getIndex();
-//        ResendMessages = new cOutVector(a.str().c_str());
-//        a.str("");
-//        a << ev.getConfigEx()->getActiveConfigName() << "_"<< ev.getConfigEx()->getActiveRunNumber() << "_DRMSG_" << getParentModule()->getIndex();
-//        DoubleReceivedMessages = new cOutVector(a.str().c_str());
 
         stDelayLimit = par("delayLimit");
         stStartTime = par("startTime");
@@ -116,6 +104,12 @@ void UDPBroadcastControl::initialize(int stage)
         sstDropPkSignal = registerSignal("dropPk");
         sstReBroadcastPkSignal = registerSignal("ReBroadcastPk");
         sstDublicatedPkSignal = registerSignal("DublicatedPk");
+    }
+    else if(stage == 3)
+    {
+        Hop->registerVector();
+        E2E->registerVector();
+        center = check_and_cast<DataCenter *>(center->getModuleByPath("DataCenter"));
     }
 
 }
@@ -384,11 +378,12 @@ void UDPBroadcastControl::processPacket(cPacket *pk)
         UDPDataIndication *ctrl = check_and_cast<UDPDataIndication *>(pk->removeControlInfo());
         if (ctrl->getDestAddr().get4() == IPv4Address::ALLONES_ADDRESS && par("resendBroadcast").boolValue())
         {
+
             BurstMSG *tmpBurstMsg = check_and_cast<BurstMSG *>(pk);
-            hopCount->record((double) tmpBurstMsg->getHopCount());
+            Hop->record(tmpBurstMsg->getHopCount());
             tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
             endtoendDelay = simTime() - pk->getTimestamp();
-            EndToEndDelay->record(endtoendDelay.dbl());
+            E2E->record(endtoendDelay.dbl());
             timeForCount = timeForCount + 1;
             nNumResend++;
             emit(sstReBroadcastPkSignal, tmpBurstMsg);
@@ -476,20 +471,26 @@ void UDPBroadcastControl::finish()
 //    ReceivedMessages->record(nNumReceived);
 //    ResendMessages->record(nNumResend);
 //    DoubleReceivedMessages->record(nNumDuplicated);
-    std::stringstream a;
-    a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_ReceivedMSG_"
-            << getParentModule()->getIndex();
-    recordScalar(a.str().c_str(), nNumReceived);
+    std::stringstream data,type,index,name;
+    data << nNumReceived;
+    type << "received";
+    index << getParentModule()->getIndex();
+    name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
+    center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
-    a.str("");
-    a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_ReMSG_"
-            << getParentModule()->getIndex();
-    recordScalar(a.str().c_str(), nNumResend);
+    //Record ReSend messages
+    data.str("");
+    data << nNumResend;
+    type.str("");
+    type << "resend";
+    center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
-    a.str("");
-    a << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << "_DRMSG_"
-            << getParentModule()->getIndex();
-    recordScalar(a.str().c_str(), nNumDuplicated);
+    //Record Double Received Messages
+    data.str("");
+    data << nNumDuplicated;
+    type.str("");
+    type << "doublereceived";
+    center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
 //    recordScalar("Total sent", nNumSent);
 //    recordScalar("Total received", nNumReceived);

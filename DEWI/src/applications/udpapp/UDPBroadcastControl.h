@@ -16,6 +16,8 @@
 #include "AppBase.h"
 
 #include "UDPSocket.h"
+#include "DataVector.h"
+#include "DataCenter.h"
 //#include "../akaroa/include/akaroa.H"
 
 
@@ -32,10 +34,13 @@ class INET_API UDPBroadcastControl : public AppBase
         int nLocalPort, nDestPort;
         std::vector<IPvXAddress> ipDestAddresses;
         IPvXAddress ipDestAddr;
+        DataCenter *center;
 
+        //cOutVector *EndToEndDelay;
+        //cOutVector *hopCount;
 
-        cOutVector *EndToEndDelay;
-        cOutVector *hopCount;
+        DataVector *E2E;
+        DataVector *Hop;
         simtime_t timeForCount;
 //        cOutVector *ReceivedMessages;
 //        cOutVector *ResendMessages;
