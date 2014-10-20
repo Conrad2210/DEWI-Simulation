@@ -101,6 +101,7 @@ void DataVector::saveData(std::string Path)
         if(fout.is_open())
         {
             //write data to file
+            fout << Type << ",\n";
             for(int i = 0; i < (int) Data.size(); i++)
             {
                 //each data value in an new row

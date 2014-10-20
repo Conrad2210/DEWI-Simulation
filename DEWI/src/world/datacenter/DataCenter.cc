@@ -90,6 +90,7 @@ void DataCenter::recordScalar(std::string Data,std::string Type, std::string Ind
         if(fout.is_open())
         {
             //write data to output file
+            fout << Type << ",\n";
             fout << Data << ",\n";
         }
 
