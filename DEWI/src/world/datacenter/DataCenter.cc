@@ -71,7 +71,7 @@ void DataCenter::recordScalar(std::string Data,std::string Type, std::string Ind
     path << ResultPath << "\\" << Type << "\\" << Index;
 
     //Create Directories
-    if(CreateDirectories(path.str()))
+    if(createDirectories(path.str()))
     {
         //Set path including file name
         path << "\\" << Name << ".csv";

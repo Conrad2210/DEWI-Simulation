@@ -150,7 +150,7 @@ void csma802154::finish()
         std::stringstream data,type,index,name;
         data << nbTxFrames;
         type << "txframes";
-        index << getParentModule()->getIndex();
+        index << getParentModule()->getParentModule()->getIndex();
         name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
         center->recordScalar(data.str(),type.str(),index.str(),name.str());
 

@@ -81,7 +81,8 @@ void DataVector::saveData(std::string Path)
     path << Path << "\\" << Type << "\\" << Name;
 
     //make directories
-    if(CreateDirectories(path.str()))
+
+    if(createDirectories(path.str()))
     {
         //Set path including fileName
         path << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
