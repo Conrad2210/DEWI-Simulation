@@ -58,6 +58,7 @@ void csma802154::initialize(int stage)
         useMACAcks = par("useMACAcks").boolValue();
         queueLength = par("queueLength");
         sifs = par("sifs");
+        randomBackoff = par("randomBackoff").boolValue();
         transmissionAttemptInterruptedByRx = false;
         nbTxFrames = 0;
         nbRxFrames = 0;
@@ -71,7 +72,15 @@ void csma802154::initialize(int stage)
         backoffValues = 0;
         stats = par("stats");
         trace = par("trace");
-        macMaxCSMABackoffs = par("macMaxCSMABackoffs");
+        if(randomBackoff)
+        {
+            macMaxCSMABackoffs = intuniform(1,par("macMaxCSMABackoffs"),1);
+            par("macMaxCSMABackoffs").setDoubleValue((double)macMaxCSMABackoffs);
+        }
+        else
+        {
+            macMaxCSMABackoffs = par("macMaxCSMABackoffs");
+        }
         macMaxFrameRetries = par("macMaxFrameRetries");
         macAckWaitDuration = par("macAckWaitDuration").doubleValue();
         aUnitBackoffPeriod = par("aUnitBackoffPeriod");

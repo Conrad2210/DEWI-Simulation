@@ -33,6 +33,7 @@ simple CSMA802154
         bool debug = default(false);
         bool stats = default(true);
         bool trace = default(false);
+        bool randomBackoff = default(false);
         
         string address=default ("auto");
         string queueModule;				// name of optional external queue module

@@ -230,6 +230,9 @@ class  csma802154 : public Ieee802154Mac
     /** @brief Stores if the MAC expects Acks for Unicast packets.*/
     bool useMACAcks;
 
+    /* @brief Random Number of Backoff retries*/
+    bool randomBackoff;
+
     /** @brief Defines the backoff method to be used.*/
     backoff_methods backoffMethod;
 
