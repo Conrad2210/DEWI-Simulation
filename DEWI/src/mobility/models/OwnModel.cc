@@ -93,38 +93,15 @@ void OwnModel::initialize(int stage)
 
         constraintAreaMin.z = 0.0;
         constraintAreaMax.z = m_marginZ;
-
-        //OwnModel::CalcPosition();
     }
-}
-void OwnModel::calcSeparation()
-{
-
-
-}
-
-void OwnModel::CalcPosition()
-{
-
-
 }
 
 void OwnModel::initializePosition()
 {
     int index = visualRepresentation->getIndex();
-//    int maxRow = 0;
-//    int maxCol = 0;
     int size = (int)ceil(sqrt((double)m_numHosts));
     int col = index % size;
     int row = ((int)floor((double)index/(double)size));
-//    for(int i = 0; i < m_numHosts; i++)
-//    {
-//        if(((int)floor((double)i/(double)size))>maxRow)
-//            maxRow = ((int)floor((double)i/(double)size));
-//
-//        if((i % size)>maxCol)
-//            maxCol = i % size;
-//    }
 
     m_SeparationX = ((m_marginX - m_distanceWall) - m_distanceWall)/m_maxCol;
     m_SeparationY = ((m_marginY - m_distanceWall) - m_distanceWall)/m_maxRow;
@@ -137,6 +114,4 @@ void OwnModel::initializePosition()
 void OwnModel::finish()
 {
     MobilityBase::finish();
-//    recordScalar("x", lastPosition.x);
-//    recordScalar("y", lastPosition.y);
 }

@@ -55,10 +55,6 @@ protected:
 public:
     OwnModel();
 
-private:
-    void calcSeparation();
-    void CalcPosition();
-
 protected:
     /** @brief Initializes mobility model parameters.*/
     virtual void initialize(int stage);
