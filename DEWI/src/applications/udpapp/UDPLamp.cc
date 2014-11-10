@@ -1,11 +1,11 @@
 /*
- * UDPBroadcastControl.cc
+ * UDPLamp.cc
  *
  *  Created on: 16 Apr 2014
  *      Author: Conrad Dandelski
  */
 
-#include "UDPBroadcastControl.h"
+#include "UDPLamp.h"
 #include "BurstMSG_m.h"
 #include "UDPControlInfo_m.h"
 #include "IPvXAddressResolver.h"
@@ -17,18 +17,18 @@
 #include "RoutingTableAccess.h"
 #endif
 
-Define_Module(UDPBroadcastControl);
+Define_Module(UDPLamp);
 
-int UDPBroadcastControl::nCounter;
+int UDPLamp::nCounter;
 
-simsignal_t UDPBroadcastControl::sstSentPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastControl::sstRcvdPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastControl::sstOutOfOrderPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastControl::sstDropPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastControl::sstReBroadcastPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastControl::sstDublicatedPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLamp::sstSentPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLamp::sstRcvdPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLamp::sstOutOfOrderPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLamp::sstDropPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLamp::sstReBroadcastPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLamp::sstDublicatedPkSignal = SIMSIGNAL_NULL;
 
-UDPBroadcastControl::UDPBroadcastControl()
+UDPLamp::UDPLamp()
 {
     pMessageLengthPar = NULL;
     pBurstDurationPar = NULL;
@@ -39,12 +39,12 @@ UDPBroadcastControl::UDPBroadcastControl()
     nOutputInterfaceMulticastBroadcast.clear();
 }
 
-UDPBroadcastControl::~UDPBroadcastControl()
+UDPLamp::~UDPLamp()
 {
     cancelAndDelete(mTimerNext);
 }
 
-void UDPBroadcastControl::initialize(int stage)
+void UDPLamp::initialize(int stage)
 {
     AppBase::initialize(stage);
 
@@ -68,7 +68,8 @@ void UDPBroadcastControl::initialize(int stage)
         E2E = new DataVector(a.str(),"latency");
         Hop = new DataVector(a.str(),"Hops");
 
-
+        stMethod = par("Method").stdstringValue();
+        fPThreshold = par("PThreshold");
 
         stDelayLimit = par("delayLimit");
         stStartTime = par("startTime");
@@ -96,7 +97,7 @@ void UDPBroadcastControl::initialize(int stage)
         nLocalPort = par("localPort");
         nDestPort = par("destPort");
 
-        mTimerNext = new cMessage("UDPBroadcastControl");
+        mTimerNext = new cMessage("UDPLamp");
 
         sstSentPkSignal = registerSignal("sentPk");
         sstRcvdPkSignal = registerSignal("rcvdPk");
@@ -114,10 +115,10 @@ void UDPBroadcastControl::initialize(int stage)
 
 }
 
-cPacket *UDPBroadcastControl::createPacket()
+cPacket *UDPLamp::createPacket()
 {
     char msgName[32];
-    sprintf(msgName, "UDPBroadcastControlData-%d", nCounter++);
+    sprintf(msgName, "UDPLampData-%d", nCounter++);
     long msgByteLength = pMessageLengthPar->longValue();
     cPacket *payload = new cPacket(msgName);
     payload->setByteLength(msgByteLength);
@@ -127,10 +128,10 @@ cPacket *UDPBroadcastControl::createPacket()
     return payload;
 }
 
-cPacket *UDPBroadcastControl::createBroadcastPacket()
+cPacket *UDPLamp::createBroadcastPacket()
 {
     char msgName[32];
-    sprintf(msgName, "UDPBroadcastControl-%d", nCounter++);
+    sprintf(msgName, "UDPLamp-%d", nCounter++);
     long msgByteLength = pMessageLengthPar->longValue();
     cPacket *payload = new cPacket(msgName);
     payload->setByteLength(msgByteLength);
@@ -141,10 +142,10 @@ cPacket *UDPBroadcastControl::createBroadcastPacket()
     return payload;
 }
 
-cPacket *UDPBroadcastControl::createRePacket(cPacket *pk)
+cPacket *UDPLamp::createRePacket(cPacket *pk)
 {
     char msgName[32];
-    sprintf(msgName, "UDPBroadcastControl-%d", nCounter++);
+    sprintf(msgName, "UDPLamp-%d", nCounter++);
     cPacket *payload = new cPacket(msgName);
     payload->setByteLength(pk->getByteLength());
     payload->addPar("sourceId") = getId();
@@ -156,7 +157,7 @@ cPacket *UDPBroadcastControl::createRePacket(cPacket *pk)
     return payload;
 }
 
-void UDPBroadcastControl::processStart()
+void UDPLamp::processStart()
 {
     socket.setOutputGate(gate("udpOut"));
     socket.bind(nLocalPort);
@@ -245,13 +246,13 @@ void UDPBroadcastControl::processStart()
 
 }
 
-IPvXAddress UDPBroadcastControl::chooseDestAddr()
+IPvXAddress UDPLamp::chooseDestAddr()
 {
     int k = intrand(ipDestAddresses.size());
     return ipDestAddresses[k];
 }
 
-void UDPBroadcastControl::processSend()
+void UDPLamp::processSend()
 {
     if (stStopTime < SIMTIME_ZERO || simTime() < stStopTime)
     {
@@ -269,12 +270,12 @@ void UDPBroadcastControl::processSend()
     }
 }
 
-void UDPBroadcastControl::processStop()
+void UDPLamp::processStop()
 {
     socket.close();
 }
 
-void UDPBroadcastControl::handleMessageWhenUp(cMessage *msg)
+void UDPLamp::handleMessageWhenUp(cMessage *msg)
 {
     if (msg->isSelfMessage())
     {
@@ -323,7 +324,7 @@ void UDPBroadcastControl::handleMessageWhenUp(cMessage *msg)
     }
 }
 
-void UDPBroadcastControl::processPacket(cPacket *pk)
+void UDPLamp::processPacket(cPacket *pk)
 {
     if (pk->getKind() == UDP_I_ERROR)
     {
@@ -370,27 +371,57 @@ void UDPBroadcastControl::processPacket(cPacket *pk)
     {
 
         nNumReceived++;
-        EV << "Broadcast Packet received and resend packet\n";
-        EV << "Received packet: " << UDPSocket::getReceivedPacketInfo(pk) << endl;
-        emit(sstRcvdPkSignal, pk);
-        ipDestAddr = IPvXAddress("255.255.255.255");
-
-        UDPDataIndication *ctrl = check_and_cast<UDPDataIndication *>(pk->removeControlInfo());
-        if (ctrl->getDestAddr().get4() == IPv4Address::ALLONES_ADDRESS && par("resendBroadcast").boolValue())
+        if(stMethod == "NONE")
         {
+            EV << "Broadcast Packet received and resend packet\n";
+            EV << "Received packet: " << UDPSocket::getReceivedPacketInfo(pk) << endl;
+            emit(sstRcvdPkSignal, pk);
+            ipDestAddr = IPvXAddress("255.255.255.255");
 
-            BurstMSG *tmpBurstMsg = check_and_cast<BurstMSG *>(pk);
-            Hop->record(tmpBurstMsg->getHopCount());
-            tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
-            endtoendDelay = simTime() - pk->getTimestamp();
-            E2E->record(endtoendDelay.dbl());
-            timeForCount = timeForCount + 1;
-            nNumResend++;
-            emit(sstReBroadcastPkSignal, tmpBurstMsg);
-            scheduleAt(simTime() + par("reBroadcastDelay").doubleValue(), tmpBurstMsg);
+            UDPDataIndication *ctrl = check_and_cast<UDPDataIndication *>(pk->removeControlInfo());
+            if (ctrl->getDestAddr().get4() == IPv4Address::ALLONES_ADDRESS && par("resendBroadcast").boolValue())
+            {
 
+                BurstMSG *tmpBurstMsg = check_and_cast<BurstMSG *>(pk);
+                Hop->record(tmpBurstMsg->getHopCount());
+                tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
+                endtoendDelay = simTime() - pk->getTimestamp();
+                E2E->record(endtoendDelay.dbl());
+                timeForCount = timeForCount + 1;
+                nNumResend++;
+                emit(sstReBroadcastPkSignal, tmpBurstMsg);
+                scheduleAt(simTime() + par("reBroadcastDelay").doubleValue(), tmpBurstMsg);
+
+            }
+            delete ctrl;
         }
-        delete ctrl;
+        else if( stMethod == "PROBABILISTIC")
+        {
+            if(((double) rand() / (RAND_MAX)) > fPThreshold)
+            {
+                EV << "Broadcast Packet received and resend packet\n";
+                            EV << "Received packet: " << UDPSocket::getReceivedPacketInfo(pk) << endl;
+                            emit(sstRcvdPkSignal, pk);
+                            ipDestAddr = IPvXAddress("255.255.255.255");
+
+                            UDPDataIndication *ctrl = check_and_cast<UDPDataIndication *>(pk->removeControlInfo());
+                            if (ctrl->getDestAddr().get4() == IPv4Address::ALLONES_ADDRESS && par("resendBroadcast").boolValue())
+                            {
+
+                                BurstMSG *tmpBurstMsg = check_and_cast<BurstMSG *>(pk);
+                                Hop->record(tmpBurstMsg->getHopCount());
+                                tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
+                                endtoendDelay = simTime() - pk->getTimestamp();
+                                E2E->record(endtoendDelay.dbl());
+                                timeForCount = timeForCount + 1;
+                                nNumResend++;
+                                emit(sstReBroadcastPkSignal, tmpBurstMsg);
+                                scheduleAt(simTime() + par("reBroadcastDelay").doubleValue(), tmpBurstMsg);
+
+                            }
+                            delete ctrl;
+            }
+        }
 
     }
     else
@@ -402,7 +433,7 @@ void UDPBroadcastControl::processPacket(cPacket *pk)
     }
 }
 
-void UDPBroadcastControl::generateBurst()
+void UDPLamp::generateBurst()
 {
     simtime_t now = simTime();
 
@@ -457,7 +488,7 @@ void UDPBroadcastControl::generateBurst()
     scheduleAt(stNextPkt, mTimerNext);
 }
 
-void UDPBroadcastControl::sendPacket()
+void UDPLamp::sendPacket()
 {
     cPacket *payload = createPacket();
 
@@ -466,7 +497,7 @@ void UDPBroadcastControl::sendPacket()
     nNumSent++;
 }
 
-void UDPBroadcastControl::finish()
+void UDPLamp::finish()
 {
 //    ReceivedMessages->record(nNumReceived);
 //    ResendMessages->record(nNumResend);
@@ -500,7 +531,7 @@ void UDPBroadcastControl::finish()
     AppBase::finish();
 }
 
-bool UDPBroadcastControl::startApp(IDoneCallback *doneCallback)
+bool UDPLamp::startApp(IDoneCallback *doneCallback)
 {
     simtime_t start = std::max(stStartTime, simTime());
 
@@ -513,7 +544,7 @@ bool UDPBroadcastControl::startApp(IDoneCallback *doneCallback)
     return true;
 }
 
-bool UDPBroadcastControl::stopApp(IDoneCallback *doneCallback)
+bool UDPLamp::stopApp(IDoneCallback *doneCallback)
 {
     if (mTimerNext)
         cancelEvent(mTimerNext);
@@ -522,7 +553,7 @@ bool UDPBroadcastControl::stopApp(IDoneCallback *doneCallback)
     return true;
 }
 
-bool UDPBroadcastControl::crashApp(IDoneCallback *doneCallback)
+bool UDPLamp::crashApp(IDoneCallback *doneCallback)
 {
     if (mTimerNext)
         cancelEvent(mTimerNext);
@@ -530,7 +561,7 @@ bool UDPBroadcastControl::crashApp(IDoneCallback *doneCallback)
     return true;
 }
 
-bool UDPBroadcastControl::sendBroadcast(const IPvXAddress &dest, cPacket *pkt)
+bool UDPLamp::sendBroadcast(const IPvXAddress &dest, cPacket *pkt)
 {
     if (!nOutputInterfaceMulticastBroadcast.empty()
             && (dest.isMulticast() || (!dest.isIPv6() && dest.get4() == IPv4Address::ALLONES_ADDRESS)))

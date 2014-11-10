@@ -35,7 +35,7 @@
 /**
  * UDP application. See NED for more info.
  */
-class INET_API UDPBroadcastBurst : public AppBase
+class INET_API UDPLightSwitch : public AppBase
 {
   public:
     enum ChooseDestAddrMode
@@ -116,8 +116,8 @@ class INET_API UDPBroadcastBurst : public AppBase
     virtual bool crashApp(IDoneCallback *doneCallback);
 
   public:
-    UDPBroadcastBurst();
-    ~UDPBroadcastBurst();
+    UDPLightSwitch();
+    ~UDPLightSwitch();
 };
 
 #endif

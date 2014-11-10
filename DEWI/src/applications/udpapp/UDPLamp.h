@@ -1,5 +1,5 @@
 /*
- * UDPBroadcastControl.h
+ * UDPLamp.h
  *
  *  Created on: 16 Apr 2014
  *      Author: R00118979
@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 #include "INETDefs.h"
 
@@ -24,7 +25,7 @@
 //UDP Application: UDPBroadcstControl; see NED for more info
 
 
-class INET_API UDPBroadcastControl : public AppBase
+class INET_API UDPLamp : public AppBase
 {
 
     protected:
@@ -57,6 +58,13 @@ class INET_API UDPBroadcastControl : public AppBase
         simtime_t stNextBurst;
         simtime_t stNextSleep;
         simtime_t endtoendDelay;
+
+        //For Broadcast Storm
+
+        std::string stMethod;
+        double fPThreshold; //Threshold variable for Probabilistic method
+
+        /////////////////////
 
         bool bActiveBurst;
         bool bIsSource;
@@ -115,8 +123,8 @@ class INET_API UDPBroadcastControl : public AppBase
         virtual bool crashApp(IDoneCallback *doneCallback);
 
     public:
-        UDPBroadcastControl();
-        ~UDPBroadcastControl();
+        UDPLamp();
+        ~UDPLamp();
 };
 
 

@@ -101,7 +101,7 @@ import dewi.applications.IUDPApp;
 //  - rcvdPk: statistics of not dropped, not out-of-order packets.
 //  - endToEndDelay: end to end delay statistics of not dropped, not out-of-order packets.
 //
-simple UDPBroadcastBurst like IUDPApp
+simple UDPLightSwitch like IUDPApp
 {
     parameters:
         string destAddresses; // space-separated list of destination IP addresses, can be empty;

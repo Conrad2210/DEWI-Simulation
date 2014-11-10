@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
-#include "UDPBroadcastBurst.h"
+#include "UDPLightSwitch.h"
 #include "BurstMSG_m.h"
 #include "UDPControlInfo_m.h"
 #include "IPvXAddressResolver.h"
@@ -35,19 +35,19 @@
 #endif
 
 EXECUTE_ON_STARTUP(
-        cEnum *e = cEnum::find("ChooseDestAddrMode"); if (!e) enums.getInstance()->add(e = new cEnum("ChooseDestAddrMode")); e->insert(UDPBroadcastBurst::ONCE, "once"); e->insert(UDPBroadcastBurst::PER_BURST, "perBurst"); e->insert(UDPBroadcastBurst::PER_SEND, "perSend"););
+        cEnum *e = cEnum::find("ChooseDestAddrMode"); if (!e) enums.getInstance()->add(e = new cEnum("ChooseDestAddrMode")); e->insert(UDPLightSwitch::ONCE, "once"); e->insert(UDPLightSwitch::PER_BURST, "perBurst"); e->insert(UDPLightSwitch::PER_SEND, "perSend"););
 
-Define_Module(UDPBroadcastBurst);
+Define_Module(UDPLightSwitch);
 
-int UDPBroadcastBurst::counter;
-int UDPBroadcastBurst::burstCounter;
+int UDPLightSwitch::counter;
+int UDPLightSwitch::burstCounter;
 
-simsignal_t UDPBroadcastBurst::sentPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastBurst::rcvdPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastBurst::outOfOrderPkSignal = SIMSIGNAL_NULL;
-simsignal_t UDPBroadcastBurst::dropPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLightSwitch::sentPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLightSwitch::rcvdPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLightSwitch::outOfOrderPkSignal = SIMSIGNAL_NULL;
+simsignal_t UDPLightSwitch::dropPkSignal = SIMSIGNAL_NULL;
 
-UDPBroadcastBurst::UDPBroadcastBurst()
+UDPLightSwitch::UDPLightSwitch()
 {
     messageLengthPar = NULL;
     burstDurationPar = NULL;
@@ -58,12 +58,12 @@ UDPBroadcastBurst::UDPBroadcastBurst()
     outputInterfaceMulticastBroadcast.clear();
 }
 
-UDPBroadcastBurst::~UDPBroadcastBurst()
+UDPLightSwitch::~UDPLightSwitch()
 {
     cancelAndDelete(timerNext);
 }
 
-void UDPBroadcastBurst::initialize(int stage)
+void UDPLightSwitch::initialize(int stage)
 {
     AppBase::initialize(stage);
 
@@ -114,7 +114,7 @@ void UDPBroadcastBurst::initialize(int stage)
         localPort = par("localPort");
         destPort = par("destPort");
 
-        timerNext = new cMessage("UDPBroadcastBurstTimer");
+        timerNext = new cMessage("UDPLightSwitchTimer");
 
         sentPkSignal = registerSignal("sentPk");
         rcvdPkSignal = registerSignal("rcvdPk");
@@ -127,7 +127,7 @@ void UDPBroadcastBurst::initialize(int stage)
     }
 }
 
-IPvXAddress UDPBroadcastBurst::chooseDestAddr()
+IPvXAddress UDPLightSwitch::chooseDestAddr()
 {
     if (destAddresses.size() == 1)
         return destAddresses[0];
@@ -136,10 +136,10 @@ IPvXAddress UDPBroadcastBurst::chooseDestAddr()
     return destAddresses[k];
 }
 
-cPacket *UDPBroadcastBurst::createPacket()
+cPacket *UDPLightSwitch::createPacket()
 {
     char msgName[32];
-    sprintf(msgName, "UDPBroadcastBurst-%d-%d", burstCounter, counter++);
+    sprintf(msgName, "UDPLightSwitch-%d-%d", burstCounter, counter++);
     long msgByteLength = messageLengthPar->longValue();
     BurstMSG *payload = new BurstMSG(msgName);
     payload->setByteLength(msgByteLength);
@@ -151,7 +151,7 @@ cPacket *UDPBroadcastBurst::createPacket()
     return payload;
 }
 
-void UDPBroadcastBurst::processStart()
+void UDPLightSwitch::processStart()
 {
     socket.setOutputGate(gate("udpOut"));
     socket.bind(localPort);
@@ -247,7 +247,7 @@ void UDPBroadcastBurst::processStart()
     processSend();
 }
 
-void UDPBroadcastBurst::processSend()
+void UDPLightSwitch::processSend()
 {
     if (stopTime < SIMTIME_ZERO || simTime() < stopTime)
     {
@@ -257,12 +257,12 @@ void UDPBroadcastBurst::processSend()
     }
 }
 
-void UDPBroadcastBurst::processStop()
+void UDPLightSwitch::processStop()
 {
     socket.close();
 }
 
-void UDPBroadcastBurst::handleMessageWhenUp(cMessage *msg)
+void UDPLightSwitch::handleMessageWhenUp(cMessage *msg)
 {
     if (msg->isSelfMessage())
     {
@@ -304,7 +304,7 @@ void UDPBroadcastBurst::handleMessageWhenUp(cMessage *msg)
     }
 }
 
-void UDPBroadcastBurst::processPacket(cPacket *pk)
+void UDPLightSwitch::processPacket(cPacket *pk)
 {
     if (pk->getKind() == UDP_I_ERROR)
     {
@@ -355,7 +355,7 @@ void UDPBroadcastBurst::processPacket(cPacket *pk)
     delete pk;
 }
 
-void UDPBroadcastBurst::generateBurst()
+void UDPLightSwitch::generateBurst()
 {
     simtime_t now = simTime();
 
@@ -417,7 +417,7 @@ void UDPBroadcastBurst::generateBurst()
     scheduleAt(nextPkt, timerNext);
 }
 
-void UDPBroadcastBurst::finish()
+void UDPLightSwitch::finish()
 {
 
     std::stringstream data,type,index,name;
@@ -437,7 +437,7 @@ void UDPBroadcastBurst::finish()
 
 }
 
-bool UDPBroadcastBurst::startApp(IDoneCallback *doneCallback)
+bool UDPLightSwitch::startApp(IDoneCallback *doneCallback)
 {
     simtime_t start = std::max(startTime, simTime());
 
@@ -450,7 +450,7 @@ bool UDPBroadcastBurst::startApp(IDoneCallback *doneCallback)
     return true;
 }
 
-bool UDPBroadcastBurst::stopApp(IDoneCallback *doneCallback)
+bool UDPLightSwitch::stopApp(IDoneCallback *doneCallback)
 {
     if (timerNext)
         cancelEvent(timerNext);
@@ -459,7 +459,7 @@ bool UDPBroadcastBurst::stopApp(IDoneCallback *doneCallback)
     return true;
 }
 
-bool UDPBroadcastBurst::crashApp(IDoneCallback *doneCallback)
+bool UDPLightSwitch::crashApp(IDoneCallback *doneCallback)
 {
     if (timerNext)
         cancelEvent(timerNext);
@@ -467,7 +467,7 @@ bool UDPBroadcastBurst::crashApp(IDoneCallback *doneCallback)
     return true;
 }
 
-bool UDPBroadcastBurst::sendBroadcast(const IPvXAddress &dest, cPacket *pkt)
+bool UDPLightSwitch::sendBroadcast(const IPvXAddress &dest, cPacket *pkt)
 {
     if (!outputInterfaceMulticastBroadcast.empty()
             && (dest.isMulticast() || (!dest.isIPv6() && dest.get4() == IPv4Address::ALLONES_ADDRESS)))

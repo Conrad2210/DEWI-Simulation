@@ -33,7 +33,7 @@
 package dewi.applications.udpapp;
 import dewi.applications.IUDPApp;
 
-simple UDPBroadcastControl like IUDPApp
+simple UDPLamp like IUDPApp
 {
     parameters:
         int localPort = default(-1); //local UDP port number (if set to -1: use ephemeral port)
@@ -55,6 +55,12 @@ simple UDPBroadcastControl like IUDPApp
         
         bool setBroadcast = default(true); //configure the socket for receive broadcast packets
         bool resendBroadcast = default(true);
+        
+        
+        
+        // Variables for mitigate Broadcast storms
+        string Method @enum("NONE","PROBABILISTIC") = default("NONE"); 
+        double PThreshold = default(0.1);
         
         @signal[sentPk](type=cPacket);
         @signal[rcvdPk](type=cPacket);
