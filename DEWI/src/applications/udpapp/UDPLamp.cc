@@ -421,6 +421,10 @@ void UDPLamp::processPacket(cPacket *pk)
                             }
                             delete ctrl;
             }
+            else
+            {
+                delete pk;
+            }
         }
 
     }
