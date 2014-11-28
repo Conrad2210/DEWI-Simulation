@@ -16,11 +16,11 @@
 // 
 // 
 
-package dewi.simulations.UseCase1_Lighting.Dimming.TSCH;
+package dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.simulations.UseCase1_Lighting.Dimming.TSCH.Node;
+import dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD.Node;
 
 
 network RealTimeNetwork
