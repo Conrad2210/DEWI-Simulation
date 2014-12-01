@@ -20,6 +20,7 @@ simple DataCenter
 {
     parameters:
         bool recordValues;
+        bool visualization = default(false);
         
         @display("i=device/server2");
 }

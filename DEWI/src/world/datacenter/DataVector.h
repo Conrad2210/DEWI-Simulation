@@ -37,6 +37,9 @@ public:
     //record double value
     void record(double value);
 
+    //record value with name
+    void record(double value, std::string name);
+
     //record int value
     void record(int value);
 

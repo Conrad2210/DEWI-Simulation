@@ -419,20 +419,23 @@ void UDPLightSwitch::generateBurst()
 
 void UDPLightSwitch::finish()
 {
+    if(!par("visualization").boolValue())
+    {
+        std::stringstream data,type,index,name;
+        data << burstCounter;
+        type << "burst";
+        index << getParentModule()->getIndex();
+        name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
-    std::stringstream data,type,index,name;
-    data << burstCounter;
-    type << "burst";
-    index << getParentModule()->getIndex();
-    name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
-    center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
-    //Record ReSend messages
-    data.str("");
-    data << numSent;
-    type.str("");
-    type << "msgsent";
-    center->recordScalar(data.str(),type.str(),index.str(),name.str());
+        //Record ReSend messages
+        data.str("");
+        data << numSent;
+        type.str("");
+        type << "msgsent";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+    }
 
 
 }

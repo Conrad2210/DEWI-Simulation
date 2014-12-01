@@ -47,13 +47,14 @@ void DataCenter::initialize(int stage)
 
 void DataCenter::finish()
 {
-    if(recordValues)
-    {
-        for(int i = 0; i < (int)ResultVectors.size(); i++)
+
+        if(recordValues)
         {
-            ResultVectors.at(i)->saveData(ResultPath);
+            for(int i = 0; i < (int)ResultVectors.size(); i++)
+            {
+                ResultVectors.at(i)->saveData(ResultPath);
+            }
         }
-    }
 
 }
 

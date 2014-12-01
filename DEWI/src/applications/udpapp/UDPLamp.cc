@@ -386,7 +386,15 @@ void UDPLamp::processPacket(cPacket *pk)
                 Hop->record(tmpBurstMsg->getHopCount());
                 tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
                 endtoendDelay = simTime() - pk->getTimestamp();
-                E2E->record(endtoendDelay.dbl());
+
+                if (!par("visualization").boolValue())
+                {
+                    E2E->record(endtoendDelay.dbl());
+                }
+                else
+                {
+                    E2E->record(endtoendDelay.dbl(),tmpBurstMsg->getName());
+                }
                 timeForCount = timeForCount + 1;
                 nNumResend++;
                 emit(sstReBroadcastPkSignal, tmpBurstMsg);
@@ -412,7 +420,14 @@ void UDPLamp::processPacket(cPacket *pk)
                                 Hop->record(tmpBurstMsg->getHopCount());
                                 tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
                                 endtoendDelay = simTime() - pk->getTimestamp();
-                                E2E->record(endtoendDelay.dbl());
+                                if (!par("visualization").boolValue())
+                                {
+                                    E2E->record(endtoendDelay.dbl());
+                                }
+                                else
+                                {
+                                    E2E->record(endtoendDelay.dbl(),tmpBurstMsg->getName());
+                                }
                                 timeForCount = timeForCount + 1;
                                 nNumResend++;
                                 emit(sstReBroadcastPkSignal, tmpBurstMsg);
@@ -503,35 +518,33 @@ void UDPLamp::sendPacket()
 
 void UDPLamp::finish()
 {
-//    ReceivedMessages->record(nNumReceived);
-//    ResendMessages->record(nNumResend);
-//    DoubleReceivedMessages->record(nNumDuplicated);
-    std::stringstream data,type,index,name;
-    data << nNumReceived;
-    type << "received";
-    index << getParentModule()->getIndex();
-    name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
-    center->recordScalar(data.str(),type.str(),index.str(),name.str());
+if (!par("visualization").boolValue()) {
+    //    ReceivedMessages->record(nNumReceived);
+    //    ResendMessages->record(nNumResend);
+    //    DoubleReceivedMessages->record(nNumDuplicated);
+        std::stringstream data,type,index,name;
+        data << nNumReceived;
+        type << "received";
+        index << getParentModule()->getIndex();
+        name << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber();
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
-    //Record ReSend messages
-    data.str("");
-    data << nNumResend;
-    type.str("");
-    type << "resend";
-    center->recordScalar(data.str(),type.str(),index.str(),name.str());
+        //Record ReSend messages
+        data.str("");
+        data << nNumResend;
+        type.str("");
+        type << "resend";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
 
-    //Record Double Received Messages
-    data.str("");
-    data << nNumDuplicated;
-    type.str("");
-    type << "doublereceived";
-    center->recordScalar(data.str(),type.str(),index.str(),name.str());
+        //Record Double Received Messages
+        data.str("");
+        data << nNumDuplicated;
+        type.str("");
+        type << "doublereceived";
+        center->recordScalar(data.str(),type.str(),index.str(),name.str());
+}
 
-//    recordScalar("Total sent", nNumSent);
-//    recordScalar("Total received", nNumReceived);
-//    recordScalar("Total deleted", nNumDeleted);
-//    recordScalar("Total double received", nNumDoubleReceived);
-//    recordScalar("Total Resend Messages", nNumResend);
+
     AppBase::finish();
 }
 

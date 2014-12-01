@@ -52,6 +52,18 @@ void DataVector::record(double value)
     Data.push_back(a.str());
 }
 
+void DataVector::record(double value, std::string name)
+{
+    //declare result variable
+    std::stringstream a;
+
+    //convert double to string
+    a << value << "," << name;
+
+    //add data entry
+    Data.push_back(a.str());
+}
+
 void DataVector::record(int value)
 {
     //declare result variable
