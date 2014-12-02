@@ -145,6 +145,7 @@ cPacket *UDPLightSwitch::createPacket()
     payload->setByteLength(msgByteLength);
     payload->addPar("sourceId") = getId();
     payload->addPar("msgId") = numSent;
+    payload->addPar("msgIdInBurst") = counter;
     payload->addPar("BroadcastPk") = true;
     payload->setHopCount(0);
 

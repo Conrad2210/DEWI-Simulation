@@ -40,6 +40,9 @@ public:
     //record value with name
     void record(double value, std::string name);
 
+    //record value with Id
+    void record(double value, int id);
+
     //record int value
     void record(int value);
 
