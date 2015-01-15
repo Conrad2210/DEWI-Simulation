@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/linklayer/mac/ieee80211/Ieee80211Frame.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/ieee80211/Ieee80211Frame.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("Ieee80211FrameType");
@@ -57,13 +78,6 @@ EXECUTE_ON_STARTUP(
     e->insert(ST_DATA, "ST_DATA");
     e->insert(ST_LBMS_REQUEST, "ST_LBMS_REQUEST");
     e->insert(ST_LBMS_REPORT, "ST_LBMS_REPORT");
-);
-
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("MeshType");
-    if (!e) enums.getInstance()->add(e = new cEnum("MeshType"));
-    e->insert(UPPERMESSAGE, "UPPERMESSAGE");
-    e->insert(ROUTING, "ROUTING");
 );
 
 Register_Class(Ieee80211Frame);
@@ -445,18 +459,10 @@ const char *Ieee80211FrameDescriptor::getFieldStructName(void *object, int field
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
+    switch (field) {
+        case 7: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<9) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211FrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1104,10 +1110,10 @@ const char *Ieee80211TwoAddressFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211TwoAddressFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1797,12 +1803,10 @@ const char *Ieee80211DataOrMgmtFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DataOrMgmtFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2037,10 +2041,10 @@ const char *Ieee80211DataFrameDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DataFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2279,10 +2283,9 @@ const char *Ieee80211DataFrameWithSNAPDescriptor::getFieldStructName(void *objec
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DataFrameWithSNAPDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2515,10 +2518,9 @@ const char *Ieee80211ManagementFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ManagementFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2534,6 +2536,13 @@ void *Ieee80211ManagementFrameDescriptor::getFieldStructPointer(void *object, in
         default: return NULL;
     }
 }
+
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("MeshType");
+    if (!e) enums.getInstance()->add(e = new cEnum("MeshType"));
+    e->insert(UPPERMESSAGE, "UPPERMESSAGE");
+    e->insert(ROUTING, "ROUTING");
+);
 
 Register_Class(Ieee80211MeshFrame);
 
@@ -2949,18 +2958,10 @@ const char *Ieee80211MeshFrameDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        case 3: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<9) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211MeshFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3296,15 +3297,9 @@ const char *Ieee80211BlockAckFrameReqDescriptor::getFieldStructName(void *object
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<6) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211BlockAckFrameReqDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3619,14 +3614,9 @@ const char *Ieee80211BlockAckFrameDescriptor::getFieldStructName(void *object, i
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<5) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211BlockAckFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const

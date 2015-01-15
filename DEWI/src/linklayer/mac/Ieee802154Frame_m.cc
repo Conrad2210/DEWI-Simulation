@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/linklayer/mac/Ieee802154Frame.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/Ieee802154Frame.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 Register_Class(Ieee802154Frame);
 
@@ -382,17 +403,12 @@ const char *Ieee802154FrameDescriptor::getFieldStructName(void *object, int fiel
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "FrameCtrl",
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
-        "MACAddress",
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(FrameCtrl));
+        case 3: return opp_typename(typeid(MACAddress));
+        case 5: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<8) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154FrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -626,10 +642,10 @@ const char *Ieee802154BeaconFrameDescriptor::getFieldStructName(void *object, in
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "SuperframeSpec",
+    switch (field) {
+        case 0: return opp_typename(typeid(SuperframeSpec));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154BeaconFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1278,10 +1294,9 @@ const char *Ieee802154CmdFrameDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154CmdFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1512,10 +1527,10 @@ const char *Ieee802154AssoReqtCmdDescriptor::getFieldStructName(void *object, in
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "DevCapability",
+    switch (field) {
+        case 0: return opp_typename(typeid(DevCapability));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154AssoReqtCmdDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1769,11 +1784,9 @@ const char *Ieee802154AssoRespCmdDescriptor::getFieldStructName(void *object, in
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154AssoRespCmdDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2006,10 +2019,9 @@ const char *Ieee802154DisassoNotiCmdDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154DisassoNotiCmdDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3126,13 +3138,9 @@ const char *Ieee802154CoorRealignCmdDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154CoorRealignCmdDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3405,12 +3413,9 @@ const char *Ieee802154GtsReqtCmdDescriptor::getFieldStructName(void *object, int
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154GtsReqtCmdDescriptor::getFieldStructPointer(void *object, int field, int i) const

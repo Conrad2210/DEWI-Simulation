@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/networklayer/contract/IPv4ControlInfo.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/networklayer/contract/IPv4ControlInfo.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 IPv4ControlInfo_Base::IPv4ControlInfo_Base() : ::cObject()
 {
@@ -474,23 +495,14 @@ const char *IPv4ControlInfoDescriptor::getFieldStructName(void *object, int fiel
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPv4Address",
-        "IPv4Address",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "IPv4Address",
-        NULL,
-        "MACAddress",
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(IPv4Address));
+        case 1: return opp_typename(typeid(IPv4Address));
+        case 10: return opp_typename(typeid(IPv4Address));
+        case 12: return opp_typename(typeid(MACAddress));
+        case 13: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<14) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv4ControlInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -744,11 +756,10 @@ const char *IPv4RoutingDecisionDescriptor::getFieldStructName(void *object, int 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "IPv4Address",
+    switch (field) {
+        case 1: return opp_typename(typeid(IPv4Address));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv4RoutingDecisionDescriptor::getFieldStructPointer(void *object, int field, int i) const

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/transport/contract/TCPCommand.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/transport/contract/TCPCommand.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("TcpCommandCode");
@@ -60,15 +81,6 @@ EXECUTE_ON_STARTUP(
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("TCPErrorCode");
     if (!e) enums.getInstance()->add(e = new cEnum("TCPErrorCode"));
-);
-
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("TCPDataTransferMode");
-    if (!e) enums.getInstance()->add(e = new cEnum("TCPDataTransferMode"));
-    e->insert(TCP_TRANSFER_UNDEFINED, "TCP_TRANSFER_UNDEFINED");
-    e->insert(TCP_TRANSFER_BYTECOUNT, "TCP_TRANSFER_BYTECOUNT");
-    e->insert(TCP_TRANSFER_OBJECT, "TCP_TRANSFER_OBJECT");
-    e->insert(TCP_TRANSFER_BYTESTREAM, "TCP_TRANSFER_BYTESTREAM");
 );
 
 Register_Class(TCPCommand);
@@ -305,11 +317,9 @@ const char *TCPCommandDescriptor::getFieldStructName(void *object, int field) co
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -565,11 +575,9 @@ const char *TCPErrorInfoDescriptor::getFieldStructName(void *object, int field) 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPErrorInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -585,6 +593,15 @@ void *TCPErrorInfoDescriptor::getFieldStructPointer(void *object, int field, int
         default: return NULL;
     }
 }
+
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("TCPDataTransferMode");
+    if (!e) enums.getInstance()->add(e = new cEnum("TCPDataTransferMode"));
+    e->insert(TCP_TRANSFER_UNDEFINED, "TCP_TRANSFER_UNDEFINED");
+    e->insert(TCP_TRANSFER_BYTECOUNT, "TCP_TRANSFER_BYTECOUNT");
+    e->insert(TCP_TRANSFER_OBJECT, "TCP_TRANSFER_OBJECT");
+    e->insert(TCP_TRANSFER_BYTESTREAM, "TCP_TRANSFER_BYTESTREAM");
+);
 
 Register_Class(TCPOpenCommand);
 
@@ -921,16 +938,11 @@ const char *TCPOpenCommandDescriptor::getFieldStructName(void *object, int field
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        "IPvXAddress",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        case 1: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<7) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPOpenCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1427,13 +1439,11 @@ const char *TCPConnectInfoDescriptor::getFieldStructName(void *object, int field
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        "IPvXAddress",
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        case 1: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPConnectInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2044,29 +2054,11 @@ const char *TCPStatusInfoDescriptor::getFieldStructName(void *object, int field)
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "IPvXAddress",
-        "IPvXAddress",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        case 2: return opp_typename(typeid(IPvXAddress));
+        case 3: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<20) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPStatusInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const

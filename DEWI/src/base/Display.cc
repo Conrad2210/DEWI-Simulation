@@ -1,5 +1,6 @@
 
 #include "Display.h"
+#include "math.h"
 
 Define_Module( Display );
 
@@ -64,8 +65,7 @@ double Display::calcInterfDist()
     //minimum power level to be able to physically receive a signal in mW
     double min_receive_power = pow(10.0, sat / 10.0);
 
-    interference_distance    = pow(wave_length_m * wave_length_m * max_trans_power /
-                                   (16.0 * M_PI * M_PI * min_receive_power), 1.0 / alpha);
+    interference_distance    = pow(wave_length_m * wave_length_m * max_trans_power /(16.0 * PI * PI * min_receive_power), 1.0 / alpha);
 
     return interference_distance;
 }

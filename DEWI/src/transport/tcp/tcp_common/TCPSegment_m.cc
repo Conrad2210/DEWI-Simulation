@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/transport/tcp/tcp_common/TCPSegment.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/transport/tcp/tcp_common/TCPSegment.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -32,17 +29,29 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("TCPOptionNumbers");
-    if (!e) enums.getInstance()->add(e = new cEnum("TCPOptionNumbers"));
-    e->insert(TCPOPTION_END_OF_OPTION_LIST, "TCPOPTION_END_OF_OPTION_LIST");
-    e->insert(TCPOPTION_NO_OPERATION, "TCPOPTION_NO_OPERATION");
-    e->insert(TCPOPTION_MAXIMUM_SEGMENT_SIZE, "TCPOPTION_MAXIMUM_SEGMENT_SIZE");
-    e->insert(TCPOPTION_WINDOW_SCALE, "TCPOPTION_WINDOW_SCALE");
-    e->insert(TCPOPTION_SACK_PERMITTED, "TCPOPTION_SACK_PERMITTED");
-    e->insert(TCPOPTION_SACK, "TCPOPTION_SACK");
-    e->insert(TCPOPTION_TIMESTAMP, "TCPOPTION_TIMESTAMP");
-);
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 TCPPayloadMessage::TCPPayloadMessage()
 {
@@ -231,11 +240,10 @@ const char *TCPPayloadMessageDescriptor::getFieldStructName(void *object, int fi
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "cPacketPtr",
+    switch (field) {
+        case 1: return opp_typename(typeid(cPacketPtr));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPPayloadMessageDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -252,6 +260,18 @@ void *TCPPayloadMessageDescriptor::getFieldStructPointer(void *object, int field
         default: return NULL;
     }
 }
+
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("TCPOptionNumbers");
+    if (!e) enums.getInstance()->add(e = new cEnum("TCPOptionNumbers"));
+    e->insert(TCPOPTION_END_OF_OPTION_LIST, "TCPOPTION_END_OF_OPTION_LIST");
+    e->insert(TCPOPTION_NO_OPERATION, "TCPOPTION_NO_OPERATION");
+    e->insert(TCPOPTION_MAXIMUM_SEGMENT_SIZE, "TCPOPTION_MAXIMUM_SEGMENT_SIZE");
+    e->insert(TCPOPTION_WINDOW_SCALE, "TCPOPTION_WINDOW_SCALE");
+    e->insert(TCPOPTION_SACK_PERMITTED, "TCPOPTION_SACK_PERMITTED");
+    e->insert(TCPOPTION_SACK, "TCPOPTION_SACK");
+    e->insert(TCPOPTION_TIMESTAMP, "TCPOPTION_TIMESTAMP");
+);
 
 Sack_Base::Sack_Base() : ::cObject()
 {
@@ -486,11 +506,9 @@ const char *SackDescriptor::getFieldStructName(void *object, int field) const
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *SackDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -801,12 +819,9 @@ const char *TCPOptionDescriptor::getFieldStructName(void *object, int field) con
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPOptionDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1378,26 +1393,12 @@ const char *TCPSegmentDescriptor::getFieldStructName(void *object, int field) co
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "TCPOption",
-        NULL,
-        "TCPPayloadMessage",
-        "ByteArray",
+    switch (field) {
+        case 13: return opp_typename(typeid(TCPOption));
+        case 15: return opp_typename(typeid(TCPPayloadMessage));
+        case 16: return opp_typename(typeid(ByteArray));
+        default: return NULL;
     };
-    return (field>=0 && field<17) ? fieldStructNames[field] : NULL;
 }
 
 void *TCPSegmentDescriptor::getFieldStructPointer(void *object, int field, int i) const

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/networklayer/icmpv6/IPv6NDMessage.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/networklayer/icmpv6/IPv6NDMessage.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 Register_Class(IPv6NDPrefixInformation);
 
@@ -364,16 +385,10 @@ const char *IPv6NDPrefixInformationDescriptor::getFieldStructName(void *object, 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "IPv6Address",
+    switch (field) {
+        case 6: return opp_typename(typeid(IPv6Address));
+        default: return NULL;
     };
-    return (field>=0 && field<7) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6NDPrefixInformationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -605,10 +620,9 @@ const char *MIPv6NDAdvertisementIntervalDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *MIPv6NDAdvertisementIntervalDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -859,11 +873,9 @@ const char *MIPv6HAInformationDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *MIPv6HAInformationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1096,10 +1108,9 @@ const char *IPv6NDMessageDescriptor::getFieldStructName(void *object, int field)
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6NDMessageDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1330,10 +1341,10 @@ const char *IPv6RouterSolicitationDescriptor::getFieldStructName(void *object, i
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6RouterSolicitationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1815,21 +1826,13 @@ const char *IPv6RouterAdvertisementDescriptor::getFieldStructName(void *object, 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
-        "IPv6NDPrefixInformation",
-        "MIPv6NDAdvertisementInterval",
-        "MIPv6HAInformation",
+    switch (field) {
+        case 7: return opp_typename(typeid(MACAddress));
+        case 9: return opp_typename(typeid(IPv6NDPrefixInformation));
+        case 10: return opp_typename(typeid(MIPv6NDAdvertisementInterval));
+        case 11: return opp_typename(typeid(MIPv6HAInformation));
+        default: return NULL;
     };
-    return (field>=0 && field<12) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6RouterAdvertisementDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2082,11 +2085,11 @@ const char *IPv6NeighbourSolicitationDescriptor::getFieldStructName(void *object
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPv6Address",
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(IPv6Address));
+        case 1: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6NeighbourSolicitationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2397,14 +2400,11 @@ const char *IPv6NeighbourAdvertisementDescriptor::getFieldStructName(void *objec
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        "IPv6Address",
-        "MACAddress",
+    switch (field) {
+        case 3: return opp_typename(typeid(IPv6Address));
+        case 4: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<5) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6NeighbourAdvertisementDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2673,12 +2673,12 @@ const char *IPv6RedirectDescriptor::getFieldStructName(void *object, int field) 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPv6Address",
-        "IPv6Address",
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(IPv6Address));
+        case 1: return opp_typename(typeid(IPv6Address));
+        case 2: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6RedirectDescriptor::getFieldStructPointer(void *object, int field, int i) const

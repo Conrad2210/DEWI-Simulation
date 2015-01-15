@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/networklayer/manetrouting/batman/BatmanMsg.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/networklayer/manetrouting/batman/BatmanMsg.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 vis_data::vis_data()
 {
@@ -228,12 +249,10 @@ const char *vis_dataDescriptor::getFieldStructName(void *object, int field) cons
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "ManetAddress",
+    switch (field) {
+        case 2: return opp_typename(typeid(ManetAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *vis_dataDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -438,11 +457,10 @@ const char *HnaElementDescriptor::getFieldStructName(void *object, int field) co
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "ManetAddress",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(ManetAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *HnaElementDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -908,20 +926,12 @@ const char *BatmanPacketDescriptor::getFieldStructName(void *object, int field) 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "ManetAddress",
-        "ManetAddress",
-        NULL,
-        NULL,
-        "HnaElement",
+    switch (field) {
+        case 6: return opp_typename(typeid(ManetAddress));
+        case 7: return opp_typename(typeid(ManetAddress));
+        case 10: return opp_typename(typeid(HnaElement));
+        default: return NULL;
     };
-    return (field>=0 && field<11) ? fieldStructNames[field] : NULL;
 }
 
 void *BatmanPacketDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1269,14 +1279,11 @@ const char *visPacketDescriptor::getFieldStructName(void *object, int field) con
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "ManetAddress",
-        NULL,
-        NULL,
-        NULL,
-        "vis_data",
+    switch (field) {
+        case 0: return opp_typename(typeid(ManetAddress));
+        case 4: return opp_typename(typeid(vis_data));
+        default: return NULL;
     };
-    return (field>=0 && field<5) ? fieldStructNames[field] : NULL;
 }
 
 void *visPacketDescriptor::getFieldStructPointer(void *object, int field, int i) const
