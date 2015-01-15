@@ -24,7 +24,7 @@ import dewi.mobility.models.OwnModel;
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.Ieee802154eNic;
+import dewi.linklayer.NIC.Ieee802154eNic;
 
 //Applications
 //UDPApp

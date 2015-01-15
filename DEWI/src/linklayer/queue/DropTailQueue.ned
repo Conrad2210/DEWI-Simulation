@@ -18,7 +18,7 @@
 
 package dewi.linklayer.queue;
 
-import dewi.linklayer.IOutputQueue;
+import dewi.linklayer.base.IOutputQueue;
 
 
 //

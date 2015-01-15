@@ -18,7 +18,7 @@
 
 package dewi.linklayer.queue;
 
-import dewi.linklayer.IOutputQueue;
+import dewi.linklayer.base.IOutputQueue;
 
 
 //@author: Stefan Reis		2014	(based on src/linklayer/queue/DropTailQueue)

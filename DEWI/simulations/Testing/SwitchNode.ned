@@ -23,7 +23,7 @@ import dewi.mobility.models.StationaryMobility;
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.Ieee802154csmaNic;
+import dewi.linklayer.NIC.ccsmaNic;
 
 //Applications
 //UDPApp
@@ -107,8 +107,9 @@ module LightSwitch
 
 
         //NIC
-        wlan: Ieee802154csmaNic {
+        wlan: ccsmaNic {
             parameters:
+                isSwitch = true;
                 @display("p=248,349;q=queue");
         }
 
