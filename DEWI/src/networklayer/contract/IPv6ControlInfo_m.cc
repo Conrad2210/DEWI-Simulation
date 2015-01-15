@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/networklayer/contract/IPv6ControlInfo.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/networklayer/contract/IPv6ControlInfo.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 IPv6ControlInfo_Base::IPv6ControlInfo_Base() : ::cObject()
 {
@@ -388,19 +409,12 @@ const char *IPv6ControlInfoDescriptor::getFieldStructName(void *object, int fiel
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "IPv6Address",
-        "IPv6Address",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "IPv6ExtensionHeaderPtr",
+    switch (field) {
+        case 1: return opp_typename(typeid(IPv6Address));
+        case 2: return opp_typename(typeid(IPv6Address));
+        case 9: return opp_typename(typeid(IPv6ExtensionHeaderPtr));
+        default: return NULL;
     };
-    return (field>=0 && field<10) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv6ControlInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const

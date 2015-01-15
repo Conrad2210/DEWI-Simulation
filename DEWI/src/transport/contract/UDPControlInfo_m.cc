@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/transport/contract/UDPControlInfo.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/transport/contract/UDPControlInfo.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("UDPCommandCode");
@@ -263,10 +284,9 @@ const char *UDPControlInfoDescriptor::getFieldStructName(void *object, int field
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPControlInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -517,11 +537,10 @@ const char *UDPBindCommandDescriptor::getFieldStructName(void *object, int field
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPBindCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -773,11 +792,10 @@ const char *UDPConnectCommandDescriptor::getFieldStructName(void *object, int fi
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPConnectCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1049,12 +1067,10 @@ const char *UDPSendCommandDescriptor::getFieldStructName(void *object, int field
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSendCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1610,16 +1626,11 @@ const char *UDPDataIndicationDescriptor::getFieldStructName(void *object, int fi
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        "IPvXAddress",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        case 1: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<7) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPDataIndicationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1910,13 +1921,11 @@ const char *UDPErrorIndicationDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        "IPvXAddress",
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        case 1: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPErrorIndicationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2357,10 +2366,9 @@ const char *UDPSetTimeToLiveCommandDescriptor::getFieldStructName(void *object, 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSetTimeToLiveCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2593,10 +2601,9 @@ const char *UDPSetTypeOfServiceCommandDescriptor::getFieldStructName(void *objec
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSetTypeOfServiceCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2829,10 +2836,9 @@ const char *UDPSetBroadcastCommandDescriptor::getFieldStructName(void *object, i
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSetBroadcastCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3065,10 +3071,9 @@ const char *UDPSetMulticastInterfaceCommandDescriptor::getFieldStructName(void *
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSetMulticastInterfaceCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3301,10 +3306,9 @@ const char *UDPSetMulticastLoopCommandDescriptor::getFieldStructName(void *objec
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSetMulticastLoopCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3537,10 +3541,9 @@ const char *UDPSetReuseAddressCommandDescriptor::getFieldStructName(void *object
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPSetReuseAddressCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3864,11 +3867,10 @@ const char *UDPJoinMulticastGroupsCommandDescriptor::getFieldStructName(void *ob
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPJoinMulticastGroupsCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -4136,10 +4138,10 @@ const char *UDPLeaveMulticastGroupsCommandDescriptor::getFieldStructName(void *o
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPvXAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(IPvXAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *UDPLeaveMulticastGroupsCommandDescriptor::getFieldStructPointer(void *object, int field, int i) const

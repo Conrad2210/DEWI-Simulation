@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/networklayer/ipv4/IPv4Datagram.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/networklayer/ipv4/IPv4Datagram.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("IPOptionClass");
@@ -304,11 +325,10 @@ const char *IPv4RecordRouteOptionDescriptor::getFieldStructName(void *object, in
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPv4Address",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPv4Address));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv4RecordRouteOptionDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -640,14 +660,10 @@ const char *IPv4TimestampOptionDescriptor::getFieldStructName(void *object, int 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        "IPv4Address",
-        NULL,
+    switch (field) {
+        case 3: return opp_typename(typeid(IPv4Address));
+        default: return NULL;
     };
-    return (field>=0 && field<5) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv4TimestampOptionDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -926,12 +942,10 @@ const char *IPv4SourceRoutingOptionDescriptor::getFieldStructName(void *object, 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "IPv4Address",
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(IPv4Address));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv4SourceRoutingOptionDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1476,27 +1490,14 @@ const char *IPv4DatagramDescriptor::getFieldStructName(void *object, int field) 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "IPv4Address",
-        "IPv4Address",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        "IPv4RecordRouteOption",
-        "IPv4TimestampOption",
-        "IPv4SourceRoutingOption",
-        NULL,
+    switch (field) {
+        case 2: return opp_typename(typeid(IPv4Address));
+        case 3: return opp_typename(typeid(IPv4Address));
+        case 14: return opp_typename(typeid(IPv4RecordRouteOption));
+        case 15: return opp_typename(typeid(IPv4TimestampOption));
+        case 16: return opp_typename(typeid(IPv4SourceRoutingOption));
+        default: return NULL;
     };
-    return (field>=0 && field<18) ? fieldStructNames[field] : NULL;
 }
 
 void *IPv4DatagramDescriptor::getFieldStructPointer(void *object, int field, int i) const

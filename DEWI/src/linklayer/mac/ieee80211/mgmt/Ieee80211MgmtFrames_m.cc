@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/linklayer/mac/ieee80211/mgmt/Ieee80211MgmtFrames.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/ieee80211/mgmt/Ieee80211MgmtFrames.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -32,63 +29,29 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("Ieee80211ReasonCode");
-    if (!e) enums.getInstance()->add(e = new cEnum("Ieee80211ReasonCode"));
-    e->insert(RC_UNSPECIFIED, "RC_UNSPECIFIED");
-    e->insert(RC_PREV_AUTH_EXPIRED, "RC_PREV_AUTH_EXPIRED");
-    e->insert(RC_DEAUTH_MS_LEAVING, "RC_DEAUTH_MS_LEAVING");
-    e->insert(RC_DISASS_INACTIVITY, "RC_DISASS_INACTIVITY");
-    e->insert(RC_DISASS_TOO_MANY_MS, "RC_DISASS_TOO_MANY_MS");
-    e->insert(RC_NONAUTH_CLASS2, "RC_NONAUTH_CLASS2");
-    e->insert(RC_NONASS_CLASS3, "RC_NONASS_CLASS3");
-    e->insert(RC_DIASS_MS_LEAVING, "RC_DIASS_MS_LEAVING");
-    e->insert(RC_NONAUTH_ASS_REQUEST, "RC_NONAUTH_ASS_REQUEST");
-    e->insert(RC_MESH_PEERING_CANCELLED, "RC_MESH_PEERING_CANCELLED");
-    e->insert(RC_MESH_MAX_PEERS, "RC_MESH_MAX_PEERS");
-    e->insert(RC_MESH_CONFIGURATION_POLICY_VIOLATION, "RC_MESH_CONFIGURATION_POLICY_VIOLATION");
-    e->insert(RC_MESH_CLOSE_RCVD, "RC_MESH_CLOSE_RCVD");
-    e->insert(RC_MESH_MAX_RETRIES, "RC_MESH_MAX_RETRIES");
-    e->insert(RC_MESH_CONFIRM_TIMEOUT, "RC_MESH_CONFIRM_TIMEOUT");
-    e->insert(RC_MESH_INVALID_GTK, "RC_MESH_INVALID_GTK");
-    e->insert(RC_MESH_INCONSISTENT_PARAMETERS, "RC_MESH_INCONSISTENT_PARAMETERS");
-    e->insert(RC_MESH_INVALID_SECURITY_CAPABILITY, "RC_MESH_INVALID_SECURITY_CAPABILITY");
-    e->insert(RC_MESH_PATH_ERROR_NO_PROXY_INFORMATION, "RC_MESH_PATH_ERROR_NO_PROXY_INFORMATION");
-    e->insert(RC_MESH_PATH_ERROR_NO_FORWARDING_INFORMATION, "RC_MESH_PATH_ERROR_NO_FORWARDING_INFORMATION");
-    e->insert(RC_MESH_PATH_ERROR_DESTINATION_UNREACHABLE, "RC_MESH_PATH_ERROR_DESTINATION_UNREACHABLE");
-    e->insert(RC_MAC_ADDRESS_ALREADY_EXISTS_IN_MBSS, "RC_MAC_ADDRESS_ALREADY_EXISTS_IN_MBSS");
-    e->insert(RC_MESH_CHANNEL_SWITCH_REGULATORY_REQUIREMENTS, "RC_MESH_CHANNEL_SWITCH_REGULATORY_REQUIREMENTS");
-    e->insert(RC_MESH_CHANNEL_SWITCH_UNSPECIFIED, "RC_MESH_CHANNEL_SWITCH_UNSPECIFIED");
-);
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
 
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("Ieee80211StatusCode");
-    if (!e) enums.getInstance()->add(e = new cEnum("Ieee80211StatusCode"));
-    e->insert(SC_SUCCESSFUL, "SC_SUCCESSFUL");
-    e->insert(SC_UNSPECIFIED, "SC_UNSPECIFIED");
-    e->insert(SC_UNSUP_CAP, "SC_UNSUP_CAP");
-    e->insert(SC_REASS_DENIED, "SC_REASS_DENIED");
-    e->insert(SC_ASS_DENIED_UNKNOWN, "SC_ASS_DENIED_UNKNOWN");
-    e->insert(SC_AUTH_ALG0_UNSUP, "SC_AUTH_ALG0_UNSUP");
-    e->insert(SC_AUTH_OUT_OF_SEQ, "SC_AUTH_OUT_OF_SEQ");
-    e->insert(SC_AUTH_CHALLENGE_FAIL, "SC_AUTH_CHALLENGE_FAIL");
-    e->insert(SC_AUTH_TIMEOUT, "SC_AUTH_TIMEOUT");
-    e->insert(SC_ASS_TOO_MANY_MS, "SC_ASS_TOO_MANY_MS");
-    e->insert(SC_DATARATE_UNSUP, "SC_DATARATE_UNSUP");
-    e->insert(SC_AUTH_REJECT_ANTI_CLOGING, "SC_AUTH_REJECT_ANTI_CLOGING");
-    e->insert(SC_AUTH_REJECT_FINITE_CYC_GROUP_UNS, "SC_AUTH_REJECT_FINITE_CYC_GROUP_UNS");
-    e->insert(SC_TBTT_REQUEST, "SC_TBTT_REQUEST");
-);
-
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("Ieee80211HWMPCode");
-    if (!e) enums.getInstance()->add(e = new cEnum("Ieee80211HWMPCode"));
-    e->insert(IE11S_GANN, "IE11S_GANN");
-    e->insert(IE11S_RANN, "IE11S_RANN");
-    e->insert(IE11S_PREQ, "IE11S_PREQ");
-    e->insert(IE11S_PREP, "IE11S_PREP");
-    e->insert(IE11S_PERR, "IE11S_PERR");
-);
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 Ieee80211CapabilityInformation::Ieee80211CapabilityInformation()
 {
@@ -324,16 +287,9 @@ const char *Ieee80211CapabilityInformationDescriptor::getFieldStructName(void *o
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<7) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211CapabilityInformationDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -557,13 +513,9 @@ const char *Ieee80211HandoverParametersDescriptor::getFieldStructName(void *obje
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211HandoverParametersDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -579,6 +531,64 @@ void *Ieee80211HandoverParametersDescriptor::getFieldStructPointer(void *object,
         default: return NULL;
     }
 }
+
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("Ieee80211ReasonCode");
+    if (!e) enums.getInstance()->add(e = new cEnum("Ieee80211ReasonCode"));
+    e->insert(RC_UNSPECIFIED, "RC_UNSPECIFIED");
+    e->insert(RC_PREV_AUTH_EXPIRED, "RC_PREV_AUTH_EXPIRED");
+    e->insert(RC_DEAUTH_MS_LEAVING, "RC_DEAUTH_MS_LEAVING");
+    e->insert(RC_DISASS_INACTIVITY, "RC_DISASS_INACTIVITY");
+    e->insert(RC_DISASS_TOO_MANY_MS, "RC_DISASS_TOO_MANY_MS");
+    e->insert(RC_NONAUTH_CLASS2, "RC_NONAUTH_CLASS2");
+    e->insert(RC_NONASS_CLASS3, "RC_NONASS_CLASS3");
+    e->insert(RC_DIASS_MS_LEAVING, "RC_DIASS_MS_LEAVING");
+    e->insert(RC_NONAUTH_ASS_REQUEST, "RC_NONAUTH_ASS_REQUEST");
+    e->insert(RC_MESH_PEERING_CANCELLED, "RC_MESH_PEERING_CANCELLED");
+    e->insert(RC_MESH_MAX_PEERS, "RC_MESH_MAX_PEERS");
+    e->insert(RC_MESH_CONFIGURATION_POLICY_VIOLATION, "RC_MESH_CONFIGURATION_POLICY_VIOLATION");
+    e->insert(RC_MESH_CLOSE_RCVD, "RC_MESH_CLOSE_RCVD");
+    e->insert(RC_MESH_MAX_RETRIES, "RC_MESH_MAX_RETRIES");
+    e->insert(RC_MESH_CONFIRM_TIMEOUT, "RC_MESH_CONFIRM_TIMEOUT");
+    e->insert(RC_MESH_INVALID_GTK, "RC_MESH_INVALID_GTK");
+    e->insert(RC_MESH_INCONSISTENT_PARAMETERS, "RC_MESH_INCONSISTENT_PARAMETERS");
+    e->insert(RC_MESH_INVALID_SECURITY_CAPABILITY, "RC_MESH_INVALID_SECURITY_CAPABILITY");
+    e->insert(RC_MESH_PATH_ERROR_NO_PROXY_INFORMATION, "RC_MESH_PATH_ERROR_NO_PROXY_INFORMATION");
+    e->insert(RC_MESH_PATH_ERROR_NO_FORWARDING_INFORMATION, "RC_MESH_PATH_ERROR_NO_FORWARDING_INFORMATION");
+    e->insert(RC_MESH_PATH_ERROR_DESTINATION_UNREACHABLE, "RC_MESH_PATH_ERROR_DESTINATION_UNREACHABLE");
+    e->insert(RC_MAC_ADDRESS_ALREADY_EXISTS_IN_MBSS, "RC_MAC_ADDRESS_ALREADY_EXISTS_IN_MBSS");
+    e->insert(RC_MESH_CHANNEL_SWITCH_REGULATORY_REQUIREMENTS, "RC_MESH_CHANNEL_SWITCH_REGULATORY_REQUIREMENTS");
+    e->insert(RC_MESH_CHANNEL_SWITCH_UNSPECIFIED, "RC_MESH_CHANNEL_SWITCH_UNSPECIFIED");
+);
+
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("Ieee80211StatusCode");
+    if (!e) enums.getInstance()->add(e = new cEnum("Ieee80211StatusCode"));
+    e->insert(SC_SUCCESSFUL, "SC_SUCCESSFUL");
+    e->insert(SC_UNSPECIFIED, "SC_UNSPECIFIED");
+    e->insert(SC_UNSUP_CAP, "SC_UNSUP_CAP");
+    e->insert(SC_REASS_DENIED, "SC_REASS_DENIED");
+    e->insert(SC_ASS_DENIED_UNKNOWN, "SC_ASS_DENIED_UNKNOWN");
+    e->insert(SC_AUTH_ALG0_UNSUP, "SC_AUTH_ALG0_UNSUP");
+    e->insert(SC_AUTH_OUT_OF_SEQ, "SC_AUTH_OUT_OF_SEQ");
+    e->insert(SC_AUTH_CHALLENGE_FAIL, "SC_AUTH_CHALLENGE_FAIL");
+    e->insert(SC_AUTH_TIMEOUT, "SC_AUTH_TIMEOUT");
+    e->insert(SC_ASS_TOO_MANY_MS, "SC_ASS_TOO_MANY_MS");
+    e->insert(SC_DATARATE_UNSUP, "SC_DATARATE_UNSUP");
+    e->insert(SC_AUTH_REJECT_ANTI_CLOGING, "SC_AUTH_REJECT_ANTI_CLOGING");
+    e->insert(SC_AUTH_REJECT_FINITE_CYC_GROUP_UNS, "SC_AUTH_REJECT_FINITE_CYC_GROUP_UNS");
+    e->insert(SC_TBTT_REQUEST, "SC_TBTT_REQUEST");
+);
+
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("Ieee80211HWMPCode");
+    if (!e) enums.getInstance()->add(e = new cEnum("Ieee80211HWMPCode"));
+    e->insert(IE11S_GANN, "IE11S_GANN");
+    e->insert(IE11S_RANN, "IE11S_RANN");
+    e->insert(IE11S_PREQ, "IE11S_PREQ");
+    e->insert(IE11S_PREP, "IE11S_PREP");
+    e->insert(IE11S_PERR, "IE11S_PERR");
+);
 
 Ieee80211SupportedRatesElement::Ieee80211SupportedRatesElement()
 {
@@ -773,11 +783,9 @@ const char *Ieee80211SupportedRatesElementDescriptor::getFieldStructName(void *o
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211SupportedRatesElementDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1008,10 +1016,9 @@ const char *Ieee80211FrameBodyDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211FrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1289,12 +1296,9 @@ const char *Ieee80211AuthenticationFrameBodyDescriptor::getFieldStructName(void 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211AuthenticationFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1532,10 +1536,9 @@ const char *Ieee80211DeauthenticationFrameBodyDescriptor::getFieldStructName(voi
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DeauthenticationFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1773,10 +1776,9 @@ const char *Ieee80211DisassociationFrameBodyDescriptor::getFieldStructName(void 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DisassociationFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2029,11 +2031,10 @@ const char *Ieee80211ProbeRequestFrameBodyDescriptor::getFieldStructName(void *o
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "Ieee80211SupportedRatesElement",
+    switch (field) {
+        case 1: return opp_typename(typeid(Ieee80211SupportedRatesElement));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ProbeRequestFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2287,11 +2288,10 @@ const char *Ieee80211AssociationRequestFrameBodyDescriptor::getFieldStructName(v
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "Ieee80211SupportedRatesElement",
+    switch (field) {
+        case 1: return opp_typename(typeid(Ieee80211SupportedRatesElement));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211AssociationRequestFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2525,10 +2525,10 @@ const char *Ieee80211ReassociationRequestFrameBodyDescriptor::getFieldStructName
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ReassociationRequestFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2805,12 +2805,10 @@ const char *Ieee80211AssociationResponseFrameBodyDescriptor::getFieldStructName(
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "Ieee80211SupportedRatesElement",
+    switch (field) {
+        case 2: return opp_typename(typeid(Ieee80211SupportedRatesElement));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211AssociationResponseFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -3328,14 +3326,11 @@ const char *Ieee80211BeaconFrameBodyDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "Ieee80211SupportedRatesElement",
-        NULL,
-        NULL,
-        "Ieee80211HandoverParameters",
+    switch (field) {
+        case 1: return opp_typename(typeid(Ieee80211SupportedRatesElement));
+        case 4: return opp_typename(typeid(Ieee80211HandoverParameters));
+        default: return NULL;
     };
-    return (field>=0 && field<5) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211BeaconFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -4045,13 +4040,9 @@ const char *Ieee80211ActionHWMPFrameBodyDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionHWMPFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -4273,13 +4264,10 @@ const char *PREQElemDescriptor::getFieldStructName(void *object, int field) cons
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
+    switch (field) {
+        case 2: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *PREQElemDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -4520,15 +4508,10 @@ const char *PERRElemDescriptor::getFieldStructName(void *object, int field) cons
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        case 2: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<6) ? fieldStructNames[field] : NULL;
 }
 
 void *PERRElemDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -4823,13 +4806,10 @@ const char *Ieee80211ActionRANNFrameBodyDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
-        NULL,
-        NULL,
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionRANNFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -5236,17 +5216,12 @@ const char *Ieee80211ActionPREQFrameBodyDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "MACAddress",
-        NULL,
-        "MACAddress",
-        NULL,
-        NULL,
-        NULL,
-        "PREQElem",
+    switch (field) {
+        case 1: return opp_typename(typeid(MACAddress));
+        case 3: return opp_typename(typeid(MACAddress));
+        case 7: return opp_typename(typeid(PREQElem));
+        default: return NULL;
     };
-    return (field>=0 && field<8) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionPREQFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -5599,16 +5574,12 @@ const char *Ieee80211ActionPREPFrameBodyDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
-        NULL,
-        "MACAddress",
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        case 2: return opp_typename(typeid(MACAddress));
+        case 5: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<7) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionPREPFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -5901,11 +5872,10 @@ const char *Ieee80211ActionPERRFrameBodyDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "PERRElem",
+    switch (field) {
+        case 1: return opp_typename(typeid(PERRElem));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionPERRFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -6160,11 +6130,10 @@ const char *Ieee80211ActionGANNFrameBodyDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MACAddress",
-        NULL,
+    switch (field) {
+        case 0: return opp_typename(typeid(MACAddress));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionGANNFrameBodyDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -6399,10 +6368,10 @@ const char *Ieee80211AuthenticationFrameDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211AuthenticationFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211AuthenticationFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211AuthenticationFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -6637,10 +6606,10 @@ const char *Ieee80211DeauthenticationFrameDescriptor::getFieldStructName(void *o
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211DeauthenticationFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211DeauthenticationFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DeauthenticationFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -6875,10 +6844,10 @@ const char *Ieee80211DisassociationFrameDescriptor::getFieldStructName(void *obj
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211DisassociationFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211DisassociationFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211DisassociationFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -7113,10 +7082,10 @@ const char *Ieee80211ProbeRequestFrameDescriptor::getFieldStructName(void *objec
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ProbeRequestFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ProbeRequestFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ProbeRequestFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -7351,10 +7320,10 @@ const char *Ieee80211AssociationRequestFrameDescriptor::getFieldStructName(void 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211AssociationRequestFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211AssociationRequestFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211AssociationRequestFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -7589,10 +7558,10 @@ const char *Ieee80211ReassociationRequestFrameDescriptor::getFieldStructName(voi
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ReassociationRequestFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ReassociationRequestFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ReassociationRequestFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -7827,10 +7796,10 @@ const char *Ieee80211AssociationResponseFrameDescriptor::getFieldStructName(void
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211AssociationResponseFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211AssociationResponseFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211AssociationResponseFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -8065,10 +8034,10 @@ const char *Ieee80211ReassociationResponseFrameDescriptor::getFieldStructName(vo
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ReassociationResponseFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ReassociationResponseFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ReassociationResponseFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -8303,10 +8272,10 @@ const char *Ieee80211BeaconFrameDescriptor::getFieldStructName(void *object, int
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211BeaconFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211BeaconFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211BeaconFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -8541,10 +8510,10 @@ const char *Ieee80211ProbeResponseFrameDescriptor::getFieldStructName(void *obje
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ProbeResponseFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ProbeResponseFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ProbeResponseFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -8779,10 +8748,10 @@ const char *Ieee80211ActionFrameDescriptor::getFieldStructName(void *object, int
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ActionFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ActionFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -9057,12 +9026,10 @@ const char *Ieee80211ActionHWMPFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        NULL,
-        "Ieee80211ActionHWMPFrameBody",
+    switch (field) {
+        case 2: return opp_typename(typeid(Ieee80211ActionHWMPFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionHWMPFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -9297,10 +9264,10 @@ const char *Ieee80211ActionRANNFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ActionRANNFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ActionRANNFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionRANNFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -9535,10 +9502,10 @@ const char *Ieee80211ActionPREQFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ActionPREQFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ActionPREQFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionPREQFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -9773,10 +9740,10 @@ const char *Ieee80211ActionPREPFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ActionPREPFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ActionPREPFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionPREPFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -10011,10 +9978,10 @@ const char *Ieee80211ActionPERRFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ActionPERRFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ActionPERRFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionPERRFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -10249,10 +10216,10 @@ const char *Ieee80211ActionGANNFrameDescriptor::getFieldStructName(void *object,
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "Ieee80211ActionGANNFrameBody",
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee80211ActionGANNFrameBody));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee80211ActionGANNFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.4 from src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -14,9 +14,6 @@
 
 USING_NAMESPACE
 
-// Template rule which fires if a struct or class doesn't have operator<<
-template<typename T>
-std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 // Another default rule (prevents compiler from choosing base class' doPacking())
 template<typename T>
@@ -31,6 +28,30 @@ void doUnpacking(cCommBuffer *, T& t) {
 
 
 
+
+// Template rule for outputting std::vector<T> types
+template<typename T, typename A>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
+{
+    out.put('{');
+    for(typename std::vector<T,A>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (it != vec.begin()) {
+            out.put(','); out.put(' ');
+        }
+        out << *it;
+    }
+    out.put('}');
+    
+    char buf[32];
+    sprintf(buf, " (size=%u)", (unsigned int)vec.size());
+    out.write(buf, strlen(buf));
+    return out;
+}
+
+// Template rule which fires if a struct or class doesn't have operator<<
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 Register_Class(Ieee802154eBasicFrame);
 
@@ -266,11 +287,10 @@ const char *Ieee802154eBasicFrameDescriptor::getFieldStructName(void *object, in
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
-        "AuxiliarySecurityHeader",
+    switch (field) {
+        case 1: return opp_typename(typeid(AuxiliarySecurityHeader));
+        default: return NULL;
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154eBasicFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -726,18 +746,14 @@ const char *Ieee802154eFrameDescriptor::getFieldStructName(void *object, int fie
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "FrameCtrl",
-        NULL,
-        NULL,
-        "MACAddress",
-        NULL,
-        "MACAddress",
-        NULL,
-        "IE_Header",
-        "IE_Payload",
+    switch (field) {
+        case 0: return opp_typename(typeid(FrameCtrl));
+        case 3: return opp_typename(typeid(MACAddress));
+        case 5: return opp_typename(typeid(MACAddress));
+        case 7: return opp_typename(typeid(IE_Header));
+        case 8: return opp_typename(typeid(IE_Payload));
+        default: return NULL;
     };
-    return (field>=0 && field<9) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154eFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1009,12 +1025,12 @@ const char *Ieee802154eBeaconFrameDescriptor::getFieldStructName(void *object, i
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "SuperframeSpec",
-        "GTSFields",
-        "PendingAddrFields",
+    switch (field) {
+        case 0: return opp_typename(typeid(SuperframeSpec));
+        case 1: return opp_typename(typeid(GTSFields));
+        case 2: return opp_typename(typeid(PendingAddrFields));
+        default: return NULL;
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154eBeaconFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2077,10 +2093,9 @@ const char *Ieee802154eCmdFrameDescriptor::getFieldStructName(void *object, int 
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        NULL,
+    switch (field) {
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154eCmdFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -2311,10 +2326,10 @@ const char *Ieee802154eMPFrameDescriptor::getFieldStructName(void *object, int f
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldStructNames[] = {
-        "MPFrameCtrl",
+    switch (field) {
+        case 0: return opp_typename(typeid(MPFrameCtrl));
+        default: return NULL;
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
 }
 
 void *Ieee802154eMPFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
