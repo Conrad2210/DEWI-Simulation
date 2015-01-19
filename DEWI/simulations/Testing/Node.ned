@@ -24,7 +24,7 @@ import dewi.mobility.models.OwnModel;
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.NIC.ccsmaNic;
+import dewi.linklayer.NIC.Ieee802154csmaNic;
 
 //Applications
 //UDPApp
@@ -118,7 +118,7 @@ module Node
 
 
         //NIC
-        wlan: ccsmaNic {
+        wlan: Ieee802154csmaNic {
             parameters:
                 @display("p=248,349;q=queue");
         }

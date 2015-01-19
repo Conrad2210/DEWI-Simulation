@@ -384,13 +384,13 @@ void UDPLamp::processPacket(cPacket *pk)
 
                 BurstMSG *tmpBurstMsg = check_and_cast<BurstMSG *>(pk);
                 Hop->record(tmpBurstMsg->getHopCount());
-                //tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
+                tmpBurstMsg->setHopCount(tmpBurstMsg->getHopCount() + 1);
                 endtoendDelay = simTime() - pk->getTimestamp();
                 E2E->record(endtoendDelay.dbl());
                 timeForCount = timeForCount + 1;
-                //nNumResend++;
-                //emit(sstReBroadcastPkSignal, tmpBurstMsg);
-                //scheduleAt(simTime() + par("reBroadcastDelay").doubleValue(), tmpBurstMsg);
+                nNumResend++;
+                emit(sstReBroadcastPkSignal, tmpBurstMsg);
+                scheduleAt(simTime() + par("reBroadcastDelay").doubleValue(), tmpBurstMsg);
 
             }
             delete ctrl;
