@@ -1,0 +1,14 @@
+
+package dewi.LEACH.Node;
+simple BS
+{
+    parameters:
+        double id;
+        double randInit;
+        double numNodes;
+        double xpos;
+        double ypos;
+    gates:
+        input in[];
+        output out[];
+}
