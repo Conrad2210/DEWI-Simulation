@@ -1,0 +1,2 @@
+slotframe: SlotframeSize: 5	ActiveFlag: 1	ChannelPage: 1	ChannelMap: 16	slotframeend.
+slotframeend.

@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA;
+package dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD;
 
 //Includes
 //Mobility
@@ -24,7 +24,7 @@ import dewi.mobility.models.OwnModel;
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.nic.Ieee802154csmaNic;
+import dewi.linklayer.nic.Ieee802154eNic;
 
 //Applications
 //UDPApp
@@ -47,23 +47,21 @@ import dewi.transport.udp.UDP;
 //MANETRouting
 import dewi.networklayer.IManetRouting;
 
-//Display Module
-import dewi.base.Display;
+import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
+import dewi.linklayer.common.Ieee802154e.macLinkTable.macLinkTable;
+import dewi.linklayer.common.Ieee802154e.macTimeslotTable.macTimeslotTable;
+import dewi.linklayer.common.Ieee802154e.macHoppingSequenceList.macHoppingSequenceList;
+import dewi.linklayer.common.Ieee802154e.macNeighborTable.macNeighborTable;
 
-//Battery Module
-import dewi.battery.models.InetSimpleBattery;
 
-module Node
+
+module LightSwitch
 {
     parameters:
         @node();
         //Variable X and Y for PlayGround Area
-        double X @unit(m);
-        double Y @unit(m);
-        double Z @unit(m);
+
         int numHosts;
-        int maxRow;
-        int maxCol;
         //Number of Hosts, to calculate the position of the nodes
         //int Hosts;
 
@@ -88,42 +86,36 @@ module Node
     submodules:
 
 
-
         //Node Location
-        mobility: OwnModel {
+        mobility: StationaryMobility {
             parameters:
-                maxCol = maxCol;
-                maxRow = maxRow;
-                marginX = X;
-                marginY = Y;
-                marginZ = Z;
                 @display("p=152,368;i=block/cogwheel");
         }
-                //Notificationboard
-        notificationBoard: NotificationBoard {
-            parameters:
-                @display("p=60,70;i=block/control");
-        }
 
-                //InterfaceTable
-        interfaceTable: InterfaceTable {
-            parameters:
-                @display("p=60,150;i=block/table");
-        }
+
         //Routing
         manetrouting: <routingProtocol> like IManetRouting if routingProtocol != "" {
             @display("p=159,287");
         }
 
-
+        //InterfaceTable
+        interfaceTable: InterfaceTable {
+            parameters:
+                @display("p=60,150;i=block/table");
+        }
 
         //NIC
-        wlan: Ieee802154csmaNic {
+        wlan: Ieee802154eNic {
             parameters:
+                numHosts = numHosts;
                 @display("p=248,349;q=queue");
         }
 
-
+        //Notificationboard
+        notificationBoard: NotificationBoard {
+            parameters:
+                @display("p=60,70;i=block/control");
+        }
 
 
         //RoutingTable
@@ -157,19 +149,30 @@ module Node
             parameters:
                 @display("p=272,154;i=block/transport");
         }
+        
+        slotframeTable: macSlotframeTable {
+            parameters:
+                @display("p=523,190;i=block/table");
+        }
+        
+        linkTable: macLinkTable {
+            parameters:
+                @display("p=523,120;i=block/table");
+        }
+        timeslotTemplate: macTimeslotTable {
+            parameters:
+                @display("p=523,50;i=block/table");
+        }
+        hoppingSequenceList: macHoppingSequenceList {
+            parameters:
+                @display("p=523,260;i=block/table");
+        }
+        neighborTable: macNeighborTable {
+            parameters:
+                @display("p=523,330;i=block/table");
+        }
 
-        //Disp
-//        disp: Display {
-//            parameters:
-//                @display("p=60,326;i=block/app2");
-//        }
-//
-//                // battery module
-//        battery: InetSimpleBattery {
-//            parameters:
-//                @display("p=60,407;i=block/plug");
-//
-//        }
+
 
 
     connections allowunconnected:

@@ -1,0 +1,7 @@
+hopping: ChannelPage: 0 NumberOfChannels: 15 PhyConfiguration: 134215680 ExtendedBitmap: 0 HoppingSequenceLength: 16 HoppingSequenceList: 11 ; 12 ; 13 ; 14 ; 15 ; 16 ; 17 ; 18 ; 19 ; 20 ; 21 ; 22 ; 23 ; 24 ; 25 ; 26 ; HoppingSequenceListEnd CurrentHop: 0 HopDwellTime: 0 hoppingend.
+hopping: ChannelPage: 0 NumberOfChannels: 1 PhyConfiguration: 2048 ExtendedBitmap: 0 HoppingSequenceLength: 1 HoppingSequenceList: 11 ; HoppingSequenceListEnd CurrentHop: 0 HopDwellTime: 0 hoppingend.
+hopping: ChannelPage: 0 NumberOfChannels: 2 PhyConfiguration: 6144 ExtendedBitmap: 0 HoppingSequenceLength: 2 HoppingSequenceList: 11 ; 12 ; HoppingSequenceListEnd CurrentHop: 0 HopDwellTime: 0 hoppingend.
+hopping: ChannelPage: 0 NumberOfChannels: 3 PhyConfiguration: 14336 ExtendedBitmap: 0 HoppingSequenceLength: 3 HoppingSequenceList: 11 ; 12 ; 13 ; HoppingSequenceListEnd CurrentHop: 0 HopDwellTime: 0 hoppingend.
+hopping: ChannelPage: 0 NumberOfChannels: 4 PhyConfiguration: 30720 ExtendedBitmap: 0 HoppingSequenceLength: 4 HoppingSequenceList: 11 ; 12 ; 13 ; 14 ; HoppingSequenceListEnd CurrentHop: 0 HopDwellTime: 0 hoppingend.
+hopping: ChannelPage: 0 NumberOfChannels: 5 PhyConfiguration: 63488 ExtendedBitmap: 0 HoppingSequenceLength: 5 HoppingSequenceList: 11 ; 12 ; 13 ; 14 ; 15 ; HoppingSequenceListEnd CurrentHop: 0 HopDwellTime: 0 hoppingend.
+hoppingend.

@@ -1,0 +1,2 @@
+timeslot: TsCCAOffset: 1800 TsCCA: 128 TsTxOffset: 2120 TsRxOffset: 1120 TsRxAckDelay: 800 TsTxAckDelay: 1000 TsRxWait: 2000 TsAckWait: 400 TsRxTx: 192 TsMaxAck: 2400 TsMaxTx: 4256 TsTimeslotLength: 10000 timeslotend. 
+timeslotend.

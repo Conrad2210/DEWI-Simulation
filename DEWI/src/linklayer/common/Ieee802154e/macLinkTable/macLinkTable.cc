@@ -103,7 +103,7 @@ void macLinkTable::initialize(int stage)
             std::string temp = (std::string) tmpLinkFileName + "_" + nodeName;
             // file name generally for all
             //std::string temp = (std::string) tmpSlotframeFileName;
-            const char* linkTableFileName = const_cast<char*>(temp.c_str());
+            const char* linkTableFileName = const_cast<char*>(tmpLinkFileName);
 
             // path depending on the number of the nodes
             //pathSlotframeTableFiles = (std::string) tmpFolderName + convertIntToString(numHosts) + "\\"

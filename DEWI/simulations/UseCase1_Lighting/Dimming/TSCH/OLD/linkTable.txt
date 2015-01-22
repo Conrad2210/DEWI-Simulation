@@ -1,0 +1,9 @@
+link: LinkID: 0 LinkOption: 4 LinkType: 1 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 0 ChannelOffset: 0 linkend.
+link: LinkID: 1 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 1 ChannelOffset: 0 linkend.
+link: LinkID: 2 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 2 ChannelOffset: 0 linkend.
+link: LinkID: 3 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 3 ChannelOffset: 0 linkend.
+link: LinkID: 4 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 4 ChannelOffset: 0 linkend.
+link: LinkID: 5 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 5 ChannelOffset: 0 linkend.
+link: LinkID: 6 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 6 ChannelOffset: 0 linkend.
+link: LinkID: 7 LinkOption: 4 LinkType: 0 SlotFrameId: 0 NodeAddress: 0xffff TimeSlot: 7 ChannelOffset: 0 linkend.
+linkend.

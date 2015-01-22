@@ -99,7 +99,7 @@ void macSlotframeTable::initialize(int stage)
             std::string temp = (std::string) tmpSlotframeFileName + "_" + nodeName;
             // file name generally for all
             //std::string temp = (std::string) tmpSlotframeFileName;
-            const char* slotframeTableFileName = const_cast<char*>(temp.c_str());
+            const char* slotframeTableFileName = const_cast<char*>(tmpSlotframeFileName);
 
             // path depending on the number of the nodes
             //pathSlotframeTableFiles = (std::string) tmpFolderName + convertIntToString(numHosts) + "\\"

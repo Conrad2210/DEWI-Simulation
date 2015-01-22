@@ -1,0 +1,66 @@
+<config>
+   <interface hosts="RealTimeNetwork.lightSwitch" names="wlan" address="10.0.0.12" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[0]" names="wlan" address="10.0.0.21" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[1]" names="wlan" address="10.0.0.20" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[2]" names="wlan" address="10.0.0.19" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[3]" names="wlan" address="10.0.0.18" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[4]" names="wlan" address="10.0.0.17" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[5]" names="wlan" address="10.0.0.16" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[6]" names="wlan" address="10.0.0.15" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[7]" names="wlan" address="10.0.0.14" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[8]" names="wlan" address="10.0.0.13" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[9]" names="wlan" address="10.0.0.1" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[10]" names="wlan" address="10.0.0.11" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[11]" names="wlan" address="10.0.0.10" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[12]" names="wlan" address="10.0.0.9" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[13]" names="wlan" address="10.0.0.8" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[14]" names="wlan" address="10.0.0.7" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[15]" names="wlan" address="10.0.0.6" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[16]" names="wlan" address="10.0.0.5" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[17]" names="wlan" address="10.0.0.4" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[18]" names="wlan" address="10.0.0.3" netmask="255.255.255.224" metric="-2147483648"/>
+   <interface hosts="RealTimeNetwork.lamp[19]" names="wlan" address="10.0.0.2" netmask="255.255.255.224" metric="-2147483648"/>
+   <multicast-group hosts="RealTimeNetwork.lightSwitch" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[0]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[1]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[2]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[3]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[4]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[5]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[6]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[7]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[8]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[9]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[10]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[11]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[12]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[13]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[14]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[15]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[16]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[17]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[18]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="RealTimeNetwork.lamp[19]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <wireless interfaces="RealTimeNetwork.lightSwitch%wlan RealTimeNetwork.lamp[0]%wlan RealTimeNetwork.lamp[1]%wlan RealTimeNetwork.lamp[2]%wlan RealTimeNetwork.lamp[3]%wlan RealTimeNetwork.lamp[4]%wlan RealTimeNetwork.lamp[5]%wlan RealTimeNetwork.lamp[6]%wlan RealTimeNetwork.lamp[7]%wlan RealTimeNetwork.lamp[8]%wlan RealTimeNetwork.lamp[9]%wlan RealTimeNetwork.lamp[10]%wlan RealTimeNetwork.lamp[11]%wlan RealTimeNetwork.lamp[12]%wlan RealTimeNetwork.lamp[13]%wlan RealTimeNetwork.lamp[14]%wlan RealTimeNetwork.lamp[15]%wlan RealTimeNetwork.lamp[16]%wlan RealTimeNetwork.lamp[17]%wlan RealTimeNetwork.lamp[18]%wlan RealTimeNetwork.lamp[19]%wlan"/>
+   <route hosts="RealTimeNetwork.lightSwitch" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[0]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[1]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[2]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[3]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[4]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[5]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[6]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[7]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[8]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[9]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[10]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[11]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[12]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[13]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[14]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[15]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[16]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[17]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[18]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="RealTimeNetwork.lamp[19]" destination="10.0.0.0" netmask="255.255.255.224" gateway="*" interface="wlan" metric="-2147483648"/>
+</config>

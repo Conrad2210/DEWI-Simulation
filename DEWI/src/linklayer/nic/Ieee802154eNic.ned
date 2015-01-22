@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.linklayer.NIC;
+package dewi.linklayer.nic;
 import dewi.linklayer.base.IOutputQueue;
 import dewi.linklayer.mac.IEEE802154e.Ieee802154eMac;
 import dewi.phyLayer.Ieee802154ePhy;

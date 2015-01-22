@@ -65,7 +65,7 @@ double Display::calcInterfDist()
     double min_receive_power = pow(10.0, sat / 10.0);
 
     interference_distance    = pow(wave_length_m * wave_length_m * max_trans_power /
-                                   (16.0 * M_PI * M_PI * min_receive_power), 1.0 / alpha);
+                                   (16.0 * PI * PI * min_receive_power), 1.0 / alpha);
 
     return interference_distance;
 }

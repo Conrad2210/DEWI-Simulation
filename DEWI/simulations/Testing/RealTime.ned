@@ -16,15 +16,16 @@
 // 
 // 
 
-package dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD;
+package dewi.simulations.Testing;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD.Node;
+import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.Node;
+import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 
-network RealTimeNetwork
+network Network
 {
     parameters:
         int numHosts;
@@ -59,16 +60,15 @@ network RealTimeNetwork
             parameters:
                 @display("p=0.68,0.56;i=misc/sun");
         }
+        DataCenter: DataCenter {
 
+            @display("p=5.52,0.6");
+        }
         configurator: IPv4NetworkConfigurator {
             config = xml("<config><interface hosts='*' address='10.x.x.x' netmask='255.x.x.x'/></config>");
             //            netmask="255.255.0.0";
             //            networkAddress="145.236.0.0";
-            @display("p=2.04,0.4");
-        }
-        DataCenter: DataCenter {
-
-            @display("p=5.52,0.6");
+            @display("p=3.16,0.6");
         }
 }
 

@@ -93,7 +93,7 @@ void macTimeslotTable::initialize(int stage)
             std::string temp = (std::string) tmpTimeslotFileName + "_" + nodeName;
             // file name generally for all
             //std::string temp = (std::string) tmpTimeslotFileName;
-            const char* timeslotTableFileName = const_cast<char*>(temp.c_str());
+            const char* timeslotTableFileName = const_cast<char*>(tmpTimeslotFileName);
 
             // path depending on the number of the nodes
             //pathSlotframeTableFiles = (std::string) tmpFolderName + convertIntToString(numHosts) + "\\"

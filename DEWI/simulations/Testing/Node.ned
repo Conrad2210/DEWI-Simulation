@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA;
+package dewi.simulations.Testing;
 
 //Includes
 //Mobility

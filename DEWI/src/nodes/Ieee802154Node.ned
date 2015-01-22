@@ -1,6 +1,6 @@
 package dewi.nodes;
 
-import dewi.linklayer.NIC.Ieee802154Nic;
+import dewi.linklayer.nic.Ieee802154Nic;
 import dewi.networklayer.StarRouting.Ieee802154StarRouting;
 
 //import inet.underTest.wpan.battery.Ieee802154Battery;

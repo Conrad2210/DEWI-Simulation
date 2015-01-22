@@ -41,7 +41,7 @@ simple Ieee802154eMac
     bool useMetrics = default(true);
 
     // switch for the Std 802.15.4e-2014 TSCH mechanism
-    bool useTSCH = default(true);
+    bool useTSCH = default(false);
     // use the TSCH without a beacon from the PAN coordinator (Note: devices will be not associated with coordinator)
         bool useTSCHdirect = default(true);
     // for the Std 802.15.4e-2014 TSCH mechanism - to set the Node as a timeScource
