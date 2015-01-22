@@ -270,6 +270,8 @@ void Ieee802154eMac::commonInitialize()
      mLowerLayerOut = findGate("lowerLayerOut");
      mQueueIn       = findGate("queueIn");
      mQueueOut      = findGate("queueOut");
+     mSchedulerIn   = findGate("schedulerIn");
+     mSchedulerOut  = findGate("schedulerOut");
 
      // get a pointer to the SlotframeTable Module
      slotframeTable = check_and_cast<IMacSlotframeTable *>(getModuleByPath(par("macSlotframeTableModule")));
@@ -940,32 +942,13 @@ void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
 
     case TP_MLME_ASSOCIATE_REQUEST:
         EV <<"[MAC]: this is a MLME_ASSOCIATE_REQUEST" << endl;
-        handle_MLME_ASSOCIATE_request(primitive->getChannelNumber(),
-                primitive->getChannelPage(),
-                (Ieee802154eAddrMode)primitive->getCoordAddrMode(),
-                primitive->getCoordPANId(),
-                (IE3ADDR) primitive->getCoordAddress(),
-                primitive->getCapabilityInformation(),
-                primitive->getSecurityLevel(),
-                primitive->getKeyIdMode(),
-                primitive->getKeySource(),
-                primitive->getKeyIndex(),
-                primitive->getLowLatencyNetworkInfo(),
-                primitive->getChannelOffset(),
-                primitive->getHoppingSequenceID());
+        handle_MLME_ASSOCIATE_request(primitive->dup());
         delete primitive;
         break;
 
     case TP_MLME_DISASSOCIATE_REQUEST:
         EV <<"[MAC]: this is a MLME_DISASSOCIATE_REQUEST" << endl;
-        handle_MLME_DISASSOCIATE_request((Ieee802154eAddrMode)primitive->getDeviceAddrMode(),
-                primitive->getDevicePANId(),
-                (IE3ADDR)primitive->getDeviceAddress(),
-                primitive->getDisassociateReason(),
-                primitive->getTxIndirect(), primitive->getSecurityLevel(),
-                primitive->getKeyIdMode(),
-                primitive->getKeySource(),
-                primitive->getKeyIndex());
+        handle_MLME_DISASSOCIATE_request(primitive->dup());
         delete primitive;
         break;
 
@@ -1120,44 +1103,6 @@ void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
         EV <<"[MAC]: this is a MLME_KEEP_ALIVE_REQUEST" << endl;
         handle_MLME_KEEP_ALIVE_request(primitive->getDstAddr(),
                 primitive->getKeepAlivePeriod());
-        delete primitive;
-        break;
-
-    // LL-MAC management service - Std 802.15.4e-2012 (table 8b) page 123
-    case TP_MLME_LLDN_DISCOVERY_REQUEST:
-        EV <<"[MAC]: this is a MLME_LLDN_DISCOVERY_REQUEST" << endl;
-        handle_MLME_LLDN_DISCOVERY_request();
-        delete primitive;
-        break;
-
-    case TP_MLME_LLDN_CONFIGURATION_REQUEST:
-        EV <<"[MAC]: this is a MLME_LLDN_CONFIGURATION_REQUEST" << endl;
-        handle_MLME_LLDN_CONFIGURATION_request();
-        delete primitive;
-        break;
-
-    case TP_MLME_LLDN_ONLINE_REQUEST:
-        EV <<"[MAC]: this is a MLME_LLDN_ONLINE_REQUEST" << endl;
-        handle_MLME_LLDN_ONLINE_request();
-        delete primitive;
-        break;
-
-    // DSME MAC management service - Std 802.15.4e-2012 (table 8c) page 124
-    case TP_MLME_DSME_GTS_REQUEST:
-        EV <<"[MAC]: this is a MLME_DSME_GTS_REQUEST" << endl;
-        handle_MLME_DSME_GTS_request();
-        delete primitive;
-        break;
-
-    case TP_MLME_DSME_INFO_REQUEST:
-        EV <<"[MAC]: this is a MLME_DSME_INFO_REQUEST" << endl;
-        handle_MLME_DSME_INFO_request();
-        delete primitive;
-        break;
-
-    case TP_MLME_DSME_LINKSTATUSRPT_REQUEST:
-        EV <<"[MAC]: this is a MLME_DSME_LINKSTATUSRPT_REQUEST" << endl;
-        handle_MLME_DSME_LINKSTATUSRPT_request();
         delete primitive;
         break;
 
@@ -1751,6 +1696,11 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
     case Ieee802154e_MULTI:  // Multipurpose
         EV << "[MAC]: continue to process received Multipurpose pkt" << endl;
         handleMulti802154e(frame);
+        break;
+
+    case Ieee802154e_ASSOCIATION_REQUEST:
+        EV << "[MAC} continue to proxess received association pkt" << endl;
+        handle_MLME_ASSOCIATE_request(frame);
         break;
 
     default:
@@ -5731,16 +5681,21 @@ void Ieee802154eMac::csmacaTrxBeacon(char trx)
  * The MLME-ASSOCIATE.request primitive is used by a device to request an association with a coordinator.
  *
  * note: see Std 802.15.4-2011 (6.2.2.1) page 79
- * from NETWORK to MAC
+ * from MAC to MAC
  *
  * param[in]. */
-void Ieee802154eMac::handle_MLME_ASSOCIATE_request(UINT_8 channelNumber, UINT_8 channelPage, Ieee802154eAddrMode coordAddrMode,
-                                           UINT_16 coordPANId, IE3ADDR coordAddress, UINT_8 capabilityInformation,
-                                           UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
-                                           UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID )
+void Ieee802154eMac::handle_MLME_ASSOCIATE_request(cMessage *msg)
 {
+    /*UINT_8 channelNumber, UINT_8 channelPage, Ieee802154eAddrMode coordAddrMode,
+                                               UINT_16 coordPANId, IE3ADDR coordAddress, UINT_8 capabilityInformation,
+                                               UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
+                                               UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID
+*/
+
 
 }
+
+
 
 /**@author: 2014    Stefan Reis
  * brief: MLME-ASSOCIATE.indication is used to indicate the reception of an MLME-ASSOCIATE.request command
@@ -5755,41 +5710,31 @@ void Ieee802154eMac::handle_MLME_ASSOCIATE_request(UINT_8 channelNumber, UINT_8 
  * from MAC to NETWORK
  *
  * param[in] */
-void Ieee802154eMac::MLME_ASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 capabilityInformation, UINT_8 securityLevel,
-        UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo,
-        UINT_16 channelOffset, UINT_8 hoppingSequenceID)
+void Ieee802154eMac::MLME_ASSOCIATE_indication(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
-    primitive->setKind(TP_MLME_ASSOCIATE_INDICATION);
-    primitive->setDeviceAddress(deviceAddress.getInt());
-    primitive->setCapabilityInformation(capabilityInformation);
-    primitive->setSecurityLevel(securityLevel);
-    primitive->setKeyIdMode(keyIdMode);
-    primitive->setKeySource(keySource);
-    primitive->setKeyIndex(keyIndex);
-    primitive->setLowLatencyNetworkInfo(lowLatencyNetworkInfo);
-    primitive->setChannelOffset(channelOffset);
-    primitive->setHoppingSequenceID(hoppingSequenceID);
+
+    Ieee802154eNetworkCtrlInfo *primitive = check_and_cast< Ieee802154eNetworkCtrlInfo*>(msg);
+//    primitive->setKind(TP_MLME_ASSOCIATE_INDICATION);
+//    primitive->setDeviceAddress(deviceAddress.getInt());
+//    primitive->setCapabilityInformation(capabilityInformation);
+//    primitive->setSecurityLevel(securityLevel);
+//    primitive->setKeyIdMode(keyIdMode);
+//    primitive->setKeySource(keySource);
+//    primitive->setKeyIndex(keyIndex);
+//    primitive->setLowLatencyNetworkInfo(lowLatencyNetworkInfo);
+//    primitive->setChannelOffset(channelOffset);
+//    primitive->setHoppingSequenceID(hoppingSequenceID);
 
     EV << "[MAC]: sending a MLME-ASSOCIATE.indication to NETWORK" << endl;
-    send(primitive, upperLayerOut);
+    send(primitive, mSchedulerOut);
 }
 
-/**@author: 2014    Stefan Reis
- * brief: MLME-ASSOCIATE.response primitive is used to initiate a response to an MLMEASSOCIATE.indication
- *
- * The MLME-ASSOCIATE.response primitive is used to initiate a response to an MLMEASSOCIATE.indication primitive.
- *
- * note: see Std 802.15.4-2011 (6.2.2.3) page 81
- * From NETWORK to MAC
- *
- * param[in] */
-void Ieee802154eMac::MLME_ASSOCIATE_responce(IE3ADDR deviceAddress, UINT_16 assocShortAddress, MACenum status, UINT_8 securityLevel,
-        UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo,
-        UINT_16 channelOffset, UINT_16 hoppingSequenceLength, std::vector<int> hoppingSequence)
+void Ieee802154eMac::handle_MLME_ASSOCIATE_responce(cMessage *msg)
 {
 
 }
+
+
 
 /**@author: 2014    Stefan Reis
  * brief: MLME-ASSOCIATE.confirm reports the result of a MLME-ASSOCIATE.request command
@@ -5801,28 +5746,26 @@ void Ieee802154eMac::MLME_ASSOCIATE_responce(IE3ADDR deviceAddress, UINT_16 asso
  * from MAC to NETWORK
  *
  * param[in] */
-void Ieee802154eMac::MLME_ASSOCIATE_confirm(UINT_16 assocShortAddress, MACenum status, UINT_8 securityLevel, UINT_8 keyIdMode,
-        UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset,
-        UINT_16 hoppingSequenceLength, std::vector<int> hoppingSequence)
+void Ieee802154eMac::MLME_ASSOCIATE_confirm(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
+    Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo*>(msg);
     primitive->setKind(TP_MLME_ASSOCIATE_CONFIRM);
-    primitive->setDeviceAddress(assocShortAddress);
-    primitive->setStatus(status);
-
-    primitive->setSecurityLevel(securityLevel);
-    primitive->setKeyIdMode(keyIdMode);
-    primitive->setKeySource(keySource);
-    primitive->setKeyIndex(keyIndex);
-    primitive->setLowLatencyNetworkInfo(lowLatencyNetworkInfo);
-    primitive->setChannelOffset(channelOffset);
+//    primitive->setDeviceAddress(assocShortAddress);
+//    primitive->setStatus(status);
+//
+//    primitive->setSecurityLevel(securityLevel);
+//    primitive->setKeyIdMode(keyIdMode);
+//    primitive->setKeySource(keySource);
+//    primitive->setKeyIndex(keyIndex);
+//    primitive->setLowLatencyNetworkInfo(lowLatencyNetworkInfo);
+//    primitive->setChannelOffset(channelOffset);
 
     // hopping Sequence need to be done [SR] problem: how to handle the not fixed size array?
    // primitive->setHoppingSequenceLength(hoppingSequenceLength);
    // primitive->setHoppingSequence()
 
     EV << "[MAC]: sending a MLME-ASSOCIATE.confirm to NETWORK" << endl;
-    send(primitive, upperLayerOut);
+    send(primitive, mSchedulerOut);
 }
 
 /**@author: 2014    Stefan Reis
@@ -5835,8 +5778,18 @@ void Ieee802154eMac::MLME_ASSOCIATE_confirm(UINT_16 assocShortAddress, MACenum s
  * note: see Std 802.15.4-2011 (6.2.3.1) page 83
  *
  * param[in] */
-void Ieee802154eMac::handle_MLME_DISASSOCIATE_request(Ieee802154eAddrMode deviceAddrMode, UINT_16 devicePANId, IE3ADDR deviceAddress,
-        UINT_8 disassociateReason, bool txIndirect, UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex)
+/*
+Ieee802154eAddrMode deviceAddrMode,
+UINT_16 devicePANId,
+IE3ADDR deviceAddress,
+UINT_8 disassociateReason,
+bool txIndirect,
+UINT_8 securityLevel,
+UINT_8 keyIdMode,
+UINT_64 keySource,
+UINT_8 keyIndex
+        */
+void Ieee802154eMac::handle_MLME_DISASSOCIATE_request(cMessage *msg)
 {
 
 }
@@ -5850,21 +5803,26 @@ void Ieee802154eMac::handle_MLME_DISASSOCIATE_request(Ieee802154eAddrMode device
  * note: see Std 802.15.4-2011 (6.2.3.2) page 84
  * from MAC to NETWORK
  *
- * param[in] */
-void Ieee802154eMac::MLME_DISASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 disassociateReason, UINT_8 securityLevel,
-        UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex)
+ * param[in]
+ * IE3ADDR deviceAddress,
+ * UINT_8 disassociateReason,
+ * UINT_8 securityLevel,
+ * UINT_8 keyIdMode,
+ * UINT_64 keySource,
+ * UINT_8 keyIndex */
+void Ieee802154eMac::MLME_DISASSOCIATE_indication(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
+    Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo*>(msg);
     primitive->setKind(TP_MLME_DISASSOCIATE_INDICATION);
-    primitive->setDeviceAddress(deviceAddress.getInt());
-    primitive->setDisassociateReason(disassociateReason);
-    primitive->setSecurityLevel(securityLevel);
-    primitive->setKeyIdMode(keyIdMode);
-    primitive->setKeySource(keySource);
-    primitive->setKeyIndex(keyIndex);
+//    primitive->setDeviceAddress(deviceAddress.getInt());
+//    primitive->setDisassociateReason(disassociateReason);
+//    primitive->setSecurityLevel(securityLevel);
+//    primitive->setKeyIdMode(keyIdMode);
+//    primitive->setKeySource(keySource);
+//    primitive->setKeyIndex(keyIndex);
 
     EV << "[MAC]: sending a MLME-DISASSOCIATE.indication to NETWORK" << endl;
-    send(primitive, upperLayerOut);
+    send(primitive, mSchedulerOut);
 }
 
 /**@author: 2014    Stefan Reis
@@ -5875,18 +5833,22 @@ void Ieee802154eMac::MLME_DISASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 
  * note: see Std 802.15.4-2011 (6.2.3.3) page 85
  * from MAC to NETWORK
  *
- * param[in] */
-void Ieee802154eMac::MLME_DISASSOCIATE_confirm(MACenum status, Ieee802154eAddrMode deviceAddrMode, UINT_16 devicePANId, IE3ADDR deviceAddress)
+ * param[in]
+ * MACenum status,
+ * Ieee802154eAddrMode deviceAddrMode,
+ * UINT_16 devicePANId,
+ * IE3ADDR deviceAddress*/
+void Ieee802154eMac::MLME_DISASSOCIATE_confirm(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
-    primitive->setKind(TP_MLME_DISASSOCIATE_CONFIRM);
-    primitive->setStatus(status);
-    primitive->setDeviceAddrMode(deviceAddrMode);
-    primitive->setDevicePANId(devicePANId);
-    primitive->setDeviceAddress(deviceAddress.getInt());
+    Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo*>(msg);
+//    primitive->setKind(TP_MLME_DISASSOCIATE_CONFIRM);
+//    primitive->setStatus(status);
+//    primitive->setDeviceAddrMode(deviceAddrMode);
+//    primitive->setDevicePANId(devicePANId);
+//    primitive->setDeviceAddress(deviceAddress.getInt());
 
     EV << "[MAC]: sending a MLME-DISASSOCIATE.confirm to NETWORK" << endl;
-    send(primitive, upperLayerOut);
+    send(primitive, mSchedulerOut);
 }
 
 /**@author: 2014    Stefan Reis
@@ -7254,197 +7216,6 @@ void Ieee802154eMac::MLME_KEEP_ALIVE_confirm(MACenum status)
 }
 
 
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-LLDN-DISCOVERY.confirm reports the results of the MLME-LLDN-DISCOVERY.request command
- *
- * This primitive indicates the end of the Discover state and gives the status of the Discovery state to a higher
- * layer.
- *
- * note: only for LLDN, see Std 802.15.4e-2012 (6.2.20.3) page 150 */
-void Ieee802154eMac::MLME_LLDN_DISCOVERY_confirm()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-LLDN-CONFIGURATION.request switches the LLDN into the Configuration state.
- *
- * The MLME-LLDN-CONFIGURATION.request primitive is generated by the next higher layer of an LLDN
- * coordinator and issued to its MLME to switch the LLDN into the Configuration state as described in 5.1.9.3.
- *
- * note: only for LLDN, see Std 802.15.4e-2012 (6.2.20.4) page 151 */
-void Ieee802154eMac::handle_MLME_LLDN_CONFIGURATION_request()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-LLDN-CONFIGURATION.confirm reports the results of the MLME-LLDN-CONFIGURATION.request command
- *
- * This primitive indicates the end of the Configuration state and gives the status of the Configuration state to
- * the next higher layer.
- *
- * note: only for LLDN, see Std 802.15.4e-2012 (6.2.20.5) page 152 */
-void Ieee802154eMac::MLME_LLDN_CONFIGURATION_confirm()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-LLDN-DISCOVERY.request switches the LLDN into the Online state.
- *
- * The MLME-LLDN-ONLINE.request primitive is generated by the next higher layer of an LLDN
- * coordinator and issued to its MLME to switch the LLDN into the Online state (5.1.9.4).
- *
- * note: only for LLDN, see Std 802.15.4e-2012 (6.2.20.6) page 152 */
-void Ieee802154eMac::handle_MLME_LLDN_ONLINE_request()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-LLDN-ONLINE.indication indicates any problems during the Online state to the next higher layer.
- *
- * The MLME-LLDN-ONLINE.indication primitive is generated by the MLME of any LLDN device and
- * issued to its next higher layer to indicate the status and any problems that occurred in the LLDN during the
- * operation in online mode. It returns the indication of the problem (NONE or UNSPECIFIED) and the
- * additional supporting information to the higher layer.
- *
- * note: only for LLDN, see Std 802.15.4e-2012 (6.2.20.7) page 153 */
-void Ieee802154eMac::MLME_LLDN_ONLINE_indication()
-{
-
-}
-
-//-------------------------------------------------------------------------------/
-/**** <DSME MAC management service - Std 802.15.4e-2012 (table 8c) page 124> ****/
-//-------------------------------------------------------------------------------/
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-GTS.request request an allocation of new DSME-GTS or deallocation,
- *        duplicated allocation notification, reduce, or restart of existing DSME-GTSs.
- *
- * The MLME-DSME-GTS.request primitive is generated by the higher layer of a device and issued to its
- * MLME to request the allocation of new DSME-GTSs or to request the deallocation, duplicated allocation
- * notification, reduce, or change of existing DSME-GTSs.
- *
- * note: only for DSME-GTS, see Std 802.15.4e-2012 (6.2.21.1.1) page 154*/
-void Ieee802154eMac::handle_MLME_DSME_GTS_request()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-GTS.indication reports the reception of a DSME-GTS request command.
- *
- * This primitive is generated by the MLME of a device and issued to its next higher layer upon the reception
- * of a DSME-GTS request command frame.
- *
- * note: only for DSME-GTS, see Std 802.15.4e-2012 (6.2.21.1.2) page 157 */
-void Ieee802154eMac::MLME_DSME_GTS_indication()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-GTS.response allows the next higher layer of a device to respond to the MLME-DSME-GTS.indication
- *
- * The MLME-DSME-GTS.response primitive can be generated by the next higher layer and issued to its
- * MLME to respond to the allocation, deallocation, duplicated allocation notification, reduce, or restart of
- * DSME-GTS.
- *
- * note: only for DSME-GTS, see Std 802.15.4e-2012 (6.2.21.1.3) page 157 */
-void Ieee802154eMac::MLME_DSME_GTS_response()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-GTS.confirm reports the results of the MLME-DSME-GTS.request command
- *
- * This primitive reports the results of a request to allocate, deallocate, notify duplicated allocation, reduce, or
- * restart DSME-GTSs to the higher layer of the device.
- *
- * note: only for DSME-GTS, see Std 802.15.4e-2012 (6.2.21.1.4) page 158 */
-void Ieee802154eMac::MLME_DSME_GTS_confirm()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-INFO.request request the timestamp, DSMESABSpecification, or DSME PAN Descriptor of the
- *        Destination device.
- *
- * The MLME-DSME-INFO.request primitive allows a Source device to request the timestamp and the
- * DSME-SAB-Specification of the Destination device or the DSME PAN Descriptor of the Connection device.
- *
- * note: only for DSME-INFO, see Std 802.15.4e-2012 (6.2.21.2.1) page 160 */
-void Ieee802154eMac::handle_MLME_DSME_INFO_request()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-INFO.indication indicate the reception of a DSME-Information request command frame.
- *
- * The MLME-DSME-INFO.indication primitive is used to indicate the reception of a DSME-Information
- * request command frame.
- *
- * note: only for DSME-INFO, see Std 802.15.4e-2012 (6.2.21.2.2) page 162 */
-void Ieee802154eMac::MLME_DSME_INFO_indication()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-INFO.confirm reports the results of the MLME-DSME-INFO.request command
- *
- * The MLME-DSME-INFO.confirm primitive reports the results of a request for the timestamp, the
- * DSMEGTS-SAB-Specification, or the DSME PAN Descriptor.
- *
- * note: only for DSME-INFO, see Std 802.15.4e-2012 (6.2.21.2.3) page 162 */
-void Ieee802154eMac::MLME_DSME_INFO_confirm(){
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-LINKSTATUSRPT.request request a device start a link quality statistic and periodically report the
- *        statistic results to the destination device
- *
- * The MLME-DSME-LINKSTATUSRPT.request primitive is generated by the higher layer of a source
- * device and is issued to its MLME to request a device start a link quality statistic and periodically report the
- * statistic results to the destination device.
- *
- * note: only for DSME-LINK-STATUS, see Std 802.15.4e-2012 (6.2.21.3.1) page 165 */
-void Ieee802154eMac::handle_MLME_DSME_LINKSTATUSRPT_request()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-LINKSTATUSRPT.indication indicates the transfer of a DSME link status report
- *
- * The MLME-DSME-LINKSTATUSRPT.indication primitive indicates the transfer of a DSME link status
- * report of a device from the MAC sublayer to the local next higher layer.
- *
- * note: only for DSME-LINK-STATUS, see Std 802.15.4e-2012 (6.2.21.3.2) page 165 */
-void Ieee802154eMac::MLME_DSME_LINKSTATUSRPT_indication()
-{
-
-}
-
-/**@author: 2014    Stefan Reis
- * brief: MLME-DSME-LINKSTATUSRPT.confirm reports the results of the MLME-DSME-LINKSTATUSRPT.request command
- *
- * The MLME-DSME-LINKSTATUSRPT.confirm primitive reports the results to start a DSME link status
- * report process.
- *
- * note: only for DSME-LINK-STATUS, see Std 802.15.4e-2012 (6.2.21.3.3) page 166 */
-void Ieee802154eMac::MLME_DSME_LINKSTATUSRPT_confirm()
-{
-
-}
 
 //-------------------------------------------------------------------------------/
 /***************************** <Timer starter> **********************************/

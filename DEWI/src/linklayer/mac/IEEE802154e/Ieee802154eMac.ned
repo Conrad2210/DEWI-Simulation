@@ -94,6 +94,8 @@ simple Ieee802154eMac
         output lowerLayerOut; 		// to the physical layer
         input queueIn;				// from the MAC queue
         output queueOut;			// to the MAC queue
+        input schedulerIn;			//from Scheduler
+        output schedulerOut;		//to Scheduler
 
 
 

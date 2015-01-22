@@ -330,25 +330,14 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     * @name MAC management service - Std 802.15.4-2011 (table 8) page 77
     */
     //@{
-    virtual void    handle_MLME_ASSOCIATE_request(UINT_8 channelNumber, UINT_8 channelPage, Ieee802154eAddrMode coordAddrMode,
-                                           UINT_16 coordPANId, IE3ADDR coordAddress, UINT_8 capabilityInformation,
-                                           UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
-                                           UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID );
-    virtual void    MLME_ASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 capabilityInformation, UINT_8 securityLevel,
-                                           UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,UINT_64 lowLatencyNetworkInfo,
-                                           UINT_16 channelOffset, UINT_8 hoppingSequenceID);
-    virtual void    MLME_ASSOCIATE_responce(IE3ADDR deviceAddress, UINT_16 assocShortAddress, MACenum status, UINT_8 securityLevel,
-                                           UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo,
-                                           UINT_16 channelOffset, UINT_16 hoppingSequenceLength, std::vector<int> hoppingSequence);
-    virtual void    MLME_ASSOCIATE_confirm(UINT_16 assocShortAddress, MACenum status, UINT_8 securityLevel, UINT_8 keyIdMode,
-                                           UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset,
-                                           UINT_16 hoppingSequenceLength, std::vector<int> hoppingSequence);
-    virtual void    handle_MLME_DISASSOCIATE_request(Ieee802154eAddrMode deviceAddrMode, UINT_16 devicePANId, IE3ADDR deviceAddress,
-                                           UINT_8 disassociateReason, bool txIndirect, UINT_8 securityLevel, UINT_8 keyIdMode,
-                                           UINT_64 keySource, UINT_8 keyIndex);
-    virtual void    MLME_DISASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 disassociateReason, UINT_8 securityLevel,
-                                           UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex);
-    virtual void    MLME_DISASSOCIATE_confirm(MACenum status, Ieee802154eAddrMode deviceAddrMode, UINT_16 devicePANId, IE3ADDR deviceAddress);
+    virtual void    handle_MLME_ASSOCIATE_request(cMessage *msg);
+    virtual void    MLME_ASSOCIATE_indication(cMessage *msg);
+    virtual void    handle_MLME_ASSOCIATE_responce(cMessage *msg);
+    virtual void    MLME_ASSOCIATE_confirm(cMessage *msg);
+    virtual void    handle_MLME_DISASSOCIATE_request(cMessage *msg);
+    virtual void    MLME_DISASSOCIATE_indication(cMessage *msg);
+    virtual void    MLME_DISASSOCIATE_confirm(cMessage *msg);
+
     virtual void    MLME_BEACON_NOTIFY_indication(UINT_8 bsn, PAN_ELE panDescriptor, PendingAddrFields pendAddrSpec,
                                            std::vector<IE3ADDR> addrList, UINT_8 sduLength, std::vector<UINT_8> sdu, UINT_8 ebsn, UINT_8 beaconType);
     virtual void    MLME_COMM_STATUS_indication(UINT_16 panId, Ieee802154eAddrMode srcAddrMode, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode,
@@ -423,33 +412,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    MLME_KEEP_ALIVE_confirm(MACenum status);
     //@}
 
-    /**
-    * @name LLDN-MAC management service - Std 802.15.4e-2012 (table 8b) page 123
-    */
-    //@{
-    virtual void    handle_MLME_LLDN_DISCOVERY_request();
-    virtual void    MLME_LLDN_DISCOVERY_confirm();
-    virtual void    handle_MLME_LLDN_CONFIGURATION_request();
-    virtual void    MLME_LLDN_CONFIGURATION_confirm();
-    virtual void    handle_MLME_LLDN_ONLINE_request();
-    virtual void    MLME_LLDN_ONLINE_indication();
-    //@}
 
-    /**
-    * @name DSME MAC management service - Std 802.15.4e-2012 (table 8c) page 124
-    */
-    //@{
-    virtual void    handle_MLME_DSME_GTS_request();
-    virtual void    MLME_DSME_GTS_indication();
-    virtual void    MLME_DSME_GTS_response();
-    virtual void    MLME_DSME_GTS_confirm();
-    virtual void    handle_MLME_DSME_INFO_request();
-    virtual void    MLME_DSME_INFO_indication();
-    virtual void    MLME_DSME_INFO_confirm();
-    virtual void    handle_MLME_DSME_LINKSTATUSRPT_request();
-    virtual void    MLME_DSME_LINKSTATUSRPT_indication();
-    virtual void    MLME_DSME_LINKSTATUSRPT_confirm();
-    //@}
 
     /**
     * @name State control and task management functions
@@ -721,6 +684,8 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     int mLowerLayerOut;
     int mQueueIn;
     int mQueueOut;
+    int mSchedulerIn;
+    int mSchedulerOut;
     //@}
 
     /** @brief  pointer to the NotificationBoard module */

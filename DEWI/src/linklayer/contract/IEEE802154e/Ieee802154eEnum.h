@@ -369,7 +369,8 @@ typedef enum
     Ieee802154e_ACK          = 3,       // MAC ACK
     Ieee802154e_CMD          = 4,       // MAC command
     Ieee802154e_LLDN         = 5,       // LLDN (Low Latency Deterministic Network)
-    Ieee802154e_MULTI        = 6        // Multipurpose
+    Ieee802154e_MULTI        = 6,        // Multipurpose
+    Ieee802154e_ASSOCIATION_REQUEST = 7  //ASSOCIATION_REQUEST
 
 } Ieee802154eFrameType;
 

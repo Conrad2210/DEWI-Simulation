@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/Ieee802154Frame.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/IEEE802154/Ieee802154Frame.msg.
 //
 
 #ifndef _IEEE802154FRAME_M_H_
@@ -23,7 +23,7 @@
 // }}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:27</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:27</tt> by nedtool.
  * <pre>
  * packet Ieee802154Frame
  * {
@@ -107,7 +107,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154Frame& obj) {obj.parsimPack(b);}
 inline void doUnpacking(cCommBuffer *b, Ieee802154Frame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:54</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:54</tt> by nedtool.
  * <pre>
  * packet Ieee802154BeaconFrame extends Ieee802154Frame
  * {
@@ -163,7 +163,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154BeaconFrame& obj) {obj.parsimPac
 inline void doUnpacking(cCommBuffer *b, Ieee802154BeaconFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:76</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:76</tt> by nedtool.
  * <pre>
  * packet Ieee802154DataFrame extends Ieee802154Frame
  * {
@@ -201,7 +201,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154DataFrame& obj) {obj.parsimPack(
 inline void doUnpacking(cCommBuffer *b, Ieee802154DataFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:84</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:84</tt> by nedtool.
  * <pre>
  * message Ieee802154AckFrame extends Ieee802154Frame
  * {
@@ -239,7 +239,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154AckFrame& obj) {obj.parsimPack(b
 inline void doUnpacking(cCommBuffer *b, Ieee802154AckFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:92</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:92</tt> by nedtool.
  * <pre>
  * message Ieee802154CmdFrame extends Ieee802154Frame
  * {
@@ -278,7 +278,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154CmdFrame& obj) {obj.parsimPack(b
 inline void doUnpacking(cCommBuffer *b, Ieee802154CmdFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:99</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:99</tt> by nedtool.
  * <pre>
  * // *** Association request command - Fig 48 ***
  * message Ieee802154AssoReqtCmd extends Ieee802154CmdFrame
@@ -318,7 +318,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154AssoReqtCmd& obj) {obj.parsimPac
 inline void doUnpacking(cCommBuffer *b, Ieee802154AssoReqtCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:105</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:105</tt> by nedtool.
  * <pre>
  * // *** Association response command (ARC) - Fig 50 ***
  * message Ieee802154AssoRespCmd extends Ieee802154CmdFrame
@@ -367,7 +367,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154AssoRespCmd& obj) {obj.parsimPac
 inline void doUnpacking(cCommBuffer *b, Ieee802154AssoRespCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:118</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:118</tt> by nedtool.
  * <pre>
  * // *** Disassociation notification command (DNC)- Fig 51 ***
  * message Ieee802154DisassoNotiCmd extends Ieee802154CmdFrame
@@ -407,7 +407,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154DisassoNotiCmd& obj) {obj.parsim
 inline void doUnpacking(cCommBuffer *b, Ieee802154DisassoNotiCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:125</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:125</tt> by nedtool.
  * <pre>
  * // *** Data request command - Fig 52 *** 
  * message Ieee802154DataReqtCmd extends Ieee802154CmdFrame
@@ -442,7 +442,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154DataReqtCmd& obj) {obj.parsimPac
 inline void doUnpacking(cCommBuffer *b, Ieee802154DataReqtCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:130</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:130</tt> by nedtool.
  * <pre>
  * // *** PAN ID conflict notification command - Fig 53 *** 
  * message Ieee802154PanIdConflictNotiCmd extends Ieee802154CmdFrame
@@ -477,7 +477,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154PanIdConflictNotiCmd& obj) {obj.
 inline void doUnpacking(cCommBuffer *b, Ieee802154PanIdConflictNotiCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:135</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:135</tt> by nedtool.
  * <pre>
  * // *** Orphan notification command - Fig 54 *** 
  * message Ieee802154OrphanNotiCmd extends Ieee802154CmdFrame
@@ -512,7 +512,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154OrphanNotiCmd& obj) {obj.parsimP
 inline void doUnpacking(cCommBuffer *b, Ieee802154OrphanNotiCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:140</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:140</tt> by nedtool.
  * <pre>
  * // *** Beacon request command - Fig 55 *** 
  * message Ieee802154BeaconReqtCmd extends Ieee802154CmdFrame
@@ -547,7 +547,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154BeaconReqtCmd& obj) {obj.parsimP
 inline void doUnpacking(cCommBuffer *b, Ieee802154BeaconReqtCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:145</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:145</tt> by nedtool.
  * <pre>
  * // *** Coordinator realignment command (CRC) - Fig 56 *** 
  * message Ieee802154CoorRealignCmd extends Ieee802154CmdFrame
@@ -600,7 +600,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154CoorRealignCmd& obj) {obj.parsim
 inline void doUnpacking(cCommBuffer *b, Ieee802154CoorRealignCmd& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/Ieee802154Frame.msg:156</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154/Ieee802154Frame.msg:156</tt> by nedtool.
  * <pre>
  * // *** GTS request command (GRC) - Fig 57 *** 
  * message Ieee802154GtsReqtCmd extends Ieee802154CmdFrame

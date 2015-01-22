@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/Ieee802154Frame.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/mac/IEEE802154/Ieee802154Frame.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
