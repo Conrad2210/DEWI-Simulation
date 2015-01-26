@@ -386,6 +386,8 @@ typedef enum
     BEACON_REQUEST,
     COORDINATOR_REALIGNMENT,
     GTS_REQUEST,
+    START_REQUEST,
+    START_CONFIRM,
 
     // Std 802.15.4e-2012 (table 5) page 95
     LL_DISCOVERY_RESPONSE,
@@ -425,6 +427,7 @@ typedef enum
 enum Ieee802154eMacTimerType
 {
     START_PAN_COOR_TIMER,       // dynamic timer
+    START_TIMER,
     MAC_BACKOFF_TIMER,
     MAC_DEFER_CCA_TIMER,
     MAC_BCN_RX_TIMER,

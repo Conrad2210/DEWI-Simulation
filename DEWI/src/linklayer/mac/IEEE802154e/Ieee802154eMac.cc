@@ -645,12 +645,12 @@ void Ieee802154eMac::initialize(int stage)
 
             if (mpib.macTSCHenabled)
             { // Std 802.15.4e-2012
-                PLME_SET_TRX_STATE_request(phy_TRX_OFF);
-                // transmit one enhanced beacon, that all the devices have the time and the ASN
-                constructBCN(); // construct beacon, save it in the frame queue
-                // start ASN
-                BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
-                scheduleAt(simTime()+ panStartTime, asnTimer);
+//                PLME_SET_TRX_STATE_request(phy_TRX_OFF);
+//                // transmit one enhanced beacon, that all the devices have the time and the ASN
+//                constructBCN(); // construct beacon, save it in the frame queue
+//                // start ASN
+//                BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
+//                scheduleAt(simTime()+ panStartTime, asnTimer);
             }
             else
             { // Std 802.15.4-2011
@@ -664,7 +664,7 @@ void Ieee802154eMac::initialize(int stage)
         }
         else    // start a device
         {
-            startDevice();
+            //startDevice();
 
 //            if(mpib.macTSCHenabled)
 //            { // start the TSCH without a beacon from the PAN coordinator (note: the device will be not associated with the coordinator.)
@@ -850,9 +850,9 @@ void Ieee802154eMac::startDevice()
 {
     /** brief: not associated device - only PAN coordinator transmits beacon
      *  note: for the value of the address fields - see Std 802.15.4-2011 (table 87) page 181 */
-    mpib.macPANId               = 0xffff;   // default value (broadcast PAN ID) - it is set after the receiving of the first beacon
-    mpib.macShortAddress        = 0xfffe;   // not associated, but initialized - it is set after the receiving of the first beacon
-    mpib.macSimpleAddress       = 0xfe;     // not associated, but initialized - it is set after the receiving of the first beacon
+    mpib.macPANId               = 0xffff;   // default value (broadcast PAN ID) - it is set after receiving of first beacon
+    mpib.macShortAddress        = 0xfffe;   // not associated, but initialized - it is set after receiving of first beacon
+    mpib.macSimpleAddress       = 0xfe;     // not associated, but initialized - it is set after receiving of first beacon
     mpib.macBeaconOrder         = 15;
     mpib.macSuperframeOrder     = 15;
     mpib.macAssociationPermit   = false;
@@ -900,8 +900,11 @@ void Ieee802154eMac::handleMessage(cMessage* msg)
         //XXX: note: not in use, not for the StarNet or the CSMA802154 example, from the NET layer comes only data packets
         return;
     }
-
-    if (msg->getArrivalGateId() == mLowerLayerIn)
+    if(msg->getArrivalGateId() == mSchedulerIn)
+    {
+	handleSchedulerMsg(msg);
+    }
+    else    if (msg->getArrivalGateId() == mLowerLayerIn)
     {
         handleLowerMsg(PK(msg));    // from PHY layer - data messages
     }
@@ -940,18 +943,6 @@ void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
         delete primitive;
         break;
 
-    case TP_MLME_ASSOCIATE_REQUEST:
-        EV <<"[MAC]: this is a MLME_ASSOCIATE_REQUEST" << endl;
-        handle_MLME_ASSOCIATE_request(primitive->dup());
-        delete primitive;
-        break;
-
-    case TP_MLME_DISASSOCIATE_REQUEST:
-        EV <<"[MAC]: this is a MLME_DISASSOCIATE_REQUEST" << endl;
-        handle_MLME_DISASSOCIATE_request(primitive->dup());
-        delete primitive;
-        break;
-
     case TP_MLME_GET_REQUEST:
         EV <<"[MAC]: this is a MLME_GET_REQUEST" << endl;
         handle_MLME_GET_request((MACPIBenum) primitive->getPibAttribute());
@@ -980,38 +971,6 @@ void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
                 primitive->getRxOnTime(),
                 primitive->getRxOnDuration(),
                 (RangingControl) primitive->getRangingRxControl());
-        delete primitive;
-        break;
-
-    case TP_MLME_SCAN_REQUEST:
-        EV <<"[MAC]: this is a MLME_SCAN_REQUEST" << endl;
-//        handle_MLME_SCAN_request((Ieee802154eChannelScanType) primitive->getScanType(), primitive->getScanChannels(), primitive->getScanDuration(), primitive->getChannelPage,
-//                primitive->getSecurityLevel(), primitive->getKeyIdMode(), primitive->getKeySource(), primitive->getKeyIndex(),
-//                primitive->getLinkQualityScan,
-//
-//                primitive->getFrameControlOptions(), primitive->getFrameControlOptionsArraySize(),
-//                primitive->getHeaderIElist(), primitive->getHeaderIElistArraySize(), primitive->getPayloadIElist(), primitive->getPayloadIElistArraySize());
-        delete primitive;
-        break;
-
-    case TP_MLME_SET_REQUEST:
-        EV <<"[MAC]: this is a MLME_SET_REQUEST" << endl;
-        handle_MLME_SET_request(MACPIBenum(primitive->getPibAttribute()),
-                MAC_PIB(primitive->getPibAttributeValue()));
-        delete primitive;
-        break;
-
-    case TP_MLME_START_REQUEST:
-        EV <<"[MAC]: this is a MLME_START_REQUEST" << endl;
-//        handle_MLME_START_request(primitive->getPanId(), primitive->getChannelNumber(), primitive->getChannelPage(), primitive->getStartTime(), primitive->getBeaconOrder(),
-//                primitive->getSuperframeOrder(), primitive->getPanCoordinator(), primitive->getBatteryLifeExtension(), primitive->getCoordRealignment(),
-//                primitive->getCoordRealignSecurityLevel(), primitive->getCoordRealignKeyIdMode(), primitive->getCoordRealignKeySource(),
-//                primitive->getCoordRealignKeyIndex(), primitive->getBeaconSecurityLevel(), primitive->getBeaconKeyIdMode(),
-//                primitive->getBeaconKeySource(), primitive->getBeaconKeyIndex,
-//
-//                IE_DSME_PAN dsmeSuperframeSpecification,
-//                IE_DSME_PAN_BeaconBitmap beaconBitmap,
-//                HOPP_DESC hoppingDescriptor);
         delete primitive;
         break;
 
@@ -1052,57 +1011,6 @@ void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
     case TP_MLME_CALIBRATE_REQUEST:
         EV <<"[MAC]: this is a MLME_CALIBRATE_REQUEST - Note: UWB is not supported" << endl;
         // handle_MLME_CALIBRATE_requeste(...); // UWB actually not supported
-        delete primitive;
-        break;
-
-    case TP_MLME_BEACON_REQUEST:
-        EV <<"[MAC]: this is a MLME_BEACON_REQUEST" << endl;
-        handle_MLME_BEACON_request(primitive->getBeaconType(),
-                primitive->getChannel(),
-                primitive->getChannelPage(),
-                primitive->getSuperframeOrder(),
-                primitive->getBeaconSecurityLevel(),
-                primitive->getBeaconKeyIdMode(),
-                primitive->getBeaconKeySource(),
-                primitive->getBeaconKeyIndex(),
-                primitive->getDstAddrMode(),
-                (IE3ADDR) primitive->getDstAddr(),
-                primitive->getBsnSuppression());
-        delete primitive;
-        break;
-
-    // TSCH MAC management service - Std 802.15.4e-2012 (table 8a) page 123
-    case TP_MLME_SET_SLOTFRAME_REQUEST:
-        EV <<"[MAC]: this is a MLME_SET_SLOTFRAME_REQUEST" << endl;
-        handle_MLME_SET_SLOTFRAME_request(primitive->getSlotframeHandle(),
-                (Ieee802154eOperation) primitive->getOperation(),
-                primitive->getSize());
-        delete primitive;
-        break;
-
-    case TP_MLME_SET_LINK_REQUEST:
-        EV <<"[MAC]: this is a MLME_SET_LINK_REQUEST" << endl;
-        handle_MLME_SET_LINK_request((Ieee802154eOperation) primitive->getOperation(),
-                primitive->getLinkHandle(),
-                primitive->getSlotframeHandle(),
-                primitive->getTimeslot(),
-                primitive->getChannelOffset(),
-                (MACTSCHLinkOptions)primitive->getLinkOptions(),
-                (MACTSCHLinkType) primitive->getLinkType(),
-                primitive->getNodeAddr());
-        delete primitive;
-        break;
-
-    case TP_MLME_TSCH_MODE_REQUEST:
-        EV <<"[MAC]: this is a MLME_TSCH_MODE_REQUEST" << endl;
-        handle_MLME_TSCH_MODE_request((Ieee802154eTSCHMode) primitive->getTschMode());
-        delete primitive;
-        break;
-
-    case TP_MLME_KEEP_ALIVE_REQUEST:
-        EV <<"[MAC]: this is a MLME_KEEP_ALIVE_REQUEST" << endl;
-        handle_MLME_KEEP_ALIVE_request(primitive->getDstAddr(),
-                primitive->getKeepAlivePeriod());
         delete primitive;
         break;
 
@@ -6218,14 +6126,15 @@ void Ieee802154eMac::MLME_RX_ENABLE_confirm(MACenum status)
  *
  * note: see Std 802.15.4-2011 (6.2.10.1) page 99
  *
- * param[in] */
-//void Ieee802154eMac::handle_MLME_SCAN_request(Ieee802154eChannelScanType scanType,UINT_64 scanChannels, UINT_8 scanDuration, UINT_8 channelPage,
-//        UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, bool linkQualityScan,
-//        bool* frameControlOptions[], unsigned int frameControlOptions_length, UINT_8* headerIElist[],
-//        unsigned int headerIElist_length, UINT_8* payloadIElist[],unsigned int payloadIElist_length)
-//{
-//
-//}
+ * param[in]
+ * Ieee802154eChannelScanType scanType,UINT_64 scanChannels, UINT_8 scanDuration, UINT_8 channelPage,
+        UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, bool linkQualityScan,
+        bool* frameControlOptions[], unsigned int frameControlOptions_length, UINT_8* headerIElist[],
+        unsigned int headerIElist_length, UINT_8* payloadIElist[],unsigned int payloadIElist_length*/
+void Ieee802154eMac::handle_MLME_SCAN_request(cMessage *msg)
+{
+
+}
 
 /**@author: 2014    Stefan Reis
  * brief: MLME-SCAN.confirm reports the results of the MLME-SCAN.request command
@@ -6234,13 +6143,15 @@ void Ieee802154eMac::MLME_RX_ENABLE_confirm(MACenum status)
  *
  * note: see Std 802.15.4-2011 (6.2.9.2) page 99
  *
- * param[in] */
-//void Ieee802154eMac::MLME_SCAN_confirm(MACenum status, Ieee802154eChannelScanType scanType, UINT_8 channelPage, std::vector<int> unscannedChannels,
-//        UINT_8 resultListSize, std::vector<int> energyDetectList, std::vector<PAN_ELE> panDescriptorList,
-//        UINT_8 detectedCategory, std::vector<int> uwbEnergyDetectList)
-//{
-//
-//}
+ * param[in]
+ * MACenum status, Ieee802154eChannelScanType scanType, UINT_8 channelPage, std::vector<int> unscannedChannels,
+        UINT_8 resultListSize, std::vector<int> energyDetectList, std::vector<PAN_ELE> panDescriptorList,
+        UINT_8 detectedCategory, std::vector<int> uwbEnergyDetectList
+ * */
+void Ieee802154eMac::MLME_SCAN_confirm(cMessage *msg)
+{
+
+}
 
 /**@author: 2014    Stefan Reis
  * brief: MLME-SET.request primitive set the given value to the PIB attribute.
@@ -6808,14 +6719,28 @@ void Ieee802154eMac::MLME_SET_confirm(MACenum status, MACPIBenum pibAttribute)
  * param18[in]:   IE_DSME_PAN               dsmeSuperframeSpecification:    Specifies the superframe configuration in the DSME-enabled PAN. Refer to 5.2.4.9.1.
  * param18[in]:   IE_DSME_PAN_BeaconBitmap  beaconBitmap:                   Specifies beacon bitmap. Refer to 5.2.4.9.3.
  * param19[in]:   HOPP_DESC                 hoppingDescriptor:              Specifies channel hopping information. Refer to Table 34a. */
-void Ieee802154eMac::handle_MLME_START_request(UINT_16 panId, UINT_8 channelNumber, UINT_8 channelPage, UINT_32 startTime, UINT_8 beaconOrder,
-                                            UINT_8 superframeOrder, bool panCoordinator, bool batteryLifeExtension, bool coordRealignment,
-                                            UINT_8 coordRealignSecurityLevel, UINT_8 coordRealignKeyIdMode, UINT_64 coordRealignKeySource,
-                                            UINT_8 coordRealignKeyIndex, UINT_8 beaconSecurityLevel, UINT_8 beaconKeyIdMode,
-                                            UINT_64 beaconKeySource, UINT_8 beaconKeyIndex, IE_DSME_PAN dsmeSuperframeSpecification,
-                                            IE_DSME_PAN_BeaconBitmap beaconBitmap, HOPP_DESC hoppingDescriptor)
+void Ieee802154eMac::handle_MLME_START_request(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *startRe = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    if(startRe->getPanCoordinator())
+    {
+	mpib.macBeaconOrder = par("BO");
+	mpib.macSuperframeOrder = par("SO");
+	                PLME_SET_TRX_STATE_request(phy_TRX_OFF);
+	                // transmit one enhanced beacon, that all the devices have the time and the ASN
+	                constructBCN(); // construct beacon, save it in the frame queue
+	                // start ASN
+	                BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
+	                scheduleAt(simTime()+ panStartTime, asnTimer);
+	                startDevice();
+    }
+    else
+    {
+	startDevice();
+    }
 
+    MLME_START_confirm(mac_SUCCESS);
+    delete startRe;
 }
 
 /**@author: 2014    Stefan Reis
@@ -6839,7 +6764,17 @@ void Ieee802154eMac::handle_MLME_START_request(UINT_16 panId, UINT_8 channelNumb
  * param1[in]:    MACenum        state:      The result of the attempt to start using an updated superframe configuration. */
 void Ieee802154eMac::MLME_START_confirm(MACenum status)
 {
+    Ieee802154eNetworkCtrlInfo *startCo = new Ieee802154eNetworkCtrlInfo("StartConfirm",TP_MLME_START_CONFIRM);
+    startCo->setStatus(status);
+    if(par("isPANCoor").boolValue())
+    {
+	startCo->setBeaconOrder(mpib.macBeaconOrder);
+	startCo->setSuperframeOrder(mpib.macSuperframeOrder);
+    }
+    startCo->setPanCoordinator(isPANCoor);
+    send(startCo->dup(),mSchedulerOut);
 
+    delete startCo;
 }
 
 /**@author: 2014    Stefan Reis
@@ -7059,12 +6994,15 @@ void Ieee802154eMac::MLME_CALIBRATE_confirm(){
  *
  * note: see Std 802.15.4e-2012 (6.2.18.1) page 140
  *
- * param[in] */
-void Ieee802154eMac::handle_MLME_BEACON_request(UINT_8 beaconType, UINT_8 channel, UINT_8 channelPage, UINT_8 superFrameOrder,
+ * param[in]
+ * UINT_8 beaconType, UINT_8 channel, UINT_8 channelPage, UINT_8 superFrameOrder,
                                     UINT_8 beaconSecurityLevel, UINT_8 beaconKeyIdMode, UINT_64 beaconKeySource,
-                                    UINT_8 beaconKeyIndex, UINT_8 dstAddrMode, IE3ADDR dstAddr,bool bsnSuppression)
+                                    UINT_8 beaconKeyIndex, UINT_8 dstAddrMode, IE3ADDR dstAddr,bool bsnSuppression
+ * */
+void Ieee802154eMac::handle_MLME_BEACON_request(cMessage *msg)
 {
-
+    MLME_BEACON_confirm(mac_SUCCESS);
+    delete msg;
 }
 
 /**@author: 2014    Stefan Reis
@@ -7080,9 +7018,11 @@ void Ieee802154eMac::MLME_BEACON_confirm(MACenum status)
     Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
     primitive->setKind(TP_MLME_BEACON_CONFIRM);
     primitive->setStatus(status);
+    primitive->setBeaconOrder(mpib.macBeaconOrder);
+    primitive->setSuperframeOrder(mpib.macSuperframeOrder);
 
     EV << "[MAC]: sending a MLME_BEACON.confirm to NETWORK" << endl;
-    send(primitive, upperLayerOut);
+    send(primitive, mSchedulerOut);
 }
 
 /**@author: 2014    Stefan Reis
@@ -9394,4 +9334,21 @@ void Ieee802154eMac::handleTsTxAckDelay()
         PLME_SET_TRX_STATE_request(phy_TX_ON);
         // next step in PLME_SET_TRX_STATE_confirm()
      }
+}
+
+
+void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
+{
+    switch(msg->getKind())
+    {
+	case TP_MLME_START_REQUEST:
+	{
+	    handle_MLME_START_request(msg);
+	    break;
+	}
+	case TP_MLME_BEACON_REQUEST:
+	{
+	    handle_MLME_BEACON_request(msg);
+	}
+    }
 }

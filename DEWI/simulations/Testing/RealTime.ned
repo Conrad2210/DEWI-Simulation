@@ -20,8 +20,8 @@ package dewi.simulations.Testing;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.Node;
-import dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA.LightSwitch;
+import dewi.nodes.Ieee802154e.Stationary.LampNode;
+import dewi.nodes.Ieee802154e.Stationary.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 
@@ -32,10 +32,10 @@ network Network
         double AreaX @unit(m) = default(80m);
         double AreaY @unit(m) = default(40m);
 
-        double nodeSeparationX = default(0);
-        double nodeSeparationY = default(0);
-        int maxRow = CalcMaxRow(numHosts);
-        int maxCol = CalcMaxCol(numHosts);
+//        double nodeSeparationX = default(0);
+//        double nodeSeparationY = default(0);
+//        int maxRow = CalcMaxRow(numHosts);
+//        int maxCol = CalcMaxCol(numHosts);
         //@display("i=background/green;is=vl;bgb=80,40;bgs=25,m;bgi=background/green,s;bgg=1,,black");
         @display("bgb=80,40;bgs=25,m");
     submodules:
@@ -43,11 +43,11 @@ network Network
             parameters:
                 @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=15.28,12.16");
         }
-        lamp[numHosts]: Node {
+        lamp[numHosts]: LampNode {
             parameters:
-                numHosts = numHosts;
-                maxRow = maxRow;
-                maxCol = maxCol;
+//                numHosts = numHosts;
+//                maxRow = maxRow;
+//                maxCol = maxCol;
 //                X = AreaX;
 //                Y = AreaY;
 //				

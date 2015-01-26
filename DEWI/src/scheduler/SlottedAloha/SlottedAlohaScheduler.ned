@@ -19,6 +19,15 @@ import dewi.scheduler.IScheduler;
 
 simple SlottedAlohaScheduler like IScheduler
 {
+    string macSlotframeTableModule = default("^.^.slotframeTable");
+    string macLinkTableModule = default("^.^.linkTable");
+    string macTimeslotTableModule = default("^.^.timeslotTemplate");
+    string macHoppingSequenceListModule = default("^.^.hoppingSequenceList");
+    string macNeighborTableModule = default("^.^.neighborTable");
+	
+	bool isPANCoor = default(false);
+	double StartTime @unit(s) = default(0s);
+
     gates:
         input from_mac;
         output to_mac;

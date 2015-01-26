@@ -15,11 +15,7 @@
 
 #ifndef BASESCHEDULER_H_
 #define BASESCHEDULER_H_
-#include "IMacLinkTable.h"
-#include "IMacSlotframeTable.h"
-#include "IMacTimeslotTable.h"
-#include "IMacHoppingSequenceList.h"
-#include "IMacNeighborTable.h"
+
 
 #include "ILifecycle.h"
 #include "INotifiable.h"
@@ -33,30 +29,10 @@ public:
     //Protected Variables
 protected:
 
-    cGate *outGate;
-    cGate *inGate;
-
-    /** @brief Link table */
-    IMacLinkTable* linkTable;
-    /** @brief slotframe table */
-    IMacSlotframeTable* slotframeTable;
-
-    /** @brief timeslot table */
-    IMacTimeslotTable* timeslotTable;
-
-    /** @brief buffer for one timeslot entry */
-    macTimeslotTableEntry* timeslotTemplate;
-
-    /** @brief Hopping Sequence List */
-    IMacHoppingSequenceList* hoppingSequenceList;
-
-    /** @brief neighbor information table */
-    IMacNeighborTable* neighborTable;
 
     //Protected Functions
 protected:
 
-    virtual int numInitStages() = 0;
 
     virtual void initialize(int) = 0;
 

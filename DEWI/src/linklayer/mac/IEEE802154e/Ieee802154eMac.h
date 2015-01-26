@@ -212,6 +212,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     //@{
     virtual void    handleMessage(cMessage *msg);
     virtual void    handleSelfMsg(cMessage*);
+    virtual void handleSchedulerMsg(cMessage *msg);
     virtual void    handleUpperMsg(cPacket*);   // for MCPS-SAP (Data)
     virtual void    handlePrimitive(int msgkind, cMessage *msg);  // for MLME-SAP (Commands)
     virtual void    handleLowerMsg(cPacket*);
@@ -356,21 +357,12 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    MLME_RESET_confirm(MACenum status);
     virtual void    handle_MLME_RX_ENABLE_request(bool deferPermit, UINT_32 rxOnTime, UINT_32 rxOnDuration, RangingControl rangingRxControl);
     virtual void    MLME_RX_ENABLE_confirm(MACenum status);
-//    virtual void    handle_MLME_SCAN_request(Ieee802154eChannelScanType scanType,UINT_64 scanChannels, UINT_8 scanDuration, UINT_8 channelPage,
-//                                            UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, bool linkQualityScan,
-//                                            bool* frameControlOptions[], unsigned int frameControlOptions_length, UINT_8* headerIElist[],
-//                                            unsigned int headerIElist_length, UINT_8* payloadIElist[],unsigned int payloadIElist_length);
-//    virtual void    MLME_SCAN_confirm(MACenum status, Ieee802154eChannelScanType scanType, UINT_8 channelPage, std::vector<int> unscannedChannels,
-//                                            UINT_8 resultListSize, std::vector<int> energyDetectList, std::vector<PAN_ELE> panDescriptorList,
-//                                            UINT_8 detectedCategory, std::vector<int> uwbEnergyDetectList);
+    virtual void    handle_MLME_SCAN_request(cMessage *msg);
+    virtual void    MLME_SCAN_confirm(cMessage *msg);
+
     virtual void    handle_MLME_SET_request(MACPIBenum pibAttribute, MAC_PIB pibAttributeValue);
     virtual void    MLME_SET_confirm(MACenum status, MACPIBenum pibAttribute);
-    virtual void    handle_MLME_START_request(UINT_16 panId, UINT_8 channelNumber, UINT_8 channelPage, UINT_32 startTime, UINT_8 beaconOrder,
-                                            UINT_8 superframeOrder, bool panCoordinator, bool batteryLifeExtension, bool coordRealignment,
-                                            UINT_8 coordRealignSecurityLevel, UINT_8 coordRealignKeyIdMode, UINT_64 coordRealignKeySource,
-                                            UINT_8 coordRealignKeyIndex, UINT_8 beaconSecurityLevel, UINT_8 beaconKeyIdMode,
-                                            UINT_64 beaconKeySource, UINT_8 beaconKeyIndex, IE_DSME_PAN dsmeSuperframeSpecification,
-                                            IE_DSME_PAN_BeaconBitmap beaconBitmap, HOPP_DESC hoppingDescriptor);
+    virtual void    handle_MLME_START_request(cMessage *msg);
     virtual void    MLME_START_confirm(MACenum status);
     virtual void    handle_MLME_SYNC_request(UINT_8 channelNumber, UINT_8 channelPage, bool trackBeacon);
     virtual void    MLME_SYNC_LOSS_indication(MACenum lossReason, UINT_16 panId, UINT_8 channelNumber, UINT_8 channelPage,
@@ -388,9 +380,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     //virtual void    MLME_CALIBRATE_confirm(MACenum status, UINT_64 CalTxRMARKEROffset, UINT_64 CalRxRMARKEROffset);
 
     // Std 802.15.4e-2012 page 140...
-    virtual void    handle_MLME_BEACON_request(UINT_8 beaconType, UINT_8 channel, UINT_8 channelPage, UINT_8 superFrameOrder,
-                                        UINT_8 beaconSecurityLevel, UINT_8 beaconKeyIdMode, UINT_64 beaconKeySource,
-                                        UINT_8 beaconKeyIndex, UINT_8 dstAddrMode, IE3ADDR dstAddr,bool bsnSuppression);
+    virtual void    handle_MLME_BEACON_request(cMessage *msg);
     virtual void    MLME_BEACON_confirm(MACenum status);
     virtual void    MLME_BEACON_REQUEST_indication(Ieee802154eBeaconType beaconType, UINT_8 srcAddrMode, IE3ADDR srcAddr,
                                         UINT_16 dstPANID, std::vector<IE_LIST> ieList);

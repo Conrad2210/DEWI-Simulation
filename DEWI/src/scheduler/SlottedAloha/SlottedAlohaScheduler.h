@@ -18,6 +18,11 @@
 
 #include <IbaseScheduler.h>
 #include <csimplemodule.h>
+#include "IMacLinkTable.h"
+#include "IMacSlotframeTable.h"
+#include "IMacTimeslotTable.h"
+#include "IMacHoppingSequenceList.h"
+#include "IMacNeighborTable.h"
 
 class INET_API SlottedAlohaScheduler: public cSimpleModule,public IbaseScheduler {
 public:
@@ -25,12 +30,15 @@ public:
     virtual ~SlottedAlohaScheduler();
 
 protected:
-    virtual int numInitStages() {return 2;}
+    int numInitStages() const {return 5;}
 
     virtual void initialize(int);
 
     virtual void handleMessage(cMessage *msg);
 
+    virtual void handleSelfMessage(cMessage *msg);
+
+    virtual void handleMACMessage(cMessage *msg);
 
     //Association Process
     virtual void MLME_ASSOCIATE_request(cMessage *msg );
@@ -68,6 +76,52 @@ protected:
     virtual void MLME_TSCHMODE_request(cMessage *msg);
 
     virtual void handle_MLME_TSCHMODE_confirm(cMessage *msg);
+
+    //START
+    virtual void MLME_START_request(cMessage *msg);
+
+    virtual void handle_MLME_START_confirm(cMessage *msg);
+
+    //SCAN
+    virtual void MLME_SCAN_request(cMessage *msg);
+
+    virtual void handle_MLME_SCAN_confirm(cMessage *msg);
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ///////////////////Helper Functions//////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+    void createInitialEntries();
+
+    //Variables
+protected:
+
+    int outGate;
+    int inGate;
+
+    /** @brief Link table */
+    IMacLinkTable* linkTable;
+    /** @brief slotframe table */
+    IMacSlotframeTable* slotframeTable;
+
+    /** @brief timeslot table */
+    IMacTimeslotTable* timeslotTable;
+
+    /** @brief buffer for one timeslot entry */
+    macTimeslotTableEntry* timeslotTemplate;
+
+    /** @brief Hopping Sequence List */
+    IMacHoppingSequenceList* hoppingSequenceList;
+
+    /** @brief neighbor information table */
+    IMacNeighborTable* neighborTable;
+
+    bool isPANCoor;
+
+protected:
+    //////////TMER
+    cMessage *BeaconTimer;
+    cMessage *StartTimer;
 };
 
 #endif /* SLOTTEDALOHASCHEDULER_H_ */
