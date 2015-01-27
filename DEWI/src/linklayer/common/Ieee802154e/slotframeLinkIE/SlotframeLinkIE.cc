@@ -35,7 +35,6 @@ int SlotframeLinkIE::fillSlotframeLinkIE()
     int length = 0;
     linkIEEntry* linkIeEntry;
     slotframeIEEntry* slotIeEntry;
-
     if (slotframeTable->getNumSlotframes() > 0)
     {
         length += 1 + slotframeTable->getNumSlotframes() * 5;
@@ -63,4 +62,9 @@ int SlotframeLinkIE::fillSlotframeLinkIE()
         }
     }
     return length;
+}
+
+slotframeLinkIEEntry *SlotframeLinkIE::getSlotframeLinkIEEntry()
+{
+    return entry;
 }

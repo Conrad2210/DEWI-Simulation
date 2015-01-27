@@ -19,7 +19,7 @@ package dewi.world.datacenter;
 simple DataCenter
 {
     parameters:
-        bool recordValues;
+        bool recordValues = default(false);
         
         @display("i=device/server2");
 }

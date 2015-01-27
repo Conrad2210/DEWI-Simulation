@@ -65,8 +65,6 @@ module LampNode
         //double Y @unit(m);
         //double Z @unit(m);
         int numHosts;
-        int maxRow;
-        int maxCol;
         //Number of Hosts, to calculate the position of the nodes
         //int Hosts;
 

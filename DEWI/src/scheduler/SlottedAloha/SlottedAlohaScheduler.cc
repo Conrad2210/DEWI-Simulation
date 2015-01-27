@@ -241,6 +241,7 @@ void SlottedAlohaScheduler::MLME_START_request(cMessage *msg)
 
     Ieee802154eNetworkCtrlInfo *startMsg = new Ieee802154eNetworkCtrlInfo("StartMsg",TP_MLME_START_REQUEST);
     startMsg->setPanCoordinator(par("isPANCoor").boolValue());
+    startMsg->setStartTime((uint32_t)par("StartTime").doubleValue());
     send(startMsg->dup(),outGate);
     delete startMsg;
     delete msg;
@@ -319,11 +320,11 @@ void SlottedAlohaScheduler::createInitialEntries()
     hoppingEntry->setHopDwellTime(0);
     hoppingEntry->setHoppingSequenceId(def_macHoppingSequenceID);
     std::vector<UINT_16> tempList;
-    for(int i = minChannelNum; i < maxChannelNum; i ++)
+    for(int i = minChannelNum; i < maxChannelNum-1; i ++)
 	tempList.push_back(i);
     hoppingEntry->setHoppingSequenceLength(tempList.size());
     hoppingEntry->setHoppingSequenceList(tempList);
-    hoppingEntry->setNumberOfChannels(maxChannelNum - minChannelNum);
+    hoppingEntry->setNumberOfChannels(tempList.size());
     hoppingEntry->setPhyConfiguration(PhyConfig);
     hoppingSequenceList->addEntry(hoppingEntry);
 }

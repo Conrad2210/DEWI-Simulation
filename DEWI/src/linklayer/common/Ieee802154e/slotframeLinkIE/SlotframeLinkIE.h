@@ -29,6 +29,7 @@ class SlotframeLinkIE
 
     public:
         int fillSlotframeLinkIE();
+        slotframeLinkIEEntry *getSlotframeLinkIEEntry();
     public:
         SlotframeLinkIE(IMacSlotframeTable* slTable, IMacLinkTable* liTable);
         virtual ~SlotframeLinkIE();

@@ -526,6 +526,8 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     MACAddress configurationMacAddress();
 
+    void MPIBcopyStandard();
+
 
 // member variables
   public:
