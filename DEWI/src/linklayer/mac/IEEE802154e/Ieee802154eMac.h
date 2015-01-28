@@ -218,6 +218,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    handleLowerMsg(cPacket*);
     virtual void    handleMacPhyPrimitive  (int, cMessage*);
     virtual void    handleBeacon(Ieee802154eFrame*);
+    virtual void    handleEB(int stage);
     virtual void    handleCommand(cMessage *msg){};
 
     virtual void    handleCommand80215(Ieee802154eFrame*);
@@ -339,8 +340,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    MLME_DISASSOCIATE_indication(cMessage *msg);
     virtual void    MLME_DISASSOCIATE_confirm(cMessage *msg);
 
-    virtual void    MLME_BEACON_NOTIFY_indication(UINT_8 bsn, PAN_ELE panDescriptor, PendingAddrFields pendAddrSpec,
-                                           std::vector<IE3ADDR> addrList, UINT_8 sduLength, std::vector<UINT_8> sdu, UINT_8 ebsn, UINT_8 beaconType);
+    virtual void    MLME_BEACON_NOTIFY_indication(cMessage *msg);
     virtual void    MLME_COMM_STATUS_indication(UINT_16 panId, Ieee802154eAddrMode srcAddrMode, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode,
                                            IE3ADDR dstAddr, MACenum status, UINT_8 securityLevel, UINT_8 keyIdMode,
                                            UINT_64 keySource, UINT_8 keyIndex);
@@ -390,7 +390,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     * @name TSCH MAC management service - Std 802.15.4e-2012 (table 8a) page 123
     */
     //@{
-    virtual void    handle_MLME_SET_SLOTFRAME_request(UINT_8 slotframeHandle, Ieee802154eOperation operation, UINT_8 size);
+    virtual void    handle_MLME_SET_SLOTFRAME_request(cMessage *msg);
     virtual void    MLME_SET_SLOTFRAME_confirm(UINT_8 slotframeHandle, MACenum status);
     virtual void    handle_MLME_SET_LINK_request(Ieee802154eOperation operation, UINT_16 linkHandle, UINT_8 slotframeHandle,
                                             UINT_16 timeslot, UINT_16 channelOffset, MACTSCHLinkOptions linkOptions,
@@ -651,6 +651,9 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     /** @brief for the backoff calculation at shared links (for TSCH CCA - IEEE Std 802.15.4e-2012 (5.1.1.4.3 TSCH CSMA-CA algorithm) page 15) */
     bool tschSharedLink;
     //@}
+
+    /** @brief variable to indicate if in SCAN period or not */
+    bool isSCAN;
 
     /**
     * @name Static variables
@@ -935,7 +938,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     /** @brief buffer for received beacon frames,
      only used by mlme_scan_request and mlme_rx_enable_request (TBD) */
-    Ieee802154eFrame* rxBeacon;
+    Ieee802154EnhancedBeaconFrame* rxBeacon;
 
     /** @brief buffer for received data frames */
     Ieee802154eFrame* rxData;
@@ -1017,6 +1020,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     cMessage* tsMaxAckTimer;
     //@}
 
+    cMessage *scanTimer;
     /**
     * @name Variables for timers
     */

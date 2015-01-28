@@ -87,6 +87,11 @@ protected:
 
     virtual void handle_MLME_SCAN_confirm(cMessage *msg);
 
+    //set Beacon
+    virtual void MLME_SET_BEACON_request(cMessage *msg);
+
+    virtual void handle_MLME_SET_BEACON_confirm(cMessage *msg);
+
 
     ////////////////////////////////////////////////////////////////////////
     ///////////////////Helper Functions//////////////////////////////////////
@@ -117,6 +122,8 @@ protected:
     IMacNeighborTable* neighborTable;
 
     bool isPANCoor;
+
+    int lastSCANChannel;
 
 protected:
     //////////TMER

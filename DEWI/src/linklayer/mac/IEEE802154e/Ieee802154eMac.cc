@@ -625,6 +625,7 @@ void Ieee802154eMac::initialize(int stage)
 	tsRxWaitTimer = new cMessage("tsRxWaitTimer", MAC_TS_RX_WAIT_TIMER);
 	tsTxAckDelayTimer = new cMessage("tsTxAckDelayTimer", MAC_TS_TX_ACK_DELAY_TIMER);
 	// get initial radio state, channel number, transmit power etc. from Phy layer in this stage
+	scanTimer = new cMessage("scanTimer", MAC_SCAN_TIMER);
     }
     else if(3 == stage)
     {
@@ -1720,6 +1721,10 @@ void Ieee802154eMac::handleSelfMsg(cMessage* msg)
 	    handleTsTxAckDelay();
 	    break;
 
+	case MAC_SCAN_TIMER:
+	    MLME_SCAN_confirm(msg);
+	    break;
+
 	default:
 	    error("[MAC]: unknown MAC timer type!");
 	    break;
@@ -1769,103 +1774,90 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 {
     if(frame->getFrmCtrl().frameVersion == Ieee802154_compatible && mpib.macTSCHcapable) // enhanced beacon frame, only if the device is TSCH capable
     {
-	EV << "[MAC]: starting processing received enhanced Beacon frame with frame version=" << (int)frame->getFrmCtrl().frameVersion << endl;
-	Ieee802154EnhancedBeaconFrame *bcnFrame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
-
-	simtime_t now, tmpf, duration;
-	uint16_t ifs;
-	now = simTime();
-
-	//calculate the time when the first bit of the beacon was received
-	duration = calDuration(frame);
-	bcnRxTime = now - duration;
-
-	/**
-	 * important: this value is calculated in <csmacaStart()>, if later on a CSMA-CA is pending
-	 *        for this bcn and backoff will resume without calling <csmacaStart()> (see <csmacaTrxBeacon()>) ,
-	 *        therefore this value will not be updated, but <csmacaCanProceed()> and other functions will
-	 *        use it and needs to be updated here
-	 */
-	schedBcnRxTime = bcnRxTime;
-	EV << "The first bit of this beacon was received by PHY layer at " << bcnRxTime << endl;
-
-	//calculate <rxBcnDuration>
-	if(bcnFrame->getByteLength() <= aMaxSIFSFrameSize)
-	    ifs = mpib.macSIFSPeriod;
-	else
-	    ifs = mpib.macLIFSPeriod;
-
-	tmpf = duration * phy_symbolrate;
-	tmpf += ifs;
-	rxBcnDuration = (uint16_t)(SIMTIME_DBL(tmpf) / aUnitBackoffPeriod);
-
-	if(fmod(tmpf, aUnitBackoffPeriod) > 0.0)
-	    rxBcnDuration++;
-
-	//update PAN descriptor
-	rxPanDescriptor.coordAddrMode = (Ieee802154eAddrMode)frame->getFrmCtrl().srcAddrMode;
-	rxPanDescriptor.coordPANId = bcnFrame->getSrcPanId();
-	rxPanDescriptor.coordAddress_16_or_64 = bcnFrame->getSrcAddr();
-	rxPanDescriptor.logicalChannel = ppib.phyCurrentChannel;
-	// rxPanDescriptor.SuperframeSpec       // ignored, store in rxSfSpec above
-	// rxPanDescriptor.GTSPermit     = gtsFields.permit;
-	// rxPanDescriptor.LinkQuality          // TODO link quality at PHY layer
-	// rxPanDescriptor.TimeStamp            // ignored, store in bcnRxTime above
-	// rxPanDescriptor.SecurityUse          // security - not implemented
-	// rxPanDescriptor.ACLEntry             // security - not implemented
-	// rxPanDescriptor.SecurityFailure      // security - not implemented
-
-	// handle the IE's
-	handleIEfield(bcnFrame);
-
-	// start ASN timer
-	startAsnTimer(bcnRxTime - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)));
-
-	// reset lost beacon counter
-	bcnLossCounter = 0;
-
-	// temporary solution for association process, to be modified in later version
-	if(notAssociated) // this is my first rxed beacon, associate with this one,
+	if(isSCAN)
 	{
-	    // activate the TSCH mode
-	    mpib.macTSCHenabled = mpib.macTSCHcapable ? true:false; //activate TSCH mode only if the device is TSCH capable
-	    backoffMethod = EXPONENTIAL;
-	    // TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
-	    mpib.macMinBE = 1;    // default: for CSMA-CA = 3; for TSCH-CA = 1
-	    mpib.macMaxBE = 7;    // default: for CSMA-CA = 5; for TSCH-CA = 7
+	    cancelEvent(scanTimer);
+	    rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
+	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SCAN_CONFIRM);
+	    tmp->setStatus(mac_SUCCESS);
+	    MLME_SCAN_confirm(tmp->dup());
 
-	    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
-	    ASSERT(mpib.macPANId == def_macPANId);
-	    notAssociated = false;
-
-	    mpib.macShortAddress = (UINT_16)mpib.macExtendedAddress.getInt();
-	    mpib.macSimpleAddress = (UINT_8)mpib.macExtendedAddress.getInt();
-
-	    mpib.macPANId = bcnFrame->getSrcPanId();           // store PAN id
-	    mpib.macCoordShortAddress = getShortAddress(bcnFrame->getSrcAddr()); // store coordinator address, always use short address
-	    mpib.macCoordExtendedAddress = bcnFrame->getSrcAddr(); // PAN coordinator uses the same address for both its own 16 and 64 bit address
-
-	    EV << "This is my first beacon, associate with it" << endl;
-#if OMNETPP_VERSION >= 0x403
-	    cModule* module =
-	    simulation.getModuleByPath(panCoorName)->getModuleByPath(".wlan.mac");
-#else
-	    cModule* module = simulation.getModuleByPath(panCoorName)->getModuleByRelativePath("wlan.mac");
-#endif
-	    Ieee802154eMac* macModule = check_and_cast<Ieee802154eMac *>(module);
-	    mpib.macShortAddress = macModule->associate_request_cmd(aExtendedAddress, capability);
+	    tmp->setName("BeaconNotify");
+	    tmp->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+	    MLME_BEACON_NOTIFY_indication(tmp->dup());
+	    delete tmp;
 	}
 	else
 	{
-	    // time correction
-	    calcTimeCorr(frame);
+	    rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
+	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SCAN_CONFIRM);
+
+	    tmp->setName("BeaconNotify");
+	    tmp->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+	    MLME_BEACON_NOTIFY_indication(tmp->dup());
+	    delete tmp;
 	}
+//	EV << "[MAC]: starting processing received enhanced Beacon frame with frame version=" << (int)frame->getFrmCtrl().frameVersion << endl;
+//	Ieee802154EnhancedBeaconFrame *bcnFrame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
+//
 
-	dispatch(phy_SUCCESS, __FUNCTION__);
-
-	resetTRX();
-	delete bcnFrame;
-	numRxBcnPkt++;
+//
+//	// handle the IE's
+//	handleIEfield(bcnFrame);
+//
+//	// start ASN timer
+//	startAsnTimer(bcnRxTime - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)));
+//
+//	// reset lost beacon counter
+//	bcnLossCounter = 0;
+//
+//	// temporary solution for association process, to be modified in later version
+//	if(notAssociated) // this is my first rxed beacon, associate with this one,
+//	{
+//	    // activate the TSCH mode
+//	    mpib.macTSCHenabled = mpib.macTSCHcapable ? true:false; //activate TSCH mode only if the device is TSCH capable
+//	    backoffMethod = EXPONENTIAL;
+//	    // TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
+//	    mpib.macMinBE = 1;    // default: for CSMA-CA = 3; for TSCH-CA = 1
+//	    mpib.macMaxBE = 7;    // default: for CSMA-CA = 5; for TSCH-CA = 7
+//
+//	    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
+//	    ASSERT(mpib.macPANId == def_macPANId);
+//	    notAssociated = false;
+//
+//	    mpib.macShortAddress = (UINT_16)mpib.macExtendedAddress.getInt();
+//	    mpib.macSimpleAddress = (UINT_8)mpib.macExtendedAddress.getInt();
+//
+//	    mpib.macPANId = bcnFrame->getSrcPanId();           // store PAN id
+//	    mpib.macCoordShortAddress = getShortAddress(bcnFrame->getSrcAddr()); // store coordinator address, always use short address
+//	    mpib.macCoordExtendedAddress = bcnFrame->getSrcAddr(); // PAN coordinator uses the same address for both its own 16 and 64 bit address
+//
+//	    EV << "This is my first beacon, associate with it" << endl;
+//#if OMNETPP_VERSION >= 0x403
+//	    cModule* module =
+//	    simulation.getModuleByPath(panCoorName)->getModuleByPath(".wlan.mac");
+//#else
+//	    cModule* module = simulation.getModuleByPath(panCoorName)->getModuleByRelativePath("wlan.mac");
+//#endif
+//	    Ieee802154eMac* macModule = check_and_cast<Ieee802154eMac *>(module);
+//	    mpib.macShortAddress = macModule->associate_request_cmd(aExtendedAddress, capability);
+//	}
+//	else
+//	{
+//	    // time correction
+//	    calcTimeCorr(frame);
+//	}
+//
+//	taskP.TS_RX_CCA_tschcca = false;
+//	taskP.TS_TX_CCA_tschcca = false;
+//	taskP.TS_RX_CCA_tschcca_STEP = 0;
+//	taskP.TS_TX_CCA_tschcca_STEP = 0;
+//
+//	dispatch(phy_SUCCESS, __FUNCTION__);
+//
+//	resetTRX();
+//	delete bcnFrame;
+//	numRxBcnPkt++;
     }
     else    // beacon frame - Std 802.15.4-2006/2011
     {
@@ -2081,6 +2073,89 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
     }
 }
 
+void Ieee802154eMac::handleEB(int stage)
+{
+
+    simtime_t now, tmpf, duration;
+    uint16_t ifs;
+    now = simTime();
+
+    //calculate the time when the first bit of the beacon was received
+    duration = calDuration(rxBeacon);
+    bcnRxTime = now - duration;
+
+    /**
+     * important: this value is calculated in <csmacaStart()>, if later on a CSMA-CA is pending
+     *        for this bcn and backoff will resume without calling <csmacaStart()> (see <csmacaTrxBeacon()>) ,
+     *        therefore this value will not be updated, but <csmacaCanProceed()> and other functions will
+     *        use it and needs to be updated here
+     */
+    schedBcnRxTime = bcnRxTime;
+    EV << "The first bit of this beacon was received by PHY layer at " << bcnRxTime << endl;
+
+    //calculate <rxBcnDuration>
+    if(rxBeacon->getByteLength() <= aMaxSIFSFrameSize)
+	ifs = mpib.macSIFSPeriod;
+    else
+	ifs = mpib.macLIFSPeriod;
+
+    tmpf = duration * phy_symbolrate;
+    tmpf += ifs;
+    rxBcnDuration = (uint16_t)(SIMTIME_DBL(tmpf) / aUnitBackoffPeriod);
+
+    if(fmod(tmpf, aUnitBackoffPeriod) > 0.0)
+	rxBcnDuration++;
+
+    //update PAN descriptor
+    rxPanDescriptor.coordAddrMode = (Ieee802154eAddrMode)rxBeacon->getFrmCtrl().srcAddrMode;
+    rxPanDescriptor.coordPANId = rxBeacon->getSrcPanId();
+    rxPanDescriptor.coordAddress_16_or_64 = rxBeacon->getSrcAddr();
+    rxPanDescriptor.logicalChannel = ppib.phyCurrentChannel;
+
+    // handle the IE's
+    handleIEfield(rxBeacon);
+
+    // start ASN timer
+    startAsnTimer(bcnRxTime - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)));
+
+    // reset lost beacon counter
+    bcnLossCounter = 0;
+    mpib.macTSCHenabled = mpib.macTSCHcapable ? true:false; //activate TSCH mode only if the device is TSCH capable
+    backoffMethod = EXPONENTIAL;
+    // TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
+    mpib.macMinBE = 1;    // default: for CSMA-CA = 3; for TSCH-CA = 1
+    mpib.macMaxBE = 7;    // default: for CSMA-CA = 5; for TSCH-CA = 7
+
+//    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
+//    ASSERT(mpib.macPANId == def_macPANId);
+    notAssociated = true;
+
+    mpib.macShortAddress = (UINT_16)mpib.macExtendedAddress.getInt();
+    mpib.macSimpleAddress = (UINT_8)mpib.macExtendedAddress.getInt();
+
+    mpib.macPANId = rxBeacon->getSrcPanId();           // store PAN id
+    mpib.macCoordShortAddress = getShortAddress(rxBeacon->getSrcAddr()); // store coordinator address, always use short address
+    mpib.macCoordExtendedAddress = rxBeacon->getSrcAddr(); // PAN coordinator uses the same address for both its own 16 and 64 bit address
+
+    // time correction
+    calcTimeCorr(rxBeacon);
+
+    taskP.TS_RX_CCA_tschcca = false;
+    taskP.TS_TX_CCA_tschcca = false;
+    taskP.TS_RX_CCA_tschcca_STEP = 0;
+    taskP.TS_TX_CCA_tschcca_STEP = 0;
+
+    dispatch(phy_SUCCESS, __FUNCTION__);
+
+    resetTRX();
+    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SET_BEACON_CONFIRM);
+    send(tmp->dup(), mSchedulerOut);
+    delete tmp;
+    //delete bcnFrame;
+    numRxBcnPkt++;
+
+}
+
 /**@author: 2014    Stefan Reis     (modified) */
 void Ieee802154eMac::handleData(Ieee802154eFrame* frame)
 {
@@ -2189,8 +2264,8 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) // TODO: include the 802
 			}
 		    }
 
-		    if(retries == 4)
-			int test = 0;
+//		    if(retries == 4)
+//			int test = 0;
 
 		    // record for the statistics (with slotframe size 100 and sim end time=10000, we can use the ASN number direct)
 		    int timeslot = FWMath::modulo(curASN, slotframeTable->getSlotframe(activeLinkEntry->getSlotframeId())->getSlotframeSize());
@@ -3060,8 +3135,34 @@ void Ieee802154eMac::constructBCN()
 		tmpTSCHTimeSlt->setMaxTx(timeslotTemplate->getMaxTx());
 		tmpTSCHTimeSlt->setTimeslotLength(timeslotTemplate->getTimeslotLength());
 	    }
+
 	    tmpTimesltIE->ieTSCHTimeslt = tmpTSCHTimeSlt;
 	    tmpSubMLME.push_back(tmpTimesltIE);
+
+	    IE_MLME_Sub* tmphopping = new IE_MLME_Sub;
+	    tmpAll = ((lengthNoIE + payloadLength + 25 + 2) < aMaxPHYPacketSize) ? true:false;
+	    payloadLength += tmpAll ? (25 + 2):3;
+
+	    tmphopping->ieNestedMLMELength = tmpAll ? 25:3; // max length of this IE
+	    tmphopping->ieMLMESubID = IE_MLME_LONG_CHANNEL_HOPPING_SEQUENCE;
+	    tmphopping->ieMLMEtype = true;   // short
+
+	    if(tmpAll)
+	    {
+		IE_CHANNEL_HOPPING *tmpChannel = new IE_CHANNEL_HOPPING;
+		tmpChannel->channelPage = hoppingSequenceList->getEntry(0)->getChannelPage();
+		tmpChannel->currentHop = hoppingSequenceList->getEntry(0)->getCurrentHop();
+		tmpChannel->extBitmap = hoppingSequenceList->getEntry(0)->getExtendedBitmap();
+		tmpChannel->hoppingSeqID = hoppingSequenceList->getEntry(0)->getHoppingSequenceId();
+		tmpChannel->hoppingSeqLength = hoppingSequenceList->getEntry(0)->getHoppingSequenceLength();
+		tmpChannel->hoppingSeqLst = hoppingSequenceList->getEntry(0)->getHoppingSequenceList();
+		tmpChannel->numberOfChannels = hoppingSequenceList->getEntry(0)->getNumberOfChannels();
+		tmpChannel->phyConfig = hoppingSequenceList->getEntry(0)->getPhyConfiguration();
+
+		tmphopping->ieChannelHop = tmpChannel;
+		tmpSubMLME.push_back(tmphopping);
+	    }
+
 	}
 	tmpIeMLME->ieMLMESub = tmpSubMLME;
 	payldIE.ieLenght = payloadLength++;
@@ -5732,42 +5833,42 @@ void Ieee802154eMac::MLME_DISASSOCIATE_confirm(cMessage *msg)
  * from MAC to NETWORK
  *
  * param[in] */
-void Ieee802154eMac::MLME_BEACON_NOTIFY_indication(UINT_8 bsn, PAN_ELE panDescriptor, PendingAddrFields pendAddrSpec, std::vector<IE3ADDR> addrList, UINT_8 sduLength, std::vector<UINT_8> sdu, UINT_8 ebsn, UINT_8 beaconType)
+void Ieee802154eMac::MLME_BEACON_NOTIFY_indication(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
     primitive->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
-    primitive->setBsn(bsn);
-    primitive->setCoordAddrMode(panDescriptor.coordAddrMode);
-    primitive->setCoordPANId(panDescriptor.coordPANId);
-    primitive->setCoordAddress(panDescriptor.coordAddress_16_or_64.getInt());
-    primitive->setChannelNumber(panDescriptor.channelNumber);
-    primitive->setChannelPage(panDescriptor.channelPage);
-    primitive->setBeaconOrder(panDescriptor.superframeSpec.BO);
-    primitive->setSuperframeOrder(panDescriptor.superframeSpec.SO);
-    primitive->setFinalCAPSlot(panDescriptor.superframeSpec.finalCap);
-    primitive->setBatteryLifeExtension(panDescriptor.superframeSpec.battLifeExt);
-    primitive->setPanCoordinator(panDescriptor.superframeSpec.panCoor);
-    primitive->setAssociationPermit(panDescriptor.superframeSpec.assoPmt);
-    primitive->setGtsPermit(panDescriptor.gtsPermit);
-    primitive->setLinkQuality(panDescriptor.linkQuality);
-    primitive->setTimeStamp(panDescriptor.timeStamp.getScale());
-    primitive->setSecurityStatus(panDescriptor.securityStatus);
-    primitive->setSecurityLevel(panDescriptor.securityLevel);
-    primitive->setKeyIdMode(panDescriptor.keyIdMode);
-    primitive->setKeySource(panDescriptor.keySource);
-    primitive->setKeyIndex(panDescriptor.keyIndex);
-    // [SR] need to be done: codelist Problem: not fixed array
-    primitive->setNmbrShortAddrPending(pendAddrSpec.numShortAddr);
-    primitive->setNmbrExtAddrPending(pendAddrSpec.numExtendedAddr);
-    // [SR] NTB: pendAddrSpec addrlist[7]
-    // [SR] need to be done: addrList (bitmap)
-    primitive->setSduLength(sduLength);
-    // [SR] NTB: sdu (set of octets)
-    primitive->setEbsn(ebsn);
-    primitive->setBeaconType(beaconType);
-
+//    primitive->setBsn(bsn);
+//    primitive->setCoordAddrMode(panDescriptor.coordAddrMode);
+//    primitive->setCoordPANId(panDescriptor.coordPANId);
+//    primitive->setCoordAddress(panDescriptor.coordAddress_16_or_64.getInt());
+//    primitive->setChannelNumber(panDescriptor.channelNumber);
+//    primitive->setChannelPage(panDescriptor.channelPage);
+//    primitive->setBeaconOrder(panDescriptor.superframeSpec.BO);
+//    primitive->setSuperframeOrder(panDescriptor.superframeSpec.SO);
+//    primitive->setFinalCAPSlot(panDescriptor.superframeSpec.finalCap);
+//    primitive->setBatteryLifeExtension(panDescriptor.superframeSpec.battLifeExt);
+//    primitive->setPanCoordinator(panDescriptor.superframeSpec.panCoor);
+//    primitive->setAssociationPermit(panDescriptor.superframeSpec.assoPmt);
+//    primitive->setGtsPermit(panDescriptor.gtsPermit);
+//    primitive->setLinkQuality(panDescriptor.linkQuality);
+//    primitive->setTimeStamp(panDescriptor.timeStamp.getScale());
+//    primitive->setSecurityStatus(panDescriptor.securityStatus);
+//    primitive->setSecurityLevel(panDescriptor.securityLevel);
+//    primitive->setKeyIdMode(panDescriptor.keyIdMode);
+//    primitive->setKeySource(panDescriptor.keySource);
+//    primitive->setKeyIndex(panDescriptor.keyIndex);
+//    // [SR] need to be done: codelist Problem: not fixed array
+//    primitive->setNmbrShortAddrPending(pendAddrSpec.numShortAddr);
+//    primitive->setNmbrExtAddrPending(pendAddrSpec.numExtendedAddr);
+//    // [SR] NTB: pendAddrSpec addrlist[7]
+//    // [SR] need to be done: addrList (bitmap)
+//    primitive->setSduLength(sduLength);
+//    // [SR] NTB: sdu (set of octets)
+//    primitive->setEbsn(ebsn);
+//    primitive->setBeaconType(beaconType);
+//
     EV << "[MAC]: sending a MLME-BEACON-NOTIFY.indication to NETWORK" << endl;
-    send(primitive, upperLayerOut);
+    send(primitive, mSchedulerOut);
 }
 
 /**@author: 2014    Stefan Reis
@@ -6090,6 +6191,20 @@ void Ieee802154eMac::MLME_RX_ENABLE_confirm(MACenum status)
  unsigned int headerIElist_length, UINT_8* payloadIElist[],unsigned int payloadIElist_length*/
 void Ieee802154eMac::handle_MLME_SCAN_request(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *scanReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    if(scanReq->getScanType() == 0x02)
+    {
+	PHY_PIB tmpPIB;
+	if(scanTimer->isScheduled())
+	    cancelEvent(scanTimer);
+	tmpPIB.phyCurrentChannel = scanReq->getChannel();
+	PLME_SET_request(PHY_CURRENT_CHANNEL, tmpPIB);
+	PLME_SET_TRX_STATE_request(phy_RX_ON);
+	double tmpTime = (aBaseSuperframeDuration * (pow(2, scanReq->getScanDuration()) + 1)) / 62.5e3;
+	scheduleAt(simTime() + tmpTime, scanTimer);
+	isSCAN = true;
+    }
+    delete scanReq;
 
 }
 
@@ -6107,7 +6222,25 @@ void Ieee802154eMac::handle_MLME_SCAN_request(cMessage *msg)
  * */
 void Ieee802154eMac::MLME_SCAN_confirm(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *scanCon = new Ieee802154eNetworkCtrlInfo("ScanConfirm", TP_MLME_SCAN_CONFIRM);
+    Ieee802154eNetworkCtrlInfo *temp = new Ieee802154eNetworkCtrlInfo();
+    if(msg->getKind() == MAC_SCAN_TIMER)
+    {
+	scanCon->setStatus(mac_NO_BEACON);
+	isSCAN = false;
+	PLME_SET_TRX_STATE_request(phy_TRX_OFF);
+    }
+    else
+    {
+	temp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+	PLME_SET_TRX_STATE_request(phy_TRX_OFF);
+	scanCon->setStatus(temp->getStatus());
+	isSCAN = false;
+    }
 
+    send(scanCon->dup(), mSchedulerOut);
+    delete temp;
+    delete scanCon;
 }
 
 /**@author: 2014    Stefan Reis
@@ -7003,9 +7136,9 @@ void Ieee802154eMac::MLME_BEACON_REQUEST_indication(Ieee802154eBeaconType beacon
  * note: only for TSCH, see Std 802.15.4e-2012 (6.2.19.1) page 143
  *
  * param[in] */
-void Ieee802154eMac::handle_MLME_SET_SLOTFRAME_request(UINT_8 slotframeHandle, Ieee802154eOperation operation, UINT_8 size)
+void Ieee802154eMac::handle_MLME_SET_SLOTFRAME_request(cMessage *msg)
 {
-
+    handleEB(0);
 }
 
 /**@author: 2014    Stefan Reis
@@ -8361,8 +8494,8 @@ void Ieee802154eMac::calcTimeCorr(Ieee802154eFrame* frame)
     timeError = tmpCorr;
     correction = tmpTime;
 
-    if(correction != 0.0)
-	int test = 0;
+//    if(correction != 0.0)
+//	int test = 0;
 
     if(!isPANCoor) // made only the calculation if the
 	timeCorrection = (timeCorrection == 0.0) ? correction:((timeCorrection + correction) / 2);
@@ -8858,7 +8991,7 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 					if(linkTable->getLinkByTimeslotSlotframe(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot(), tmpSlotLink->getSlotframeIE(i)->getSlotframeId()) == NULL)
 					{
 					    macLinkTableEntry *tmpLink = new macLinkTableEntry();
-					    tmpLink->setChannelOffset(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot());
+					    tmpLink->setChannelOffset(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getChannelOffset());
 					    tmpLink->setLinkOption(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkOption());
 					    if(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkOption() == LNK_OP_SHARED_RECEIVE)
 					    {
@@ -8906,17 +9039,21 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 			    {
 				macTimeslotTableEntry* tmpTimeslot = (*it)->ieTSCHTimeslt;
 
-				tmpTimeslot->setTemplateId(timeslotTable->getNumTemplates() + 1);
-				timeslotTable->addTemplate(tmpTimeslot);
-				useTimeslotID = tmpTimeslot->getTemplateId();
-//				if(tmpTimeslot->getTemplateId() + 1
-//					> timeslotTable->getNumTemplates())
-//				    EV
-//					      << "[MAC]handleBcn (enhanced beacon): ERROR wrong timeslot ID"
-//					      << endl;
-////				else
-//				    useTimeslotID =
-//					    tmpTimeslot->getTemplateId();
+				if(timeslotTable->getNumTemplates() == 0)
+				{
+				    tmpTimeslot->setTemplateId(timeslotTable->getNumTemplates() + 1);
+				    timeslotTable->addTemplate(tmpTimeslot);
+				    useTimeslotID = tmpTimeslot->getTemplateId();
+
+				}
+				else if(tmpTimeslot->getTemplateId() + 1 > timeslotTable->getNumTemplates())
+				{
+				    EV << "[MAC]handleBcn (enhanced beacon): ERROR wrong timeslot ID" << endl;
+				}
+				else
+				{
+				    useTimeslotID = tmpTimeslot->getTemplateId();
+				}
 
 				if((*it)->ieNestedMLMELength > 1)
 				{
@@ -8944,7 +9081,24 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 			{
 			    if((*it)->ieMLMESubID == IE_MLME_LONG_CHANNEL_HOPPING_SEQUENCE)
 			    {
-				//TODO:[SR] channel hopping sequence
+				//fixed
+				IE_CHANNEL_HOPPING* tmpChannel = (*it)->ieChannelHop;
+				macHoppingSequenceListEntry *tmpHopE = new macHoppingSequenceListEntry;
+				tmpHopE->setChannelPage(tmpChannel->channelPage);
+				tmpHopE->setCurrentHop(tmpChannel->currentHop);
+				tmpHopE->setExtendedBitmap(tmpChannel->extBitmap);
+				tmpHopE->setHopDwellTime(0);
+				tmpHopE->setHoppingSequenceId(tmpChannel->hoppingSeqID);
+				tmpHopE->setHoppingSequenceLength(tmpChannel->hoppingSeqLength);
+				tmpHopE->setHoppingSequenceList(tmpChannel->hoppingSeqLst);
+				tmpHopE->setNumberOfChannels(tmpChannel->numberOfChannels);
+				tmpHopE->setPhyConfiguration(tmpChannel->phyConfig);
+
+				if(hoppingSequenceList->getEntryById(tmpHopE->getHoppingSequenceId()) == NULL)
+				    hoppingSequenceList->addEntry(tmpHopE);
+				else
+				    hoppingSequenceList->editHoppingSequenceListEntry(tmpHopE);
+				useHoppingSequenceID = tmpHopE->getHoppingSequenceId();
 			    }
 			}
 		    }
@@ -9403,6 +9557,18 @@ void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
 	case TP_MLME_BEACON_REQUEST:
 	{
 	    handle_MLME_BEACON_request(msg);
+	    break;
+	}
+	case TP_MLME_SCAN_REQUEST:
+	{
+	    handle_MLME_SCAN_request(msg);
+	    break;
+	}
+	case TP_MLME_SET_BEACON_REQUEST:
+	{
+	    handleEB(0);
+	    delete msg;
+	    break;
 	}
     }
 }
