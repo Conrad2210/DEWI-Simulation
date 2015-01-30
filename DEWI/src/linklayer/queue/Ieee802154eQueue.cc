@@ -15,7 +15,6 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-
 #include "INETDefs.h"
 
 #include "Ieee802154eQueue.h"
@@ -38,7 +37,7 @@ void Ieee802154eQueue::initialize()
     emit(queueLengthSignal, queue.length());
 
     outGate = gate("out");
-    inGate  = gate("in");
+    inGate = gate("in");
 
     // configuration
     frameCapacity = par("frameCapacity");
@@ -46,23 +45,23 @@ void Ieee802154eQueue::initialize()
 
 cMessage *Ieee802154eQueue::enqueue(cMessage *msg)
 {
-    if (frameCapacity && queue.length() >= frameCapacity)
+    if(frameCapacity && queue.length() >= frameCapacity)
     {
-        EV << "Ieee802154eQueue: Queue full, dropping packet.\n";
-        return msg;
+	EV << "Ieee802154eQueue: Queue full, dropping packet.\n";
+	return msg;
     }
     else
     {
-        queue.insert(msg);
-        emit(queueLengthSignal, queue.length());
-        return NULL;
+	queue.insert(msg);
+	emit(queueLengthSignal, queue.length());
+	return NULL;
     }
 }
 
 cMessage *Ieee802154eQueue::dequeue()
 {
-    if (queue.empty())
-        return NULL;
+    if(queue.empty())
+	return NULL;
 
     cMessage *msg = (cMessage *)queue.pop();
 
@@ -85,24 +84,38 @@ bool Ieee802154eQueue::isEmpty()
 //@author: Stefan Reis      2014
 cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr)
 {
-    for (int i = 0; i < queue.length(); ++i)
+    for(int i = 0; i < queue.length(); ++i)
     {
-        cPacket *msg = PK(queue.get(i));
-        if (dynamic_cast<Ieee802154eFrame *>(msg))
-        {
-            Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eFrame *>(msg))
+	{
+	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-            if (tmpMsg->getDstAddr() == dstAddr)
-            {
-                emit(dequeuePkSignal, msg);
-                emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-                return msg;
-            }
-        }
+	    if(tmpMsg->getDstAddr() == dstAddr)
+	    {
+		emit(dequeuePkSignal, msg);
+		emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+		return msg;
+	    }
+	}
     }
 
-    EV<<"Ieee802154eQueue: msg don't exist in the queue"<< endl;
+    EV << "Ieee802154eQueue: msg don't exist in the queue" << endl;
     return NULL;
+}
+
+cMessage *Ieee802154eQueue::requestAdvPacket()
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eAssociationFrame *>(msg))
+	{
+	    emit(dequeuePkSignal, msg);
+	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+	    return msg;
+	}
+    }
 }
 
 //@author: Stefan Reis      2014
@@ -112,37 +125,37 @@ bool Ieee802154eQueue::deleteMsgQueue(MACAddress dstAddr, bool all)
     int countPkt = 0;
     int i = 0;
 
-    while (!queue.empty() &&  i < queue.length())
+    while(!queue.empty() && i < queue.length())
     {
-        cPacket *msg = PK(queue.get(i));
-        if (dynamic_cast<Ieee802154eFrame *>(msg))
-        {
-            Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
-            if (tmpMsg->getDstAddr() == dstAddr)
-            {
-                countPkt++;
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eFrame *>(msg))
+	{
+	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+	    if(tmpMsg->getDstAddr() == dstAddr)
+	    {
+		countPkt++;
 
-                if (all || !foundFirst )
-                {
-                    queue.remove(queue.get(i));
-                    foundFirst = true;
-                    i = 0; // start from the beginning, to prevent an NULL pointer
-                }
-                else
-                    ++i;
-            }
-            ++i;
-        }
-        else
-            ++i;
+		if(all || !foundFirst)
+		{
+		    queue.remove(queue.get(i));
+		    foundFirst = true;
+		    i = 0; // start from the beginning, to prevent an NULL pointer
+		}
+		else
+		    ++i;
+	    }
+	    ++i;
+	}
+	else
+	    ++i;
     }
 
-    if (!foundFirst)
-        EV<<"Ieee802154eQueue: msg couldn't delete from the queue"<< endl;
+    if(!foundFirst)
+	EV << "Ieee802154eQueue: msg couldn't delete from the queue" << endl;
 
     emit(queueLengthSignal, queue.length());
 
-    return foundFirst?true:false;
+    return foundFirst ? true:false;
 }
 
 //@author: Stefan Reis      2014
@@ -152,35 +165,35 @@ void Ieee802154eQueue::insertInQueue(cMessage *msg)
 
     emit(rcvdPkSignal, msg);
 
-    if (packetRequested > 0)
+    if(packetRequested > 0)
     {
-        packetRequested--;
-        emit(enqueuePkSignal, msg);
-        emit(dequeuePkSignal, msg);
-        emit(queueingTimeSignal, SIMTIME_ZERO);
-        sendOut(msg);
+	packetRequested--;
+	emit(enqueuePkSignal, msg);
+	emit(dequeuePkSignal, msg);
+	emit(queueingTimeSignal, SIMTIME_ZERO);
+	sendOut(msg);
     }
     else
     {
-        msg->setArrivalTime(simTime());
-        cMessage *droppedMsg = enqueue(msg);
-        if (msg != droppedMsg)
-            emit(enqueuePkSignal, msg);
+	msg->setArrivalTime(simTime());
+	cMessage *droppedMsg = enqueue(msg);
+	if(msg != droppedMsg)
+	    emit(enqueuePkSignal, msg);
 
-        if (droppedMsg)
-        {
-            numQueueDropped++;
-            emit(dropPkByQueueSignal, droppedMsg);
-            delete droppedMsg;
-        }
-        else
-            notifyListeners();
+	if(droppedMsg)
+	{
+	    numQueueDropped++;
+	    emit(dropPkByQueueSignal, droppedMsg);
+	    delete droppedMsg;
+	}
+	else
+	    notifyListeners();
     }
 
-    if (ev.isGUI())
+    if(ev.isGUI())
     {
-        char buf[40];
-        sprintf(buf, "q rcvd: %d\nq dropped: %d", numQueueReceived, numQueueDropped);
-        getDisplayString().setTagArg("t", 0, buf);
+	char buf[40];
+	sprintf(buf, "q rcvd: %d\nq dropped: %d", numQueueReceived, numQueueDropped);
+	getDisplayString().setTagArg("t", 0, buf);
     }
 }

@@ -370,7 +370,8 @@ typedef enum
     Ieee802154e_CMD          = 4,       // MAC command
     Ieee802154e_LLDN         = 5,       // LLDN (Low Latency Deterministic Network)
     Ieee802154e_MULTI        = 6,        // Multipurpose
-    Ieee802154e_ASSOCIATION_REQUEST = 7  //ASSOCIATION_REQUEST
+    Ieee802154e_ASSOCIATION_REQUEST = 7,  //ASSOCIATION_REQUEST
+    Ieee802154e_ASSOCIATION_RESPONCE = 8
 
 } Ieee802154eFrameType;
 
@@ -428,6 +429,8 @@ enum Ieee802154eMacTimerType
 {
     START_PAN_COOR_TIMER,       // dynamic timer
     START_TIMER,
+    ASSOCIATION_TIMER,
+    ASSOCIATION_WAIT_TIMER,
     MAC_SCAN_TIMER,
     MAC_BACKOFF_TIMER,
     MAC_DEFER_CCA_TIMER,

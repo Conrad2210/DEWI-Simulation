@@ -71,6 +71,8 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
      */
     virtual cMessage *requestSpcPacket(MACAddress addr);
 
+    virtual cMessage *requestAdvPacket();
+
     /**
      * delete a specific one/all packet(s) from the queue
      */

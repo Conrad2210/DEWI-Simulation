@@ -41,7 +41,7 @@ network Network
     submodules:
         lightSwitch: LightSwitch {
             parameters:
-                @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=15.28,12.16");
+                @display("i=lighting/lightswitch;p=15.28,12.16");
         }
         lamp[numHosts]: LampNode {
             parameters:
@@ -53,7 +53,7 @@ network Network
 //				
 //                Hosts = numFixHosts;
 
-                @display("b=1,1,oval;i=status/bulb;p=3.68,10.84");
+                @display("b=1.5,1.5,oval,red;;i=status/bulb;p=3.68,10.84");
         }
 
         channelControl: ChannelControl {

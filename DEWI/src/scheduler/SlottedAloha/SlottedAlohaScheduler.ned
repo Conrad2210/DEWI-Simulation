@@ -27,6 +27,7 @@ simple SlottedAlohaScheduler like IScheduler
 	
 	bool isPANCoor = default(false);
 	double StartTime @unit(s) = default(0s);
+	double AssociateWaitTime @unit(s) = default(0.5s);
 
     gates:
         input from_mac;

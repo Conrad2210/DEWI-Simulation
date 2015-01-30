@@ -58,7 +58,8 @@ macTimeslotTable::macTimeslotTable()
 macTimeslotTable::~macTimeslotTable()
 {
     for (int i = 0; i < (int) idToTemplate.size(); i++)
-        delete idToTemplate[i];
+        delete idToTemplate.at(i);
+
 
     delete[] tmpTemplateList;
 }

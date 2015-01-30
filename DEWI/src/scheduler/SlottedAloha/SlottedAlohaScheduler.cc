@@ -16,6 +16,7 @@
 #include <SlottedAloha/SlottedAlohaScheduler.h>
 #include "Ieee802154eConst.h"
 #include "Ieee802154eNetworkCtrlInfo_m.h"
+#include "Ieee802154eFrame_m.h"
 Define_Module(SlottedAlohaScheduler);
 static const int PhyConfig = 134215680;
 static const int ExtendedBitmap = 0;
@@ -31,11 +32,15 @@ SlottedAlohaScheduler::SlottedAlohaScheduler()
 {
     // TODO Auto-generated constructor stub
     lastSCANChannel = 0;
+    notAssociated = true;
 }
 
 SlottedAlohaScheduler::~SlottedAlohaScheduler()
 {
     // TODO Auto-generated destructor stub
+    delete AssociateTimer;
+    delete BeaconTimer;
+    delete StartTimer;
 
 }
 
@@ -65,7 +70,8 @@ void SlottedAlohaScheduler::initialize(int stage)
     }
     else if(stage == 2)
     {
-
+	AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
+	//AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
     }
     else if(stage == 3)
     {
@@ -122,6 +128,21 @@ void SlottedAlohaScheduler::handleMACMessage(cMessage *msg)
 	    handle_MLME_BEACON_indication(msg);
 	    break;
 	}
+	case TP_MLME_SET_BEACON_CONFIRM:
+	{
+	    handle_MLME_SET_BEACON_confirm(msg);
+	    break;
+	}
+	case TP_MLME_ASSOCIATE_INDICATION:
+	{
+	    handle_MLME_ASSOCIATE_indication(msg);
+	    break;
+	}
+	case TP_MLME_ASSOCIATE_CONFIRM:
+	{
+	    handle_MLME_ASSOCIATE_confirm(msg);
+	    break;
+	}
 	default:
 	{
 	    if(ev.isGUI())
@@ -148,6 +169,16 @@ void SlottedAlohaScheduler::handleSelfMessage(cMessage *msg)
 	    MLME_BEACON_request(msg);
 	    break;
 	}
+	case ASSOCIATION_TIMER:
+	{
+	    MLME_ASSOCIATE_request(msg);
+	    break;
+	}
+	case ASSOCIATION_WAIT_TIMER:
+	{
+	   MLME_SCAN_request(msg);
+	    break;
+	}
 	default:
 	{
 	    if(ev.isGUI())
@@ -164,18 +195,74 @@ void SlottedAlohaScheduler::handleSelfMessage(cMessage *msg)
 //Association Process
 void SlottedAlohaScheduler::MLME_ASSOCIATE_request(cMessage *msg)
 {
+    if(notAssociated)
+    {
+	//if(AssociateWaitTimer->isScheduled())
+	//    cancelEvent(AssociateWaitTimer);
+	Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("AssociationRequest", TP_MLME_ASSOCIATE_REQUEST);
+	send(tmp->dup(), outGate);
+	//scheduleAt(simTime() + par("AssociateWaitTime"), AssociateWaitTimer);
+	delete tmp;
+    }
 }
 
 void SlottedAlohaScheduler::handle_MLME_ASSOCIATE_indication(cMessage *msg)
 {
+    MLME_ASSOCIATE_responce(msg->dup());
+    delete msg;
 }
 
 void SlottedAlohaScheduler::MLME_ASSOCIATE_responce(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    Ieee802154eNetworkCtrlInfo *AssRes = new Ieee802154eNetworkCtrlInfo("AssociationResponse", TP_MLME_ASSOCIATE_RESPONSE);
+    AssRes->setDeviceAddress(tmp->getDeviceAddress());
+    AssRes->setAssocShortAddress(tmp->getSrcAddr());
+    AssRes->setStatus(mac_FastA_successful);
+    AssRes->setChannelOffset(tmp->getChannelOffset());
+    send(AssRes->dup(), outGate);
+    delete AssRes;
+    delete tmp;
 }
 
 void SlottedAlohaScheduler::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    if(tmp->getStatus() == mac_FastA_successful)
+    {
+	//if(AssociateWaitTimer->isScheduled())
+	//    cancelEvent(AssociateWaitTimer);
+	notAssociated = false;
+	cDisplayString& parentDisp = getParentModule()->getParentModule()->getDisplayString();
+	const char* temp = getParentModule()->getParentModule()->getName();
+	if(!strcmp(temp, "lightSwitch"))
+	{
+	    parentDisp.parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+	}
+	else
+	{
+	    parentDisp.parse("b=1.5,1.5,oval,green;i=status/bulb");
+	}
+    }
+    else
+    {
+	//if(AssociateWaitTimer->isScheduled())
+	//    cancelEvent(AssociateWaitTimer);
+	notAssociated = true;
+	cDisplayString& parentDisp = getParentModule()->getParentModule()->getDisplayString();
+	const char* temp = getParentModule()->getParentModule()->getName();
+	if(!strcmp(temp, "lightSwitch"))
+	{
+	    parentDisp.parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+	}
+	else
+	{
+	    parentDisp.parse("b=1.5,1.5,oval,yellow;i=status/bulb");
+	}
+	scheduleAt(simTime(), AssociateTimer);
+    }
+
+    delete tmp;
 }
 
 //Dissassociation Process
@@ -259,7 +346,16 @@ void SlottedAlohaScheduler::MLME_START_request(cMessage *msg)
 void SlottedAlohaScheduler::handle_MLME_START_confirm(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *startCo = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-
+    cDisplayString& parentDisp = getParentModule()->getParentModule()->getDisplayString();
+    const char* temp = getParentModule()->getParentModule()->getName();
+    if(!strcmp(temp, "lightSwitch"))
+    {
+	parentDisp.parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+    }
+    else
+    {
+	parentDisp.parse("b=1.5,1.5,oval,yellow;i=status/bulb");
+    }
     if(startCo->getPanCoordinator())
     {
 	MLME_BEACON_request(msg);
@@ -317,15 +413,18 @@ void SlottedAlohaScheduler::handle_MLME_SCAN_confirm(cMessage *msg)
 
 void SlottedAlohaScheduler::MLME_SET_BEACON_request(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("SetSlotRequest",TP_MLME_SET_BEACON_REQUEST);
-    send(tmp->dup(),outGate);
+    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("SetSlotRequest", TP_MLME_SET_BEACON_REQUEST);
+    send(tmp->dup(), outGate);
     delete tmp;
     delete msg;
 }
 
 void SlottedAlohaScheduler::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 {
+    EV << "[SCHEDULER]: Recieved information from coordinator, start Association process" << endl;
 
+    scheduleAt(simTime(), AssociateTimer);
+    delete msg;
 }
 
 void SlottedAlohaScheduler::createInitialEntries()

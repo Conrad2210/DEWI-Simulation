@@ -94,7 +94,7 @@ class INET_API macNeighborTableEntry : public cObject
         UINT_16 RPL_OF;
 
         /* Transmission Delay: for the Std 802.15.4e-2012 retransmission calculation. */
-        UINT_8 transDelay;
+        int transDelay;
 
     private:
         macNeighborTableEntry(const macNeighborTableEntry& obj);
@@ -138,7 +138,7 @@ class INET_API macNeighborTableEntry : public cObject
         UINT_16 getRPLrank() const{return RPLrank;}
         bool getIsTimeSource() const{return isTimeSource;}
         UINT_16 getRPL_OF() const{return RPL_OF;}
-        UINT_8 getTransDelay() const{return transDelay;}
+        int getTransDelay() const{return transDelay;}
 
         //Set function
         virtual void setNeighborTable(IMacNeighborTable* t) {this->ownerp = t;}
@@ -158,7 +158,7 @@ class INET_API macNeighborTableEntry : public cObject
         virtual void setRPLrank(UINT_16 rplRank) {RPLrank = rplRank;}
         virtual void setIsTimeSource(bool timeSource) {isTimeSource = timeSource;}
         virtual void setRPL_OF(UINT_16 rplOF) {RPL_OF = rplOF;}
-        virtual void setTransDelay(UINT_8 delay) {transDelay = delay;}
+        virtual void setTransDelay(int delay) {transDelay = delay;}
 
         virtual void incrBeaconLostCount() {BeaconLostCount = BeaconLostCount+1;}
         virtual void incrNumTxData() {numTxData = numTxData+1;}

@@ -125,10 +125,15 @@ protected:
 
     int lastSCANChannel;
 
+    bool notAssociated;
+
 protected:
     //////////TMER
     cMessage *BeaconTimer;
     cMessage *StartTimer;
+    cMessage *AssociateTimer;
+    cMessage *ScheduleTimer;
+    //cMessage *AssociateWaitTimer;
 };
 
 #endif /* SLOTTEDALOHASCHEDULER_H_ */
