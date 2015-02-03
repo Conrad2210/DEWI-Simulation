@@ -9715,7 +9715,25 @@ void Ieee802154eMac::MPIBcopyStandard()
     mpib.macTxTotalDuration = MPIB.macTxTotalDuration;
     mpib.macUseEnhancedBeacon = MPIB.macUseEnhancedBeacon;
 }
+void Ieee802154eMac::handle_SCHEDULE_request(cMessage *msg)
+{
 
+}
+
+void Ieee802154eMac::SCHEDULE_indication(cMessage *msg)
+{
+
+}
+
+void Ieee802154eMac::handle_SCHEDULE_response(cMessage *msg)
+{
+
+}
+
+void Ieee802154eMac::SCHEDULE_confirm(cMessage *msg)
+{
+
+}
 void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
 {
     switch(msg->getKind())

@@ -403,6 +403,13 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     //@}
 
 
+    //SCHEDULE
+
+    virtual void handle_SCHEDULE_request(cMessage *msg);
+    virtual void SCHEDULE_indication(cMessage *msg);
+    virtual void handle_SCHEDULE_response(cMessage *msg);
+    virtual void SCHEDULE_confirm(cMessage *msg);
+
 
     /**
     * @name State control and task management functions

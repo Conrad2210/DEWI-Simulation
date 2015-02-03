@@ -93,6 +93,12 @@ protected:
     virtual void handle_MLME_SET_BEACON_confirm(cMessage *msg);
 
 
+
+    //build schedule
+    virtual void SCHEDULE_request(cMessage *msg);
+    virtual void handle_SCHEDULE_indication(cMessage *msg);
+    virtual void SCHEDULE_response(cMessage *msg);
+    virtual void handle_SCHEDULE_confirm(cMessage *msg);
     ////////////////////////////////////////////////////////////////////////
     ///////////////////Helper Functions//////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////

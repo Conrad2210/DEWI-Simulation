@@ -116,6 +116,11 @@ message Ieee802154eAssociationFrame extends Ieee802154eFrame
     Ieee802154eNetworkCtrlInfo CntrlInfo;
 }
 
+message Ieee802154eScheduleFrame extends Ieee802154eFrame
+{
+    Ieee802154eNetworkCtrlInfo CntrlInfo;
+}
+
 // ********************************				
 // MAC command frame format - Std 802.15.4e-2012 (figure 48) page 67
 // ********************************

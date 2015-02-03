@@ -71,6 +71,7 @@ void SlottedAlohaScheduler::initialize(int stage)
     else if(stage == 2)
     {
 	AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
+	ScheduleTimer = new cMessage("ScheduleTimer",SCHEDULE_TIMER);
 	//AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
     }
     else if(stage == 3)
@@ -179,6 +180,11 @@ void SlottedAlohaScheduler::handleSelfMessage(cMessage *msg)
 	   MLME_SCAN_request(msg);
 	    break;
 	}
+	case SCHEDULE_TIMER:
+	{
+	    SCHEDULE_request(msg);
+	    break;
+	}
 	default:
 	{
 	    if(ev.isGUI())
@@ -243,6 +249,8 @@ void SlottedAlohaScheduler::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	{
 	    parentDisp.parse("b=1.5,1.5,oval,green;i=status/bulb");
 	}
+	double tempTime = 0 + ((double)rand() / RAND_MAX) * (0.1 - 0);
+	scheduleAt(simTime() + tempTime,ScheduleTimer);
     }
     else
     {
@@ -478,5 +486,27 @@ void SlottedAlohaScheduler::createInitialEntries()
 	hoppingEntry->setPhyConfiguration(PhyConfig);
 	hoppingSequenceList->addEntry(hoppingEntry);
     }
+
+}
+void SlottedAlohaScheduler::SCHEDULE_request(cMessage *msg)
+{
+    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("ScheduleRequest",TP_SCHEDULE_REQUEST);
+
+    delete tmp;
+
+}
+
+void SlottedAlohaScheduler::handle_SCHEDULE_indication(cMessage *msg)
+{
+
+}
+
+void SlottedAlohaScheduler::SCHEDULE_response(cMessage *msg)
+{
+
+}
+
+void SlottedAlohaScheduler::handle_SCHEDULE_confirm(cMessage *msg)
+{
 
 }
