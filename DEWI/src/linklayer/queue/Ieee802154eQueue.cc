@@ -117,6 +117,19 @@ cMessage *Ieee802154eQueue::requestAdvPacket()
 	}
     }
 }
+cMessage *Ieee802154eQueue::requestSchdulePacket()
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eScheduleFrame *>(msg))
+	{
+	    emit(dequeuePkSignal, msg);
+	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+	    return msg;
+	}
+    }
+}
 
 //@author: Stefan Reis      2014
 bool Ieee802154eQueue::deleteMsgQueue(MACAddress dstAddr, bool all)

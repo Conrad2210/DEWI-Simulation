@@ -75,6 +75,7 @@ class INET_API IMacNeighborTable
           * Returns the link from the macLinkTable
           */
          virtual macNeighborTableEntry *getNeighborByPos(int pos) = 0;
+         virtual macNeighborTableEntry *getNeighborByPos(int pos, bool fillTmpNeighborList) = 0;
          virtual macNeighborTableEntry *getNeighborBySAddr(UINT_16 addr) = 0;
          virtual macNeighborTableEntry *getNeighborByEAddr(MACAddress addr) = 0;
          virtual macNeighborTableEntry *getNeighborById(int id) = 0;

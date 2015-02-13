@@ -127,6 +127,9 @@ protected:
     /** @brief neighbor information table */
     IMacNeighborTable* neighborTable;
 
+
+    //.temp link entry for scheduler messages
+    macLinkTableEntry *linkEntryScheduler;
     bool isPANCoor;
 
     int lastSCANChannel;
@@ -139,6 +142,7 @@ protected:
     cMessage *StartTimer;
     cMessage *AssociateTimer;
     cMessage *ScheduleTimer;
+    cMessage *ScheduleWaitTimer;
     //cMessage *AssociateWaitTimer;
 };
 

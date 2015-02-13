@@ -103,6 +103,9 @@ class INET_API macLinkTable : public cSimpleModule, public IMacLinkTable, protec
         //Returns Link by Id
         virtual macLinkTableEntry *getLinkById(int id);
 
+        //returns link by Timeslot, ChannelOffset and NodeAddress
+        macLinkTableEntry *getLinkByTimeslotOffsetAddress(int timeslot, int offset, UINT_16 address);
+
         //Returns number of links used for specific Slotframe
         virtual int getNumberLinksBySlotframe(int slotframeId);
 
@@ -113,12 +116,19 @@ class INET_API macLinkTable : public cSimpleModule, public IMacLinkTable, protec
         // get LinkTableEntry, depending on the timeslot and slotframe
         virtual macLinkTableEntry *getLinkByTimeslotSlotframe(int timeslot, int slotframe);
 
+        //Return links by depending on timeslot and slotframe
+        virtual void getLinksByTimeslotSlotframe(int timeslot, int slotframe, std::list<macLinkTableEntry*> *list);
+
         //@author:  2014    Stefan Reis
         // check if a link exist to the dest address
         virtual bool existLink(UINT_16 address);
 
+        //check if exactly the same link exist
+        virtual bool existLink(macLinkTableEntry* link);
+
         //Returns link by linkId and slotframeId
         virtual macLinkTableEntry *getLinkByIdAndSlotframe(int LinkId, int SlotframeId);
+
 
         //Return first link which belongs to node address
         virtual macLinkTableEntry *getLinkByNodeAddress(UINT_16 address);

@@ -1,4 +1,12 @@
 # Partial OMNeT++/Tkenv config file -- see $HOME/.tkenvrc as well
 config default-configname	{One}
 config default-runnumber	{0}
+inspector Network.lightSwitch.wlan.ifq.l2queue cQueue {} 1 464x315+2+1:normal
+inspector Network.lightSwitch.linkTable.idToLink {std::vector<macLinkTableEntry *>} {} 1 464x315+4+695:normal
+inspector {Network.lamp[8].linkTable.idToLink} {std::vector<macLinkTableEntry *>} {} 1 464x315+485+699:normal
+inspector Network.lightSwitch.wlan.mac Ieee802154eMac 30 1 464x315+2+349:normal
+inspector {Network.lamp[8].wlan.mac} Ieee802154eMac 246 1 464x315+483+349:normal
+inspector {Network.lamp[6].linkTable.idToLink} {std::vector<macLinkTableEntry *>} {} 1 464x315+968+700:normal
+inspector {Network.lamp[0].wlan.ifq.l2queue} cQueue {} 1 464x315+971+348:normal
+inspector {Network.lamp[4].wlan.ifq.l2queue} cQueue {} 1 464x315+906+80:normal
 

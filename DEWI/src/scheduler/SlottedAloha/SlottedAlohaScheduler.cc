@@ -71,7 +71,8 @@ void SlottedAlohaScheduler::initialize(int stage)
     else if(stage == 2)
     {
 	AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
-	ScheduleTimer = new cMessage("ScheduleTimer",SCHEDULE_TIMER);
+	ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
+	ScheduleWaitTimer = new cMessage("ScheduleWaitTimer", SCHEDULE_WAIT_TIMER);
 	//AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
     }
     else if(stage == 3)
@@ -144,6 +145,16 @@ void SlottedAlohaScheduler::handleMACMessage(cMessage *msg)
 	    handle_MLME_ASSOCIATE_confirm(msg);
 	    break;
 	}
+	case TP_SCHEDULE_INDICATION:
+	{
+	    handle_SCHEDULE_indication(msg);
+	    break;
+	}
+	case TP_SCHEDULE_CONFIRM:
+	{
+	    handle_SCHEDULE_confirm(msg);
+	    break;
+	}
 	default:
 	{
 	    if(ev.isGUI())
@@ -177,12 +188,19 @@ void SlottedAlohaScheduler::handleSelfMessage(cMessage *msg)
 	}
 	case ASSOCIATION_WAIT_TIMER:
 	{
-	   MLME_SCAN_request(msg);
+	    MLME_SCAN_request(msg);
 	    break;
 	}
 	case SCHEDULE_TIMER:
 	{
 	    SCHEDULE_request(msg);
+	    break;
+	}
+	case SCHEDULE_WAIT_TIMER:
+	{
+	    ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
+	    double tempTime = 0 + ((double)rand() / RAND_MAX) * (0.1 - 0);
+	    scheduleAt(simTime() + tempTime, ScheduleTimer);
 	    break;
 	}
 	default:
@@ -249,8 +267,9 @@ void SlottedAlohaScheduler::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	{
 	    parentDisp.parse("b=1.5,1.5,oval,green;i=status/bulb");
 	}
+	ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
 	double tempTime = 0 + ((double)rand() / RAND_MAX) * (0.1 - 0);
-	scheduleAt(simTime() + tempTime,ScheduleTimer);
+	scheduleAt(simTime() + tempTime, ScheduleTimer);
     }
     else
     {
@@ -362,7 +381,10 @@ void SlottedAlohaScheduler::handle_MLME_START_confirm(cMessage *msg)
     }
     else
     {
-	parentDisp.parse("b=1.5,1.5,oval,yellow;i=status/bulb");
+	if(isPANCoor)
+	    parentDisp.parse("b=1.5,1.5,oval,blue;i=status/bulb");
+	else
+	    parentDisp.parse("b=1.5,1.5,oval,yellow;i=status/bulb");
     }
     if(startCo->getPanCoordinator())
     {
@@ -455,7 +477,7 @@ void SlottedAlohaScheduler::createInitialEntries()
 
 	macSlotframeTableEntry *slotframeEntry = new macSlotframeTableEntry();
 	slotframeEntry->setSlotframeId(0);
-	slotframeEntry->setSlotframeSize(2);
+	slotframeEntry->setSlotframeSize(3);
 	slotframeEntry->setSlotframeTable(slotframeTable);
 	slotframeTable->addSlotframe(slotframeEntry);
 
@@ -490,23 +512,134 @@ void SlottedAlohaScheduler::createInitialEntries()
 }
 void SlottedAlohaScheduler::SCHEDULE_request(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("ScheduleRequest",TP_SCHEDULE_REQUEST);
+    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("ScheduleRequest", TP_SCHEDULE_REQUEST);
+    macNeighborTableEntry *neigh;
+//    if(ScheduleTimer->isScheduled() && msg != ScheduleTimer)
+//	cancelEvent(ScheduleTimer);
 
+    bool linkExists = false;
+    for(int i = 0; i < neighborTable->getNumNeighbors(); i++)
+    {
+	neigh = neighborTable->getNeighborByPos(i, false);
+	for(int k = 0; k < linkTable->getNumLinks(); k++)
+	{
+	    if(linkTable->getLink(k)->getNodeAddress() != neigh->getShortAddress() && linkTable->getLink(k)->getLinkType() != LNK_TP_ADVERTISING)
+		linkExists = true;
+	}
+	if(!linkExists)
+	{
+	    tmp->setCoordAddrMode(defFrmCtrl_AddrMode64);
+	    tmp->setCoordAddress(neigh->getExtendedAddress().getInt());
+	    tmp->setTimeslot(1);
+	    tmp->setChannelOffset(1);
+	    send(tmp->dup(), outGate);
+	}
+
+    }
+
+    scheduleAt(simTime() + 1, ScheduleWaitTimer);
     delete tmp;
+    delete msg;
 
 }
 
 void SlottedAlohaScheduler::handle_SCHEDULE_indication(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    Ieee802154eNetworkCtrlInfo *response = Ctrl->dup();
+    response->setKind(TP_SCHEDULE_RESPONSE);
+    macLinkTableEntry *linkEntry = new macLinkTableEntry();
+    linkEntry->setChannelOffset(Ctrl->getChannelOffset());
+    linkEntry->setLinkId(linkTable->getNumLinks() + 1);
+    linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE);
+    linkEntry->setLinkType(LNK_TP_NORMAL);
+    linkEntry->setNodeAddress(Ctrl->getDeviceAddress());
+    linkEntry->setSlotframeId(slotframeTable->getSlotframe(0)->getSlotframeId());
+    linkEntry->setTimeslot(Ctrl->getTimeslot());
+
+    if(linkTable->existLink(linkEntry))
+    {
+	response->setStatus(mac_SUCCESS);
+
+    }
+    else
+    {
+	response->setStatus(mac_DENIED);
+    }
+
+    SCHEDULE_response(response->dup());
+
+    delete response;
+    delete Ctrl;
 
 }
 
 void SlottedAlohaScheduler::SCHEDULE_response(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *response = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    macNeighborTableEntry *neigh = neighborTable->getNeighborBySAddr(response->getDeviceAddress());
+    response->setDeviceAddress(neigh->getExtendedAddress().getInt());
+    send(response->dup(), outGate);
 
+    delete response;
 }
 
 void SlottedAlohaScheduler::handle_SCHEDULE_confirm(cMessage *msg)
 {
+    if(isPANCoor)
+    {
+	    Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+	    Ieee802154eNetworkCtrlInfo *response = Ctrl->dup();
+	    response->setKind(TP_SCHEDULE_RESPONSE);
+	    macLinkTableEntry *linkEntry = new macLinkTableEntry();
+	    linkEntry->setChannelOffset(Ctrl->getChannelOffset());
+	    linkEntry->setLinkId(linkTable->getNumLinks() + 1);
+	    linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE);
+	    linkEntry->setLinkType(LNK_TP_NORMAL);
+	    linkEntry->setNodeAddress(Ctrl->getDeviceAddress());
+	    linkEntry->setSlotframeId(slotframeTable->getSlotframe(0)->getSlotframeId());
+	    linkEntry->setTimeslot(Ctrl->getTimeslot());
+	    linkTable->addLink(linkEntry);
+	    delete response;
+	    delete Ctrl;
 
+    }
+    else
+
+    {
+	Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+	if(ScheduleWaitTimer->isScheduled())
+	    cancelEvent(ScheduleWaitTimer);
+	if(Ctrl->getStatus() == mac_SUCCESS)
+	{
+
+	    macLinkTableEntry *linkEntry = new macLinkTableEntry();
+	    linkEntry->setChannelOffset(Ctrl->getChannelOffset());
+	    linkEntry->setLinkId(linkTable->getNumLinks() + 1);
+	    linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE);
+	    linkEntry->setLinkType(LNK_TP_NORMAL);
+	    linkEntry->setNodeAddress(Ctrl->getDeviceAddress());
+	    linkEntry->setSlotframeId(slotframeTable->getSlotframe(0)->getSlotframeId());
+	    linkEntry->setTimeslot(Ctrl->getTimeslot());
+	    linkTable->addLink(linkEntry);
+	    cDisplayString& parentDisp = getParentModule()->getParentModule()->getDisplayString();
+	    const char* temp = getParentModule()->getParentModule()->getName();
+	    if(!strcmp(temp, "lightSwitch"))
+	    {
+		parentDisp.parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+	    }
+	    else
+	    {
+		parentDisp.parse("b=1.5,1.5,oval,blue;i=status/bulb");
+	    }
+
+	}
+	else
+	{
+	    ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
+	    double tempTime = 0 + ((double)rand() / RAND_MAX) * (0.1 - 0);
+	    scheduleAt(simTime() + tempTime, ScheduleTimer);
+	}
+	delete Ctrl;
+    }
 }

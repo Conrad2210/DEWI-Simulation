@@ -524,6 +524,9 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void calcTimeCorr(Ieee802154eFrame*);
         //@}
 
+    //Check beacon ASN
+    virtual void checkBeaconASN(Ieee802154eFrame*);
+
     // Use to distinguish the radio module that send the event
     int radioModule;
     InterfaceEntry *iface;
@@ -661,6 +664,9 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     /** @brief variable to indicate if in SCAN period or not */
     bool isSCAN;
+
+    /** @brief variable to indicate to construct and transmit a beacon */
+    bool txBeaconNow;
 
     /**
     * @name Static variables

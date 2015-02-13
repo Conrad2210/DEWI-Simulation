@@ -73,6 +73,8 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
 
     virtual cMessage *requestAdvPacket();
 
+    virtual cMessage *requestSchdulePacket();
+
     /**
      * delete a specific one/all packet(s) from the queue
      */
