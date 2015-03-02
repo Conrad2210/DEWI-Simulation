@@ -13,14 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.world.datacenter;
+package dewi.scheduler.SlottedAloha;
 
+import dewi.scheduler.IScheduler;
 
-simple DataCenter
+simple SlottedAloha  like IScheduler
 {
-    parameters:
-        bool recordValues = default(false);
-        bool visualization = default(false);
-        
-        @display("i=device/server2");
+    string macSlotframeTableModule = default("^.^.slotframeTable");
+    string macLinkTableModule = default("^.^.linkTable");
+    string macTimeslotTableModule = default("^.^.timeslotTemplate");
+    string macHoppingSequenceListModule = default("^.^.hoppingSequenceList");
+    string macNeighborTableModule = default("^.^.neighborTable");
+	
+	bool isPANCoor = default(false);
+	double StartTime @unit(s) = default(0s);
+	double AssociateWaitTime @unit(s) = default(0.5s);
+
+    gates:
+        input from_mac;
+        output to_mac;
 }

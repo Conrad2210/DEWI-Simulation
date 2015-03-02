@@ -17,10 +17,10 @@ package dewi.linklayer.nic;
 import dewi.linklayer.base.IOutputQueue;
 import dewi.linklayer.mac.IEEE802154e.Ieee802154eMac;
 import dewi.phyLayer.Ieee802154ePhy;
-import dewi.scheduler.IScheduler;
 import dewi.linklayer.common.Ieee802154e.macLinkTable.macLinkTable;
 import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
 import dewi.linklayer.common.Ieee802154e.macTimeslotTable.macTimeslotTable;
+import dewi.scheduler.IScheduler;
 
 module Ieee802154eNic
 {
@@ -52,9 +52,8 @@ module Ieee802154eNic
 
         scheduler: <scheduleTyp> like IScheduler {
             parameters:
-                @display("p=200,180;i=abstract/table");
+                @display("p=180,180;i=block/segm;q=IFQueue");
         }
-
 
     connections:
         radioIn --> phy.radioIn;
@@ -62,8 +61,8 @@ module Ieee802154eNic
         phy.upperLayerIn <-- { @display("m=m,25,0,25,0"); } <-- mac.lowerLayerOut;
         mac.upperLayerOut --> upperLayerOut;
         mac.upperLayerIn <-- upperLayerIn;
-        mac.schedulerOut --> scheduler.from_mac;
-        mac.schedulerIn <-- scheduler.to_mac;
         ifq.in <-- mac.queueOut;	// to handle the IEEE 802.15.4e-2012 mgs's for the links
         ifq.out --> mac.queueIn; 	// to handle the IEEE 802.15.4e-2012 mgs's for the links
+        scheduler.from_mac <-- mac.schedulerOut;
+        scheduler.to_mac --> mac.schedulerIn;
 }

@@ -104,31 +104,123 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr)
     return NULL;
 }
 
+
+
 cMessage *Ieee802154eQueue::requestAdvPacket()
 {
     for(int i = 0; i < queue.length(); ++i)
     {
 	cPacket *msg = PK(queue.get(i));
-	if(dynamic_cast<Ieee802154eAssociationFrame *>(msg))
+	if((strcmp(msg->getName(),"AssociationRequest") == 0 || strcmp(msg->getName(),"AssociationResponse") == 0 ))
 	{
 	    emit(dequeuePkSignal, msg);
 	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
 	    return msg;
 	}
     }
+    return NULL;
 }
+
+cMessage *Ieee802154eQueue::requestBeaconPacket()
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(strcmp(msg->getName(),"Ieee802154BEACON") == 0)
+	{
+	    emit(dequeuePkSignal, msg);
+	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+	    return msg;
+	}
+    }
+    return NULL;
+}
+
+bool Ieee802154eQueue::existSchedRes(MACAddress addr)
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eFrame *>(msg))
+	{
+	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"SchedulerResponse") == 0)
+	    {
+		return true;
+	    }
+	}
+    }
+    return false;
+}
+
+bool Ieee802154eQueue::existSchedReq(MACAddress addr)
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eFrame *>(msg))
+	{
+	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"SchedulerRequest") == 0)
+	    {
+		return true;
+	    }
+	}
+    }
+    return false;
+}
+
+bool Ieee802154eQueue::existAssRes(MACAddress addr)
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eFrame *>(msg))
+	{
+	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"AssociationResponse") == 0)
+	    {
+		return true;
+	    }
+	}
+    }
+    return false;
+}
+
+bool Ieee802154eQueue::existAssReq(MACAddress addr)
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154eFrame *>(msg))
+	{
+	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"AssociationRequest") == 0)
+	    {
+		return true;
+	    }
+	}
+    }
+    return false;
+}
+
 cMessage *Ieee802154eQueue::requestSchdulePacket()
 {
     for(int i = 0; i < queue.length(); ++i)
     {
 	cPacket *msg = PK(queue.get(i));
-	if(dynamic_cast<Ieee802154eScheduleFrame *>(msg))
+	if((strcmp(msg->getName(),"SchedulerResponse") == 0 || strcmp(msg->getName(),"SchedulerRequest") == 0))
 	{
 	    emit(dequeuePkSignal, msg);
 	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
 	    return msg;
 	}
     }
+    return NULL;
 }
 
 //@author: Stefan Reis      2014

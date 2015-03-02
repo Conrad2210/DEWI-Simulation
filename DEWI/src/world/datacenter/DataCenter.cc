@@ -39,26 +39,24 @@ void DataCenter::initialize(int stage)
 {
     if(stage == 0)
     {
-        if(ev.getConfigEx()->getConfigValue("result-dir") != NULL)
-        {
-            ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
-            recordValues = par("recordValues").boolValue();
-        }
-        else
-            recordValues = false;
+	recordValues = par("recordValues").boolValue();
+	if(recordValues)
+	    ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
+
     }
 }
 
 
 void DataCenter::finish()
 {
-    if(recordValues)
-    {
-        for(int i = 0; i < (int)ResultVectors.size(); i++)
+
+        if(recordValues)
         {
-            ResultVectors.at(i)->saveData(ResultPath);
+            for(int i = 0; i < (int)ResultVectors.size(); i++)
+            {
+                ResultVectors.at(i)->saveData(ResultPath);
+            }
         }
-    }
 
 }
 

@@ -13,11 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.scheduler.SlottedAloha;
+package dewi.scheduler.MulHopClu;
 
 import dewi.scheduler.IScheduler;
 
-simple SlottedAlohaScheduler like IScheduler
+simple MulHopClu  like IScheduler
 {
     string macSlotframeTableModule = default("^.^.slotframeTable");
     string macLinkTableModule = default("^.^.linkTable");

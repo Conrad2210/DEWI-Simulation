@@ -75,6 +75,14 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
 
     virtual cMessage *requestSchdulePacket();
 
+    virtual cMessage *requestBeaconPacket();
+
+    virtual bool existSchedRes(MACAddress addr);
+    virtual bool existAssRes(MACAddress addr);
+    virtual bool existAssReq(MACAddress addr);
+
+    virtual bool existSchedReq(MACAddress addr);
+
     /**
      * delete a specific one/all packet(s) from the queue
      */

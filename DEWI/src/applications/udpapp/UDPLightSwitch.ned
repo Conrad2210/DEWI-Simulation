@@ -121,6 +121,7 @@ simple UDPLightSwitch like IUDPApp
         string outputInterface = default(""); // select the interface in which the packets will be sent
         string outputInterfaceMulticastBroadcast = default(""); // select the interface in which the broadcast packets will be sent
         bool setBroadcast = default(false); // Configure the socket for receive broadcast packets   
+        bool visualization = default(false);
         @signal[sentPk](type=cPacket);
         @signal[rcvdPk](type=cPacket);
         @signal[dropPk](type=cPacket);

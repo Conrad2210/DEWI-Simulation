@@ -55,6 +55,7 @@ simple UDPLamp like IUDPApp
         
         bool setBroadcast = default(true); //configure the socket for receive broadcast packets
         bool resendBroadcast = default(true);
+        bool visualization = default(false);
         
         
         

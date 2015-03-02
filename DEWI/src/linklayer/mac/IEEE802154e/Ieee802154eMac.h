@@ -221,7 +221,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    handleEB(int stage);
     virtual void    handleCommand(cMessage *msg){};
 
-    virtual void    handleCommand80215(Ieee802154eFrame*);
+    //virtual void    handleCommand80215(Ieee802154eFrame*);
     virtual void    handleData(Ieee802154eFrame*);
     virtual void    handleAck(Ieee802154eFrame*);
     virtual void    handleLLDN802154e(Ieee802154eFrame*);   // LLDN (Low Latency Deterministic Network)
@@ -408,7 +408,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void handle_SCHEDULE_request(cMessage *msg);
     virtual void SCHEDULE_indication(cMessage *msg);
     virtual void handle_SCHEDULE_response(cMessage *msg);
-    virtual void SCHEDULE_confirm(cMessage *msg);
+    virtual void SCHEDULE_confirm(cMessage *msg, bool ack);
 
 
     /**
@@ -538,7 +538,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     void MPIBcopyStandard();
 
-
+    void updateNeighbor(Ieee802154eFrame *frame, FrameCtrl frmCtrl);
 // member variables
   public:
 

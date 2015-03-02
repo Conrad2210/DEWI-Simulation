@@ -24,10 +24,10 @@
 #include "IMacHoppingSequenceList.h"
 #include "IMacNeighborTable.h"
 
-class INET_API SlottedAlohaScheduler: public cSimpleModule,public IbaseScheduler {
+class INET_API SlottedAloha: public cSimpleModule,public IbaseScheduler {
 public:
-    SlottedAlohaScheduler();
-    virtual ~SlottedAlohaScheduler();
+    SlottedAloha();
+    virtual ~SlottedAloha();
 
 protected:
     int numInitStages() const {return 5;}
@@ -127,9 +127,19 @@ protected:
     /** @brief neighbor information table */
     IMacNeighborTable* neighborTable;
 
+    //last Neighbor
+    macNeighborTableEntry *lastNeighbor;
+
 
     //.temp link entry for scheduler messages
-    macLinkTableEntry *linkEntryScheduler;
+    //entry for received requests
+    macLinkTableEntry *tempLinkEntryRx;
+
+    //entry for transmitted requests
+    macLinkTableEntry *tempLinkEntryTx;
+
+
+    bool firstLink;
     bool isPANCoor;
 
     int lastSCANChannel;
@@ -142,8 +152,9 @@ protected:
     cMessage *StartTimer;
     cMessage *AssociateTimer;
     cMessage *ScheduleTimer;
-    cMessage *ScheduleWaitTimer;
-    //cMessage *AssociateWaitTimer;
+
+
+    cMessage *AssociateWaitTimer;
 };
 
 #endif /* SLOTTEDALOHASCHEDULER_H_ */

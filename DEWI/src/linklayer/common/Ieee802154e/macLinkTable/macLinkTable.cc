@@ -43,7 +43,7 @@
 
 Define_Module(macLinkTable);
 
-#define LINKIDS_START  1
+#define LINKIDS_START  0
 
 std::ostream& operator<<(std::ostream& os, const macLinkTableEntry& e)
 {
@@ -265,11 +265,11 @@ bool macLinkTable::existLink(macLinkTableEntry *link)
 {
     for(int i = 0; i < (int)idToLink.size(); i++)
     {
-	if(idToLink[i]->getNodeAddress() == link->getNodeAddress()
-		&& idToLink[i]->getLinkOption() == link->getLinkType()
-		&& idToLink[i]->getTimeslot() == link->getTimeslot()
-		&& idToLink[i]->getChannelOffset() == link->getChannelOffset()
-		&& idToLink[i]->getLinkOption() == link->getLinkOption())
+	if(idToLink.at(i)->getNodeAddress() == link->getNodeAddress()
+		&& idToLink.at(i)->getLinkType() == link->getLinkType()
+		&& idToLink.at(i)->getTimeslot() == link->getTimeslot()
+		&& idToLink.at(i)->getChannelOffset() == link->getChannelOffset()
+		&& idToLink.at(i)->getLinkOption() == link->getLinkOption())
 	    return true;
     }
     return false;
@@ -398,6 +398,15 @@ bool macLinkTable::addLink(macLinkTableEntry *entry)
 	    if(ev.isGUI())
 	    {
 		EV << getParentModule()->getParentModule()->getFullName() << "not possible to add link, is not available for this slotframeId" << "\n";
+	    }
+	    return false;
+	}
+
+	if(existLink(entry))
+	{
+	    if(ev.isGUI())
+	    {
+		EV << getParentModule()->getParentModule()->getFullName() << "not possible to add link, identical link already exists" << "\n";
 	    }
 	    return false;
 	}

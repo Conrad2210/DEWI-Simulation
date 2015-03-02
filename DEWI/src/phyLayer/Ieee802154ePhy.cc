@@ -706,7 +706,7 @@ void Ieee802154ePhy::handleLowerMsgEnd(AirFrame * airframe)
             frame->setKind(PACKETOK);
             Radio80211aControlInfo * cinfo = new Radio80211aControlInfo;    //FIXME: need to shift in the PHY class, to reduce the depency to other files [SR]
             cinfo->setSnr(airframe->getSnr());
-            cinfo->setLossRate(-1);
+            cinfo->setLossRate(-1); //FIXME: How to
             cinfo->setRecPow(airframe->getPowRec());
             frame->setControlInfo(cinfo);
 

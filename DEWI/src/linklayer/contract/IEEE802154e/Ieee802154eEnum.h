@@ -201,7 +201,8 @@ typedef enum
     mac_DPS_NOT_SUPPORTED           = 0x8a,     // MLME-DPS.confirm - Std 802.15.4-2011 (table 41) page 113
     mac_SOUNDING_NOT_SUPPORTED      = 0x8b,     // MLME-SOUNDING.confirm - Std 802.15.4-2011 (table 42) page 114
     mac_COMPUTATION_NEEDED          = 0x8c,     // MLME-CALIBRATE.confirm - Std 802.15.4-2011 (table 44) page 115
-    mac_ACK_RCVD_NODSN_NOSA         = 0x8d      // MCPS-DATA.confirm - Std 802.15.4e-2012 (table 57) page 170
+    mac_ACK_RCVD_NODSN_NOSA         = 0x8d,      // MCPS-DATA.confirm - Std 802.15.4e-2012 (table 57) page 170
+    mac_LINK_EXISTS		    = 0x8e
 
 } MACenum;
 

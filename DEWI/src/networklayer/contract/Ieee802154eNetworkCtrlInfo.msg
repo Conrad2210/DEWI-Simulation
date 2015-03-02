@@ -203,4 +203,6 @@ message Ieee802154eNetworkCtrlInfo
 	uint8_t		numBackoffs;
 	uint8_t		ackPayload[];
 	
+	bool receivedByACK;
+	
 }
