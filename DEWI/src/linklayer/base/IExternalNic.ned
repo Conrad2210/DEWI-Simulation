@@ -15,7 +15,7 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package dewi.linklayer;
+package dewi.linklayer.base;
 
 moduleinterface IExternalNic extends INic
 {

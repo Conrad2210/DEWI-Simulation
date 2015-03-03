@@ -186,6 +186,7 @@ Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const char *name, int kin
     this->numBackoffs_var = 0;
     ackPayload_arraysize = 0;
     this->ackPayload_var = 0;
+    this->receivedByACK_var = 0;
 }
 
 Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const Ieee802154eNetworkCtrlInfo& other) : ::cMessage(other)
@@ -403,6 +404,7 @@ void Ieee802154eNetworkCtrlInfo::copy(const Ieee802154eNetworkCtrlInfo& other)
     ackPayload_arraysize = other.ackPayload_arraysize;
     for (unsigned int i=0; i<ackPayload_arraysize; i++)
         this->ackPayload_var[i] = other.ackPayload_var[i];
+    this->receivedByACK_var = other.receivedByACK_var;
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
@@ -538,6 +540,7 @@ void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
     doPacking(b,this->numBackoffs_var);
     b->pack(ackPayload_arraysize);
     doPacking(b,this->ackPayload_var,ackPayload_arraysize);
+    doPacking(b,this->receivedByACK_var);
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
@@ -739,6 +742,7 @@ void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
         this->ackPayload_var = new uint8_t[ackPayload_arraysize];
         doUnpacking(b,this->ackPayload_var,ackPayload_arraysize);
     }
+    doUnpacking(b,this->receivedByACK_var);
 }
 
 bool Ieee802154eNetworkCtrlInfo::getToParent() const
@@ -2151,6 +2155,16 @@ void Ieee802154eNetworkCtrlInfo::setAckPayload(unsigned int k, uint8_t ackPayloa
     this->ackPayload_var[k] = ackPayload;
 }
 
+bool Ieee802154eNetworkCtrlInfo::getReceivedByACK() const
+{
+    return receivedByACK_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setReceivedByACK(bool receivedByACK)
+{
+    this->receivedByACK_var = receivedByACK;
+}
+
 class Ieee802154eNetworkCtrlInfoDescriptor : public cClassDescriptor
 {
   public:
@@ -2198,7 +2212,7 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getProperty(const char *proper
 int Ieee802154eNetworkCtrlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 119+basedesc->getFieldCount(object) : 119;
+    return basedesc ? 120+basedesc->getFieldCount(object) : 120;
 }
 
 unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -2329,8 +2343,9 @@ unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *objec
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISARRAY | FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<119) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<120) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int field) const
@@ -2461,8 +2476,9 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int
         "rangingFOM",
         "numBackoffs",
         "ackPayload",
+        "receivedByACK",
     };
-    return (field>=0 && field<119) ? fieldNames[field] : NULL;
+    return (field>=0 && field<120) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fieldName) const
@@ -2588,6 +2604,7 @@ int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fi
     if (fieldName[0]=='r' && strcmp(fieldName, "rangingFOM")==0) return base+116;
     if (fieldName[0]=='n' && strcmp(fieldName, "numBackoffs")==0) return base+117;
     if (fieldName[0]=='a' && strcmp(fieldName, "ackPayload")==0) return base+118;
+    if (fieldName[0]=='r' && strcmp(fieldName, "receivedByACK")==0) return base+119;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -2719,8 +2736,9 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeString(void *objec
         "uint8_t",
         "uint8_t",
         "uint8_t",
+        "bool",
     };
-    return (field>=0 && field<119) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<120) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -2896,6 +2914,7 @@ std::string Ieee802154eNetworkCtrlInfoDescriptor::getFieldAsString(void *object,
         case 116: return ulong2string(pp->getRangingFOM());
         case 117: return ulong2string(pp->getNumBackoffs());
         case 118: return ulong2string(pp->getAckPayload(i));
+        case 119: return bool2string(pp->getReceivedByACK());
         default: return "";
     }
 }
@@ -3028,6 +3047,7 @@ bool Ieee802154eNetworkCtrlInfoDescriptor::setFieldAsString(void *object, int fi
         case 116: pp->setRangingFOM(string2ulong(value)); return true;
         case 117: pp->setNumBackoffs(string2ulong(value)); return true;
         case 118: pp->setAckPayload(i,string2ulong(value)); return true;
+        case 119: pp->setReceivedByACK(string2bool(value)); return true;
         default: return false;
     }
 }

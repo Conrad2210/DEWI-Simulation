@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package dewi.linklayer;
+package dewi.linklayer.base;
 
 moduleinterface IWirelessNic extends INic
 {

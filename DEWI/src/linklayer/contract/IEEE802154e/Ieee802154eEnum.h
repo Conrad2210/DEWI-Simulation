@@ -201,7 +201,8 @@ typedef enum
     mac_DPS_NOT_SUPPORTED           = 0x8a,     // MLME-DPS.confirm - Std 802.15.4-2011 (table 41) page 113
     mac_SOUNDING_NOT_SUPPORTED      = 0x8b,     // MLME-SOUNDING.confirm - Std 802.15.4-2011 (table 42) page 114
     mac_COMPUTATION_NEEDED          = 0x8c,     // MLME-CALIBRATE.confirm - Std 802.15.4-2011 (table 44) page 115
-    mac_ACK_RCVD_NODSN_NOSA         = 0x8d      // MCPS-DATA.confirm - Std 802.15.4e-2012 (table 57) page 170
+    mac_ACK_RCVD_NODSN_NOSA         = 0x8d,      // MCPS-DATA.confirm - Std 802.15.4e-2012 (table 57) page 170
+    mac_LINK_EXISTS		    = 0x8e
 
 } MACenum;
 
@@ -369,7 +370,11 @@ typedef enum
     Ieee802154e_ACK          = 3,       // MAC ACK
     Ieee802154e_CMD          = 4,       // MAC command
     Ieee802154e_LLDN         = 5,       // LLDN (Low Latency Deterministic Network)
-    Ieee802154e_MULTI        = 6        // Multipurpose
+    Ieee802154e_MULTI        = 6,        // Multipurpose
+    Ieee802154e_ASSOCIATION_REQUEST = 7,  //ASSOCIATION_REQUEST
+    Ieee802154e_ASSOCIATION_RESPONCE = 8,
+    Ieee802154e_SCHEDULER_REQUEST = 9,
+    Ieee802154e_SCHEDULER_RESPONCE = 10,
 
 } Ieee802154eFrameType;
 
@@ -385,6 +390,8 @@ typedef enum
     BEACON_REQUEST,
     COORDINATOR_REALIGNMENT,
     GTS_REQUEST,
+    START_REQUEST,
+    START_CONFIRM,
 
     // Std 802.15.4e-2012 (table 5) page 95
     LL_DISCOVERY_RESPONSE,
@@ -424,6 +431,12 @@ typedef enum
 enum Ieee802154eMacTimerType
 {
     START_PAN_COOR_TIMER,       // dynamic timer
+    START_TIMER,
+    ASSOCIATION_TIMER,
+    ASSOCIATION_WAIT_TIMER,
+    SCHEDULE_TIMER,
+    SCHEDULE_WAIT_TIMER,
+    MAC_SCAN_TIMER,
     MAC_BACKOFF_TIMER,
     MAC_DEFER_CCA_TIMER,
     MAC_BCN_RX_TIMER,
@@ -533,6 +546,8 @@ typedef enum
     TP_MLME_TSCH_MODE_CONFIRM,
     TP_MLME_KEEP_ALIVE_REQUEST,
     TP_MLME_KEEP_ALIVE_CONFIRM,
+    TP_MLME_SET_BEACON_REQUEST,
+    TP_MLME_SET_BEACON_CONFIRM,
     // LL-MAC management service - Std 802.15.4e-2012 (table 8b) page 123
     TP_MLME_LLDN_DISCOVERY_REQUEST,
     TP_MLME_LLDN_DISCOVERY_CONFIRM,
@@ -559,6 +574,10 @@ typedef enum
     TP_TS_TX_CCA_TSCHCCA,
     // for TSCH CCA - Receiver
     TP_TS_RX_CCA_TSCHCCA,
+    TP_SCHEDULE_REQUEST,
+    TP_SCHEDULE_INDICATION,
+    TP_SCHEDULE_RESPONSE,
+    TP_SCHEDULE_CONFIRM
 
 } Ieee802154eMacTaskType;
 

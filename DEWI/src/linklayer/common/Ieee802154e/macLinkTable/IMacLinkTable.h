@@ -79,9 +79,14 @@ class INET_API IMacLinkTable
         //@author:  2014    Stefan Reis
         virtual macLinkTableEntry *getLinkByTimeslotSlotframe(int timeslot, int slotframe) = 0;
 
+        //Return links by depending on timeslot and slotframe
+               virtual void getLinksByTimeslotSlotframe(int timeslot, int slotframe, std::list<macLinkTableEntry*> *list) = 0;
+
         //@author: 2014     Stefan Reis
         virtual bool existLink(UINT_16 address) = 0;
+        virtual bool existLink(macLinkTableEntry* link) = 0;
 
+        virtual macLinkTableEntry *getLinkByTimeslotOffsetAddress(int timeslot, int offset, UINT_16 address) = 0;
         /*
          * Edit existing link
          */

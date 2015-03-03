@@ -20,10 +20,11 @@
     #include "Ieee802154eDef.h"
     #include "Ieee802154eEnum.h"
     #include "Ieee802154eField.h"
+    #include "Ieee802154eNetworkCtrlInfo_m.h"
 // }}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:47</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:50</tt> by nedtool.
  * <pre>
  * packet Ieee802154eBasicFrame
  * {
@@ -67,7 +68,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eBasicFrame& obj) {obj.parsimPac
 inline void doUnpacking(cCommBuffer *b, Ieee802154eBasicFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:54</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:57</tt> by nedtool.
  * <pre>
  * message Ieee802154eFrame extends Ieee802154eBasicFrame
  * {
@@ -153,7 +154,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eFrame& obj) {obj.parsimPack(b);
 inline void doUnpacking(cCommBuffer *b, Ieee802154eFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:72</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:75</tt> by nedtool.
  * <pre>
  * message Ieee802154eBeaconFrame extends Ieee802154eFrame
  * {
@@ -207,7 +208,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eBeaconFrame& obj) {obj.parsimPa
 inline void doUnpacking(cCommBuffer *b, Ieee802154eBeaconFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:87</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:90</tt> by nedtool.
  * <pre>
  * // *****************************************
  * // Enhanced Beacon frame format - Std 802.15.4e-2012 (figure 40a) page 64
@@ -244,7 +245,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154EnhancedBeaconFrame& obj) {obj.p
 inline void doUnpacking(cCommBuffer *b, Ieee802154EnhancedBeaconFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:94</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:97</tt> by nedtool.
  * <pre>
  * // ********************************
  * // Data frame format - Std 802.15.4e-2012 (figure 46) page 65
@@ -281,7 +282,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eDataFrame& obj) {obj.parsimPack
 inline void doUnpacking(cCommBuffer *b, Ieee802154eDataFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:101</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:104</tt> by nedtool.
  * <pre>
  * // ******************************		
  * // Acknowledgment frame format - Std 802.15.4-2011 (figure 47) page 65
@@ -318,7 +319,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eAckFrame& obj) {obj.parsimPack(
 inline void doUnpacking(cCommBuffer *b, Ieee802154eAckFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:108</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:111</tt> by nedtool.
  * <pre>
  * // ******************************		
  * // Enhanced Acknowledgement frame format - Std 802.15.4e-2012 (figure 47a) page 66
@@ -356,6 +357,84 @@ inline void doUnpacking(cCommBuffer *b, Ieee802154eEnhancedAckFrame& obj) {obj.p
 
 /**
  * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:115</tt> by nedtool.
+ * <pre>
+ * message Ieee802154eAssociationFrame extends Ieee802154eFrame
+ * {
+ *     Ieee802154eNetworkCtrlInfo CntrlInfo;
+ * }
+ * </pre>
+ */
+class Ieee802154eAssociationFrame : public ::Ieee802154eFrame
+{
+  protected:
+    Ieee802154eNetworkCtrlInfo CntrlInfo_var;
+
+  private:
+    void copy(const Ieee802154eAssociationFrame& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const Ieee802154eAssociationFrame&);
+
+  public:
+    Ieee802154eAssociationFrame(const char *name=NULL, int kind=0);
+    Ieee802154eAssociationFrame(const Ieee802154eAssociationFrame& other);
+    virtual ~Ieee802154eAssociationFrame();
+    Ieee802154eAssociationFrame& operator=(const Ieee802154eAssociationFrame& other);
+    virtual Ieee802154eAssociationFrame *dup() const {return new Ieee802154eAssociationFrame(*this);}
+    virtual void parsimPack(cCommBuffer *b);
+    virtual void parsimUnpack(cCommBuffer *b);
+
+    // field getter/setter methods
+    virtual Ieee802154eNetworkCtrlInfo& getCntrlInfo();
+    virtual const Ieee802154eNetworkCtrlInfo& getCntrlInfo() const {return const_cast<Ieee802154eAssociationFrame*>(this)->getCntrlInfo();}
+    virtual void setCntrlInfo(const Ieee802154eNetworkCtrlInfo& CntrlInfo);
+};
+
+inline void doPacking(cCommBuffer *b, Ieee802154eAssociationFrame& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, Ieee802154eAssociationFrame& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:120</tt> by nedtool.
+ * <pre>
+ * message Ieee802154eScheduleFrame extends Ieee802154eFrame
+ * {
+ *     Ieee802154eNetworkCtrlInfo CntrlInfo;
+ * }
+ * </pre>
+ */
+class Ieee802154eScheduleFrame : public ::Ieee802154eFrame
+{
+  protected:
+    Ieee802154eNetworkCtrlInfo CntrlInfo_var;
+
+  private:
+    void copy(const Ieee802154eScheduleFrame& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const Ieee802154eScheduleFrame&);
+
+  public:
+    Ieee802154eScheduleFrame(const char *name=NULL, int kind=0);
+    Ieee802154eScheduleFrame(const Ieee802154eScheduleFrame& other);
+    virtual ~Ieee802154eScheduleFrame();
+    Ieee802154eScheduleFrame& operator=(const Ieee802154eScheduleFrame& other);
+    virtual Ieee802154eScheduleFrame *dup() const {return new Ieee802154eScheduleFrame(*this);}
+    virtual void parsimPack(cCommBuffer *b);
+    virtual void parsimUnpack(cCommBuffer *b);
+
+    // field getter/setter methods
+    virtual Ieee802154eNetworkCtrlInfo& getCntrlInfo();
+    virtual const Ieee802154eNetworkCtrlInfo& getCntrlInfo() const {return const_cast<Ieee802154eScheduleFrame*>(this)->getCntrlInfo();}
+    virtual void setCntrlInfo(const Ieee802154eNetworkCtrlInfo& CntrlInfo);
+};
+
+inline void doPacking(cCommBuffer *b, Ieee802154eScheduleFrame& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, Ieee802154eScheduleFrame& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:128</tt> by nedtool.
  * <pre>
  * // ********************************				
  * // MAC command frame format - Std 802.15.4e-2012 (figure 48) page 67
@@ -399,7 +478,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eCmdFrame& obj) {obj.parsimPack(
 inline void doUnpacking(cCommBuffer *b, Ieee802154eCmdFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:123</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Ieee802154eFrame.msg:136</tt> by nedtool.
  * <pre>
  * packet Ieee802154eMPFrame extends Ieee802154eFrame
  * {

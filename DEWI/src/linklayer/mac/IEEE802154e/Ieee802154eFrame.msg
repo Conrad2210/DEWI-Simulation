@@ -18,6 +18,7 @@ cplusplus {{
     #include "Ieee802154eDef.h"
     #include "Ieee802154eEnum.h"
     #include "Ieee802154eField.h"
+    #include "Ieee802154eNetworkCtrlInfo_m.h"
 }}
 
 class noncobject MACAddress;
@@ -42,6 +43,8 @@ struct SuperframeSpec;
 
 struct DevCapability;
 struct PendingAddrFields;
+
+class noncobject Ieee802154eNetworkCtrlInfo;
 
 packet Ieee802154eBasicFrame
 {
@@ -106,6 +109,16 @@ message Ieee802154eAckFrame extends Ieee802154eFrame
 // ******************************
 message Ieee802154eEnhancedAckFrame extends Ieee802154eFrame
 {   
+}
+
+message Ieee802154eAssociationFrame extends Ieee802154eFrame
+{
+    Ieee802154eNetworkCtrlInfo CntrlInfo;
+}
+
+message Ieee802154eScheduleFrame extends Ieee802154eFrame
+{
+    Ieee802154eNetworkCtrlInfo CntrlInfo;
 }
 
 // ********************************				

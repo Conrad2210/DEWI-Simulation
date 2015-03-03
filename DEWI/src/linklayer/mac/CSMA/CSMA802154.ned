@@ -21,7 +21,7 @@
 //***************************************************************************
 //* part of:    Modifications to the MF-2 framework by CSEM
 //**************************************************************************/
-package dewi.linklayer.mac;
+package dewi.linklayer.mac.CSMA;
 
 //
 // IEEE 802.15.4-2006 non-beacon enabled CSMA protocol

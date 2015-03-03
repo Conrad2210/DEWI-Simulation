@@ -20,8 +20,8 @@ package dewi.simulations.Testing;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.simulations.Testing.Node;
-import dewi.simulations.Testing.LightSwitch;
+import dewi.nodes.Ieee802154e.Rectangular.LampNode;
+import dewi.nodes.Ieee802154e.Rectangular.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 
@@ -41,19 +41,16 @@ network Network
     submodules:
         lightSwitch: LightSwitch {
             parameters:
-                @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=15.28,12.16");
+                @display("i=lighting/lightswitch;p=15.28,12.16");
         }
-        lamp[numHosts]: Node {
+        lamp[numHosts]: LampNode {
             parameters:
                 numHosts = numHosts;
                 maxRow = maxRow;
                 maxCol = maxCol;
-//                X = AreaX;
-//                Y = AreaY;
-//				
-//                Hosts = numFixHosts;
+                //Hosts = numFixHosts;
 
-                @display("b=1,1,oval;i=status/bulb;p=3.68,10.84");
+                @display("b=1.5,1.5,oval,red;;i=status/bulb;p=3.68,10.84");
         }
 
         channelControl: ChannelControl {

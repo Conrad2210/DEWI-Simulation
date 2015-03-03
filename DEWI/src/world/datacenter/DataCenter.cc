@@ -39,8 +39,10 @@ void DataCenter::initialize(int stage)
 {
     if(stage == 0)
     {
-        ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
-        recordValues = par("recordValues").boolValue();
+	recordValues = par("recordValues").boolValue();
+	if(recordValues)
+	    ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
+
     }
 }
 

@@ -21,6 +21,7 @@ package dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD;
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
 import dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD.Node;
+import dewi.world.datacenter.DataCenter;
 
 
 network RealTimeNetwork
@@ -37,7 +38,11 @@ network RealTimeNetwork
         //@display("i=background/green;is=vl;bgb=80,40;bgs=25,m;bgi=background/green,s;bgg=1,,black");
         @display("bgb=80,40;bgs=25,m");
     submodules:
-        fixhost[numHosts]: Node {
+        lightSwitch: LightSwitch {
+            parameters:
+                @display("b=0.1,0.1,rect;i=lighting/lightswitch;p=15.28,12.16");
+        }
+        lamp[numHosts]: Node {
             parameters:
                 numHosts = numHosts;
                 maxRow = maxRow;
@@ -47,7 +52,7 @@ network RealTimeNetwork
 //				
 //                Hosts = numFixHosts;
 
-                @display("b=1,1,oval;i=device/pocketpc;p=8.44,0.92");
+                @display("b=1,1,oval;i=status/bulb;p=3.68,10.84");
         }
 
         channelControl: ChannelControl {
@@ -60,6 +65,10 @@ network RealTimeNetwork
             //            netmask="255.255.0.0";
             //            networkAddress="145.236.0.0";
             @display("p=2.04,0.4");
+        }
+        DataCenter: DataCenter {
+
+            @display("p=5.52,0.6");
         }
 }
 

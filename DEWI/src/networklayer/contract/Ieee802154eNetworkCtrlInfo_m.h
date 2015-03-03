@@ -216,6 +216,8 @@
  *     uint8_t numBackoffs;
  *     uint8_t ackPayload[];
  * 
+ *     bool receivedByACK;
+ * 
  * }
  * </pre>
  */
@@ -352,6 +354,7 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     uint8_t numBackoffs_var;
     uint8_t *ackPayload_var; // array ptr
     unsigned int ackPayload_arraysize;
+    bool receivedByACK_var;
 
   private:
     void copy(const Ieee802154eNetworkCtrlInfo& other);
@@ -631,6 +634,8 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     virtual unsigned int getAckPayloadArraySize() const;
     virtual uint8_t getAckPayload(unsigned int k) const;
     virtual void setAckPayload(unsigned int k, uint8_t ackPayload);
+    virtual bool getReceivedByACK() const;
+    virtual void setReceivedByACK(bool receivedByACK);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eNetworkCtrlInfo& obj) {obj.parsimPack(b);}

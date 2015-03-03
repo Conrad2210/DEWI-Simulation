@@ -35,7 +35,6 @@ int SlotframeLinkIE::fillSlotframeLinkIE()
     int length = 0;
     linkIEEntry* linkIeEntry;
     slotframeIEEntry* slotIeEntry;
-
     if (slotframeTable->getNumSlotframes() > 0)
     {
         length += 1 + slotframeTable->getNumSlotframes() * 5;
@@ -46,21 +45,31 @@ int SlotframeLinkIE::fillSlotframeLinkIE()
             slotIeEntry = new slotframeIEEntry();
             slotIeEntry->setSlotframeId(slotframeTable->getSlotframe(i)->getSlotframeId());
             slotIeEntry->setSlotframeSize(slotframeTable->getSlotframe(i)->getSlotframeSize());
-            slotIeEntry->setNumLinks(linkTable->getNumberLinksBySlotframe(slotIeEntry->getSlotframeId()));
+            int numLinks = 0;
+
             for(int k = 0; k < linkTable->getNumLinks(); k++)
             {
                 linkIeEntry = new linkIEEntry();
-                if(slotIeEntry->getSlotframeId() == linkTable->getLink(k)->getSlotframeId())
+                if(slotIeEntry->getSlotframeId() == linkTable->getLink(k)->getSlotframeId() &&
+                	(linkTable->getLink(k)->getLinkType() == LNK_TP_ADVERTISING ||linkTable->getLink(k)->getLinkType() == LNK_TP_JOIN))
                 {
                     length += 5;
                     linkIeEntry->setTimeslot(linkTable->getLink(k)->getTimeslot());
                     linkIeEntry->setChannelOffset(linkTable->getLink(k)->getChannelOffset());
                     linkIeEntry->setLinkOption(linkTable->getLink(k)->getLinkOption());
+                    linkIeEntry->setLinkTyp(linkTable->getLink(k)->getLinkType());
                     slotIeEntry->setLinkIE(linkIeEntry);
+                    numLinks++;
                 }
             }
+            slotIeEntry->setNumLinks(numLinks);
             entry->setSlotframeIE(slotIeEntry);
         }
     }
     return length;
+}
+
+slotframeLinkIEEntry *SlotframeLinkIE::getSlotframeLinkIEEntry()
+{
+    return entry;
 }

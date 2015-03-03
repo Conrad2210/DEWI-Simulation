@@ -1,5 +1,5 @@
 
-package dewi.linklayer.mac;
+package dewi.linklayer.mac.IEEE802154;
 
 simple Ieee802154Mac
 {

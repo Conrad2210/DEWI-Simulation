@@ -41,9 +41,10 @@ simple Ieee802154eMac
     bool useMetrics = default(true);
 
     // switch for the Std 802.15.4e-2014 TSCH mechanism
-    bool useTSCH = default(true);
+    bool TSCHcapable = default(true);
+    bool useTSCH = default(false);
     // use the TSCH without a beacon from the PAN coordinator (Note: devices will be not associated with coordinator)
-        bool useTSCHdirect = default(true);
+        bool useTSCHdirect = default(false);
     // for the Std 802.15.4e-2014 TSCH mechanism - to set the Node as a timeScource
     bool timeSource = default(false);
     // for the Std 802.15.4e-2014 TSCH mechanism - to use or not the CCA during the TSCH CCA transmission
@@ -94,6 +95,8 @@ simple Ieee802154eMac
         output lowerLayerOut; 		// to the physical layer
         input queueIn;				// from the MAC queue
         output queueOut;			// to the MAC queue
+        input schedulerIn;			//from Scheduler
+        output schedulerOut;		//to Scheduler
 
 
 

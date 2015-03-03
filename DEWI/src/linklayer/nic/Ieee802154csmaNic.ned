@@ -1,10 +1,10 @@
 //
 // This NIC implements an IEEE 802.15.4 network interface card with an interface queue.
 //
-package dewi.linklayer;
+package dewi.linklayer.nic;
 
-import dewi.linklayer.IOutputQueue;
-import dewi.linklayer.mac.CSMA802154;
+import dewi.linklayer.base.IOutputQueue;
+import dewi.linklayer.mac.CSMA.CSMA802154;
 import dewi.phyLayer.Ieee802154Phy;
 
 module Ieee802154csmaNic

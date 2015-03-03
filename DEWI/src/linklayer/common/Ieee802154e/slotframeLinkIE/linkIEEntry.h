@@ -24,6 +24,7 @@ class linkIEEntry
         int timeslot;
         int channelOffset;
         MACTSCHLinkOptions linkOption;
+        MACTSCHLinkType linkTyp;
 
     public:
         virtual void setTimeslot(int n){timeslot = n;}
@@ -34,6 +35,11 @@ class linkIEEntry
 
         virtual void setLinkOption(MACTSCHLinkOptions n){linkOption = n;}
         virtual MACTSCHLinkOptions getLinkOption(){return linkOption;}
+
+        virtual void setLinkTyp(MACTSCHLinkType n){linkTyp = n;}
+        virtual MACTSCHLinkType getLinkTyp(){return linkTyp;}
+
+
     public:
         linkIEEntry();
         virtual ~linkIEEntry();

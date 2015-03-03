@@ -16,7 +16,7 @@
 //
 
 
-package dewi.linklayer;
+package dewi.linklayer.base;
 
 //
 // Prototype module for link layer protocols.

@@ -752,9 +752,9 @@ struct IE_CHANNEL_HOPPING
     UINT_8              channelPage;
     UINT_16             numberOfChannels;
     UINT_32             phyConfig;
-    std::vector<int>    extBitmap;          // extended bitmap (variable)
+    UINT_32    		extBitmap;          // extended bitmap (variable)
     UINT_16             hoppingSeqLength;
-    std::vector<int>    hoppingSeqLst;      // Hopping sequence list (variable)
+    std::vector<UINT_16>    hoppingSeqLst;      // Hopping sequence list (variable)
     UINT_16             currentHop;
 };
 

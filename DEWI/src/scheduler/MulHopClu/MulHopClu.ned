@@ -13,14 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.linklayer;
+package dewi.scheduler.MulHopClu;
 
-//
-// TODO auto-generated type
-//
-moduleinterface ILocator
+import dewi.scheduler.IScheduler;
+
+simple MulHopClu  like IScheduler
 {
+    string macSlotframeTableModule = default("^.^.slotframeTable");
+    string macLinkTableModule = default("^.^.linkTable");
+    string macTimeslotTableModule = default("^.^.timeslotTemplate");
+    string macHoppingSequenceListModule = default("^.^.hoppingSequenceList");
+    string macNeighborTableModule = default("^.^.neighborTable");
+	
+	bool isPANCoor = default(false);
+	double StartTime @unit(s) = default(0s);
+	double AssociateWaitTime @unit(s) = default(0.5s);
+
     gates:
-        input inGate;
-        output outGate;
+        input from_mac;
+        output to_mac;
 }

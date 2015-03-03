@@ -96,6 +96,7 @@ class INET_API macNeighborTable: public cSimpleModule, public IMacNeighborTable,
 
         //Returns the Neighbor
         virtual macNeighborTableEntry *getNeighborByPos(int pos);
+        virtual macNeighborTableEntry *getNeighborByPos(int pos, bool fillTmpNeighborList);
         virtual macNeighborTableEntry *getNeighborBySAddr(UINT_16 address);
         virtual macNeighborTableEntry *getNeighborByEAddr(MACAddress address);
         virtual macNeighborTableEntry *getNeighborById(int id);

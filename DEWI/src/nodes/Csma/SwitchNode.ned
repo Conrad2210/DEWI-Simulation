@@ -13,18 +13,17 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.simulations.Testing;
+package dewi.nodes.Csma;
 
 //Includes
 //Mobility
 import dewi.mobility.models.StationaryMobility;
-import dewi.mobility.models.OwnModel;
 
 //NetworkLayer
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.Ieee802154csmaNic;
+import dewi.linklayer.nic.Ieee802154csmaNic;
 
 //Applications
 //UDPApp
@@ -53,17 +52,12 @@ import dewi.base.Display;
 //Battery Module
 import dewi.battery.models.InetSimpleBattery;
 
-module Node
+module LightSwitch
 {
     parameters:
         @node();
         //Variable X and Y for PlayGround Area
-        double X @unit(m);
-        double Y @unit(m);
-        double Z @unit(m);
         int numHosts;
-        int maxRow;
-        int maxCol;
         //Number of Hosts, to calculate the position of the nodes
         //int Hosts;
 
@@ -90,13 +84,8 @@ module Node
 
 
         //Node Location
-        mobility: OwnModel {
+        mobility: StationaryMobility {
             parameters:
-                maxCol = maxCol;
-                maxRow = maxRow;
-                marginX = X;
-                marginY = Y;
-                marginZ = Z;
                 @display("p=152,368;i=block/cogwheel");
         }
                 //Notificationboard

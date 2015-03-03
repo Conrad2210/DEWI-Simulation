@@ -212,14 +212,16 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     //@{
     virtual void    handleMessage(cMessage *msg);
     virtual void    handleSelfMsg(cMessage*);
+    virtual void handleSchedulerMsg(cMessage *msg);
     virtual void    handleUpperMsg(cPacket*);   // for MCPS-SAP (Data)
     virtual void    handlePrimitive(int msgkind, cMessage *msg);  // for MLME-SAP (Commands)
     virtual void    handleLowerMsg(cPacket*);
     virtual void    handleMacPhyPrimitive  (int, cMessage*);
     virtual void    handleBeacon(Ieee802154eFrame*);
+    virtual void    handleEB(cMessage *msg);
     virtual void    handleCommand(cMessage *msg){};
 
-    virtual void    handleCommand80215(Ieee802154eFrame*);
+    //virtual void    handleCommand80215(Ieee802154eFrame*);
     virtual void    handleData(Ieee802154eFrame*);
     virtual void    handleAck(Ieee802154eFrame*);
     virtual void    handleLLDN802154e(Ieee802154eFrame*);   // LLDN (Low Latency Deterministic Network)
@@ -330,27 +332,15 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     * @name MAC management service - Std 802.15.4-2011 (table 8) page 77
     */
     //@{
-    virtual void    handle_MLME_ASSOCIATE_request(UINT_8 channelNumber, UINT_8 channelPage, Ieee802154eAddrMode coordAddrMode,
-                                           UINT_16 coordPANId, IE3ADDR coordAddress, UINT_8 capabilityInformation,
-                                           UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
-                                           UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID );
-    virtual void    MLME_ASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 capabilityInformation, UINT_8 securityLevel,
-                                           UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,UINT_64 lowLatencyNetworkInfo,
-                                           UINT_16 channelOffset, UINT_8 hoppingSequenceID);
-    virtual void    MLME_ASSOCIATE_responce(IE3ADDR deviceAddress, UINT_16 assocShortAddress, MACenum status, UINT_8 securityLevel,
-                                           UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo,
-                                           UINT_16 channelOffset, UINT_16 hoppingSequenceLength, std::vector<int> hoppingSequence);
-    virtual void    MLME_ASSOCIATE_confirm(UINT_16 assocShortAddress, MACenum status, UINT_8 securityLevel, UINT_8 keyIdMode,
-                                           UINT_64 keySource, UINT_8 keyIndex, UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset,
-                                           UINT_16 hoppingSequenceLength, std::vector<int> hoppingSequence);
-    virtual void    handle_MLME_DISASSOCIATE_request(Ieee802154eAddrMode deviceAddrMode, UINT_16 devicePANId, IE3ADDR deviceAddress,
-                                           UINT_8 disassociateReason, bool txIndirect, UINT_8 securityLevel, UINT_8 keyIdMode,
-                                           UINT_64 keySource, UINT_8 keyIndex);
-    virtual void    MLME_DISASSOCIATE_indication(IE3ADDR deviceAddress, UINT_8 disassociateReason, UINT_8 securityLevel,
-                                           UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex);
-    virtual void    MLME_DISASSOCIATE_confirm(MACenum status, Ieee802154eAddrMode deviceAddrMode, UINT_16 devicePANId, IE3ADDR deviceAddress);
-    virtual void    MLME_BEACON_NOTIFY_indication(UINT_8 bsn, PAN_ELE panDescriptor, PendingAddrFields pendAddrSpec,
-                                           std::vector<IE3ADDR> addrList, UINT_8 sduLength, std::vector<UINT_8> sdu, UINT_8 ebsn, UINT_8 beaconType);
+    virtual void    handle_MLME_ASSOCIATE_request(cMessage *msg);
+    virtual void    MLME_ASSOCIATE_indication(cMessage *msg);
+    virtual void    handle_MLME_ASSOCIATE_responce(cMessage *msg);
+    virtual void    MLME_ASSOCIATE_confirm(cMessage *msg);
+    virtual void    handle_MLME_DISASSOCIATE_request(cMessage *msg);
+    virtual void    MLME_DISASSOCIATE_indication(cMessage *msg);
+    virtual void    MLME_DISASSOCIATE_confirm(cMessage *msg);
+
+    virtual void    MLME_BEACON_NOTIFY_indication(cMessage *msg);
     virtual void    MLME_COMM_STATUS_indication(UINT_16 panId, Ieee802154eAddrMode srcAddrMode, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode,
                                            IE3ADDR dstAddr, MACenum status, UINT_8 securityLevel, UINT_8 keyIdMode,
                                            UINT_64 keySource, UINT_8 keyIndex);
@@ -367,21 +357,12 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    MLME_RESET_confirm(MACenum status);
     virtual void    handle_MLME_RX_ENABLE_request(bool deferPermit, UINT_32 rxOnTime, UINT_32 rxOnDuration, RangingControl rangingRxControl);
     virtual void    MLME_RX_ENABLE_confirm(MACenum status);
-//    virtual void    handle_MLME_SCAN_request(Ieee802154eChannelScanType scanType,UINT_64 scanChannels, UINT_8 scanDuration, UINT_8 channelPage,
-//                                            UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, bool linkQualityScan,
-//                                            bool* frameControlOptions[], unsigned int frameControlOptions_length, UINT_8* headerIElist[],
-//                                            unsigned int headerIElist_length, UINT_8* payloadIElist[],unsigned int payloadIElist_length);
-//    virtual void    MLME_SCAN_confirm(MACenum status, Ieee802154eChannelScanType scanType, UINT_8 channelPage, std::vector<int> unscannedChannels,
-//                                            UINT_8 resultListSize, std::vector<int> energyDetectList, std::vector<PAN_ELE> panDescriptorList,
-//                                            UINT_8 detectedCategory, std::vector<int> uwbEnergyDetectList);
+    virtual void    handle_MLME_SCAN_request(cMessage *msg);
+    virtual void    MLME_SCAN_confirm(cMessage *msg);
+
     virtual void    handle_MLME_SET_request(MACPIBenum pibAttribute, MAC_PIB pibAttributeValue);
     virtual void    MLME_SET_confirm(MACenum status, MACPIBenum pibAttribute);
-    virtual void    handle_MLME_START_request(UINT_16 panId, UINT_8 channelNumber, UINT_8 channelPage, UINT_32 startTime, UINT_8 beaconOrder,
-                                            UINT_8 superframeOrder, bool panCoordinator, bool batteryLifeExtension, bool coordRealignment,
-                                            UINT_8 coordRealignSecurityLevel, UINT_8 coordRealignKeyIdMode, UINT_64 coordRealignKeySource,
-                                            UINT_8 coordRealignKeyIndex, UINT_8 beaconSecurityLevel, UINT_8 beaconKeyIdMode,
-                                            UINT_64 beaconKeySource, UINT_8 beaconKeyIndex, IE_DSME_PAN dsmeSuperframeSpecification,
-                                            IE_DSME_PAN_BeaconBitmap beaconBitmap, HOPP_DESC hoppingDescriptor);
+    virtual void    handle_MLME_START_request(cMessage *msg);
     virtual void    MLME_START_confirm(MACenum status);
     virtual void    handle_MLME_SYNC_request(UINT_8 channelNumber, UINT_8 channelPage, bool trackBeacon);
     virtual void    MLME_SYNC_LOSS_indication(MACenum lossReason, UINT_16 panId, UINT_8 channelNumber, UINT_8 channelPage,
@@ -399,9 +380,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     //virtual void    MLME_CALIBRATE_confirm(MACenum status, UINT_64 CalTxRMARKEROffset, UINT_64 CalRxRMARKEROffset);
 
     // Std 802.15.4e-2012 page 140...
-    virtual void    handle_MLME_BEACON_request(UINT_8 beaconType, UINT_8 channel, UINT_8 channelPage, UINT_8 superFrameOrder,
-                                        UINT_8 beaconSecurityLevel, UINT_8 beaconKeyIdMode, UINT_64 beaconKeySource,
-                                        UINT_8 beaconKeyIndex, UINT_8 dstAddrMode, IE3ADDR dstAddr,bool bsnSuppression);
+    virtual void    handle_MLME_BEACON_request(cMessage *msg);
     virtual void    MLME_BEACON_confirm(MACenum status);
     virtual void    MLME_BEACON_REQUEST_indication(Ieee802154eBeaconType beaconType, UINT_8 srcAddrMode, IE3ADDR srcAddr,
                                         UINT_16 dstPANID, std::vector<IE_LIST> ieList);
@@ -411,7 +390,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     * @name TSCH MAC management service - Std 802.15.4e-2012 (table 8a) page 123
     */
     //@{
-    virtual void    handle_MLME_SET_SLOTFRAME_request(UINT_8 slotframeHandle, Ieee802154eOperation operation, UINT_8 size);
+    virtual void    handle_MLME_SET_SLOTFRAME_request(cMessage *msg);
     virtual void    MLME_SET_SLOTFRAME_confirm(UINT_8 slotframeHandle, MACenum status);
     virtual void    handle_MLME_SET_LINK_request(Ieee802154eOperation operation, UINT_16 linkHandle, UINT_8 slotframeHandle,
                                             UINT_16 timeslot, UINT_16 channelOffset, MACTSCHLinkOptions linkOptions,
@@ -423,33 +402,14 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    MLME_KEEP_ALIVE_confirm(MACenum status);
     //@}
 
-    /**
-    * @name LLDN-MAC management service - Std 802.15.4e-2012 (table 8b) page 123
-    */
-    //@{
-    virtual void    handle_MLME_LLDN_DISCOVERY_request();
-    virtual void    MLME_LLDN_DISCOVERY_confirm();
-    virtual void    handle_MLME_LLDN_CONFIGURATION_request();
-    virtual void    MLME_LLDN_CONFIGURATION_confirm();
-    virtual void    handle_MLME_LLDN_ONLINE_request();
-    virtual void    MLME_LLDN_ONLINE_indication();
-    //@}
 
-    /**
-    * @name DSME MAC management service - Std 802.15.4e-2012 (table 8c) page 124
-    */
-    //@{
-    virtual void    handle_MLME_DSME_GTS_request();
-    virtual void    MLME_DSME_GTS_indication();
-    virtual void    MLME_DSME_GTS_response();
-    virtual void    MLME_DSME_GTS_confirm();
-    virtual void    handle_MLME_DSME_INFO_request();
-    virtual void    MLME_DSME_INFO_indication();
-    virtual void    MLME_DSME_INFO_confirm();
-    virtual void    handle_MLME_DSME_LINKSTATUSRPT_request();
-    virtual void    MLME_DSME_LINKSTATUSRPT_indication();
-    virtual void    MLME_DSME_LINKSTATUSRPT_confirm();
-    //@}
+    //SCHEDULE
+
+    virtual void handle_SCHEDULE_request(cMessage *msg);
+    virtual void SCHEDULE_indication(cMessage *msg);
+    virtual void handle_SCHEDULE_response(cMessage *msg);
+    virtual void SCHEDULE_confirm(cMessage *msg, bool ack);
+
 
     /**
     * @name State control and task management functions
@@ -564,6 +524,9 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void calcTimeCorr(Ieee802154eFrame*);
         //@}
 
+    //Check beacon ASN
+    virtual void checkBeaconASN(Ieee802154eFrame*);
+
     // Use to distinguish the radio module that send the event
     int radioModule;
     InterfaceEntry *iface;
@@ -573,7 +536,9 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     MACAddress configurationMacAddress();
 
+    void MPIBcopyStandard();
 
+    void updateNeighbor(Ieee802154eFrame *frame, FrameCtrl frmCtrl);
 // member variables
   public:
 
@@ -697,6 +662,12 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     bool tschSharedLink;
     //@}
 
+    /** @brief variable to indicate if in SCAN period or not */
+    bool isSCAN;
+
+    /** @brief variable to indicate to construct and transmit a beacon */
+    bool txBeaconNow;
+
     /**
     * @name Static variables
     */
@@ -721,6 +692,8 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     int mLowerLayerOut;
     int mQueueIn;
     int mQueueOut;
+    int mSchedulerIn;
+    int mSchedulerOut;
     //@}
 
     /** @brief  pointer to the NotificationBoard module */
@@ -978,7 +951,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     /** @brief buffer for received beacon frames,
      only used by mlme_scan_request and mlme_rx_enable_request (TBD) */
-    Ieee802154eFrame* rxBeacon;
+    Ieee802154EnhancedBeaconFrame* rxBeacon;
 
     /** @brief buffer for received data frames */
     Ieee802154eFrame* rxData;
@@ -1060,6 +1033,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     cMessage* tsMaxAckTimer;
     //@}
 
+    cMessage *scanTimer;
     /**
     * @name Variables for timers
     */

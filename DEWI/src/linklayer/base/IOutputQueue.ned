@@ -16,7 +16,7 @@
 //
 
 
-package dewi.linklayer;
+package dewi.linklayer.base;
 
 //
 // Prototype for per-NIC output queues. Concrete queues can implement

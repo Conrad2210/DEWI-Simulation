@@ -1,10 +1,10 @@
 //
 // This NIC implements an IEEE 802.15.4 network interface card with an interface queue.
 //
-package dewi.linklayer;
+package dewi.linklayer.nic;
 
-import dewi.linklayer.IOutputQueue;
-import dewi.linklayer.mac.Ieee802154Mac;
+import dewi.linklayer.base.IOutputQueue;
+import dewi.linklayer.mac.IEEE802154.Ieee802154Mac;
 import dewi.phyLayer.Ieee802154Phy;
 
 module Ieee802154Nic

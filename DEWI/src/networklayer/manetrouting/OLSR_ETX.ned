@@ -1,4 +1,4 @@
-//
+
 //   Copyright (C) 2009 by Alfonso Ariza
 //   Malaga University
 // This program is free software: you can redistribute it and/or modify

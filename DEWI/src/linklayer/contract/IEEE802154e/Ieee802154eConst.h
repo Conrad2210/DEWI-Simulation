@@ -192,9 +192,9 @@ const UINT_16  aResponseWaitTime            = 32 * aBaseSuperframeDuration;     
 #define def_macTsCCA                            128
 #define def_macTsTxOffset                       2120
 #define def_macTsRxOffset                       1120
-#define def_macTsRxAckDelay                     800
+#define def_macTsRxAckDelay                     1000
 #define def_macTsTxAckDelay                     1000
-#define def_macTsRxWait                         2200
+#define def_macTsRxWait                         2000
 #define def_macTsAckWait                        400
 #define def_macTsRxTx                           192
 #define def_macTsMaxAck                         2400
