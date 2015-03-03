@@ -426,11 +426,9 @@ void UDPLamp::processPacket(cPacket *pk)
                                 }
                                 else
                                 {
-<<<<<<< HEAD
-                                    E2E->record(endtoendDelay.dbl(),tmpBurstMsg->getName());
-=======
+
                                     E2E->record(simTime().dbl(),pk->par("msgIdInBurst").longValue());
->>>>>>> Mac
+
                                 }
                                 timeForCount = timeForCount + 1;
                                 nNumResend++;

@@ -19,11 +19,9 @@ package dewi.world.datacenter;
 simple DataCenter
 {
     parameters:
-<<<<<<< HEAD
-        bool recordValues;
-=======
+
         bool recordValues = default(false);
->>>>>>> Mac
+
         bool visualization = default(false);
         
         @display("i=device/server2");
