@@ -45,6 +45,7 @@ SlottedAloha::~SlottedAloha()
     delete BeaconTimer;
     delete StartTimer;
     delete ScheduleTimer;
+    delete ScanTimer;
 
 }
 
@@ -78,6 +79,7 @@ void SlottedAloha::initialize(int stage)
     BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
     StartTimer = new cMessage("StartTimer", START_TIMER);
     AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
+    ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
 
     createInitialEntries();
 
@@ -194,6 +196,11 @@ void SlottedAloha::handleSelfMessage(cMessage *msg)
 	case START_TIMER:
 	{
 	    MLME_START_request(msg->dup());
+	    break;
+	}
+	case MAC_SCAN_TIMER:
+	{
+	    MLME_SCAN_request(msg->dup());
 	    break;
 	}
 	case BEACON_REQUEST:
@@ -420,9 +427,9 @@ void SlottedAloha::handle_MLME_START_confirm(cMessage *msg)
     }
     if(isPANCoor)
     {
-	if(ScheduleTimer->isScheduled())
-	    cancelEvent(ScheduleTimer);
-	scheduleAt(simTime() + 60, ScheduleTimer);
+//	if(ScheduleTimer->isScheduled())
+//	    cancelEvent(ScheduleTimer);
+//	scheduleAt(simTime() + 60, ScheduleTimer);
     }
 }
 
@@ -431,52 +438,87 @@ void SlottedAloha::MLME_SCAN_request(cMessage *msg)
 {
 
     Ieee802154eNetworkCtrlInfo *scanReq = new Ieee802154eNetworkCtrlInfo("ScanRequest", TP_MLME_SCAN_REQUEST);
-
-    if(lastSCANChannel == 0)
+    if(!dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
     {
-	scanReq->setChannel(channelList[0]);
-	lastSCANChannel = channelList[0];
+	if(lastSCANChannel == 0)
+	{
+	    scanReq->setChannel(channelList[0]);
+	    lastSCANChannel = channelList[0];
+	}
+	else
+	{
+	    for(int i = 0; i < numChannel; i++)
+	    {
+		if(lastSCANChannel == channelList[i] && lastSCANChannel != channelList[numChannel])
+		{
+		    lastSCANChannel = channelList[i + 1];
+		    scanReq->setChannel(channelList[i + 1]);
+		    break;
+		}
+		else if(lastSCANChannel == channelList[numChannel])
+		{
+		    scanReq->setChannel(channelList[0]);
+		    lastSCANChannel = channelList[0];
+		    break;
+		}
+	    }
+	}
+	scanReq->setScanType(0x02);
+	send(scanReq->dup(), outGate);
+
+	double tempTime = aBaseSuperframeDuration * pow(2, 5) / 62.5e3;
+	if(ScanTimer->isScheduled())
+	    cancelEvent(ScanTimer);
+
+	scheduleAt(simTime() + tempTime, ScanTimer);
     }
     else
     {
-	for(int i = 0; i < numChannel; i++)
-	{
-	    if(lastSCANChannel == channelList[i] && lastSCANChannel != channelList[numChannel])
-	    {
-		lastSCANChannel = channelList[i + 1];
-		scanReq->setChannel(channelList[i + 1]);
-		break;
-	    }
-	    else if(lastSCANChannel == channelList[numChannel])
-	    {
-		scanReq->setChannel(channelList[0]);
-		lastSCANChannel = channelList[0];
-		break;
-	    }
-	}
+	scanReq->setScanType(0x00);
+	send(scanReq->dup(), outGate);
+	if(ScanTimer->isScheduled())
+		    cancelEvent(ScanTimer);
     }
-    scanReq->setScanType(0x02);
-    scanReq->setScanDuration(5);
-    send(scanReq->dup(), outGate);
-
     delete scanReq;
     delete msg;
 }
 
 void SlottedAloha::handle_MLME_SCAN_confirm(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-    if(tmp->getStatus() == mac_NO_BEACON)
-	MLME_SCAN_request(tmp->dup());
+    Ieee802154EnhancedBeaconFrame *tmp = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+    if(ScanTimer->isScheduled())
+	cancelEvent(ScanTimer);
+
+    MLME_SCAN_request(tmp->dup());
+    MLME_SET_BEACON_request(tmp->dup());
+
+
+
     delete tmp;
+
 }
 
 void SlottedAloha::MLME_SET_BEACON_request(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("SetSlotRequest", TP_MLME_SET_BEACON_REQUEST);
-    send(tmp->dup(), outGate);
-    delete tmp;
-    delete msg;
+
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
+    {
+	Ieee802154EnhancedBeaconFrame * tmp = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	tmp->setKind(TP_MLME_SET_BEACON_REQUEST);
+	tmp->setName("SetSlotRequest");
+	send(tmp->dup(), outGate);
+	delete tmp;
+    }
+    else
+    {
+
+	Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("SetSlotRequest", TP_MLME_SET_BEACON_REQUEST);
+
+	send(tmp->dup(), outGate);
+	delete tmp;
+	delete msg;
+    }
+
 }
 
 void SlottedAloha::handle_MLME_SET_BEACON_confirm(cMessage *msg)

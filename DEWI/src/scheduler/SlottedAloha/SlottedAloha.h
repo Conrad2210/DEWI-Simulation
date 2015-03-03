@@ -23,6 +23,7 @@
 #include "IMacTimeslotTable.h"
 #include "IMacHoppingSequenceList.h"
 #include "IMacNeighborTable.h"
+#include "Ieee802154eFrame_m.h"
 
 class INET_API SlottedAloha: public cSimpleModule,public IbaseScheduler {
 public:
@@ -147,11 +148,14 @@ protected:
     bool notAssociated;
 
 protected:
-    //////////TMER
+    //////////TIMER
     cMessage *BeaconTimer;
     cMessage *StartTimer;
     cMessage *AssociateTimer;
     cMessage *ScheduleTimer;
+    cMessage *ScanTimer;
+
+    std::vector<Ieee802154EnhancedBeaconFrame *>BeaconContainer;
 
 
     cMessage *AssociateWaitTimer;

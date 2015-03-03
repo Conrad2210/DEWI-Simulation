@@ -1775,16 +1775,13 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
     {
 	if(isSCAN)
 	{
-	    cancelEvent(scanTimer);
-	    rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
-	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SCAN_CONFIRM);
-	    tmp->setStatus(mac_SUCCESS);
-	    MLME_SCAN_confirm(tmp->dup());
 
-	    tmp->setName("BeaconNotify");
-	    tmp->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
-	    MLME_BEACON_NOTIFY_indication(tmp->dup());
-	    delete tmp;
+
+
+
+	    MLME_SCAN_confirm(frame->dup());
+	    delete frame;
+
 	}
 	else
 	{
@@ -2072,8 +2069,12 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
     }
 }
 
-void Ieee802154eMac::handleEB(int stage)
+void Ieee802154eMac::handleEB(cMessage *msg)
 {
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
+	rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+    else
+	delete msg;
 
     simtime_t now, tmpf, duration;
     uint16_t ifs;
@@ -6360,6 +6361,15 @@ void Ieee802154eMac::handle_MLME_SCAN_request(cMessage *msg)
 	PLME_SET_TRX_STATE_request(phy_RX_ON);
 	isSCAN = true;
     }
+    else if(scanReq->getScanType() == 0x00)
+    {
+	PHY_PIB tmpPIB;
+	tmpPIB.phyCurrentChannel = scanReq->getChannel();
+	PLME_SET_request(PHY_CURRENT_CHANNEL, tmpPIB);
+	PLME_SET_TRX_STATE_request(phy_TRX_OFF);
+	resetTRX();
+	isSCAN = false;
+    }
     delete scanReq;
 
 }
@@ -6378,25 +6388,11 @@ void Ieee802154eMac::handle_MLME_SCAN_request(cMessage *msg)
  * */
 void Ieee802154eMac::MLME_SCAN_confirm(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *scanCon = new Ieee802154eNetworkCtrlInfo("ScanConfirm", TP_MLME_SCAN_CONFIRM);
-    Ieee802154eNetworkCtrlInfo *temp = new Ieee802154eNetworkCtrlInfo();
-    if(msg->getKind() == MAC_SCAN_TIMER)
-    {
-	scanCon->setStatus(mac_NO_BEACON);
-	isSCAN = false;
-	PLME_SET_TRX_STATE_request(phy_TRX_OFF);
-    }
-    else
-    {
-	temp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-	PLME_SET_TRX_STATE_request(phy_TRX_OFF);
-	scanCon->setStatus(temp->getStatus());
-	isSCAN = false;
-    }
-
-    send(scanCon->dup(), mSchedulerOut);
-    delete temp;
-    delete scanCon;
+    Ieee802154EnhancedBeaconFrame * frame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+    frame->setName("ScanConfirm");
+    frame->setKind(TP_MLME_SCAN_CONFIRM);
+    send(frame->dup(), mSchedulerOut);
+    delete frame;
 }
 
 /**@author: 2014    Stefan Reis
@@ -7297,7 +7293,7 @@ void Ieee802154eMac::MLME_BEACON_REQUEST_indication(Ieee802154eBeaconType beacon
  * param[in] */
 void Ieee802154eMac::handle_MLME_SET_SLOTFRAME_request(cMessage *msg)
 {
-    handleEB(0);
+    handleEB(msg->dup());
     delete msg;
 }
 
@@ -10078,7 +10074,7 @@ void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
 	}
 	case TP_MLME_SET_BEACON_REQUEST:
 	{
-	    handleEB(0);
+	    handleEB(msg->dup());
 	    delete msg;
 	    break;
 	}

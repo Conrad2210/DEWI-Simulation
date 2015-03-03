@@ -218,7 +218,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void    handleLowerMsg(cPacket*);
     virtual void    handleMacPhyPrimitive  (int, cMessage*);
     virtual void    handleBeacon(Ieee802154eFrame*);
-    virtual void    handleEB(int stage);
+    virtual void    handleEB(cMessage *msg);
     virtual void    handleCommand(cMessage *msg){};
 
     //virtual void    handleCommand80215(Ieee802154eFrame*);
