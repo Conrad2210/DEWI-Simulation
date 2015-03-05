@@ -16,7 +16,7 @@
 // 
 // 
 
-package dewi.simulations.Testing;
+package dewi.simulations.Examples.IEEE802154e.TSCHSlottedAloha;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
@@ -42,10 +42,6 @@ network Network
         lightSwitch: LightSwitch {
             parameters:
                 @display("i=lighting/lightswitch;p=15.28,12.16");
-        }
-        gateWay: LightSwitch {
-            parameters:
-                @display("i=device/accesspoint;p=25.56,6.6");
         }
         lamp[numHosts]: LampNode {
             parameters:

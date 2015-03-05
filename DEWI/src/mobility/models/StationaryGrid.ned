@@ -22,7 +22,7 @@ package dewi.mobility.models;
 //
 //
 
-simple OwnModel extends MobilityBase
+simple StationaryGrid extends MobilityBase
 {
     int maxRow;
     int maxCol;

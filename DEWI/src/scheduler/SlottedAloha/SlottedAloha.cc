@@ -288,37 +288,42 @@ void SlottedAloha::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 
 	notAssociated = false;
 	cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+	    cDisplayString* tempStr = new cDisplayString();
 	const char* temp = getParentModule()->getParentModule()->getName();
 	if(!strcmp(temp, "lightSwitch"))
 	{
-	    parentDisp->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+	    tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
 	}
 	else
 	{
-	    parentDisp->parse("b=1.5,1.5,oval,green;i=status/bulb");
+	    tempStr->parse("b=1.5,1.5,oval,green;i=status/bulb");
 	}
 
 	if(ScheduleTimer->isScheduled())
 	    cancelEvent(ScheduleTimer);
 	double tempTime = 0 + ((double)rand() / RAND_MAX) * (0.1 - 0);
 	scheduleAt(simTime() + tempTime, ScheduleTimer);
+	    parentDisp->updateWith(*tempStr);
     }
     else
     {
 
 	notAssociated = true;
 	cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+	    cDisplayString* tempStr = new cDisplayString();
 	const char* temp = getParentModule()->getParentModule()->getName();
 	if(!strcmp(temp, "lightSwitch"))
 	{
-	    parentDisp->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+	    tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
 	}
 	else
 	{
-	    parentDisp->parse("b=1.5,1.5,oval,yellow;i=status/bulb");
+	    tempStr->parse("b=1.5,1.5,oval,yellow;i=status/bulb");
 	}
 	scheduleAt(simTime(), AssociateTimer);
+	parentDisp->updateWith(*tempStr);
     }
+
 
     delete tmp;
 }
@@ -405,17 +410,18 @@ void SlottedAloha::handle_MLME_START_confirm(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *startCo = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+    cDisplayString* tempStr = new cDisplayString();
     const char* temp = getParentModule()->getParentModule()->getName();
     if(!strcmp(temp, "lightSwitch"))
     {
-	parentDisp->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+	tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
     }
     else
     {
 	if(isPANCoor)
-	    parentDisp->parse("b=1.5,1.5,oval,blue;i=status/bulb");
+	    tempStr->parse("b=1.5,1.5,oval,blue;i=status/bulb");
 	else
-	    parentDisp->parse("b=1.5,1.5,oval,yellow;i=status/bulb");
+	    tempStr->parse("b=1.5,1.5,oval,yellow;i=status/bulb");
     }
     if(startCo->getPanCoordinator())
     {
@@ -431,6 +437,7 @@ void SlottedAloha::handle_MLME_START_confirm(cMessage *msg)
 //	    cancelEvent(ScheduleTimer);
 //	scheduleAt(simTime() + 60, ScheduleTimer);
     }
+    parentDisp->updateWith(*tempStr);
 }
 
 //Scan
@@ -740,6 +747,7 @@ void SlottedAloha::handle_SCHEDULE_confirm(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+    cDisplayString* tempStr = new cDisplayString();
     const char* temp = getParentModule()->getParentModule()->getName();
     if(!Ctrl->getReceivedByACK())
     {
@@ -748,12 +756,12 @@ void SlottedAloha::handle_SCHEDULE_confirm(cMessage *msg)
 	    linkTable->addLink(tempLinkEntryTx);
 	    if(!strcmp(temp, "lightSwitch"))
 	    {
-		parentDisp->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+		tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
 	    }
 	    else
 	    {
 
-		parentDisp->parse("b=1.5,1.5,oval,blue;i=status/bulb");
+		tempStr->parse("b=1.5,1.5,oval,blue;i=status/bulb");
 	    }
 	}
 	else if(Ctrl->getStatus() == mac_LINK_EXISTS)
@@ -761,12 +769,12 @@ void SlottedAloha::handle_SCHEDULE_confirm(cMessage *msg)
 	    linkTable->addLink(tempLinkEntryTx);
 	    if(!strcmp(temp, "lightSwitch"))
 	    {
-		parentDisp->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+		tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
 	    }
 	    else
 	    {
 
-		parentDisp->parse("b=1.5,1.5,oval,blue;i=status/bulb");
+		tempStr->parse("b=1.5,1.5,oval,blue;i=status/bulb");
 	    }
 	}
 
@@ -782,12 +790,12 @@ void SlottedAloha::handle_SCHEDULE_confirm(cMessage *msg)
 	    linkTable->addLink(tempLinkEntryRx);
 	    if(!strcmp(temp, "lightSwitch"))
 	    {
-		parentDisp->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
+		tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
 	    }
 	    else
 	    {
 
-		parentDisp->parse("b=1.5,1.5,oval,blue;i=status/bulb");
+		tempStr->parse("b=1.5,1.5,oval,blue;i=status/bulb");
 	    }
 	}
 	else if(Ctrl->getStatus() == mac_LINK_EXISTS)
@@ -796,4 +804,5 @@ void SlottedAloha::handle_SCHEDULE_confirm(cMessage *msg)
 
 	}
     }
+    parentDisp->updateWith(*tempStr);
 }

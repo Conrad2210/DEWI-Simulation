@@ -18,7 +18,7 @@ package dewi.nodes.Csma;
 //Includes
 //Mobility
 import dewi.mobility.models.StationaryMobility;
-import dewi.mobility.models.OwnModel;
+import dewi.mobility.models.StationaryGrid;
 
 //NetworkLayer
 import dewi.nodes.inet.NetworkLayer;
@@ -90,7 +90,7 @@ module LampNode
 
 
         //Node Location
-        mobility: OwnModel {
+        mobility: StationaryGrid {
             parameters:
                 maxCol = maxCol;
                 maxRow = maxRow;

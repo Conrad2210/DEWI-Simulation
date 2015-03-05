@@ -713,7 +713,7 @@ void Ieee802154eMac::initialize(int stage)
 //                BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
 //                scheduleAt(panStartTime, asnTimer);
 //            }
-
+	    PLME_SET_TRX_STATE_request(phy_TRX_OFF);
 	}
     }
 }

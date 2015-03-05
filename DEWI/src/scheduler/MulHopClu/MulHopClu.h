@@ -24,6 +24,7 @@
 #include "IMacTimeslotTable.h"
 #include "IMacHoppingSequenceList.h"
 #include "IMacNeighborTable.h"
+#include "beaconTable.h"
 
 class MulHopClu : public cSimpleModule, public IbaseScheduler
 {
@@ -31,132 +32,135 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 	MulHopClu();
 	virtual ~MulHopClu();
 
+	int numInitStages() const
+	{
+	    return 5;
+	}
 
-	int numInitStages() const {return 5;}
+	virtual void initialize(int);
 
-	    virtual void initialize(int);
+	virtual void handleMessage(cMessage *msg);
 
-	    virtual void handleMessage(cMessage *msg);
+	virtual void handleSelfMessage(cMessage *msg);
 
-	    virtual void handleSelfMessage(cMessage *msg);
+	virtual void handleMACMessage(cMessage *msg);
 
-	    virtual void handleMACMessage(cMessage *msg);
+	//Association Process
+	virtual void MLME_ASSOCIATE_request(cMessage *msg);
 
-	    //Association Process
-	    virtual void MLME_ASSOCIATE_request(cMessage *msg );
+	virtual void handle_MLME_ASSOCIATE_indication(cMessage *msg);
 
-	    virtual void handle_MLME_ASSOCIATE_indication(cMessage *msg);
+	virtual void MLME_ASSOCIATE_responce(cMessage *msg);
 
-	    virtual void MLME_ASSOCIATE_responce(cMessage *msg);
+	virtual void handle_MLME_ASSOCIATE_confirm(cMessage *msg);
 
-	    virtual void handle_MLME_ASSOCIATE_confirm(cMessage *msg);
+	//Dissassociation Process
+	virtual void MLME_DISASSOCIATE_request(cMessage *msg);
 
+	virtual void handle_MLME_DIASSOCIATE_indication(cMessage *msg);
 
-	    //Dissassociation Process
-	    virtual void MLME_DISASSOCIATE_request(cMessage *msg);
+	virtual void handle_MLME_DIASSOCIATE_confirm(cMessage *msg);
 
-	    virtual void handle_MLME_DIASSOCIATE_indication(cMessage *msg);
+	//Advertisment
 
-	    virtual void handle_MLME_DIASSOCIATE_confirm(cMessage *msg);
+	virtual void MLME_BEACON_request(cMessage *msg);
 
-	    //Advertisment
+	virtual void handle_MLME_BEACON_confirm(cMessage *msg);
 
-	    virtual void MLME_BEACON_request(cMessage *msg);
+	virtual void handle_MLME_BEACON_indication(cMessage *msg);
 
-	    virtual void handle_MLME_BEACON_confirm(cMessage *msg);
+	virtual void MLME_SETSLOTFRAME_request(cMessage *msg);
 
-	    virtual void handle_MLME_BEACON_indication(cMessage *msg);
+	virtual void handle_MLME_SETSLOTFRAME_confirm(cMessage *msg);
 
-	    virtual void MLME_SETSLOTFRAME_request(cMessage *msg);
+	virtual void MLME_SETLINK_request(cMessage *msg);
 
-	    virtual void handle_MLME_SETSLOTFRAME_confirm(cMessage *msg);
+	virtual void handle_MLME_SETLINK_confirm(cMessage *msg);
 
-	    virtual void MLME_SETLINK_request(cMessage *msg);
+	virtual void MLME_TSCHMODE_request(cMessage *msg);
 
-	    virtual void handle_MLME_SETLINK_confirm(cMessage *msg);
+	virtual void handle_MLME_TSCHMODE_confirm(cMessage *msg);
 
-	    virtual void MLME_TSCHMODE_request(cMessage *msg);
+	//START
+	virtual void MLME_START_request(cMessage *msg);
 
-	    virtual void handle_MLME_TSCHMODE_confirm(cMessage *msg);
+	virtual void handle_MLME_START_confirm(cMessage *msg);
 
-	    //START
-	    virtual void MLME_START_request(cMessage *msg);
+	//SCAN
+	virtual void MLME_SCAN_request(cMessage *msg);
 
-	    virtual void handle_MLME_START_confirm(cMessage *msg);
+	virtual void handle_MLME_SCAN_confirm(cMessage *msg);
 
-	    //SCAN
-	    virtual void MLME_SCAN_request(cMessage *msg);
+	//set Beacon
+	virtual void MLME_SET_BEACON_request(cMessage *msg);
 
-	    virtual void handle_MLME_SCAN_confirm(cMessage *msg);
+	virtual void handle_MLME_SET_BEACON_confirm(cMessage *msg);
 
-	    //set Beacon
-	    virtual void MLME_SET_BEACON_request(cMessage *msg);
+	//build schedule
+	virtual void SCHEDULE_request(cMessage *msg);
+	virtual void handle_SCHEDULE_indication(cMessage *msg);
+	virtual void SCHEDULE_response(cMessage *msg);
+	virtual void handle_SCHEDULE_confirm(cMessage *msg);
+	////////////////////////////////////////////////////////////////////////
+	///////////////////Helper Functions//////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////
+	void createInitialEntries();
 
-	    virtual void handle_MLME_SET_BEACON_confirm(cMessage *msg);
+	//Variables
+    protected:
 
+	int outGate;
+	int inGate;
 
+	/** @brief Link table */
+	IMacLinkTable* linkTable;
+	/** @brief slotframe table */
+	IMacSlotframeTable* slotframeTable;
 
-	    //build schedule
-	    virtual void SCHEDULE_request(cMessage *msg);
-	    virtual void handle_SCHEDULE_indication(cMessage *msg);
-	    virtual void SCHEDULE_response(cMessage *msg);
-	    virtual void handle_SCHEDULE_confirm(cMessage *msg);
-	    ////////////////////////////////////////////////////////////////////////
-	    ///////////////////Helper Functions//////////////////////////////////////
-	    ////////////////////////////////////////////////////////////////////////
-	    void createInitialEntries();
+	/** @brief timeslot table */
+	IMacTimeslotTable* timeslotTable;
 
-	    //Variables
-	protected:
+	/** @brief buffer for one timeslot entry */
+	macTimeslotTableEntry* timeslotTemplate;
 
-	    int outGate;
-	    int inGate;
+	/** @brief Hopping Sequence List */
+	IMacHoppingSequenceList* hoppingSequenceList;
 
-	    /** @brief Link table */
-	    IMacLinkTable* linkTable;
-	    /** @brief slotframe table */
-	    IMacSlotframeTable* slotframeTable;
+	/** @brief neighbor information table */
+	IMacNeighborTable* neighborTable;
 
-	    /** @brief timeslot table */
-	    IMacTimeslotTable* timeslotTable;
+	//last Neighbor
+	macNeighborTableEntry *lastNeighbor;
 
-	    /** @brief buffer for one timeslot entry */
-	    macTimeslotTableEntry* timeslotTemplate;
+	//.temp link entry for scheduler messages
+	//entry for received requests
+	macLinkTableEntry *tempLinkEntryRx;
 
-	    /** @brief Hopping Sequence List */
-	    IMacHoppingSequenceList* hoppingSequenceList;
+	//entry for transmitted requests
+	macLinkTableEntry *tempLinkEntryTx;
 
-	    /** @brief neighbor information table */
-	    IMacNeighborTable* neighborTable;
+	bool firstLink;
+	bool isPANCoor;
 
-	    //last Neighbor
-	    macNeighborTableEntry *lastNeighbor;
+	int lastSCANChannel;
 
+	bool notAssociated;
 
-	    //.temp link entry for scheduler messages
-	    //entry for received requests
-	    macLinkTableEntry *tempLinkEntryRx;
+    protected:
+	//////////TMER
+	cMessage *BeaconTimer;
+	cMessage *StartTimer;
+	cMessage *AssociateTimer;
+	cMessage *ScheduleTimer;
+	cMessage *ScanTimer;
 
-	    //entry for transmitted requests
-	    macLinkTableEntry *tempLinkEntryTx;
+	cMessage *AssociateWaitTimer;
 
+	beaconTable BeaconTable;
 
-	    bool firstLink;
-	    bool isPANCoor;
+	int stage;
 
-	    int lastSCANChannel;
-
-	    bool notAssociated;
-
-	protected:
-	    //////////TMER
-	    cMessage *BeaconTimer;
-	    cMessage *StartTimer;
-	    cMessage *AssociateTimer;
-	    cMessage *ScheduleTimer;
-
-
-	    cMessage *AssociateWaitTimer;
+	int scanDuration;
 };
 
 #endif /* MULHOPCLU_H_ */

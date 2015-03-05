@@ -13,13 +13,12 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.nodes.Ieee802154e.Stationary;
+package dewi.nodes.Ieee802154e.RandomPos;
 
 //Includes
 //Mobility
 import dewi.mobility.models.StationaryMobility;
 import dewi.mobility.models.StationaryGrid;
-import dewi.mobility.models.StaticGridMobility;
 
 //NetworkLayer
 import dewi.nodes.inet.NetworkLayer;
@@ -56,14 +55,12 @@ import dewi.linklayer.common.Ieee802154e.macNeighborTable.macNeighborTable;
 
 
 
-module LampNode
+module gateWay
 {
     parameters:
         @node();
         //Variable X and Y for PlayGround Area
-        //double X @unit(m);
-        //double Y @unit(m);
-        //double Z @unit(m);
+
         int numHosts;
         //Number of Hosts, to calculate the position of the nodes
         //int Hosts;
@@ -92,11 +89,6 @@ module LampNode
         //Node Location
         mobility: StationaryMobility {
             parameters:
-                //maxCol = maxCol;
-                //maxRow = maxRow;
-                //marginX = X;
-                //marginY = Y;
-                //marginZ = Z;
                 @display("p=152,368;i=block/cogwheel");
         }
 

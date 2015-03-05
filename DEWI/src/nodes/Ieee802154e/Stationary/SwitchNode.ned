@@ -18,7 +18,7 @@ package dewi.nodes.Ieee802154e.Stationary;
 //Includes
 //Mobility
 import dewi.mobility.models.StationaryMobility;
-import dewi.mobility.models.OwnModel;
+import dewi.mobility.models.StationaryGrid;
 import dewi.mobility.models.StaticGridMobility;
 
 //NetworkLayer

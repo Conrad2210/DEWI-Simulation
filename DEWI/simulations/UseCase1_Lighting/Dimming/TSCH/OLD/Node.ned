@@ -18,7 +18,7 @@ package dewi.simulations.UseCase1_Lighting.Dimming.TSCH.OLD;
 //Includes
 //Mobility
 import dewi.mobility.models.StationaryMobility;
-import dewi.mobility.models.OwnModel;
+import dewi.mobility.models.StationaryGrid;
 
 //NetworkLayer
 import dewi.nodes.inet.NetworkLayer;
@@ -91,7 +91,7 @@ module Node
 
 
         //Node Location
-        mobility: OwnModel {
+        mobility: StationaryGrid {
             parameters:
                 maxCol = maxCol;
                 maxRow = maxRow;
