@@ -73,6 +73,8 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
 
     virtual cMessage *requestAdvPacket();
 
+    virtual cMessage *requestDisAssPacket(bool response);
+
     virtual cMessage *requestSchdulePacket();
 
     virtual cMessage *requestBeaconPacket();
@@ -87,6 +89,8 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
      * delete a specific one/all packet(s) from the queue
      */
     virtual bool deleteMsgQueue(MACAddress dstAddr, bool all);
+
+    virtual bool deleteBCNQueue();
 
     virtual void insertInQueue(cMessage *msg);
 };

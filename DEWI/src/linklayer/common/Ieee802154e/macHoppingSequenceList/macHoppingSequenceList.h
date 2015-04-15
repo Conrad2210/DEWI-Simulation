@@ -98,6 +98,9 @@ class INET_API macHoppingSequenceList : public cSimpleModule, public IMacHopping
 
         //Edits an HoppingSequenceListEntry
         virtual void editHoppingSequenceListEntry(macHoppingSequenceListEntry* entry);
+
+	//deletes all entries
+	virtual void clearTable();
 };
 
 #endif /* MACHOPPINGSEQUENCELIST_H_ */

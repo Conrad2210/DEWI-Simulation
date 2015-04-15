@@ -82,5 +82,9 @@ class INET_API IMacNeighborTable
          virtual bool isNeighborBySAddr(UINT_16 address) = 0;
          virtual bool isNeighborByEAddr(MACAddress address) = 0;
          virtual bool isNeighborTimeSource(UINT_16 address) = 0;
+         virtual MACAddress getAddressFromCH() = 0;
+
+ 	//deletes all entries
+ 	virtual void clearTable() = 0;
 };
 #endif /* IMACNeighborTABLE_H_ */

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/radio/Radio80211aControlInfo.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/propagation/radioModels/Radio80211aControlInfo.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:

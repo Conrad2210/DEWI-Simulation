@@ -96,6 +96,14 @@ class INET_API macNeighborTableEntry : public cObject
         /* Transmission Delay: for the Std 802.15.4e-2012 retransmission calculation. */
         int transDelay;
 
+        bool nextStageCH;
+        bool sameStageCH;
+        bool prevStageCH;
+        bool myCH;
+        bool myCS;
+
+        int stage;
+
     private:
         macNeighborTableEntry(const macNeighborTableEntry& obj);
         macNeighborTableEntry& operator=(const macNeighborTableEntry& obj);
@@ -140,6 +148,18 @@ class INET_API macNeighborTableEntry : public cObject
         UINT_16 getRPL_OF() const{return RPL_OF;}
         int getTransDelay() const{return transDelay;}
 
+
+        bool isNextStageCH(){return nextStageCH;}
+        bool isPrevStageCH(){return prevStageCH;}
+        bool isSameStageCH(){return sameStageCH;}
+        bool isMyCH(){return myCH;}
+        bool isMyCS(){return myCS;}
+
+        int getStage(){return stage;}
+
+        void setStage(int st){stage = st;}
+
+
         //Set function
         virtual void setNeighborTable(IMacNeighborTable* t) {this->ownerp = t;}
         virtual void setNeighborId(int id) {neighborId = id;}
@@ -166,5 +186,12 @@ class INET_API macNeighborTableEntry : public cObject
         virtual void incrNumRxData() {numRxData = numRxData+1;}
         virtual void incrNumRxDataAck() {numRxDataAck = numRxDataAck+1;}
         virtual void decrTransDelay() {transDelay = transDelay-1;}
+
+        virtual void isNextStageCH(bool is){nextStageCH=is;}
+        virtual void isPrevStageCH(bool is){prevStageCH=is;}
+        virtual void isSameStageCH(bool is){sameStageCH=is;}
+        virtual void isMyCH(bool is){myCH = is;}
+        virtual void isMyCS(bool is){myCS = is;}
+
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

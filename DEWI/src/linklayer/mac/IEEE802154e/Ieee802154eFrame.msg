@@ -88,6 +88,9 @@ message Ieee802154eBeaconFrame extends Ieee802154eFrame
 // *****************************************
 message Ieee802154EnhancedBeaconFrame extends Ieee802154eFrame
 {
+    int BO;
+    int SO;
+    int stage;
 }
 
 // ********************************
@@ -114,11 +117,36 @@ message Ieee802154eEnhancedAckFrame extends Ieee802154eFrame
 message Ieee802154eAssociationFrame extends Ieee802154eFrame
 {
     Ieee802154eNetworkCtrlInfo CntrlInfo;
+    
+    int CoorStage;
+    bool CS;
+    bool CH;
+}
+
+message Ieee802154eDisassociationFrame extends Ieee802154eFrame
+{
+    Ieee802154eNetworkCtrlInfo CntrlInfo;
 }
 
 message Ieee802154eScheduleFrame extends Ieee802154eFrame
 {
+     
     Ieee802154eNetworkCtrlInfo CntrlInfo;
+}
+
+message Ieee802154eMulHoCluFrame extends Ieee802154eFrame
+{
+ 	 Ieee802154eNetworkCtrlInfo CntrlInfo;
+ 	     
+    int CoorStage;
+    bool CS;
+    bool CH;
+    
+    int ChannelOffset;
+    int timeslot;
+    int BO;
+    int SO;
+ 	   
 }
 
 // ********************************				

@@ -48,7 +48,10 @@ class INET_API macLinkTableEntry : public cObject
         UINT_16 nodeAddress;
         int timeslot;
         int channelOffset;
-        State state;          ///< requested interface state, similar to Linux ifup/ifdown
+        bool prevStage;          ///< requested interface state, similar to Linux ifup/ifdown
+        bool nextStage;
+        bool sameStage;
+        State state;
 
     private:
         macLinkTableEntry(const macLinkTableEntry& obj);
@@ -81,6 +84,10 @@ class INET_API macLinkTableEntry : public cObject
         UINT_16 getNodeAddress() const {return nodeAddress;}
         int getTimeslot() const {return timeslot;}
         int getChannelOffset() const {return channelOffset;}
+        bool isprevStage(){return prevStage;}
+        bool isnextStage(){return nextStage;}
+        bool issameStage(){return sameStage;}
+
 
         virtual void setMacLinkTable(IMacLinkTable* t) {this->ownerp = t;}
         virtual void setLinkId(int id) {LinkId = id;}
@@ -90,5 +97,8 @@ class INET_API macLinkTableEntry : public cObject
         virtual void setNodeAddress(UINT_16 address) {nodeAddress = address;}
         virtual void setTimeslot(int slot) {timeslot = slot;}
         virtual void setChannelOffset(int offset) {channelOffset = offset;}
+        virtual void isprevStage(bool is){prevStage = is;}
+        virtual void isnextStage(bool is){nextStage = is;}
+        virtual void issameStage(bool is){sameStage = is;}
 };
 #endif /* MACLINKTABLEENTRY_H_ */

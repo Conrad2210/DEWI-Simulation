@@ -61,8 +61,8 @@ macSlotframeTable::macSlotframeTable()
 macSlotframeTable::~macSlotframeTable()
 {
     //@author Conrad Dandelski
-    for (int i = 0; i < (int) idToSlotframe.size(); i++)
-        delete idToSlotframe[i];
+    while(idToSlotframe.size() != 0)
+	idToSlotframe.erase(idToSlotframe.begin());
 
     delete[] tmpSlotframeList;
 }
@@ -314,3 +314,9 @@ void macSlotframeTable::invalidTmpSlotframeList()
     tmpSlotframeList = NULL;
 }
 
+
+void macSlotframeTable::clearTable()
+{
+    while(idToSlotframe.size() != 0)
+	idToSlotframe.erase(idToSlotframe.begin());
+}

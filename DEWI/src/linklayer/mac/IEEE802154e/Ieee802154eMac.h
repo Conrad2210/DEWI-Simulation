@@ -334,10 +334,11 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     //@{
     virtual void    handle_MLME_ASSOCIATE_request(cMessage *msg);
     virtual void    MLME_ASSOCIATE_indication(cMessage *msg);
-    virtual void    handle_MLME_ASSOCIATE_responce(cMessage *msg);
+    virtual void    handle_MLME_ASSOCIATE_response(cMessage *msg);
     virtual void    MLME_ASSOCIATE_confirm(cMessage *msg);
     virtual void    handle_MLME_DISASSOCIATE_request(cMessage *msg);
     virtual void    MLME_DISASSOCIATE_indication(cMessage *msg);
+    virtual void    handle_MLME_DISASSOCIATE_response(cMessage *msg);
     virtual void    MLME_DISASSOCIATE_confirm(cMessage *msg);
 
     virtual void    MLME_BEACON_NOTIFY_indication(cMessage *msg);
@@ -411,6 +412,12 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     virtual void SCHEDULE_confirm(cMessage *msg, bool ack);
 
 
+    //Multihop CLustering
+    virtual void handle_RESTART_request(cMessage *msg);
+    virtual void RESTART_confirm(cMessage *msg);
+
+
+
     /**
     * @name State control and task management functions
     */
@@ -429,6 +436,7 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     * @name Timer handling functions
     */
     //@{
+    virtual void handleAwaitingBeaconTimer();
     virtual void    handleBackoffTimer();
     virtual void    handleDeferCCATimer();
     virtual void    handleBcnRxTimer();
@@ -867,6 +875,8 @@ class INET_API Ieee802154eMac: public WirelessMacBase
 
     /** @brief CSMA wait of next beacon */
     bool csmacaWaitNextBeacon;
+
+    bool awaitingNextBeacon;
     //@}
 
     /**
@@ -968,6 +978,11 @@ class INET_API Ieee802154eMac: public WirelessMacBase
     * @name Timer messages
     */
     //@{
+
+    /** @brief Timer for awaiting a Beacon
+     *
+     */
+    cMessage* awaitingBeacon;
     /** @brief backoff timer for CSMA-CA */
     cMessage* backoffTimer;
 

@@ -57,8 +57,8 @@ macNeighborTable::macNeighborTable()
 
 macNeighborTable::~macNeighborTable()
 {
-    for(int i = 0; i < (int)idToNeighbor.size(); i++)
-	delete idToNeighbor[i];
+    while(idToNeighbor.size() != 0)
+	idToNeighbor.erase(idToNeighbor.begin());
 
     delete[] tmpNeighborList;
 }
@@ -298,7 +298,7 @@ bool macNeighborTable::deleteNeighbor(macNeighborTableEntry *entry)
 	throw cRuntimeError("deleteNeighbor(): Neighbor '%d' not found in Neighbor table", entry->getNeighborId());
 
     nb->fireChangeNotification(NF_NEIGHBOR_DELETED, entry);
-    idToNeighbor[id - NEIGHBORIDS_START] = NULL;
+    idToNeighbor.erase(idToNeighbor.begin()+(id - NEIGHBORIDS_START));
     delete entry;
     invalidTmpNeighborList();
     return true;
@@ -489,4 +489,20 @@ void macNeighborTable::invalidTmpNeighborList()
     tmpNumNeighbors = -1;
     delete[] tmpNeighborList;
     tmpNeighborList = NULL;
+}
+
+MACAddress macNeighborTable::getAddressFromCH()
+{
+    for(int i = 0; i < (int) idToNeighbor.size(); i++)
+    {
+	if(idToNeighbor.at(i)->isNextStageCH())
+	    return idToNeighbor.at(i)->getExtendedAddress();
+    }
+    return MACAddress::UNSPECIFIED_ADDRESS;
+}
+
+void macNeighborTable::clearTable()
+{
+    while(idToNeighbor.size() != 0)
+	idToNeighbor.erase(idToNeighbor.begin());
 }

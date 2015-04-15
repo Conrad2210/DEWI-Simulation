@@ -38,6 +38,9 @@ macLinkTableEntry::macLinkTableEntry()
     nodeAddress = 0x00;
     timeslot = -1;
     channelOffset = -1;
+    prevStage = false;
+    nextStage = false;
+    sameStage = false;
 }
 
 macLinkTableEntry::~macLinkTableEntry()

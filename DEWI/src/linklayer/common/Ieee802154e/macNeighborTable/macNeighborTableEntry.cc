@@ -46,6 +46,11 @@ macNeighborTableEntry::macNeighborTableEntry()
     isTimeSource = false;
     RPL_OF = 0;
     transDelay = 0;
+    nextStageCH = false;
+    sameStageCH = false;
+    prevStageCH = false;
+    myCH = false;
+    myCS = false;
 }
 
 macNeighborTableEntry::~macNeighborTableEntry()
@@ -74,6 +79,7 @@ std::string macNeighborTableEntry::info() const
     out<<" isTimeSource: " << isTimeSource;
     out<<" RPL_OF: " << (int)RPL_OF;
     out<<" transDelay: " << (int)transDelay;
+    out<<" CH next Stage: " << (bool)nextStageCH;
     return out.str();
 }
 

@@ -63,8 +63,8 @@ macLinkTable::macLinkTable()
 macLinkTable::~macLinkTable()
 {
     //@author: Conrad Dandelski
-    for(int i = 0; i < (int)idToLink.size(); i++)
-	delete idToLink[i];
+    while(idToLink.size() != 0)
+	idToLink.erase(idToLink.begin());
 
     delete[] tmpLinkList;
 }
@@ -175,7 +175,7 @@ int macLinkTable::getNumLinks()
 macLinkTableEntry *macLinkTable::getLinkByTimeslotOffsetAddress(int timeslot, int offset, UINT_16 address)
 {
     macLinkTableEntry *entry = new macLinkTableEntry();
-    for(int i = 0; i < idToLink.size(); i++)
+    for(int i = 0; i < (int)idToLink.size(); i++)
     {
 	entry = idToLink.at(i);
 	if(entry->getTimeslot() == timeslot && entry->getChannelOffset() == offset && entry->getNodeAddress() == address)
@@ -185,6 +185,34 @@ macLinkTableEntry *macLinkTable::getLinkByTimeslotOffsetAddress(int timeslot, in
     }
     return NULL;
 }
+
+
+
+int macLinkTable::getTimeSlotByOffset(int offset)
+{
+    for(int i = 0; i < (int) idToLink.size(); i++)
+    {
+	if(idToLink.at(i)->getChannelOffset() == offset)
+	{
+	    return idToLink.at(i)->getTimeslot();
+	}
+    }
+    return -1;
+}
+
+int macLinkTable::getOffsetByTimeslot(int timeslot)
+{
+    for(int i = 0; i < (int) idToLink.size(); i++)
+    {
+	if(idToLink.at(i)->getTimeslot() == timeslot)
+	{
+	    return idToLink.at(i)->getChannelOffset();
+	}
+    }
+    return -1;
+}
+
+
 macLinkTableEntry *macLinkTable::getLink(int pos)
 {
     //@author: Conrad Dandelski
@@ -546,4 +574,10 @@ void macLinkTable::editLink(macLinkTableEntry *entry)
     {
 	EV << nodename << ": Edited Link: " << entry->getLinkId() << "; Nothing changed" << endl;
     }
+}
+
+void macLinkTable::clearTable()
+{
+    while(idToLink.size() != 0)
+	idToLink.erase(idToLink.begin());
 }

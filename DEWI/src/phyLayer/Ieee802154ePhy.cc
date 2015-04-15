@@ -609,7 +609,8 @@ void Ieee802154ePhy::handleLowerMsgStart(AirFrame * airframe)
     // arrived in time
     // NOTE: a message may have arrival time in the past here when we are
     // processing ongoing transmissions during a channel change
-    if (airframe->getArrivalTime() == simTime() && rcvdPower >= sensitivity && rs.getState() != RadioState::TRANSMIT && snrInfo.ptr == NULL)
+    bool temp = rcvdPower >= sensitivity;
+    if (airframe->getArrivalTime() == simTime() && temp && rs.getState() != RadioState::TRANSMIT && snrInfo.ptr == NULL)
     {
         EV << "[PHY]: start receiving " << airframe->getName() << " frame ...\n";
 
@@ -706,7 +707,7 @@ void Ieee802154ePhy::handleLowerMsgEnd(AirFrame * airframe)
             frame->setKind(PACKETOK);
             Radio80211aControlInfo * cinfo = new Radio80211aControlInfo;    //FIXME: need to shift in the PHY class, to reduce the depency to other files [SR]
             cinfo->setSnr(airframe->getSnr());
-            cinfo->setLossRate(-1); //FIXME: How to
+            cinfo->setLossRate(airframe->getPSend()); //FIXME: Lossrate is used here as temp storage for transmit power
             cinfo->setRecPow(airframe->getPowRec());
             frame->setControlInfo(cinfo);
 

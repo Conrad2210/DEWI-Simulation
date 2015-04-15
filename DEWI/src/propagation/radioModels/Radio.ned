@@ -19,7 +19,7 @@
 // ***************************************************************************
 // ***************************************************************************
 
-package dewi.linklayer.radio;
+package dewi.propagation.radioModels;
 
 //
 // This is an abstract module that defines all parameters for radio modules

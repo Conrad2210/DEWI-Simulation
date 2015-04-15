@@ -205,4 +205,7 @@ message Ieee802154eNetworkCtrlInfo
 	
 	bool receivedByACK;
 	
+	
+	int stage;
+	
 }

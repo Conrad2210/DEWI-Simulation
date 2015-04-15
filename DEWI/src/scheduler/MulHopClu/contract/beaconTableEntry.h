@@ -14,7 +14,7 @@ class beaconTableEntry
 {
     public:
 	beaconTableEntry();
-	beaconTableEntry(int Eid, Ieee802154EnhancedBeaconFrame *msg, MACAddress extAddr, UINT16 shrtAdd, double rxPw, double r, UINT16 srcid, SimTime timestamp);
+	beaconTableEntry(int Eid, Ieee802154EnhancedBeaconFrame *msg, MACAddress extAddr, UINT16 shrtAdd, double rxPw, double r, UINT16 srcid, SimTime timestamp,double txPw, double dis);
 	virtual ~beaconTableEntry();
 
     private:
@@ -26,6 +26,8 @@ class beaconTableEntry
 	double rssi;
 	UINT16 srcPanId;
 	SimTime receivedAt;
+	double txPower;
+	double distance;
 
     public:
 
@@ -38,8 +40,11 @@ class beaconTableEntry
 	UINT16 getsrcAddrShort(){return srcAddrShort;}
 	void setsrcAddrShort(UINT16 addr){srcAddrShort = addr;}
 
-	double getrecvPower(){return recvPower;}
-	void setrecvPower(double power){recvPower = power;}
+	double getrecvPowerdBm(){return recvPower;}
+	void setrecvPowerdBm(double power){recvPower = power;}
+
+	double getrecvPowermW();
+	void setrecvPowermW(double power);
 
 	double getrssi(){return rssi;}
 	void setrssi(double d){rssi=d;}
@@ -49,6 +54,20 @@ class beaconTableEntry
 
 	SimTime getreceivedAt(){return receivedAt;}
 	void setreceivedAt(SimTime at){receivedAt = at;}
+
+	int getid(){return id;}
+	void setid(int i){id = i;}
+
+	double getTxPowermW(){return txPower;}
+	void setTxPowermW(double d){txPower = d;}
+
+	double getTxPowerdBm();
+	void setTxPowerdBm(double d);
+
+	double getDistance(){return distance;}
+	void setDistance(double d){distance=d;}
+
+
 
 };
 

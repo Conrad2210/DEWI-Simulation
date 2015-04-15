@@ -26,9 +26,15 @@ simple MulHopClu  like IScheduler
     string macNeighborTableModule = default("^.^.neighborTable");
 	
 	bool isPANCoor = default(false);
+	bool capablePanCoor = default(true);
 	double StartTime @unit(s) = default(0s);
 	double AssociateWaitTime @unit(s) = default(0.5s);
-
+	double Sensitivity @unit(dBm) = default(-95dBm);
+	
+	double transmitterPower @unit(mW) = default(0mW);
+	
+	//Probability to become a cluster head;
+	double pCh = default(0.9);
     gates:
         input from_mac;
         output to_mac;

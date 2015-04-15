@@ -77,6 +77,9 @@ class INET_API IMacTimeslotTemplate
          */
         virtual macTimeslotTemplateEntry *getTemplate(int pos) = 0;
 
+	//deletes all entries
+	virtual void clearTable() = 0;
+
 };
 
 #endif /* IMACTIMESLOTTEMPLATE_H_ */

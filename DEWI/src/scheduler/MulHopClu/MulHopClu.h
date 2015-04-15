@@ -25,6 +25,7 @@
 #include "IMacHoppingSequenceList.h"
 #include "IMacNeighborTable.h"
 #include "beaconTable.h"
+#include "clusterTable.h"
 
 class MulHopClu : public cSimpleModule, public IbaseScheduler
 {
@@ -50,7 +51,7 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 
 	virtual void handle_MLME_ASSOCIATE_indication(cMessage *msg);
 
-	virtual void MLME_ASSOCIATE_responce(cMessage *msg);
+	virtual void MLME_ASSOCIATE_response(cMessage *msg);
 
 	virtual void handle_MLME_ASSOCIATE_confirm(cMessage *msg);
 
@@ -58,6 +59,7 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 	virtual void MLME_DISASSOCIATE_request(cMessage *msg);
 
 	virtual void handle_MLME_DIASSOCIATE_indication(cMessage *msg);
+	virtual void MLME_DISASSOCIATE_response(cMessage *msg);
 
 	virtual void handle_MLME_DIASSOCIATE_confirm(cMessage *msg);
 
@@ -96,16 +98,42 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 
 	virtual void handle_MLME_SET_BEACON_confirm(cMessage *msg);
 
-	//build schedule
+	//retrieve schedule
 	virtual void SCHEDULE_request(cMessage *msg);
 	virtual void handle_SCHEDULE_indication(cMessage *msg);
 	virtual void SCHEDULE_response(cMessage *msg);
 	virtual void handle_SCHEDULE_confirm(cMessage *msg);
+
+	//PAN COORD check for beacon from CH same stage
+	virtual void handle_BEACON_WAIT_timer(cMessage *msg);
+	virtual void handle_BEACON_CH_SAME_STAGE(cMessage *msg);
+
+
+	virtual void RESTART_request(cMessage *msg);
+
+	virtual void handle_RESTART_confirm(cMessage *msg);
+
+
 	////////////////////////////////////////////////////////////////////////
 	///////////////////Helper Functions//////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////
 	void createInitialEntries();
 
+	void setSchedule();
+	void setScheduleChStUn();
+	void setScheduleChStZe();
+	void setScheduleChInit();
+	void setScheduleCs();
+
+	double calcDistance(double transPowmW, double minRecvPowermW);
+
+	double mWTodBm(double mW){return 10*log10(mW);}
+	double dBmTomW(double dBm){return pow(10,dBm/10);}
+
+
+
+
+	void updateDisplay();
 	//Variables
     protected:
 
@@ -139,12 +167,7 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 	//entry for transmitted requests
 	macLinkTableEntry *tempLinkEntryTx;
 
-	bool firstLink;
-	bool isPANCoor;
 
-	int lastSCANChannel;
-
-	bool notAssociated;
 
     protected:
 	//////////TMER
@@ -153,14 +176,55 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 	cMessage *AssociateTimer;
 	cMessage *ScheduleTimer;
 	cMessage *ScanTimer;
+	cMessage *BeaconScanTimer;
 
 	cMessage *AssociateWaitTimer;
 
 	beaconTable BeaconTable;
+	clusterTable ClusterTable;
 
-	int stage;
+	//saves the cluster stage
+	int nCluStage;
 
-	int scanDuration;
+	//Beacon Order
+	int nBO;
+
+	//Superframe order
+	int nSO;
+
+	//BeaconIntervaltime
+	double fBI;
+
+	//For PanCoord,
+	//after association store's the number of scans for beacon
+	int nScanCounter;
+
+	// Variable to set the length of the initial channel scan period
+	int nScanDuration;
+
+	// is scanning for beacon from Ch same stage
+	bool bScanBeaconCH;
+
+	//Is pan coor or not
+	bool bIsPANCoor;
+
+	//is capable to become a pan coord or not
+	bool bCapablePanCoor;
+
+	//variable to store the channel which was scanned before
+	int nLastSCANChannel;
+
+	//is associated or not
+	bool bNotAssociated;
+
+	//stores the sensitivity
+	double fSensitivity;
+
+	//variable to stores the probability to become a CH
+	double fPCH;
+
+	//stores the transmitpower
+	double fTransmitterPower;
 };
 
 #endif /* MULHOPCLU_H_ */

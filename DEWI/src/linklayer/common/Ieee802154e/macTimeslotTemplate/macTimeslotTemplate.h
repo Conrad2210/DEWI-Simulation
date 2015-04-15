@@ -93,6 +93,9 @@ class INET_API macTimeslotTemplate : public cSimpleModule, public IMacTimeslotTe
 
         //Edits an TimeslotTemplate
         virtual void editTimeslotTemplate(macTimeslotTemplateEntry* entry);
+
+	//deletes all entries
+	virtual void clearTable();
 };
 
 #endif /* MACTIMESLOTTEMPLATE_H_ */

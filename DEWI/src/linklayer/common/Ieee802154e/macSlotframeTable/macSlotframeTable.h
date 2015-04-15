@@ -99,6 +99,9 @@ class INET_API macSlotframeTable: public cSimpleModule, public IMacSlotframeTabl
 
         //Returns slotframe by id
         virtual macSlotframeTableEntry *getSlotframeById(int id);
+
+	//deletes all entries
+	virtual void clearTable();
 };
 
 #endif /* MACSLOTFRAMETABLE_H_ */

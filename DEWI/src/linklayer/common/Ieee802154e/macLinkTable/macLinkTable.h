@@ -106,6 +106,9 @@ class INET_API macLinkTable : public cSimpleModule, public IMacLinkTable, protec
         //returns link by Timeslot, ChannelOffset and NodeAddress
         macLinkTableEntry *getLinkByTimeslotOffsetAddress(int timeslot, int offset, UINT_16 address);
 
+
+        int getTimeSlotByOffset(int offset);
+        int getOffsetByTimeslot(int timeslot);
         //Returns number of links used for specific Slotframe
         virtual int getNumberLinksBySlotframe(int slotframeId);
 
@@ -145,5 +148,7 @@ class INET_API macLinkTable : public cSimpleModule, public IMacLinkTable, protec
         //@author:  2014    Stefan Reis
         // check if a receive link has a timescoure
         virtual bool isTimescource(UINT_16 address);
+
+        virtual void clearTable();
 };
 #endif /* MACLINKTABLE_H_ */

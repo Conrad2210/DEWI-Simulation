@@ -100,10 +100,15 @@ class INET_API macNeighborTable: public cSimpleModule, public IMacNeighborTable,
         virtual macNeighborTableEntry *getNeighborBySAddr(UINT_16 address);
         virtual macNeighborTableEntry *getNeighborByEAddr(MACAddress address);
         virtual macNeighborTableEntry *getNeighborById(int id);
+        virtual MACAddress getAddressFromCH();
 
         virtual bool isNeighborBySAddr(UINT_16 address);
         virtual bool isNeighborByEAddr(MACAddress address);
         virtual bool isNeighborTimeSource(UINT_16 address);
+
+	//deletes all entries
+	virtual void clearTable();
+
 };
 
 #endif /* MACNEIGHBORTABLE_H_ */

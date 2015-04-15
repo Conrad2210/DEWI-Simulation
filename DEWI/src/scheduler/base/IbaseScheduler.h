@@ -44,7 +44,7 @@ protected:
 
     virtual void handle_MLME_ASSOCIATE_indication(cMessage *msg) = 0;
 
-    virtual void MLME_ASSOCIATE_responce(cMessage *msg) = 0;
+    virtual void MLME_ASSOCIATE_response(cMessage *msg) = 0;
 
     virtual void handle_MLME_ASSOCIATE_confirm(cMessage *msg) = 0;
 

@@ -236,9 +236,11 @@ Ieee802154eMac::~Ieee802154eMac()
     cancelAndDelete(tsRxWaitTimer);
     cancelAndDelete(tsTxAckDelayTimer);
     cancelAndDelete(scanTimer);
+    cancelAndDelete(awaitingBeacon);
 
     emptyHListLink(&hlistBLink1, &hlistBLink2);
     emptyHListLink(&hlistDLink1, &hlistDLink2);
+
 }
 
 InterfaceEntry * Ieee802154eMac::createInterfaceEntry()
@@ -598,6 +600,7 @@ void Ieee802154eMac::initialize(int stage)
 	    WATCH(mpib.macRXSuccessCount);
 	    WATCH(mpib.macNACKcount);
 	}
+	WATCH(mpib.macPANId);
 
 	// to record the timeslot where the retransmission is successful
 	sucTimeslot = registerSignal("timeSlot");
@@ -632,6 +635,7 @@ void Ieee802154eMac::initialize(int stage)
 	tsTxAckDelayTimer = new cMessage("tsTxAckDelayTimer", MAC_TS_TX_ACK_DELAY_TIMER);
 	// get initial radio state, channel number, transmit power etc. from Phy layer in this stage
 	scanTimer = new cMessage("scanTimer", MAC_SCAN_TIMER);
+	awaitingBeacon = new cMessage("awaitingBeaconTimer", MAC_AWAITING_BEACON);
     }
     else if(3 == stage)
     {
@@ -713,7 +717,7 @@ void Ieee802154eMac::initialize(int stage)
 //                BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
 //                scheduleAt(panStartTime, asnTimer);
 //            }
-	    PLME_SET_TRX_STATE_request(phy_TRX_OFF);
+	    PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
 	}
     }
 }
@@ -800,6 +804,7 @@ void Ieee802154eMac::finish()
     recordScalar("num of frames sent successfully two retry", numRetryTwo);
     recordScalar("num of frames sent successfully three retry", numRetryThree);
     recordScalar("num of frames sent successfully four retry", numRetryFour);
+
 }
 
 /**@author: 2014    Stefan Reis     (modified) */
@@ -946,7 +951,8 @@ void Ieee802154eMac::handleMessage(cMessage* msg)
 	handlePrimitive(msg->getKind(), msg); // from NET layer - command messages
 	//XXX: note: not in use, not for the StarNet or the CSMA802154 example, from the NET layer comes only data packets
 	return;
-    }else if(msg->getArrivalGateId() == mSchedulerIn)
+    }
+    else if(msg->getArrivalGateId() == mSchedulerIn)
     {
 	handleSchedulerMsg(msg);
     }
@@ -1395,11 +1401,10 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 	return;
     }
 
-    if(msg->getControlInfo())
-	delete msg->removeControlInfo();
-
     FrameCtrl frmCtrl = frame->getFrmCtrl();
     Ieee802154eFrameType frmType = frmCtrl.frameType;
+    if(msg->getControlInfo() && frmType != Ieee802154e_BEACON)
+	delete msg->removeControlInfo();
 
     EV << "[MAC]: an " << frameTypeTxt[frmType] << " frame received from the PHY layer, performing filtering now ..." << endl;
 
@@ -1448,7 +1453,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 
     EV << "[MAC]: checking if the received frame requires an ACK" << endl;
     //send an acknowledgment if needed (no matter this is a duplicated packet or not)
-    if((frmType == Ieee802154e_DATA) || (frmType == Ieee802154e_CMD) || (frmType == Ieee802154e_MULTI) || (frmType == Ieee802154e_ASSOCIATION_REQUEST) || (frmType == Ieee802154e_ASSOCIATION_RESPONCE) || (frmType == Ieee802154e_SCHEDULER_REQUEST) || (frmType == Ieee802154e_SCHEDULER_RESPONCE))
+    if((frmType == Ieee802154e_DATA) || (frmType == Ieee802154e_CMD) || (frmType == Ieee802154e_MULTI) || (frmType == Ieee802154e_ASSOCIATION_REQUEST) || (frmType == Ieee802154e_DISASSOCIATION_REQUEST) || (frmType == Ieee802154e_ASSOCIATION_RESPONSE) || (frmType == Ieee802154e_DISASSOCIATION_RESPONSE) || (frmType == Ieee802154e_SCHEDULER_REQUEST) || (frmType == Ieee802154e_SCHEDULER_RESPONSE))
     {
 	if(frmCtrl.ackReq) //Acknowledgment required
 	{
@@ -1476,8 +1481,8 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 		    constructACK(frame);
 		else
 		{
-		    resetTRX();
-		    return;
+		    txAck = NULL;
+
 		}
 
 		// for TSCH Std 802.15.4e-2012 - TSCH CCA Receiver
@@ -1613,17 +1618,29 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 	    EV << "[MAC} continue to proxess received association request pkt" << endl;
 	    MLME_ASSOCIATE_indication(frame);
 	    break;
-	case Ieee802154e_ASSOCIATION_RESPONCE:
+	case Ieee802154e_ASSOCIATION_RESPONSE:
 	    EV << "[MAC} continue to process received association response pkt" << endl;
 	    MLME_ASSOCIATE_confirm(frame->dup());
 	    delete frame;
 	    break;
+	case Ieee802154e_DISASSOCIATION_REQUEST:
+	    EV << "[MAC} continue to process received association response pkt" << endl;
+	    MLME_DISASSOCIATE_indication(frame->dup());
+	    delete frame;
+	    break;
+
+	case Ieee802154e_DISASSOCIATION_RESPONSE:
+	    EV << "[MAC} continue to process received association response pkt" << endl;
+	    MLME_DISASSOCIATE_confirm(frame->dup());
+	    delete frame;
+	    break;
+
 	case Ieee802154e_SCHEDULER_REQUEST:
 	    EV << "[MAC] continue to process received scheduler request pkt" << endl;
 	    SCHEDULE_indication(frame->dup());
 	    delete frame;
 	    break;
-	case Ieee802154e_SCHEDULER_RESPONCE:
+	case Ieee802154e_SCHEDULER_RESPONSE:
 	    EV << "[MAC] continue to process received scheduler response pkt" << endl;
 	    SCHEDULE_confirm(frame->dup(), false);
 	    delete frame;
@@ -1724,6 +1741,10 @@ void Ieee802154eMac::handleSelfMsg(cMessage* msg)
 	    MLME_SCAN_confirm(msg);
 	    break;
 
+	case MAC_AWAITING_BEACON:
+	    handleAwaitingBeaconTimer();
+	    break;
+
 	default:
 	    error("[MAC]: unknown MAC timer type!");
 	    break;
@@ -1776,22 +1797,26 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 	if(isSCAN)
 	{
 
-
-
-
-	    MLME_SCAN_confirm(frame->dup());
-	    delete frame;
+	    frame->setTimestamp(simTime());
+	    MLME_SCAN_confirm(frame);
 
 	}
 	else
 	{
-	    rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
-	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SCAN_CONFIRM);
+	    if(isPANCoor && !neighborTable->getNeighborByEAddr(frame->getSrcAddr())->isPrevStageCH() && !notAssociated)
+	    {
+		MLME_BEACON_NOTIFY_indication(frame);
+	    }
+	    else
+	    {
+		rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
+		Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SCAN_CONFIRM);
 
-	    tmp->setName("BeaconNotify");
-	    tmp->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
-	    MLME_BEACON_NOTIFY_indication(tmp->dup());
-	    delete tmp;
+		tmp->setName("BeaconNotify");
+		tmp->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+		MLME_BEACON_NOTIFY_indication(tmp->dup());
+		delete tmp;
+	    }
 	}
 //	EV << "[MAC]: starting processing received enhanced Beacon frame with frame version=" << (int)frame->getFrmCtrl().frameVersion << endl;
 //	Ieee802154EnhancedBeaconFrame *bcnFrame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
@@ -2071,18 +2096,29 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 
 void Ieee802154eMac::handleEB(cMessage *msg)
 {
-    if(dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
-	rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
-    else
-	delete msg;
-
     simtime_t now, tmpf, duration;
     uint16_t ifs;
+    bool firstBe = false;
+    double timeCorr = 0.0;
     now = simTime();
 
     //calculate the time when the first bit of the beacon was received
-    duration = calDuration(rxBeacon);
-    bcnRxTime = now - duration;
+
+    awaitingNextBeacon = false;
+
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
+    {
+	rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	duration = calDuration(rxBeacon);
+	bcnRxTime = rxBeacon->getTimestamp() - duration;
+	firstBe = true;
+    }
+    else
+    {
+	delete msg;
+	duration = calDuration(rxBeacon);
+	bcnRxTime = now - duration;
+    }
 
     /**
      * important: this value is calculated in <csmacaStart()>, if later on a CSMA-CA is pending
@@ -2114,6 +2150,14 @@ void Ieee802154eMac::handleEB(cMessage *msg)
 
     // handle the IE's
     handleIEfield(rxBeacon);
+    if(firstBe)
+    {
+	timeCorr = simTime().dbl() - rxBeacon->getCreationTime().dbl();
+
+	int asnSlots = (timeCorr / timeslotTable->getTemplate(useTimeslotID)->getTimeslotLengthDbl()) + 1;
+
+	mpib.macASN += asnSlots;
+    }
 
     // reset lost beacon counter
     bcnLossCounter = 0;
@@ -2123,8 +2167,18 @@ void Ieee802154eMac::handleEB(cMessage *msg)
     mpib.macMinBE = par("macMinBE");    // default: for CSMA-CA = 3; for TSCH-CA = 1
     mpib.macMaxBE = par("macMaxBE");    // default: for CSMA-CA = 5; for TSCH-CA = 7
 
-    // start ASN timer
-    startAsnTimer(bcnRxTime - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)));
+    if(firstBe)
+    {
+	double temp = bcnRxTime.dbl() - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)) + timeCorr;
+	int tempi = temp / timeslotTable->getTemplate(useTimeslotID)->getTimeslotLengthDbl();
+	temp = tempi * timeslotTable->getTemplate(useTimeslotID)->getTimeslotLengthDbl() + timeslotTable->getTemplate(useTimeslotID)->getTimeslotLengthDbl();
+	// start ASN timer
+	startAsnTimer(temp);
+    }
+    else
+    {
+	startAsnTimer(bcnRxTime.dbl() - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)));
+    }
 
 //    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
 //    ASSERT(mpib.macPANId == def_macPANId);
@@ -2137,6 +2191,11 @@ void Ieee802154eMac::handleEB(cMessage *msg)
     mpib.macCoordShortAddress = getShortAddress(rxBeacon->getSrcAddr()); // store coordinator address, always use short address
     mpib.macCoordExtendedAddress = rxBeacon->getSrcAddr(); // PAN coordinator uses the same address for both its own 16 and 64 bit address
 
+    mpib.macSuperframeOrder = (UINT8)rxBeacon->getSO();
+    mpib.macBeaconOrder = (UINT8)rxBeacon->getBO();
+    if(awaitingBeacon->isScheduled())
+	cancelEvent(awaitingBeacon);
+    scheduleAt(simTime() + pow(2, mpib.macBeaconOrder) * mpib.macSuperframeOrder * timeslotTable->getTemplate(0)->getTimeslotLengthDbl() - timeslotTable->getTemplate(0)->getTimeslotLengthDbl(), awaitingBeacon);
     // time correction
     calcTimeCorr(rxBeacon);
 
@@ -2311,9 +2370,13 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) // TODO: include the 802
 		    delete frame;   // delete the ACK
 		    if(txPkt == txData)
 		    {
-			if(txData->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONCE)
+			if(txData->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONSE)
 			{
 			    SCHEDULE_confirm(txData->dup(), true);
+			}
+			if(txData->getFrmCtrl().frameType == Ieee802154e_DISASSOCIATION_RESPONSE)
+			{
+			    neighborTable->deleteNeighbor(neighborTable->getNeighborBySAddr(getShortAddress(txData->getDstAddr())));
 			}
 			delete txData;
 			txData = NULL;
@@ -2547,7 +2610,6 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) // TODO: include the 802
 //	// other cmds will be released by <handleIfsTimer()>
 //    }
 //}
-
 /**@author: 2014    Stefan Reis */
 void Ieee802154eMac::handleLLDN802154e(Ieee802154eFrame*) // TODO: [SR]
 {
@@ -2580,12 +2642,12 @@ bool Ieee802154eMac::frameFilter(Ieee802154eFrame* frame)
 	numCollision++;
 	return true;
     }
-//    if(frame->getKind() == BITERROR)
-//    {
-//	EV << "[MAC]: frame corrupted due to bit error, dropped" << endl;
-//	//numCollision++;
-//	return true;
-//    }
+    if(frame->getKind() == BITERROR)
+    {
+	EV << "[MAC]: frame corrupted due to bit error, dropped" << endl;
+	//numCollision++;
+	return true;
+    }
     else if(frame->getKind() == RX_DURING_CCA)
     {
 	EV << "[MAC]: frame corrupted due to being received during CCA, dropped" << endl;
@@ -2617,7 +2679,7 @@ bool Ieee802154eMac::frameFilter(Ieee802154eFrame* frame)
     if(!mpib.macPromiscuousMode)
     {
 	//check packet type
-	if((frmType != Ieee802154e_BEACON) && (frmType != Ieee802154e_DATA) && (frmType != Ieee802154e_ACK) && (frmType != Ieee802154e_CMD) && (frmType != Ieee802154e_LLDN) && (frmType != Ieee802154e_MULTI) && (frmType != Ieee802154e_ASSOCIATION_REQUEST) && (frmType != Ieee802154e_ASSOCIATION_RESPONCE) && (frmType != Ieee802154e_SCHEDULER_REQUEST) && (frmType != Ieee802154e_SCHEDULER_RESPONCE))
+	if((frmType != Ieee802154e_BEACON) && (frmType != Ieee802154e_DATA) && (frmType != Ieee802154e_ACK) && (frmType != Ieee802154e_CMD) && (frmType != Ieee802154e_LLDN) && (frmType != Ieee802154e_MULTI) && (frmType != Ieee802154e_ASSOCIATION_REQUEST) && (frmType != Ieee802154e_DISASSOCIATION_REQUEST) && (frmType != Ieee802154e_DISASSOCIATION_RESPONSE) && (frmType != Ieee802154e_ASSOCIATION_RESPONSE) && (frmType != Ieee802154e_SCHEDULER_REQUEST) && (frmType != Ieee802154e_SCHEDULER_RESPONSE))
 	{
 	    return true;
 	}
@@ -2962,6 +3024,8 @@ void Ieee802154eMac::constructBCN()
 	//--- construct a enhanced beacon --- Std 802.15.4e-2012 (figure 40a) page 64
 	Ieee802154EnhancedBeaconFrame* tmpEBcn = new Ieee802154EnhancedBeaconFrame();
 	tmpEBcn->setName("Ieee802154BEACON");
+	tmpEBcn->setBO(mpib.macBeaconOrder);
+	tmpEBcn->setSO(mpib.macSuperframeOrder);
 	// construct frame control field
 	frmCtrl.frameType = Ieee802154e_BEACON;
 	frmCtrl.securityEnabled = secuBeacon;
@@ -5683,14 +5747,25 @@ void Ieee802154eMac::handle_MLME_ASSOCIATE_request(cMessage *msg)
      UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
      UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID
      */
+
     Ieee802154eAssociationFrame *dataFrame = new Ieee802154eAssociationFrame(msg->getName(), msg->getKind());
     Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     FrameCtrl frmCtrl;
+
     //Create Request
     AssReq->setCoordAddrMode(MAC_COORD_SHORT_ADDRESS);
     AssReq->setCoordPANId(mpib.macPANId);
     AssReq->setCoordAddress(mpib.macCoordShortAddress);
     AssReq->setChannelOffset(linkTable->getLink(0)->getChannelOffset());
+
+    if(AssReq->getPanCoordinator())
+    {
+	dataFrame->setCH(AssReq->getPanCoordinator());
+	mpib.macUseEnhancedBeacon = true;
+	isPANCoor = true;
+    }
+    else
+	dataFrame->setCS(AssReq->getPanCoordinator());
 
     dataFrame->setCntrlInfo(*AssReq->dup());
     dataFrame->setSeqNmbr(mpib.macDSN++);
@@ -5782,13 +5857,17 @@ void Ieee802154eMac::MLME_ASSOCIATE_indication(cMessage *msg)
 
     primitive->setChannelOffset(tmp->getCntrlInfo().getChannelOffset());
 
+    primitive->setAssocShortAddress(getShortAddress(tmp->getSrcAddr()));
+
+    primitive->setPanCoordinator(tmp->getCH());
+
     EV << "[MAC]: sending a MLME-ASSOCIATE.indication to NETWORK" << endl;
     send(primitive->dup(), mSchedulerOut);
     delete primitive;
     delete tmp;
 }
 
-void Ieee802154eMac::handle_MLME_ASSOCIATE_responce(cMessage *msg)
+void Ieee802154eMac::handle_MLME_ASSOCIATE_response(cMessage *msg)
 {
     Ieee802154eAssociationFrame *dataFrame = new Ieee802154eAssociationFrame();
     Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
@@ -5796,8 +5875,19 @@ void Ieee802154eMac::handle_MLME_ASSOCIATE_responce(cMessage *msg)
     //Create Request
     dataFrame->setName("AssociationResponse");
     dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setSeqNmbr(mpib.macDSN++);
+    if(AssReq->getPanCoordinator())
+    {
+	dataFrame->setCH(true);
+	dataFrame->setCS(false);
+    }
+    else
+    {
+	dataFrame->setCH(false);
+	dataFrame->setCS(true);
+    }
     //Create Frame Control
-    frmCtrl.frameType = Ieee802154e_ASSOCIATION_RESPONCE;
+    frmCtrl.frameType = Ieee802154e_ASSOCIATION_RESPONSE;
     frmCtrl.securityEnabled = secuData;
     frmCtrl.frmPending = (txBroadCmd == NULL) ? false:true;
     frmCtrl.ackReq = true;
@@ -5856,7 +5946,7 @@ void Ieee802154eMac::handle_MLME_ASSOCIATE_responce(cMessage *msg)
     dataFrame->setAuxSecHd(auxSecHd);
 
     if(!queueModule->existAssRes(tmpDstAddr))
-    	queueModule->insertInQueue(dataFrame->dup());
+	queueModule->insertInQueue(dataFrame->dup());
 
     delete AssReq;
     delete dataFrame;
@@ -5888,7 +5978,10 @@ void Ieee802154eMac::MLME_ASSOCIATE_confirm(cMessage *msg)
 	notAssociated = true;
     }
     primitive->setStatus(tmp->getCntrlInfo().getStatus());
-
+    primitive->setAssocShortAddress(getShortAddress(tmp->getSrcAddr()));
+    primitive->setPanCoordinator(tmp->getCH());
+    primitive->setStage(tmp->getCntrlInfo().getStage());
+    primitive->setPanId(tmp->getSrcPanId());
     EV << "[MAC]: sending a MLME-ASSOCIATE.confirm to NETWORK" << endl;
     send(primitive->dup(), mSchedulerOut);
 
@@ -5920,7 +6013,80 @@ void Ieee802154eMac::MLME_ASSOCIATE_confirm(cMessage *msg)
  */
 void Ieee802154eMac::handle_MLME_DISASSOCIATE_request(cMessage *msg)
 {
+    Ieee802154eDisassociationFrame *dataFrame = new Ieee802154eDisassociationFrame(msg->getName(), TP_MLME_DISASSOCIATE_REQUEST);
+    Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    FrameCtrl frmCtrl;
 
+    //Create Request
+    AssReq->setCoordAddrMode(MAC_COORD_SHORT_ADDRESS);
+    AssReq->setCoordPANId(mpib.macPANId);
+    AssReq->setCoordAddress(mpib.macCoordShortAddress);
+
+    dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setSeqNmbr(mpib.macDSN++);
+    //Create Frame Control
+    frmCtrl.frameType = Ieee802154e_DISASSOCIATION_REQUEST;
+    frmCtrl.securityEnabled = secuData;
+    frmCtrl.frmPending = (txBroadCmd == NULL) ? false:true;
+    frmCtrl.ackReq = true;
+    frmCtrl.seqNbSup = false;   // send Sequence number
+    frmCtrl.dstAddrMode = defFrmCtrl_AddrMode16;
+    frmCtrl.frameVersion = Ieee802154_compatible;
+    if(mpib.macEBAutoSA == 0)  // NONE Address
+	frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
+    else if(mpib.macEBAutoSA == 1) // SHORT Address
+	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
+    else if(mpib.macEBAutoSA == 2) // FULL Address
+	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
+
+    IE3ADDR tmpDstAddr;
+    IE3ADDR tmpSrcAddr;
+    UINT_16 tmpDstPanId;
+    UINT_16 tmpSrcPanId;
+
+    if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
+    { // 16 bit address
+	tmpDstPanId = mpib.macPANId;
+	tmpDstAddr = (IE3ADDR)mpib.macCoordShortAddress;
+    }
+    else
+    { // 64 bit address
+	tmpDstPanId = mpib.macPANId;
+	tmpDstAddr = (IE3ADDR)mpib.macCoordExtendedAddress;
+    }
+
+    if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+    { // 16 bit address
+	tmpSrcPanId = mpib.macPANId;
+	tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+    }
+    else
+    { // 64 bit address
+	tmpSrcPanId = mpib.macPANId;
+	tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+    }
+
+    dataFrame->setDstPanId(tmpDstPanId);
+    dataFrame->setDstAddr(tmpDstAddr);
+    dataFrame->setSrcPanId(tmpSrcPanId);
+    dataFrame->setSrcAddr(tmpSrcAddr);
+    frmCtrl.compPanID = getPANIDComp(frmCtrl, dataFrame->getSrcPanId(), dataFrame->getDstPanId());
+
+    // security is not implemented
+    AuxiliarySecurityHeader auxSecHd;
+    auxSecHd.secLvl = ASH_SLVL_NONE;
+    auxSecHd.keyIdentMode = 0;
+    auxSecHd.keySource = 0;
+    auxSecHd.keyIndex = 0;
+
+    dataFrame->setFrmCtrl(frmCtrl);
+    dataFrame->setAuxSecHd(auxSecHd);
+
+    if(!queueModule->existAssReq(tmpDstAddr))
+	queueModule->insertInQueue(dataFrame->dup());
+
+    delete dataFrame;
+    delete AssReq;
 }
 
 /**@author: 2014    Stefan Reis
@@ -5941,17 +6107,89 @@ void Ieee802154eMac::handle_MLME_DISASSOCIATE_request(cMessage *msg)
  * UINT_8 keyIndex */
 void Ieee802154eMac::MLME_DISASSOCIATE_indication(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo*>(msg);
-    primitive->setKind(TP_MLME_DISASSOCIATE_INDICATION);
-//    primitive->setDeviceAddress(deviceAddress.getInt());
-//    primitive->setDisassociateReason(disassociateReason);
-//    primitive->setSecurityLevel(securityLevel);
-//    primitive->setKeyIdMode(keyIdMode);
-//    primitive->setKeySource(keySource);
-//    primitive->setKeyIndex(keyIndex);
-
+    Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
+    tmpMsg->setKind(TP_MLME_DISASSOCIATE_INDICATION);
     EV << "[MAC]: sending a MLME-DISASSOCIATE.indication to NETWORK" << endl;
-    send(primitive, mSchedulerOut);
+    send(tmpMsg, mSchedulerOut);
+
+}
+
+void Ieee802154eMac::handle_MLME_DISASSOCIATE_response(cMessage *msg)
+{
+    Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
+    Ieee802154eDisassociationFrame *dataFrame = new Ieee802154eDisassociationFrame("DisassociationResponse", TP_MLME_DISASSOCIATE_RESPONSE);
+    Ieee802154eNetworkCtrlInfo *AssReq = new Ieee802154eNetworkCtrlInfo();
+    FrameCtrl frmCtrl;
+    //Create Request
+    dataFrame->setName("DisassociationResponse");
+    AssReq->setStatus(mac_SUCCESS);
+    dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setSeqNmbr(mpib.macDSN++);
+    //Create Frame Control
+    frmCtrl.frameType = Ieee802154e_DISASSOCIATION_RESPONSE;
+    frmCtrl.securityEnabled = secuData;
+    frmCtrl.frmPending = (txBroadCmd == NULL) ? false:true;
+    frmCtrl.ackReq = true;
+    frmCtrl.seqNbSup = false;   // send Sequence number
+    frmCtrl.dstAddrMode = defFrmCtrl_AddrMode16;
+    frmCtrl.frameVersion = Ieee802154_compatible;
+
+    if(mpib.macEBAutoSA == 0)  // NONE Address
+	frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
+    else if(mpib.macEBAutoSA == 1) // SHORT Address
+	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
+    else if(mpib.macEBAutoSA == 2) // FULL Address
+	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
+
+    IE3ADDR tmpDstAddr;
+    IE3ADDR tmpSrcAddr;
+    UINT_16 tmpDstPanId;
+    UINT_16 tmpSrcPanId;
+
+    if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
+    { // 16 bit address
+	tmpDstPanId = mpib.macPANId;
+	tmpDstAddr = (IE3ADDR)tmpMsg->getSrcAddr();
+    }
+    else
+    { // 64 bit address
+	tmpDstPanId = mpib.macPANId;
+	tmpDstAddr = (IE3ADDR)tmpMsg->getSrcAddr();
+    }
+
+    if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+    { // 16 bit address
+	tmpSrcPanId = mpib.macPANId;
+	tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+    }
+    else
+    { // 64 bit address
+	tmpSrcPanId = mpib.macPANId;
+	tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+    }
+
+    dataFrame->setDstPanId(tmpDstPanId);
+    dataFrame->setDstAddr(tmpDstAddr);
+    dataFrame->setSrcPanId(tmpSrcPanId);
+    dataFrame->setSrcAddr(tmpSrcAddr);
+    frmCtrl.compPanID = getPANIDComp(frmCtrl, dataFrame->getSrcPanId(), dataFrame->getDstPanId());
+
+    // security is not implemented
+    AuxiliarySecurityHeader auxSecHd;
+    auxSecHd.secLvl = ASH_SLVL_NONE;
+    auxSecHd.keyIdentMode = 0;
+    auxSecHd.keySource = 0;
+    auxSecHd.keyIndex = 0;
+
+    dataFrame->setFrmCtrl(frmCtrl);
+    dataFrame->setAuxSecHd(auxSecHd);
+
+    if(!queueModule->existAssRes(tmpDstAddr))
+	queueModule->insertInQueue(dataFrame->dup());
+
+    delete AssReq;
+    delete dataFrame;
+    delete tmpMsg;
 }
 
 /**@author: 2014    Stefan Reis
@@ -5969,15 +6207,13 @@ void Ieee802154eMac::MLME_DISASSOCIATE_indication(cMessage *msg)
  * IE3ADDR deviceAddress*/
 void Ieee802154eMac::MLME_DISASSOCIATE_confirm(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo*>(msg);
-//    primitive->setKind(TP_MLME_DISASSOCIATE_CONFIRM);
-//    primitive->setStatus(status);
-//    primitive->setDeviceAddrMode(deviceAddrMode);
-//    primitive->setDevicePANId(devicePANId);
-//    primitive->setDeviceAddress(deviceAddress.getInt());
 
+    Ieee802154eDisassociationFrame * tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
+    neighborTable->deleteNeighbor(neighborTable->getNeighborBySAddr(getShortAddress(tmpMsg->getSrcAddr())));
+    tmpMsg->setKind(TP_MLME_DISASSOCIATE_CONFIRM);
     EV << "[MAC]: sending a MLME-DISASSOCIATE.confirm to NETWORK" << endl;
-    send(primitive, mSchedulerOut);
+    send(tmpMsg->dup(), mSchedulerOut);
+    delete tmpMsg;
 }
 
 /**@author: 2014    Stefan Reis
@@ -5994,42 +6230,22 @@ void Ieee802154eMac::MLME_DISASSOCIATE_confirm(cMessage *msg)
  * param[in] */
 void Ieee802154eMac::MLME_BEACON_NOTIFY_indication(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
-    primitive->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
-//    primitive->setBsn(bsn);
-//    primitive->setCoordAddrMode(panDescriptor.coordAddrMode);
-//    primitive->setCoordPANId(panDescriptor.coordPANId);
-//    primitive->setCoordAddress(panDescriptor.coordAddress_16_or_64.getInt());
-//    primitive->setChannelNumber(panDescriptor.channelNumber);
-//    primitive->setChannelPage(panDescriptor.channelPage);
-//    primitive->setBeaconOrder(panDescriptor.superframeSpec.BO);
-//    primitive->setSuperframeOrder(panDescriptor.superframeSpec.SO);
-//    primitive->setFinalCAPSlot(panDescriptor.superframeSpec.finalCap);
-//    primitive->setBatteryLifeExtension(panDescriptor.superframeSpec.battLifeExt);
-//    primitive->setPanCoordinator(panDescriptor.superframeSpec.panCoor);
-//    primitive->setAssociationPermit(panDescriptor.superframeSpec.assoPmt);
-//    primitive->setGtsPermit(panDescriptor.gtsPermit);
-//    primitive->setLinkQuality(panDescriptor.linkQuality);
-//    primitive->setTimeStamp(panDescriptor.timeStamp.getScale());
-//    primitive->setSecurityStatus(panDescriptor.securityStatus);
-//    primitive->setSecurityLevel(panDescriptor.securityLevel);
-//    primitive->setKeyIdMode(panDescriptor.keyIdMode);
-//    primitive->setKeySource(panDescriptor.keySource);
-//    primitive->setKeyIndex(panDescriptor.keyIndex);
-//    // [SR] need to be done: codelist Problem: not fixed array
-//    primitive->setNmbrShortAddrPending(pendAddrSpec.numShortAddr);
-//    primitive->setNmbrExtAddrPending(pendAddrSpec.numExtendedAddr);
-//    // [SR] NTB: pendAddrSpec addrlist[7]
-//    // [SR] need to be done: addrList (bitmap)
-//    primitive->setSduLength(sduLength);
-//    // [SR] NTB: sdu (set of octets)
-//    primitive->setEbsn(ebsn);
-//    primitive->setBeaconType(beaconType);
-//
-    EV << "[MAC]: sending a MLME-BEACON-NOTIFY.indication to NETWORK" << endl;
-    send(primitive->dup(), mSchedulerOut);
-    delete primitive;
-    delete msg;
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg) && isPANCoor)
+    {
+	msg->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+	send(msg, mSchedulerOut);
+    }
+    else
+    {
+	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
+	primitive->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+
+	EV << "[MAC]: sending a MLME-BEACON-NOTIFY.indication to NETWORK" << endl;
+	send(primitive->dup(), mSchedulerOut);
+	delete primitive;
+	delete msg;
+    }
+
 }
 
 /**@author: 2014    Stefan Reis
@@ -6391,8 +6607,7 @@ void Ieee802154eMac::MLME_SCAN_confirm(cMessage *msg)
     Ieee802154EnhancedBeaconFrame * frame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
     frame->setName("ScanConfirm");
     frame->setKind(TP_MLME_SCAN_CONFIRM);
-    send(frame->dup(), mSchedulerOut);
-    delete frame;
+    send(frame, mSchedulerOut);
 }
 
 /**@author: 2014    Stefan Reis
@@ -6968,6 +7183,7 @@ void Ieee802154eMac::handle_MLME_START_request(cMessage *msg)
 	// transmit one enhanced beacon, that all the devices have the time and the ASN
 	//constructBCN(); // construct beacon, save it in the frame queue
 	// start ASN
+	//mpib.macPANId;
 	BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
 	scheduleAt(simTime() + (double)startRe->getStartTime(), asnTimer);
 	//startDevice();
@@ -7240,7 +7456,7 @@ void Ieee802154eMac::handle_MLME_BEACON_request(cMessage *msg)
     //constructBCN();
     //constructBCN();
     txBeaconNow = true;
-    MLME_BEACON_confirm(mac_SUCCESS);
+
     delete msg;
 }
 
@@ -9186,7 +9402,7 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 					    macLinkTableEntry *tmpLink = new macLinkTableEntry();
 					    tmpLink->setChannelOffset(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getChannelOffset());
 					    tmpLink->setLinkOption(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkOption());
-					    tmpLink->setLinkType(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkTyp());
+					    //tmpLink->setLinkType(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkTyp());
 					    if(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkTyp() == (LNK_TP_ADVERTISING || LNK_TP_JOIN))
 						tmpLink->setNodeAddress(0xffff);
 					    else
@@ -9336,30 +9552,58 @@ void Ieee802154eMac::handleAsnTimer()
 	EV << activeLinkEntry->info() << endl;
 
 	//check if beacon is ready
-	if(activeLinkEntry->getLinkType() == LNK_TP_ADVERTISING && txBeaconNow)
+	if(activeLinkEntry->getLinkType() == LNK_TP_ADVERTISING && txBeaconNow && !activeLinkEntry->isprevStage())
 	{
 	    constructBCN();
+	    MLME_BEACON_confirm(mac_SUCCESS);
 	    txBeaconNow = false;
 	}
 
 	// request the frame for this dest address
 	cMessage *tmpMsg = NULL;
+
 	switch(activeLinkEntry->getLinkType())
 	{
 	    case LNK_TP_NORMAL:
 		tmpMsg = queueModule->requestSpcPacket((IE3ADDR)activeLinkEntry->getNodeAddress());
 		break;
 	    case LNK_TP_ADVERTISING:
-		tmpMsg = queueModule->requestBeaconPacket();
-		break;
-	    case LNK_TP_JOIN:
-		tmpMsg = queueModule->requestAdvPacket();
-		if(tmpMsg == NULL)
+		if(!awaitingNextBeacon || isPANCoor)
 		{
-		    tmpMsg = queueModule->requestSchdulePacket();
+		    tmpMsg = queueModule->requestBeaconPacket();
+
+		    if(tmpMsg == NULL)
+		    {
+			tmpMsg = queueModule->requestAdvPacket();
+		    }
+		    if(tmpMsg == NULL && activeLinkEntry->isnextStage())
+		    {
+			tmpMsg = queueModule->requestDisAssPacket(true);
+		    }
+
+		    if(tmpMsg == NULL)
+		    {
+			tmpMsg = queueModule->requestSchdulePacket();
+		    }
+
+		    if(tmpMsg == NULL)
+			tmpMsg = NULL;
 		}
-		if(tmpMsg == NULL)
+		else
 		    tmpMsg = NULL;
+		break;
+
+	    case LNK_TP_JOIN:
+		if(!awaitingNextBeacon)
+		{
+		    if(activeLinkEntry->isprevStage())
+		    {
+			tmpMsg = queueModule->requestAdvPacket();
+
+			if(tmpMsg == NULL)
+			    tmpMsg = queueModule->requestDisAssPacket(false);
+		    }
+		}
 		break;
 	    default:
 		tmpMsg = NULL;
@@ -9497,6 +9741,7 @@ void Ieee802154eMac::handleAsnTimer()
 		EV << "[TSCH CCA]-Transmitter: no pkt to send, go back to sleep" << endl;
 		taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) = false;
 		taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 0;
+
 		resetTRX();
 	    }
 	}
@@ -9517,6 +9762,16 @@ void Ieee802154eMac::handleAsnTimer()
 	    EV << "[TSCH CCA]-Reserved: nothing to do, go back to sleep" << endl;
 	    resetTRX();
 	}
+    }
+    else
+    {
+	taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) = false;
+	taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 0;
+	taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA) = false;
+	taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) = 0;
+	resetTRX();
+	queueModule->deleteBCNQueue();
+	scheduleAt(simTime(), asnTimer);
     }
 }
 void Ieee802154eMac::checkBeaconASN(Ieee802154eFrame *msg)
@@ -9835,221 +10090,338 @@ void Ieee802154eMac::MPIBcopyStandard()
 }
 void Ieee802154eMac::handle_SCHEDULE_request(cMessage *msg)
 {
-    Ieee802154eScheduleFrame *tmpSchedul = new Ieee802154eScheduleFrame("SchedulerRequest", TP_SCHEDULE_REQUEST);
-    Ieee802154eNetworkCtrlInfo *tmpNetCn = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-    FrameCtrl frmCtrl;
-    frmCtrl.frameType = Ieee802154e_SCHEDULER_REQUEST;
-    frmCtrl.securityEnabled = secuData;
-    frmCtrl.frmPending = (txData == NULL) ? false:true;
-    frmCtrl.ackReq = true;
-    frmCtrl.seqNbSup = false;
-    frmCtrl.dstAddrMode = tmpNetCn->getDeviceAddrMode();
-    frmCtrl.frameVersion = Ieee802154_compatible;
-    if(mpib.macEBAutoSA == 0)  // NONE Address
-	frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
-    else if(mpib.macEBAutoSA == 1)  // SHORT Address
-	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
-    else if(mpib.macEBAutoSA == 2)  // FULL Address
-	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
 
-    IE3ADDR tmpDstAddr;
-    IE3ADDR tmpSrcAddr;
-    UINT_16 tmpDstPanId;
-    UINT_16 tmpSrcPanId;
+    Ieee802154eNetworkCtrlInfo *tmpNetCn;
+    if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+    {
+	Ieee802154eMulHoCluFrame *tmpSchedul = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
+	tmpNetCn = new Ieee802154eNetworkCtrlInfo();
+	FrameCtrl frmCtrl;
+	frmCtrl.frameType = Ieee802154e_SCHEDULER_REQUEST;
+	frmCtrl.securityEnabled = secuData;
+	frmCtrl.frmPending = (txData == NULL) ? false:true;
+	frmCtrl.ackReq = true;
+	frmCtrl.seqNbSup = false;
+	frmCtrl.dstAddrMode = defFrmCtrl_AddrMode64;
+	frmCtrl.frameVersion = Ieee802154_compatible;
+	if(mpib.macEBAutoSA == 0)  // NONE Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
+	else if(mpib.macEBAutoSA == 1)  // SHORT Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
+	else if(mpib.macEBAutoSA == 2)  // FULL Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
 
-    if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
-    { // 16 bit address
-	tmpDstPanId = mpib.macPANId;
+	IE3ADDR tmpDstAddr;
+	IE3ADDR tmpSrcAddr;
+	//UINT_16 tmpDstPanId;
+	UINT_16 tmpSrcPanId;
 
-	tmpDstAddr = (IE3ADDR)getShortAddress(MACAddress(tmpNetCn->getDeviceAddress()));
-    }
-    else if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode64)
-    { // 64 bit address
-	tmpDstPanId = mpib.macPANId;
-	tmpDstAddr = (IE3ADDR)tmpNetCn->getDeviceAddress();
-    }
+	if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+	}
+	else
+	{ // 64 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+	}
 
-    if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
-    { // 16 bit address
-	tmpSrcPanId = mpib.macPANId;
-	tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+	tmpSchedul->setSrcPanId(tmpSrcPanId);
+	tmpSchedul->setSrcAddr(tmpSrcAddr);
+	frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
+
+	AuxiliarySecurityHeader auxSecHd;
+	auxSecHd.secLvl = ASH_SLVL_NONE;
+	auxSecHd.keyIdentMode = 0;
+	auxSecHd.keySource = 0;
+	auxSecHd.keyIndex = 0;
+
+	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setFrmCtrl(frmCtrl);
+	tmpSchedul->setAuxSecHd(auxSecHd);
+	tmpSchedul->setSeqNmbr(mpib.macDSN++);
+
+	if(!queueModule->existSchedReq(tmpDstAddr))
+	    queueModule->insertInQueue(tmpSchedul->dup());
+	delete tmpNetCn;
+	delete tmpSchedul;
     }
     else
-    { // 64 bit address
-	tmpSrcPanId = mpib.macPANId;
-	tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+    {
+	Ieee802154eScheduleFrame *tmpSchedul = new Ieee802154eScheduleFrame("SchedulerRequest", TP_SCHEDULE_REQUEST);
+	tmpNetCn = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+	FrameCtrl frmCtrl;
+	frmCtrl.frameType = Ieee802154e_SCHEDULER_REQUEST;
+	frmCtrl.securityEnabled = secuData;
+	frmCtrl.frmPending = (txData == NULL) ? false:true;
+	frmCtrl.ackReq = true;
+	frmCtrl.seqNbSup = false;
+	frmCtrl.dstAddrMode = tmpNetCn->getDeviceAddrMode();
+	frmCtrl.frameVersion = Ieee802154_compatible;
+	if(mpib.macEBAutoSA == 0)  // NONE Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
+	else if(mpib.macEBAutoSA == 1)  // SHORT Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
+	else if(mpib.macEBAutoSA == 2)  // FULL Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
+
+	IE3ADDR tmpDstAddr;
+	IE3ADDR tmpSrcAddr;
+	UINT_16 tmpDstPanId;
+	UINT_16 tmpSrcPanId;
+
+	if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+	    tmpDstPanId = mpib.macPANId;
+
+	    tmpDstAddr = (IE3ADDR)getShortAddress(MACAddress(tmpNetCn->getDeviceAddress()));
+	}
+	else if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode64)
+	{ // 64 bit address
+	    tmpDstPanId = mpib.macPANId;
+	    tmpDstAddr = (IE3ADDR)tmpNetCn->getDeviceAddress();
+	}
+
+	if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+	}
+	else
+	{ // 64 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+	}
+
+	tmpSchedul->setDstPanId(tmpDstPanId);
+	tmpSchedul->setDstAddr(tmpDstAddr);
+	tmpSchedul->setSrcPanId(tmpSrcPanId);
+	tmpSchedul->setSrcAddr(tmpSrcAddr);
+	frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
+
+	AuxiliarySecurityHeader auxSecHd;
+	auxSecHd.secLvl = ASH_SLVL_NONE;
+	auxSecHd.keyIdentMode = 0;
+	auxSecHd.keySource = 0;
+	auxSecHd.keyIndex = 0;
+
+	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setFrmCtrl(frmCtrl);
+	tmpSchedul->setAuxSecHd(auxSecHd);
+	tmpSchedul->setSeqNmbr(mpib.macDSN++);
+
+	if(!queueModule->existSchedReq(tmpDstAddr))
+	    queueModule->insertInQueue(tmpSchedul->dup());
+	delete tmpNetCn;
+	delete tmpSchedul;
     }
-
-    tmpSchedul->setDstPanId(tmpDstPanId);
-    tmpSchedul->setDstAddr(tmpDstAddr);
-    tmpSchedul->setSrcPanId(tmpSrcPanId);
-    tmpSchedul->setSrcAddr(tmpSrcAddr);
-    frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
-
-    AuxiliarySecurityHeader auxSecHd;
-    auxSecHd.secLvl = ASH_SLVL_NONE;
-    auxSecHd.keyIdentMode = 0;
-    auxSecHd.keySource = 0;
-    auxSecHd.keyIndex = 0;
-
-    tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
-    tmpSchedul->setFrmCtrl(frmCtrl);
-    tmpSchedul->setAuxSecHd(auxSecHd);
-    tmpSchedul->setSeqNmbr(mpib.macDSN++);
-
-    if(!queueModule->existSchedReq(tmpDstAddr))
-	queueModule->insertInQueue(tmpSchedul->dup());
-
-
-    delete tmpNetCn;
-    delete tmpSchedul;
 
 }
 
 void Ieee802154eMac::SCHEDULE_indication(cMessage *msg)
 {
-    Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
-    Ieee802154eNetworkCtrlInfo *Ctrl = new Ieee802154eNetworkCtrlInfo("SchedulerRequest", TP_SCHEDULE_INDICATION);
-    Ctrl->setTimeslot(scheduler->getCntrlInfo().getTimeslot());
-    Ctrl->setChannelOffset(scheduler->getCntrlInfo().getChannelOffset());
+    if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+    {
+	//if(!queueModule->existSchedRes(msg->getSrcAddr()))
+	msg->setKind(TP_SCHEDULE_INDICATION);
+	send(msg->dup(), mSchedulerOut);
+	delete msg;
+    }
+    else
+    {
+	Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
+	Ieee802154eNetworkCtrlInfo *Ctrl = new Ieee802154eNetworkCtrlInfo("SchedulerRequest", TP_SCHEDULE_INDICATION);
+	Ctrl->setTimeslot(scheduler->getCntrlInfo().getTimeslot());
+	Ctrl->setChannelOffset(scheduler->getCntrlInfo().getChannelOffset());
 
-    if(scheduler->getCntrlInfo().getDeviceAddrMode() == defFrmCtrl_AddrMode16)
-	Ctrl->setDeviceAddress(getShortAddress(scheduler->getSrcAddr()));
-    else if(scheduler->getCntrlInfo().getDeviceAddrMode() == defFrmCtrl_AddrMode64)
-	Ctrl->setDeviceAddress(getShortAddress(scheduler->getSrcAddr()));
+	if(scheduler->getCntrlInfo().getDeviceAddrMode() == defFrmCtrl_AddrMode16)
+	    Ctrl->setDeviceAddress(getShortAddress(scheduler->getSrcAddr()));
+	else if(scheduler->getCntrlInfo().getDeviceAddrMode() == defFrmCtrl_AddrMode64)
+	{
+	    Ctrl->setDeviceAddress(scheduler->getSrcAddr().getInt());
 
-    if(!queueModule->existSchedRes(scheduler->getSrcAddr()))
-	send(Ctrl->dup(), mSchedulerOut);
+	}
 
-    delete Ctrl;
-    delete scheduler;
+	if(!queueModule->existSchedRes(scheduler->getSrcAddr()))
+	    send(Ctrl->dup(), mSchedulerOut);
+
+	delete Ctrl;
+	delete scheduler;
+    }
 
 }
 
 void Ieee802154eMac::handle_SCHEDULE_response(cMessage *msg)
 {
-    Ieee802154eScheduleFrame *tmpSchedul = new Ieee802154eScheduleFrame("SchedulerResponse", TP_SCHEDULE_RESPONSE);
-    Ieee802154eNetworkCtrlInfo *tmpNetCn = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-    FrameCtrl frmCtrl;
-    frmCtrl.frameType = Ieee802154e_SCHEDULER_RESPONCE;
-    frmCtrl.securityEnabled = secuData;
-    frmCtrl.frmPending = (txData == NULL) ? false:true;
-    frmCtrl.ackReq = true;
-    frmCtrl.seqNbSup = false;
-    frmCtrl.dstAddrMode = defFrmCtrl_AddrMode64;
-    frmCtrl.frameVersion = Ieee802154_compatible;
-    if(mpib.macEBAutoSA == 0)  // NONE Address
-	frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
-    else if(mpib.macEBAutoSA == 1)  // SHORT Address
-	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
-    else if(mpib.macEBAutoSA == 2)  // FULL Address
-	frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
+    Ieee802154eNetworkCtrlInfo *tmpNetCn;
+    if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+    {
+	Ieee802154eMulHoCluFrame *tmpSchedul = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
+	tmpNetCn = new Ieee802154eNetworkCtrlInfo();
+	FrameCtrl frmCtrl;
+	frmCtrl.frameType = Ieee802154e_SCHEDULER_RESPONSE;
+	frmCtrl.securityEnabled = secuData;
+	frmCtrl.frmPending = (txData == NULL) ? false:true;
+	frmCtrl.ackReq = true;
+	frmCtrl.seqNbSup = false;
+	frmCtrl.dstAddrMode = defFrmCtrl_AddrMode64;
+	frmCtrl.frameVersion = Ieee802154_compatible;
+	if(mpib.macEBAutoSA == 0)  // NONE Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
+	else if(mpib.macEBAutoSA == 1)  // SHORT Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
+	else if(mpib.macEBAutoSA == 2)  // FULL Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
 
-    IE3ADDR tmpDstAddr;
-    IE3ADDR tmpSrcAddr;
-    UINT_16 tmpDstPanId;
-    UINT_16 tmpSrcPanId;
+	IE3ADDR tmpDstAddr;
+	IE3ADDR tmpSrcAddr;
+	//UINT_16 tmpDstPanId;
+	UINT_16 tmpSrcPanId;
 
-    if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
-    { // 16 bit address
-	tmpDstPanId = mpib.macPANId;
-	tmpDstAddr = (IE3ADDR)getShortAddress(MACAddress(tmpNetCn->getDeviceAddress()));
-    }
-    else if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode64)
-    { // 64 bit address
-	tmpDstPanId = mpib.macPANId;
-	tmpDstAddr = (IE3ADDR)tmpNetCn->getDeviceAddress();
-    }
+	if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+	}
+	else
+	{ // 64 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+	}
 
-    if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
-    { // 16 bit address
-	tmpSrcPanId = mpib.macPANId;
-	tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+	tmpSchedul->setSrcPanId(tmpSrcPanId);
+	tmpSchedul->setSrcAddr(tmpSrcAddr);
+	frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
+
+	AuxiliarySecurityHeader auxSecHd;
+	auxSecHd.secLvl = ASH_SLVL_NONE;
+	auxSecHd.keyIdentMode = 0;
+	auxSecHd.keySource = 0;
+	auxSecHd.keyIndex = 0;
+
+	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setFrmCtrl(frmCtrl);
+	tmpSchedul->setAuxSecHd(auxSecHd);
+	tmpSchedul->setSeqNmbr(mpib.macDSN++);
+
+	if(!queueModule->existSchedReq(tmpDstAddr))
+	    queueModule->insertInQueue(tmpSchedul->dup());
+	delete tmpNetCn;
+	delete tmpSchedul;
     }
     else
-    { // 64 bit address
-	tmpSrcPanId = mpib.macPANId;
-	tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+    {
+	Ieee802154eScheduleFrame *tmpSchedul = new Ieee802154eScheduleFrame("SchedulerResponse", TP_SCHEDULE_RESPONSE);
+	tmpNetCn = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+	FrameCtrl frmCtrl;
+	frmCtrl.frameType = Ieee802154e_SCHEDULER_REQUEST;
+	frmCtrl.securityEnabled = secuData;
+	frmCtrl.frmPending = (txData == NULL) ? false:true;
+	frmCtrl.ackReq = true;
+	frmCtrl.seqNbSup = false;
+	frmCtrl.dstAddrMode = tmpNetCn->getDeviceAddrMode();
+	frmCtrl.frameVersion = Ieee802154_compatible;
+	if(mpib.macEBAutoSA == 0)  // NONE Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrModeNone;
+	else if(mpib.macEBAutoSA == 1)  // SHORT Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
+	else if(mpib.macEBAutoSA == 2)  // FULL Address
+	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
+
+	IE3ADDR tmpDstAddr;
+	IE3ADDR tmpSrcAddr;
+	UINT_16 tmpDstPanId;
+	UINT_16 tmpSrcPanId;
+
+	if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+	    tmpDstPanId = mpib.macPANId;
+
+	    tmpDstAddr = (IE3ADDR)getShortAddress(MACAddress(tmpNetCn->getDeviceAddress()));
+	}
+	else if(frmCtrl.dstAddrMode == defFrmCtrl_AddrMode64)
+	{ // 64 bit address
+	    tmpDstPanId = mpib.macPANId;
+	    tmpDstAddr = (IE3ADDR)tmpNetCn->getDeviceAddress();
+	}
+
+	if(frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macShortAddress;
+	}
+	else
+	{ // 64 bit address
+	    tmpSrcPanId = mpib.macPANId;
+	    tmpSrcAddr = (IE3ADDR)mpib.macExtendedAddress;
+	}
+
+	tmpSchedul->setDstPanId(tmpDstPanId);
+	tmpSchedul->setDstAddr(tmpDstAddr);
+	tmpSchedul->setSrcPanId(tmpSrcPanId);
+	tmpSchedul->setSrcAddr(tmpSrcAddr);
+	frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
+
+	AuxiliarySecurityHeader auxSecHd;
+	auxSecHd.secLvl = ASH_SLVL_NONE;
+	auxSecHd.keyIdentMode = 0;
+	auxSecHd.keySource = 0;
+	auxSecHd.keyIndex = 0;
+
+	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setFrmCtrl(frmCtrl);
+	tmpSchedul->setAuxSecHd(auxSecHd);
+	tmpSchedul->setSeqNmbr(mpib.macDSN++);
+
+	if(!queueModule->existSchedReq(tmpDstAddr))
+	    queueModule->insertInQueue(tmpSchedul->dup());
+	delete tmpNetCn;
+	delete tmpSchedul;
     }
-
-    tmpSchedul->setDstPanId(tmpDstPanId);
-    tmpSchedul->setDstAddr(tmpDstAddr);
-    tmpSchedul->setSrcPanId(tmpSrcPanId);
-    tmpSchedul->setSrcAddr(tmpSrcAddr);
-    frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
-
-    AuxiliarySecurityHeader auxSecHd;
-    auxSecHd.secLvl = ASH_SLVL_NONE;
-    auxSecHd.keyIdentMode = 0;
-    auxSecHd.keySource = 0;
-    auxSecHd.keyIndex = 0;
-
-    tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
-    tmpSchedul->setFrmCtrl(frmCtrl);
-    tmpSchedul->setAuxSecHd(auxSecHd);
-    tmpSchedul->setSeqNmbr(mpib.macDSN++);
-    queueModule->insertInQueue(tmpSchedul->dup());
-
-    delete tmpSchedul;
-    delete tmpNetCn;
 }
 
 void Ieee802154eMac::SCHEDULE_confirm(cMessage *msg, bool ack)
 {
 
-    Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
-    Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(&scheduler->getCntrlInfo());
-    if(scheduler->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONCE)
+    if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+    {
+	msg->setKind(TP_SCHEDULE_CONFIRM);
+	send(msg->dup(), mSchedulerOut);
+
+	delete msg;
+    }
+    else
     {
 
-	Ctrl->setName("SchedulerRequest");
-	Ctrl->setKind(TP_SCHEDULE_CONFIRM);
-	Ctrl->setReceivedByACK(ack);
-	send(Ctrl->dup(), mSchedulerOut);
+	Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
+	Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(&scheduler->getCntrlInfo());
+	if(scheduler->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONSE)
+	{
 
+	    Ctrl->setName("SchedulerRequest");
+	    Ctrl->setKind(TP_SCHEDULE_CONFIRM);
+	    Ctrl->setReceivedByACK(ack);
+	    send(Ctrl->dup(), mSchedulerOut);
+
+	}
+
+	if(scheduler->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_REQUEST)
+	{
+	    Ctrl->setStatus(mac_DENIED);
+	    Ctrl->setName("SchedulerRequest");
+	    Ctrl->setKind(TP_SCHEDULE_CONFIRM);
+	    Ctrl->setReceivedByACK(ack);
+	    send(Ctrl->dup(), mSchedulerOut);
+
+	}
+
+	//delete Ctrl;
+	delete scheduler;
     }
-
-    if(scheduler->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_REQUEST)
-    {
-	Ctrl->setStatus(mac_DENIED);
-	Ctrl->setName("SchedulerRequest");
-	Ctrl->setKind(TP_SCHEDULE_CONFIRM);
-	Ctrl->setReceivedByACK(ack);
-	send(Ctrl->dup(), mSchedulerOut);
-
-    }
-
-    //delete Ctrl;
-    delete scheduler;
 
 }
-//    if(isPANCoor)
-//    {
-//	Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
-//	Ieee802154eNetworkCtrlInfo *Ctrl = new Ieee802154eNetworkCtrlInfo("SchedulerRequest", TP_SCHEDULE_CONFIRM);
-//	Ctrl->setTimeslot(scheduler->getCntrlInfo().getTimeslot());
-//	Ctrl->setChannelOffset(scheduler->getCntrlInfo().getChannelOffset());
-//	Ctrl->setDeviceAddress(getShortAddress(scheduler->getDstAddr()));
-//	send(Ctrl->dup(), mSchedulerOut);
-//
-//	delete Ctrl;
-//	delete scheduler;
-//    }
-//
-//    else
-//    {
-//	Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
-//	Ieee802154eNetworkCtrlInfo *Ctrl = new Ieee802154eNetworkCtrlInfo("SchedulerRequest", TP_SCHEDULE_CONFIRM);
-//	Ctrl->setTimeslot(scheduler->getCntrlInfo().getTimeslot());
-//	Ctrl->setChannelOffset(scheduler->getCntrlInfo().getChannelOffset());
-//	Ctrl->setDeviceAddress(getShortAddress(scheduler->getSrcAddr()));
-//	send(Ctrl->dup(), mSchedulerOut);
-//
-//	delete Ctrl;
-//	delete scheduler;
-//
-//    }
-//}
+
 void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
 {
     switch(msg->getKind())
@@ -10084,9 +10456,21 @@ void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
 	    delete msg;
 	    break;
 	}
+	case TP_MLME_DISASSOCIATE_REQUEST:
+	{
+	    handle_MLME_DISASSOCIATE_request(msg->dup());
+	    delete msg;
+	    break;
+	}
 	case TP_MLME_ASSOCIATE_RESPONSE:
 	{
-	    handle_MLME_ASSOCIATE_responce(msg->dup());
+	    handle_MLME_ASSOCIATE_response(msg->dup());
+	    delete msg;
+	    break;
+	}
+	case TP_MLME_DISASSOCIATE_RESPONSE:
+	{
+	    handle_MLME_DISASSOCIATE_response(msg->dup());
 	    delete msg;
 	    break;
 	}
@@ -10099,6 +10483,12 @@ void Ieee802154eMac::handleSchedulerMsg(cMessage *msg)
 	case TP_SCHEDULE_RESPONSE:
 	{
 	    handle_SCHEDULE_response(msg->dup());
+	    delete msg;
+	    break;
+	}
+	case TP_RESTART_REQUEST:
+	{
+	    handle_RESTART_request(msg->dup());
 	    delete msg;
 	    break;
 	}
@@ -10161,4 +10551,252 @@ void Ieee802154eMac::updateNeighbor(Ieee802154eFrame *frame, FrameCtrl frmCtrl)
 	//	}
 	//neighborTable->editNeighbor(tmpEntry);
     }
+}
+
+void Ieee802154eMac::handleAwaitingBeaconTimer()
+{
+    awaitingNextBeacon = true;
+}
+
+void Ieee802154eMac::handle_RESTART_request(cMessage *msg)
+{
+    if(backoffTimer->isScheduled())
+	cancelEvent(backoffTimer);
+
+    if(deferCCATimer->isScheduled())
+	cancelEvent(deferCCATimer);
+    if(bcnRxTimer->isScheduled())
+	cancelEvent(bcnRxTimer);
+    if(bcnTxTimer->isScheduled())
+	cancelEvent(bcnTxTimer);
+    if(ackTimeoutTimer->isScheduled())
+	cancelEvent(ackTimeoutTimer);
+    if(txAckBoundTimer->isScheduled())
+	cancelEvent(txAckBoundTimer);
+    if(txCmdDataBoundTimer->isScheduled())
+	cancelEvent(txCmdDataBoundTimer);
+    if(ifsTimer->isScheduled())
+	cancelEvent(ifsTimer);
+    if(txSDTimer->isScheduled())
+	cancelEvent(txSDTimer);
+    if(rxSDTimer->isScheduled())
+	cancelEvent(rxSDTimer);
+    if(finalCAPTimer->isScheduled())
+	cancelEvent(finalCAPTimer);
+    if(gtsTimer->isScheduled())
+	cancelEvent(gtsTimer);
+
+    // TSCH timer
+    if(asnTimer->isScheduled())
+	cancelEvent(asnTimer);
+    if(tsCCAOffsetTimer->isScheduled())
+	cancelEvent(tsCCAOffsetTimer);
+    if(tsTxOffsetTimer->isScheduled())
+	cancelEvent(tsTxOffsetTimer);
+    if(tsRxAckDelayTimer->isScheduled())
+	cancelEvent(tsRxAckDelayTimer);
+    if(tsAckWaitTimer->isScheduled())
+	cancelEvent(tsAckWaitTimer);
+    if(tsRxOffsetTimer->isScheduled())
+	cancelEvent(tsRxOffsetTimer);
+    if(tsRxWaitTimer->isScheduled())
+	cancelEvent(tsRxWaitTimer);
+    if(tsTxAckDelayTimer->isScheduled())
+	cancelEvent(tsTxAckDelayTimer);
+    if(scanTimer->isScheduled())
+	cancelEvent(scanTimer);
+    if(awaitingBeacon->isScheduled())
+	cancelEvent(awaitingBeacon);
+
+    emptyHListLink(&hlistBLink1, &hlistBLink2);
+    emptyHListLink(&hlistDLink1, &hlistDLink2);
+
+    MPIBcopyStandard();
+    mpib.macExtendedAddress = aExtendedAddress;
+    mpib.macBSN = intrand(256);     // Beacon Sequence Number
+    mpib.macDSN = intrand(256);     // Data Sequence Number
+    mpib.macEBSN = intrand(256);     // Enhanced Beacon Sequence Number
+
+    m_debug = par("debug");
+    isPANCoor = par("isPANCoor");
+    coordRealignment = false;
+    mpib.macBeaconOrder = par("BO");
+    mpib.macSuperframeOrder = par("SO");
+    dataTransMode = par("dataTransMode");
+    panCoorName = par("panCoorName");
+
+    ack4Data = par("ack4Data");
+    mpib.macRxOnWhenIdle = par("setRxOnWhenIdle");
+
+    trx_state_req_activ = false;
+    trx_state_req = phy_INVALID_PARAMETER;
+    useIeee802Ctrl = par("useIeee802Ctrl");
+
+    // for test [SR]
+    mpib.macMaxFrameRetries = par("maxRetries");
+
+    // set TSCHCapable
+    mpib.macTSCHcapable = par("TSCHcapable").boolValue();
+    // for the IEEE Std 802.15.4e-2012 TSCH mode
+    useTSCH = par("useTSCH");
+    timeSource = false;    // It will be only set in the TSCH mode
+    useCCA = par("useCCA");     // It will be only set in the TSCH mode
+    txBeaconNow = false;
+    if(useTSCH)
+    {
+	mpib.macTSCHcapable = true;
+	/* Note: It will be set true for a PAN coordinator or if the first enhanced beacon with ASN arrived.
+	 * useTSCHdirect - activate the TSCh mode without a Beacon from the PAN coordinator (note: the device will be not associated with the coordinator.) */
+	mpib.macTSCHenabled = isPANCoor ? true:par("useTSCHdirect");
+	mpib.macTimestampSupported = true; // see Std 802.15.4e-2012 (5.1.4.2a.2 Node synchronization) page 29
+	mpib.macUseEnhancedBeacon = true;  // Use Enhanced Beacon
+	timeSource = par("timeSource");
+	useCCA = par("useCCA");
+	useTimeslotID = par("useTimeslotID"); //default timeslot template=0 - Std 802.15.4e-2012 (Table 52e�TSCH-MAC PIB attributes for macTimeslotTemplate) page 176
+	useHoppingSequenceID = par("useHoppingSequenceID"); // default = 0; all channels are supported
+    }
+    timeError = 0x0000;
+    timeCorrection = 0.0;
+    startTimeslot = 0.0;
+
+    if(par("useMetrics"))
+    {
+	mpib.macMetricsCapable = true;
+	mpib.macMetricsEnabled = true;
+    }
+
+    if(mpib.macBeaconOrder > 15 || mpib.macSuperframeOrder > mpib.macBeaconOrder)
+	error("[MAC]: wrong values for MAC parameter BO or SO");
+    else if(mpib.macBeaconOrder == 15)
+	error("[MAC]: non-beacon mode (BO = 15) has not been tested!");
+    else if(mpib.macSuperframeOrder == mpib.macBeaconOrder)
+	error("[MAC]: warning!! the case BO == SO has not been tested!");
+
+    if(dataTransMode != 1 && dataTransMode != 2 && dataTransMode != 3) // Std IEEE 802.15.4-2011 - 4.5.2 Data transfer model; page 13
+	error("[MAC]: data transfer mode = %d is not supported in the model!", dataTransMode);
+
+    // Initialization parameters for backoff method
+    std::string backoffMethodStr = par("backoffMethod").stdstringValue();
+
+    // for TSCH - The device shall use an exponential backoff mechanism - Std 802.15.4e-2012 (5.1.1.4.3 TSCH CSMA-CA algorithm) page 14
+    if(mpib.macTSCHenabled)
+    {
+	backoffMethod = EXPONENTIAL;
+	// TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
+	mpib.macMinBE = par("macMinBE");    // default: for CSMA-CA = 3; for TSCH-CA = 1
+	mpib.macMaxBE = par("macMaxBE");    // default: for CSMA-CA = 5; for TSCH-CA = 7
+    }
+    else if(backoffMethodStr == "exponential")
+    {
+	backoffMethod = EXPONENTIAL;
+	mpib.macMinBE = par("macMinBE");
+	mpib.macMaxBE = par("macMaxBE");
+    }
+    else
+    {
+	if(backoffMethodStr == "linear")
+	    backoffMethod = LINEAR;
+	else if(backoffMethodStr == "constant")
+	    backoffMethod = CONSTANT;
+	else
+	{
+	    error("Unknown backoff method \"%s\".\
+    	                       Use \"constant\", \"linear\" or \"\
+    	                       \"exponential\".", backoffMethodStr.c_str());
+	}
+	initialCW = par("contentionWindow"); // need to be check [SR]
+    }
+    NB = 0;
+    BE = 0;
+
+    panStartTime = 5.0;
+
+    secuData = false;    // security not implemented
+    secuBeacon = false;    // security not implemented
+
+    taskP.init();
+    taskP.TS_RX_CCA_tschcca = false;
+    taskP.TS_TX_CCA_tschcca = false;
+    taskP.TS_RX_CCA_tschcca_STEP = 0;
+    taskP.TS_TX_CCA_tschcca_STEP = 0;
+
+    // for beacon
+    rxBO = 15;       // set through the beacon
+    rxSO = 15;       // set through the beacon
+    beaconWaitingTx = false;
+    notAssociated = true;
+    bcnLossCounter = 0;
+
+    // for transmission
+    inTransmission = false;
+    waitBcnCmdAck = false;
+    waitBcnCmdUpperAck = false;
+    waitDataAck = false;
+    waitGTSAck = false;
+    numBcnCmdRetry = 0;
+    numBcnCmdUpperRetry = 0;
+    numDataRetry = 0;
+    numGTSRetry = 0;
+
+    // for CSMA-CA
+    csmacaWaitNextBeacon = false;
+    backoffStatus = 0;
+
+    // for timer
+    lastTime_bcnRxTimer = 0;
+    inTxSD_txSDTimer = false;
+    inRxSD_rxSDTimer = false;
+    index_gtsTimer = 0;
+
+    // device capability
+    capability.alterPANCoor = false;
+    capability.FFD = true;
+    capability.powerSource = false;
+    capability.recvOnWhenIdle = mpib.macRxOnWhenIdle; // default: true
+    capability.secuCapable = false;
+    capability.alloShortAddr = true;
+    capability.hostName = getParentModule()->getParentModule()->getFullName();
+
+    // GTS variables for PAN coordinator
+    gtsCount = 0;
+    for(int i = 0; i < 7; i++)
+    {
+	gtsList[i].devShortAddr = def_macShortAddress;  // 0xffff
+	gtsList[i].startSlot = 0;
+	gtsList[i].length = 0;
+	gtsList[i].isRecvGTS = false;
+	gtsList[i].isTxPending = false;
+    }
+    tmp_finalCap = aNumSuperframeSlots - 1; // 15 if no GTS
+    indexCurrGts = 99;
+    isTxPending = false;
+
+    // GTS variables for devices
+    gtsLength = 0;
+    gtsStartSlot = 0;
+    gtsTransDuration = 0;
+    txPkt = NULL;
+    txBeacon = NULL;
+    txBcnCmdUpper = NULL;
+    txBcnCmd = NULL;
+    txData = NULL;
+    txGTS = NULL;
+    txAck = NULL;
+    txCsmaca = NULL;
+    tmpCsmaca = NULL;
+    rxBeacon = NULL;
+    rxData = NULL;
+    rxCmd = NULL;
+
+    resetTRX();
+
+    msg->setKind(TP_RESTART_CONFIRM);
+    msg->setName("Restart Confirm");
+    RESTART_confirm(msg);
+}
+
+void Ieee802154eMac::RESTART_confirm(cMessage *msg)
+{
+    send(msg->dup(),mSchedulerOut);
+    delete msg;
 }

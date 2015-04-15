@@ -77,5 +77,8 @@ class INET_API IMacSlotframeTable
          virtual macSlotframeTableEntry *getSlotframe(int pos) = 0;
 
          virtual macSlotframeTableEntry *getSlotframeById(int id) = 0;
+
+ 	//deletes all entries
+ 	virtual void clearTable() = 0;
 };
 #endif /* IMACSLOTFRAMETABLE_H_ */

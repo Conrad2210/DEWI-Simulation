@@ -1054,6 +1054,9 @@ Register_Class(Ieee802154EnhancedBeaconFrame);
 
 Ieee802154EnhancedBeaconFrame::Ieee802154EnhancedBeaconFrame(const char *name, int kind) : ::Ieee802154eFrame(name,kind)
 {
+    this->BO_var = 0;
+    this->SO_var = 0;
+    this->stage_var = 0;
 }
 
 Ieee802154EnhancedBeaconFrame::Ieee802154EnhancedBeaconFrame(const Ieee802154EnhancedBeaconFrame& other) : ::Ieee802154eFrame(other)
@@ -1075,16 +1078,55 @@ Ieee802154EnhancedBeaconFrame& Ieee802154EnhancedBeaconFrame::operator=(const Ie
 
 void Ieee802154EnhancedBeaconFrame::copy(const Ieee802154EnhancedBeaconFrame& other)
 {
+    this->BO_var = other.BO_var;
+    this->SO_var = other.SO_var;
+    this->stage_var = other.stage_var;
 }
 
 void Ieee802154EnhancedBeaconFrame::parsimPack(cCommBuffer *b)
 {
     ::Ieee802154eFrame::parsimPack(b);
+    doPacking(b,this->BO_var);
+    doPacking(b,this->SO_var);
+    doPacking(b,this->stage_var);
 }
 
 void Ieee802154EnhancedBeaconFrame::parsimUnpack(cCommBuffer *b)
 {
     ::Ieee802154eFrame::parsimUnpack(b);
+    doUnpacking(b,this->BO_var);
+    doUnpacking(b,this->SO_var);
+    doUnpacking(b,this->stage_var);
+}
+
+int Ieee802154EnhancedBeaconFrame::getBO() const
+{
+    return BO_var;
+}
+
+void Ieee802154EnhancedBeaconFrame::setBO(int BO)
+{
+    this->BO_var = BO;
+}
+
+int Ieee802154EnhancedBeaconFrame::getSO() const
+{
+    return SO_var;
+}
+
+void Ieee802154EnhancedBeaconFrame::setSO(int SO)
+{
+    this->SO_var = SO;
+}
+
+int Ieee802154EnhancedBeaconFrame::getStage() const
+{
+    return stage_var;
+}
+
+void Ieee802154EnhancedBeaconFrame::setStage(int stage)
+{
+    this->stage_var = stage;
 }
 
 class Ieee802154EnhancedBeaconFrameDescriptor : public cClassDescriptor
@@ -1134,7 +1176,7 @@ const char *Ieee802154EnhancedBeaconFrameDescriptor::getProperty(const char *pro
 int Ieee802154EnhancedBeaconFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 0+basedesc->getFieldCount(object) : 0;
+    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
 }
 
 unsigned int Ieee802154EnhancedBeaconFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -1145,7 +1187,12 @@ unsigned int Ieee802154EnhancedBeaconFrameDescriptor::getFieldTypeFlags(void *ob
             return basedesc->getFieldTypeFlags(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return 0;
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154EnhancedBeaconFrameDescriptor::getFieldName(void *object, int field) const
@@ -1156,12 +1203,21 @@ const char *Ieee802154EnhancedBeaconFrameDescriptor::getFieldName(void *object, 
             return basedesc->getFieldName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return NULL;
+    static const char *fieldNames[] = {
+        "BO",
+        "SO",
+        "stage",
+    };
+    return (field>=0 && field<3) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154EnhancedBeaconFrameDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount(object) : 0;
+    if (fieldName[0]=='B' && strcmp(fieldName, "BO")==0) return base+0;
+    if (fieldName[0]=='S' && strcmp(fieldName, "SO")==0) return base+1;
+    if (fieldName[0]=='s' && strcmp(fieldName, "stage")==0) return base+2;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -1173,7 +1229,12 @@ const char *Ieee802154EnhancedBeaconFrameDescriptor::getFieldTypeString(void *ob
             return basedesc->getFieldTypeString(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return NULL;
+    static const char *fieldTypeStrings[] = {
+        "int",
+        "int",
+        "int",
+    };
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154EnhancedBeaconFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -1213,6 +1274,9 @@ std::string Ieee802154EnhancedBeaconFrameDescriptor::getFieldAsString(void *obje
     }
     Ieee802154EnhancedBeaconFrame *pp = (Ieee802154EnhancedBeaconFrame *)object; (void)pp;
     switch (field) {
+        case 0: return long2string(pp->getBO());
+        case 1: return long2string(pp->getSO());
+        case 2: return long2string(pp->getStage());
         default: return "";
     }
 }
@@ -1227,6 +1291,9 @@ bool Ieee802154EnhancedBeaconFrameDescriptor::setFieldAsString(void *object, int
     }
     Ieee802154EnhancedBeaconFrame *pp = (Ieee802154EnhancedBeaconFrame *)object; (void)pp;
     switch (field) {
+        case 0: pp->setBO(string2long(value)); return true;
+        case 1: pp->setSO(string2long(value)); return true;
+        case 2: pp->setStage(string2long(value)); return true;
         default: return false;
     }
 }
@@ -1239,7 +1306,9 @@ const char *Ieee802154EnhancedBeaconFrameDescriptor::getFieldStructName(void *ob
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return NULL;
+    switch (field) {
+        default: return NULL;
+    };
 }
 
 void *Ieee802154EnhancedBeaconFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -1878,6 +1947,9 @@ Register_Class(Ieee802154eAssociationFrame);
 
 Ieee802154eAssociationFrame::Ieee802154eAssociationFrame(const char *name, int kind) : ::Ieee802154eFrame(name,kind)
 {
+    this->CoorStage_var = 0;
+    this->CS_var = 0;
+    this->CH_var = 0;
 }
 
 Ieee802154eAssociationFrame::Ieee802154eAssociationFrame(const Ieee802154eAssociationFrame& other) : ::Ieee802154eFrame(other)
@@ -1900,18 +1972,27 @@ Ieee802154eAssociationFrame& Ieee802154eAssociationFrame::operator=(const Ieee80
 void Ieee802154eAssociationFrame::copy(const Ieee802154eAssociationFrame& other)
 {
     this->CntrlInfo_var = other.CntrlInfo_var;
+    this->CoorStage_var = other.CoorStage_var;
+    this->CS_var = other.CS_var;
+    this->CH_var = other.CH_var;
 }
 
 void Ieee802154eAssociationFrame::parsimPack(cCommBuffer *b)
 {
     ::Ieee802154eFrame::parsimPack(b);
     doPacking(b,this->CntrlInfo_var);
+    doPacking(b,this->CoorStage_var);
+    doPacking(b,this->CS_var);
+    doPacking(b,this->CH_var);
 }
 
 void Ieee802154eAssociationFrame::parsimUnpack(cCommBuffer *b)
 {
     ::Ieee802154eFrame::parsimUnpack(b);
     doUnpacking(b,this->CntrlInfo_var);
+    doUnpacking(b,this->CoorStage_var);
+    doUnpacking(b,this->CS_var);
+    doUnpacking(b,this->CH_var);
 }
 
 Ieee802154eNetworkCtrlInfo& Ieee802154eAssociationFrame::getCntrlInfo()
@@ -1922,6 +2003,36 @@ Ieee802154eNetworkCtrlInfo& Ieee802154eAssociationFrame::getCntrlInfo()
 void Ieee802154eAssociationFrame::setCntrlInfo(const Ieee802154eNetworkCtrlInfo& CntrlInfo)
 {
     this->CntrlInfo_var = CntrlInfo;
+}
+
+int Ieee802154eAssociationFrame::getCoorStage() const
+{
+    return CoorStage_var;
+}
+
+void Ieee802154eAssociationFrame::setCoorStage(int CoorStage)
+{
+    this->CoorStage_var = CoorStage;
+}
+
+bool Ieee802154eAssociationFrame::getCS() const
+{
+    return CS_var;
+}
+
+void Ieee802154eAssociationFrame::setCS(bool CS)
+{
+    this->CS_var = CS;
+}
+
+bool Ieee802154eAssociationFrame::getCH() const
+{
+    return CH_var;
+}
+
+void Ieee802154eAssociationFrame::setCH(bool CH)
+{
+    this->CH_var = CH;
 }
 
 class Ieee802154eAssociationFrameDescriptor : public cClassDescriptor
@@ -1971,7 +2082,7 @@ const char *Ieee802154eAssociationFrameDescriptor::getProperty(const char *prope
 int Ieee802154eAssociationFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int Ieee802154eAssociationFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -1984,8 +2095,11 @@ unsigned int Ieee802154eAssociationFrameDescriptor::getFieldTypeFlags(void *obje
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISCOMPOUND,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eAssociationFrameDescriptor::getFieldName(void *object, int field) const
@@ -1998,8 +2112,11 @@ const char *Ieee802154eAssociationFrameDescriptor::getFieldName(void *object, in
     }
     static const char *fieldNames[] = {
         "CntrlInfo",
+        "CoorStage",
+        "CS",
+        "CH",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eAssociationFrameDescriptor::findField(void *object, const char *fieldName) const
@@ -2007,6 +2124,9 @@ int Ieee802154eAssociationFrameDescriptor::findField(void *object, const char *f
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='C' && strcmp(fieldName, "CntrlInfo")==0) return base+0;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CoorStage")==0) return base+1;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CS")==0) return base+2;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CH")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -2020,8 +2140,11 @@ const char *Ieee802154eAssociationFrameDescriptor::getFieldTypeString(void *obje
     }
     static const char *fieldTypeStrings[] = {
         "Ieee802154eNetworkCtrlInfo",
+        "int",
+        "bool",
+        "bool",
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eAssociationFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -2062,6 +2185,9 @@ std::string Ieee802154eAssociationFrameDescriptor::getFieldAsString(void *object
     Ieee802154eAssociationFrame *pp = (Ieee802154eAssociationFrame *)object; (void)pp;
     switch (field) {
         case 0: {std::stringstream out; out << pp->getCntrlInfo(); return out.str();}
+        case 1: return long2string(pp->getCoorStage());
+        case 2: return bool2string(pp->getCS());
+        case 3: return bool2string(pp->getCH());
         default: return "";
     }
 }
@@ -2076,6 +2202,9 @@ bool Ieee802154eAssociationFrameDescriptor::setFieldAsString(void *object, int f
     }
     Ieee802154eAssociationFrame *pp = (Ieee802154eAssociationFrame *)object; (void)pp;
     switch (field) {
+        case 1: pp->setCoorStage(string2long(value)); return true;
+        case 2: pp->setCS(string2bool(value)); return true;
+        case 3: pp->setCH(string2bool(value)); return true;
         default: return false;
     }
 }
@@ -2103,6 +2232,241 @@ void *Ieee802154eAssociationFrameDescriptor::getFieldStructPointer(void *object,
         field -= basedesc->getFieldCount(object);
     }
     Ieee802154eAssociationFrame *pp = (Ieee802154eAssociationFrame *)object; (void)pp;
+    switch (field) {
+        case 0: return (void *)(&pp->getCntrlInfo()); break;
+        default: return NULL;
+    }
+}
+
+Register_Class(Ieee802154eDisassociationFrame);
+
+Ieee802154eDisassociationFrame::Ieee802154eDisassociationFrame(const char *name, int kind) : ::Ieee802154eFrame(name,kind)
+{
+}
+
+Ieee802154eDisassociationFrame::Ieee802154eDisassociationFrame(const Ieee802154eDisassociationFrame& other) : ::Ieee802154eFrame(other)
+{
+    copy(other);
+}
+
+Ieee802154eDisassociationFrame::~Ieee802154eDisassociationFrame()
+{
+}
+
+Ieee802154eDisassociationFrame& Ieee802154eDisassociationFrame::operator=(const Ieee802154eDisassociationFrame& other)
+{
+    if (this==&other) return *this;
+    ::Ieee802154eFrame::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void Ieee802154eDisassociationFrame::copy(const Ieee802154eDisassociationFrame& other)
+{
+    this->CntrlInfo_var = other.CntrlInfo_var;
+}
+
+void Ieee802154eDisassociationFrame::parsimPack(cCommBuffer *b)
+{
+    ::Ieee802154eFrame::parsimPack(b);
+    doPacking(b,this->CntrlInfo_var);
+}
+
+void Ieee802154eDisassociationFrame::parsimUnpack(cCommBuffer *b)
+{
+    ::Ieee802154eFrame::parsimUnpack(b);
+    doUnpacking(b,this->CntrlInfo_var);
+}
+
+Ieee802154eNetworkCtrlInfo& Ieee802154eDisassociationFrame::getCntrlInfo()
+{
+    return CntrlInfo_var;
+}
+
+void Ieee802154eDisassociationFrame::setCntrlInfo(const Ieee802154eNetworkCtrlInfo& CntrlInfo)
+{
+    this->CntrlInfo_var = CntrlInfo;
+}
+
+class Ieee802154eDisassociationFrameDescriptor : public cClassDescriptor
+{
+  public:
+    Ieee802154eDisassociationFrameDescriptor();
+    virtual ~Ieee802154eDisassociationFrameDescriptor();
+
+    virtual bool doesSupport(cObject *obj) const;
+    virtual const char *getProperty(const char *propertyname) const;
+    virtual int getFieldCount(void *object) const;
+    virtual const char *getFieldName(void *object, int field) const;
+    virtual int findField(void *object, const char *fieldName) const;
+    virtual unsigned int getFieldTypeFlags(void *object, int field) const;
+    virtual const char *getFieldTypeString(void *object, int field) const;
+    virtual const char *getFieldProperty(void *object, int field, const char *propertyname) const;
+    virtual int getArraySize(void *object, int field) const;
+
+    virtual std::string getFieldAsString(void *object, int field, int i) const;
+    virtual bool setFieldAsString(void *object, int field, int i, const char *value) const;
+
+    virtual const char *getFieldStructName(void *object, int field) const;
+    virtual void *getFieldStructPointer(void *object, int field, int i) const;
+};
+
+Register_ClassDescriptor(Ieee802154eDisassociationFrameDescriptor);
+
+Ieee802154eDisassociationFrameDescriptor::Ieee802154eDisassociationFrameDescriptor() : cClassDescriptor("Ieee802154eDisassociationFrame", "Ieee802154eFrame")
+{
+}
+
+Ieee802154eDisassociationFrameDescriptor::~Ieee802154eDisassociationFrameDescriptor()
+{
+}
+
+bool Ieee802154eDisassociationFrameDescriptor::doesSupport(cObject *obj) const
+{
+    return dynamic_cast<Ieee802154eDisassociationFrame *>(obj)!=NULL;
+}
+
+const char *Ieee802154eDisassociationFrameDescriptor::getProperty(const char *propertyname) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : NULL;
+}
+
+int Ieee802154eDisassociationFrameDescriptor::getFieldCount(void *object) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
+}
+
+unsigned int Ieee802154eDisassociationFrameDescriptor::getFieldTypeFlags(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeFlags(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISCOMPOUND,
+    };
+    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+}
+
+const char *Ieee802154eDisassociationFrameDescriptor::getFieldName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldNames[] = {
+        "CntrlInfo",
+    };
+    return (field>=0 && field<1) ? fieldNames[field] : NULL;
+}
+
+int Ieee802154eDisassociationFrameDescriptor::findField(void *object, const char *fieldName) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount(object) : 0;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CntrlInfo")==0) return base+0;
+    return basedesc ? basedesc->findField(object, fieldName) : -1;
+}
+
+const char *Ieee802154eDisassociationFrameDescriptor::getFieldTypeString(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeString(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldTypeStrings[] = {
+        "Ieee802154eNetworkCtrlInfo",
+    };
+    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
+}
+
+const char *Ieee802154eDisassociationFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldProperty(object, field, propertyname);
+        field -= basedesc->getFieldCount(object);
+    }
+    switch (field) {
+        default: return NULL;
+    }
+}
+
+int Ieee802154eDisassociationFrameDescriptor::getArraySize(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getArraySize(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eDisassociationFrame *pp = (Ieee802154eDisassociationFrame *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+std::string Ieee802154eDisassociationFrameDescriptor::getFieldAsString(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldAsString(object,field,i);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eDisassociationFrame *pp = (Ieee802154eDisassociationFrame *)object; (void)pp;
+    switch (field) {
+        case 0: {std::stringstream out; out << pp->getCntrlInfo(); return out.str();}
+        default: return "";
+    }
+}
+
+bool Ieee802154eDisassociationFrameDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->setFieldAsString(object,field,i,value);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eDisassociationFrame *pp = (Ieee802154eDisassociationFrame *)object; (void)pp;
+    switch (field) {
+        default: return false;
+    }
+}
+
+const char *Ieee802154eDisassociationFrameDescriptor::getFieldStructName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee802154eNetworkCtrlInfo));
+        default: return NULL;
+    };
+}
+
+void *Ieee802154eDisassociationFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructPointer(object, field, i);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eDisassociationFrame *pp = (Ieee802154eDisassociationFrame *)object; (void)pp;
     switch (field) {
         case 0: return (void *)(&pp->getCntrlInfo()); break;
         default: return NULL;
@@ -2338,6 +2702,381 @@ void *Ieee802154eScheduleFrameDescriptor::getFieldStructPointer(void *object, in
         field -= basedesc->getFieldCount(object);
     }
     Ieee802154eScheduleFrame *pp = (Ieee802154eScheduleFrame *)object; (void)pp;
+    switch (field) {
+        case 0: return (void *)(&pp->getCntrlInfo()); break;
+        default: return NULL;
+    }
+}
+
+Register_Class(Ieee802154eMulHoCluFrame);
+
+Ieee802154eMulHoCluFrame::Ieee802154eMulHoCluFrame(const char *name, int kind) : ::Ieee802154eFrame(name,kind)
+{
+    this->CoorStage_var = 0;
+    this->CS_var = 0;
+    this->CH_var = 0;
+    this->ChannelOffset_var = 0;
+    this->timeslot_var = 0;
+    this->BO_var = 0;
+    this->SO_var = 0;
+}
+
+Ieee802154eMulHoCluFrame::Ieee802154eMulHoCluFrame(const Ieee802154eMulHoCluFrame& other) : ::Ieee802154eFrame(other)
+{
+    copy(other);
+}
+
+Ieee802154eMulHoCluFrame::~Ieee802154eMulHoCluFrame()
+{
+}
+
+Ieee802154eMulHoCluFrame& Ieee802154eMulHoCluFrame::operator=(const Ieee802154eMulHoCluFrame& other)
+{
+    if (this==&other) return *this;
+    ::Ieee802154eFrame::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void Ieee802154eMulHoCluFrame::copy(const Ieee802154eMulHoCluFrame& other)
+{
+    this->CntrlInfo_var = other.CntrlInfo_var;
+    this->CoorStage_var = other.CoorStage_var;
+    this->CS_var = other.CS_var;
+    this->CH_var = other.CH_var;
+    this->ChannelOffset_var = other.ChannelOffset_var;
+    this->timeslot_var = other.timeslot_var;
+    this->BO_var = other.BO_var;
+    this->SO_var = other.SO_var;
+}
+
+void Ieee802154eMulHoCluFrame::parsimPack(cCommBuffer *b)
+{
+    ::Ieee802154eFrame::parsimPack(b);
+    doPacking(b,this->CntrlInfo_var);
+    doPacking(b,this->CoorStage_var);
+    doPacking(b,this->CS_var);
+    doPacking(b,this->CH_var);
+    doPacking(b,this->ChannelOffset_var);
+    doPacking(b,this->timeslot_var);
+    doPacking(b,this->BO_var);
+    doPacking(b,this->SO_var);
+}
+
+void Ieee802154eMulHoCluFrame::parsimUnpack(cCommBuffer *b)
+{
+    ::Ieee802154eFrame::parsimUnpack(b);
+    doUnpacking(b,this->CntrlInfo_var);
+    doUnpacking(b,this->CoorStage_var);
+    doUnpacking(b,this->CS_var);
+    doUnpacking(b,this->CH_var);
+    doUnpacking(b,this->ChannelOffset_var);
+    doUnpacking(b,this->timeslot_var);
+    doUnpacking(b,this->BO_var);
+    doUnpacking(b,this->SO_var);
+}
+
+Ieee802154eNetworkCtrlInfo& Ieee802154eMulHoCluFrame::getCntrlInfo()
+{
+    return CntrlInfo_var;
+}
+
+void Ieee802154eMulHoCluFrame::setCntrlInfo(const Ieee802154eNetworkCtrlInfo& CntrlInfo)
+{
+    this->CntrlInfo_var = CntrlInfo;
+}
+
+int Ieee802154eMulHoCluFrame::getCoorStage() const
+{
+    return CoorStage_var;
+}
+
+void Ieee802154eMulHoCluFrame::setCoorStage(int CoorStage)
+{
+    this->CoorStage_var = CoorStage;
+}
+
+bool Ieee802154eMulHoCluFrame::getCS() const
+{
+    return CS_var;
+}
+
+void Ieee802154eMulHoCluFrame::setCS(bool CS)
+{
+    this->CS_var = CS;
+}
+
+bool Ieee802154eMulHoCluFrame::getCH() const
+{
+    return CH_var;
+}
+
+void Ieee802154eMulHoCluFrame::setCH(bool CH)
+{
+    this->CH_var = CH;
+}
+
+int Ieee802154eMulHoCluFrame::getChannelOffset() const
+{
+    return ChannelOffset_var;
+}
+
+void Ieee802154eMulHoCluFrame::setChannelOffset(int ChannelOffset)
+{
+    this->ChannelOffset_var = ChannelOffset;
+}
+
+int Ieee802154eMulHoCluFrame::getTimeslot() const
+{
+    return timeslot_var;
+}
+
+void Ieee802154eMulHoCluFrame::setTimeslot(int timeslot)
+{
+    this->timeslot_var = timeslot;
+}
+
+int Ieee802154eMulHoCluFrame::getBO() const
+{
+    return BO_var;
+}
+
+void Ieee802154eMulHoCluFrame::setBO(int BO)
+{
+    this->BO_var = BO;
+}
+
+int Ieee802154eMulHoCluFrame::getSO() const
+{
+    return SO_var;
+}
+
+void Ieee802154eMulHoCluFrame::setSO(int SO)
+{
+    this->SO_var = SO;
+}
+
+class Ieee802154eMulHoCluFrameDescriptor : public cClassDescriptor
+{
+  public:
+    Ieee802154eMulHoCluFrameDescriptor();
+    virtual ~Ieee802154eMulHoCluFrameDescriptor();
+
+    virtual bool doesSupport(cObject *obj) const;
+    virtual const char *getProperty(const char *propertyname) const;
+    virtual int getFieldCount(void *object) const;
+    virtual const char *getFieldName(void *object, int field) const;
+    virtual int findField(void *object, const char *fieldName) const;
+    virtual unsigned int getFieldTypeFlags(void *object, int field) const;
+    virtual const char *getFieldTypeString(void *object, int field) const;
+    virtual const char *getFieldProperty(void *object, int field, const char *propertyname) const;
+    virtual int getArraySize(void *object, int field) const;
+
+    virtual std::string getFieldAsString(void *object, int field, int i) const;
+    virtual bool setFieldAsString(void *object, int field, int i, const char *value) const;
+
+    virtual const char *getFieldStructName(void *object, int field) const;
+    virtual void *getFieldStructPointer(void *object, int field, int i) const;
+};
+
+Register_ClassDescriptor(Ieee802154eMulHoCluFrameDescriptor);
+
+Ieee802154eMulHoCluFrameDescriptor::Ieee802154eMulHoCluFrameDescriptor() : cClassDescriptor("Ieee802154eMulHoCluFrame", "Ieee802154eFrame")
+{
+}
+
+Ieee802154eMulHoCluFrameDescriptor::~Ieee802154eMulHoCluFrameDescriptor()
+{
+}
+
+bool Ieee802154eMulHoCluFrameDescriptor::doesSupport(cObject *obj) const
+{
+    return dynamic_cast<Ieee802154eMulHoCluFrame *>(obj)!=NULL;
+}
+
+const char *Ieee802154eMulHoCluFrameDescriptor::getProperty(const char *propertyname) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : NULL;
+}
+
+int Ieee802154eMulHoCluFrameDescriptor::getFieldCount(void *object) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 8+basedesc->getFieldCount(object) : 8;
+}
+
+unsigned int Ieee802154eMulHoCluFrameDescriptor::getFieldTypeFlags(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeFlags(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISCOMPOUND,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<8) ? fieldTypeFlags[field] : 0;
+}
+
+const char *Ieee802154eMulHoCluFrameDescriptor::getFieldName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldNames[] = {
+        "CntrlInfo",
+        "CoorStage",
+        "CS",
+        "CH",
+        "ChannelOffset",
+        "timeslot",
+        "BO",
+        "SO",
+    };
+    return (field>=0 && field<8) ? fieldNames[field] : NULL;
+}
+
+int Ieee802154eMulHoCluFrameDescriptor::findField(void *object, const char *fieldName) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount(object) : 0;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CntrlInfo")==0) return base+0;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CoorStage")==0) return base+1;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CS")==0) return base+2;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CH")==0) return base+3;
+    if (fieldName[0]=='C' && strcmp(fieldName, "ChannelOffset")==0) return base+4;
+    if (fieldName[0]=='t' && strcmp(fieldName, "timeslot")==0) return base+5;
+    if (fieldName[0]=='B' && strcmp(fieldName, "BO")==0) return base+6;
+    if (fieldName[0]=='S' && strcmp(fieldName, "SO")==0) return base+7;
+    return basedesc ? basedesc->findField(object, fieldName) : -1;
+}
+
+const char *Ieee802154eMulHoCluFrameDescriptor::getFieldTypeString(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeString(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldTypeStrings[] = {
+        "Ieee802154eNetworkCtrlInfo",
+        "int",
+        "bool",
+        "bool",
+        "int",
+        "int",
+        "int",
+        "int",
+    };
+    return (field>=0 && field<8) ? fieldTypeStrings[field] : NULL;
+}
+
+const char *Ieee802154eMulHoCluFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldProperty(object, field, propertyname);
+        field -= basedesc->getFieldCount(object);
+    }
+    switch (field) {
+        default: return NULL;
+    }
+}
+
+int Ieee802154eMulHoCluFrameDescriptor::getArraySize(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getArraySize(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eMulHoCluFrame *pp = (Ieee802154eMulHoCluFrame *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+std::string Ieee802154eMulHoCluFrameDescriptor::getFieldAsString(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldAsString(object,field,i);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eMulHoCluFrame *pp = (Ieee802154eMulHoCluFrame *)object; (void)pp;
+    switch (field) {
+        case 0: {std::stringstream out; out << pp->getCntrlInfo(); return out.str();}
+        case 1: return long2string(pp->getCoorStage());
+        case 2: return bool2string(pp->getCS());
+        case 3: return bool2string(pp->getCH());
+        case 4: return long2string(pp->getChannelOffset());
+        case 5: return long2string(pp->getTimeslot());
+        case 6: return long2string(pp->getBO());
+        case 7: return long2string(pp->getSO());
+        default: return "";
+    }
+}
+
+bool Ieee802154eMulHoCluFrameDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->setFieldAsString(object,field,i,value);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eMulHoCluFrame *pp = (Ieee802154eMulHoCluFrame *)object; (void)pp;
+    switch (field) {
+        case 1: pp->setCoorStage(string2long(value)); return true;
+        case 2: pp->setCS(string2bool(value)); return true;
+        case 3: pp->setCH(string2bool(value)); return true;
+        case 4: pp->setChannelOffset(string2long(value)); return true;
+        case 5: pp->setTimeslot(string2long(value)); return true;
+        case 6: pp->setBO(string2long(value)); return true;
+        case 7: pp->setSO(string2long(value)); return true;
+        default: return false;
+    }
+}
+
+const char *Ieee802154eMulHoCluFrameDescriptor::getFieldStructName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    switch (field) {
+        case 0: return opp_typename(typeid(Ieee802154eNetworkCtrlInfo));
+        default: return NULL;
+    };
+}
+
+void *Ieee802154eMulHoCluFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructPointer(object, field, i);
+        field -= basedesc->getFieldCount(object);
+    }
+    Ieee802154eMulHoCluFrame *pp = (Ieee802154eMulHoCluFrame *)object; (void)pp;
     switch (field) {
         case 0: return (void *)(&pp->getCntrlInfo()); break;
         default: return NULL;

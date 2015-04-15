@@ -77,5 +77,10 @@ class INET_API IMacHoppingSequenceList
          * Edits an HoppingSequenceListEntry
          */
         virtual void editHoppingSequenceListEntry(macHoppingSequenceListEntry* entry) = 0;
+
+
+
+	//deletes all entries
+	virtual void clearTable() = 0;
 };
 #endif /* IMACHOPPINGSEQUENCELIST_H_ */

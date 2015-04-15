@@ -51,7 +51,7 @@ int SlotframeLinkIE::fillSlotframeLinkIE()
             {
                 linkIeEntry = new linkIEEntry();
                 if(slotIeEntry->getSlotframeId() == linkTable->getLink(k)->getSlotframeId() &&
-                	(linkTable->getLink(k)->getLinkType() == LNK_TP_ADVERTISING ||linkTable->getLink(k)->getLinkType() == LNK_TP_JOIN))
+                	(linkTable->getLink(k)->getLinkType() == LNK_TP_ADVERTISING ||linkTable->getLink(k)->getLinkType() == LNK_TP_JOIN) && !linkTable->getLink(k)->isprevStage())
                 {
                     length += 5;
                     linkIeEntry->setTimeslot(linkTable->getLink(k)->getTimeslot());

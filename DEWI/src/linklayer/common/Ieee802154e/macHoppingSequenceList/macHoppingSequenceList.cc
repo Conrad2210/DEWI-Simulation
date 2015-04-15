@@ -57,8 +57,8 @@ macHoppingSequenceList::macHoppingSequenceList()
 
 macHoppingSequenceList::~macHoppingSequenceList()
 {
-    for (int i = 0; i < (int) idToEntry.size(); i++)
-        delete idToEntry[i];
+    while(idToEntry.size() != 0)
+	idToEntry.erase(idToEntry.begin());
 
     delete[] tmpEntryList;
 }
@@ -344,4 +344,10 @@ void macHoppingSequenceList::invalidTmpHoppingSequenceList()
     tmpNumEntries = -1;
     delete[] tmpEntryList;
     tmpEntryList = NULL;
+}
+
+void macHoppingSequenceList::clearTable()
+{
+    while(idToEntry.size() != 0)
+	idToEntry.erase(idToEntry.begin());
 }

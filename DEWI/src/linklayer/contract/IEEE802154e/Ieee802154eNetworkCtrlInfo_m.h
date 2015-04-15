@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/networklayer/contract/Ieee802154eNetworkCtrlInfo.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/contract/IEEE802154e/Ieee802154eNetworkCtrlInfo.msg.
 //
 
 #ifndef _IEEE802154ENETWORKCTRLINFO_M_H_
@@ -22,7 +22,7 @@
 // }}
 
 /**
- * Class generated from <tt>src/networklayer/contract/Ieee802154eNetworkCtrlInfo.msg:15</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/contract/IEEE802154e/Ieee802154eNetworkCtrlInfo.msg:15</tt> by nedtool.
  * <pre>
  * message Ieee802154eNetworkCtrlInfo
  * {
@@ -218,6 +218,9 @@
  * 
  *     bool receivedByACK;
  * 
+ * 
+ *     int stage;
+ * 
  * }
  * </pre>
  */
@@ -355,6 +358,7 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     uint8_t *ackPayload_var; // array ptr
     unsigned int ackPayload_arraysize;
     bool receivedByACK_var;
+    int stage_var;
 
   private:
     void copy(const Ieee802154eNetworkCtrlInfo& other);
@@ -636,6 +640,8 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     virtual void setAckPayload(unsigned int k, uint8_t ackPayload);
     virtual bool getReceivedByACK() const;
     virtual void setReceivedByACK(bool receivedByACK);
+    virtual int getStage() const;
+    virtual void setStage(int stage);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eNetworkCtrlInfo& obj) {obj.parsimPack(b);}

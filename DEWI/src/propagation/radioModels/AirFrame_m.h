@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/linklayer/radio/AirFrame.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/propagation/radioModels/AirFrame.msg.
 //
 
 #ifndef _AIRFRAME_M_H_
@@ -22,7 +22,7 @@
 // }}
 
 /**
- * Class generated from <tt>src/linklayer/radio/AirFrame.msg:51</tt> by nedtool.
+ * Class generated from <tt>src/propagation/radioModels/AirFrame.msg:51</tt> by nedtool.
  * <pre>
  * //
  * // Format of the messages that are sent to the channel

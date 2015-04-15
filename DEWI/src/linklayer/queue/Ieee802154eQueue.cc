@@ -104,14 +104,12 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr)
     return NULL;
 }
 
-
-
 cMessage *Ieee802154eQueue::requestAdvPacket()
 {
     for(int i = 0; i < queue.length(); ++i)
     {
 	cPacket *msg = PK(queue.get(i));
-	if((strcmp(msg->getName(),"AssociationRequest") == 0 || strcmp(msg->getName(),"AssociationResponse") == 0 ))
+	if((strcmp(msg->getName(), "AssociationRequest") == 0 || strcmp(msg->getName(), "AssociationResponse") == 0))
 	{
 	    emit(dequeuePkSignal, msg);
 	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -121,12 +119,40 @@ cMessage *Ieee802154eQueue::requestAdvPacket()
     return NULL;
 }
 
+cMessage *Ieee802154eQueue::requestDisAssPacket(bool response)
+{
+    for(int i = 0; i < queue.length(); ++i)
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(response)
+	{
+	    if(msg->getKind() == TP_MLME_DISASSOCIATE_RESPONSE|| msg->getKind() == Ieee802154e_DISASSOCIATION_RESPONSE)
+	    {
+		emit(dequeuePkSignal, msg);
+		emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+		return msg;
+	    }
+	}
+	else
+	{
+	    if(msg->getKind() == TP_MLME_DISASSOCIATE_REQUEST || msg->getKind() == Ieee802154e_DISASSOCIATION_REQUEST)
+	    {
+		emit(dequeuePkSignal, msg);
+		emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+		return msg;
+	    }
+	}
+    }
+    return NULL;
+
+}
+
 cMessage *Ieee802154eQueue::requestBeaconPacket()
 {
     for(int i = 0; i < queue.length(); ++i)
     {
 	cPacket *msg = PK(queue.get(i));
-	if(strcmp(msg->getName(),"Ieee802154BEACON") == 0)
+	if(strcmp(msg->getName(), "Ieee802154BEACON") == 0)
 	{
 	    emit(dequeuePkSignal, msg);
 	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -145,7 +171,7 @@ bool Ieee802154eQueue::existSchedRes(MACAddress addr)
 	{
 	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"SchedulerResponse") == 0)
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "SchedulerResponse") == 0)
 	    {
 		return true;
 	    }
@@ -163,7 +189,7 @@ bool Ieee802154eQueue::existSchedReq(MACAddress addr)
 	{
 	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"SchedulerRequest") == 0)
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "SchedulerRequest") == 0)
 	    {
 		return true;
 	    }
@@ -181,7 +207,7 @@ bool Ieee802154eQueue::existAssRes(MACAddress addr)
 	{
 	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"AssociationResponse") == 0)
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationResponse") == 0)
 	    {
 		return true;
 	    }
@@ -199,7 +225,7 @@ bool Ieee802154eQueue::existAssReq(MACAddress addr)
 	{
 	    Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(),"AssociationRequest") == 0)
+	    if(tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationRequest") == 0)
 	    {
 		return true;
 	    }
@@ -213,7 +239,7 @@ cMessage *Ieee802154eQueue::requestSchdulePacket()
     for(int i = 0; i < queue.length(); ++i)
     {
 	cPacket *msg = PK(queue.get(i));
-	if((strcmp(msg->getName(),"SchedulerResponse") == 0 || strcmp(msg->getName(),"SchedulerRequest") == 0))
+	if(msg->getKind() == TP_SCHEDULE_REQUEST || msg->getKind() == TP_SCHEDULE_RESPONSE)
 	{
 	    emit(dequeuePkSignal, msg);
 	    emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -259,6 +285,40 @@ bool Ieee802154eQueue::deleteMsgQueue(MACAddress dstAddr, bool all)
 	EV << "Ieee802154eQueue: msg couldn't delete from the queue" << endl;
 
     emit(queueLengthSignal, queue.length());
+
+    return foundFirst ? true:false;
+}
+
+bool Ieee802154eQueue::deleteBCNQueue()
+{
+    bool foundFirst = false;
+    int countPkt = 0;
+    int i = 0;
+    bool all = true;
+
+    while(!queue.empty() && i < queue.length())
+    {
+	cPacket *msg = PK(queue.get(i));
+	if(dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
+	{
+	    Ieee802154EnhancedBeaconFrame* tmpMsg = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+
+	    if(all || !foundFirst)
+	    {
+		queue.remove(queue.get(i));
+		foundFirst = true;
+		i = 0; // start from the beginning, to prevent an NULL pointer
+	    }
+	    else
+		++i;
+
+	}
+	else
+	    ++i;
+    }
+
+    if(!foundFirst)
+	EV << "Ieee802154eQueue: msg couldn't delete from the queue" << endl;
 
     return foundFirst ? true:false;
 }

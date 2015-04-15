@@ -75,5 +75,8 @@ class INET_API IMacTimeslotTable
          * Edits an TimeslotEntry
          */
         virtual void editTimeslotTemplate(macTimeslotTableEntry* entry) = 0;
+
+	//deletes all entries
+	virtual void clearTable() = 0;
 };
 #endif /* IMACTIMESLOTTABLE_H_ */

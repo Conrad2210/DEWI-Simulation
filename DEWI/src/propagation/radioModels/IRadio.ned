@@ -17,7 +17,7 @@
 //
 
 
-package dewi.linklayer.radio;
+package dewi.propagation.radioModels;
 
 //
 // Prototype for radio modules. Radio modules deal with the transmission

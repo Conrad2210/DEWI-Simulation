@@ -261,11 +261,11 @@ void SlottedAloha::MLME_ASSOCIATE_request(cMessage *msg)
 
 void SlottedAloha::handle_MLME_ASSOCIATE_indication(cMessage *msg)
 {
-    MLME_ASSOCIATE_responce(msg->dup());
+    MLME_ASSOCIATE_response(msg->dup());
     delete msg;
 }
 
-void SlottedAloha::MLME_ASSOCIATE_responce(cMessage *msg)
+void SlottedAloha::MLME_ASSOCIATE_response(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     Ieee802154eNetworkCtrlInfo *AssRes = new Ieee802154eNetworkCtrlInfo("AssociationResponse", TP_MLME_ASSOCIATE_RESPONSE);

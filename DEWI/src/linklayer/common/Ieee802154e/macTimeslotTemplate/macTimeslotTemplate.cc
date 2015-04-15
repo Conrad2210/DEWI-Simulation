@@ -47,8 +47,10 @@ macTimeslotTemplate::macTimeslotTemplate()
 
 macTimeslotTemplate::~macTimeslotTemplate()
 {
-    for (int i = 0; i < (int) idToTemplate.size(); i++)
-        delete idToTemplate[i];
+    while(idToTemplate.size() != 0)
+	idToTemplate.erase(idToTemplate.begin());
+
+
     delete[] tmpTemplateList;
 }
 
@@ -345,3 +347,8 @@ void macTimeslotTemplate::invalidTmpTemplateList()
     tmpTemplateList = NULL;
 }
 
+void macTimeslotTemplate::clearTable()
+{
+    while(idToTemplate.size() != 0)
+	idToTemplate.erase(idToTemplate.begin());
+}
