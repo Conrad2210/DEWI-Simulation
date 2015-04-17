@@ -99,6 +99,11 @@ MulHopClu::~MulHopClu()
     else
 	delete BeaconScanTimer;
 
+    if(DisassociateWaitTimer->isScheduled())
+	cancelAndDelete(DisassociateWaitTimer);
+    else
+	delete DisassociateWaitTimer;
+
 }
 
 void MulHopClu::initialize(int stage)
@@ -138,11 +143,12 @@ void MulHopClu::initialize(int stage)
     AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
     ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
     BeaconScanTimer = new cMessage("BeaconScanTimer", SCHEDULE_BEACON_SCAN_TIMER);
+    DisassociateWaitTimer = new cMessage("DisassociateWaitTimer", DISASSOCIATION_WAIT_TIMER);
 
     fSensitivity = par("Sensitivity").doubleValue();
     fPCH = par("pCh").doubleValue();
     fTransmitterPower = par("transmitterPower").doubleValue();
-
+    bAssociateDirectly = false;
     if(bIsPANCoor)
     {
 	nCluStage = 0;
@@ -305,6 +311,11 @@ void MulHopClu::handleSelfMessage(cMessage *msg)
 	case SCHEDULE_BEACON_SCAN_TIMER:
 	{
 	    handle_BEACON_WAIT_timer(NULL);
+	    break;
+	}
+	case DISASSOCIATION_WAIT_TIMER:
+	{
+	    MLME_DISASSOCIATE_request(NULL);
 	    break;
 	}
 	default:
@@ -487,7 +498,11 @@ void MulHopClu::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	scheduleAt(simTime(), AssociateTimer);
 	parentDisp->updateWith(*tempStr);
     }
+    if(AssociateTimer->isScheduled())
+	cancelEvent(AssociateTimer);
 
+    if(AssociateWaitTimer->isScheduled())
+	cancelEvent(AssociateWaitTimer);
     delete tmp;
 }
 
@@ -495,7 +510,7 @@ void MulHopClu::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 void MulHopClu::MLME_DISASSOCIATE_request(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("DisassociationRequest", TP_MLME_DISASSOCIATE_REQUEST);
-
+    //scheduleAt(simTime()+2,DisassociateWaitTimer);
     send(cnt->dup(), outGate);
     delete cnt;
 
@@ -524,6 +539,8 @@ void MulHopClu::handle_MLME_DIASSOCIATE_confirm(cMessage *msg)
 {
     Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
     ClusterTable.deleteEntry(ClusterTable.getEntryByShrtAddr(tmpMsg->getSrcAddr().getInt()));
+    if(DisassociateWaitTimer->isScheduled())
+	cancelEvent(DisassociateWaitTimer);
     RESTART_request(NULL);
 
     delete tmpMsg;
@@ -758,16 +775,24 @@ void MulHopClu::handle_MLME_SET_BEACON_confirm(cMessage *msg)
     if(bIsPANCoor)
     {
 	if(bNotAssociated)
+	{
+	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (120 - 0);
 	    if(!AssociateTimer->isScheduled())
-		scheduleAt(simTime(), AssociateTimer);
+		scheduleAt(simTime() + waitTime, AssociateTimer);
+	}
     }
     else
     {
 	if(bNotAssociated)
 	{
-	int i = 300; //FIXME: Make it variable or changable by init parameters;
-	if(!AssociateTimer->isScheduled())
-	    scheduleAt(simTime() + (double)i, AssociateTimer);
+	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (10 - 0);
+	    if(!bAssociateDirectly)
+	    {
+		waitTime = 150 + ((double)rand() / RAND_MAX) * (180 - 150); //FIXME: Make it variable or changable by init parameters;
+		bAssociateDirectly = true;
+	    }
+	    if(!AssociateTimer->isScheduled())
+		scheduleAt(simTime() + waitTime, AssociateTimer);
 	}
     }
 
@@ -1313,10 +1338,9 @@ void MulHopClu::handle_BEACON_WAIT_timer(cMessage *msg)
     if(nScanCounter < 4)
     {
 	nScanCounter++;
-	if(BeaconScanTimer->isScheduled())
-	    cancelEvent(BeaconScanTimer);
-
-	scheduleAt(simTime() + (fBI * 4), BeaconScanTimer);
+	int waitConstant = intuniform(2, 5);
+	if(!BeaconScanTimer->isScheduled())
+	    scheduleAt(simTime() + (fBI * waitConstant), BeaconScanTimer);
     }
     else
     {
@@ -1362,11 +1386,9 @@ void MulHopClu::updateDisplay()
 
 void MulHopClu::RESTART_request(cMessage *msg)
 {
-    Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("Restart",TP_RESTART_REQUEST);
+    Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("Restart", TP_RESTART_REQUEST);
 
-
-
-    send(cnt->dup(),outGate);
+    send(cnt->dup(), outGate);
     delete cnt;
     delete msg;
 
@@ -1374,56 +1396,96 @@ void MulHopClu::RESTART_request(cMessage *msg)
 
 void MulHopClu::handle_RESTART_confirm(cMessage *msg)
 {
-	linkTable->clearTable();
-        neighborTable->clearTable();
-        hoppingSequenceList->clearTable();
-        timeslotTable->clearTable();
-        slotframeTable->clearTable();
-        ClusterTable.clearTable();
-        BeaconTable.flushBeaconTable();
-        nLastSCANChannel = 0;
-        nScanCounter = 0;
-        lastNeighbor = NULL;
-        tempLinkEntryRx = new macLinkTableEntry();
-        tempLinkEntryTx = NULL;
-        inGate = findGate("from_mac");
-        outGate = findGate("to_mac");
-        bCapablePanCoor = par("capablePanCoor").boolValue();
-        if(bCapablePanCoor)
-    	bIsPANCoor = par("isPANCoor").boolValue();
-        else
-    	bIsPANCoor = false;
+    linkTable->clearTable();
+    neighborTable->clearTable();
+    hoppingSequenceList->clearTable();
+    timeslotTable->clearTable();
+    slotframeTable->clearTable();
+    ClusterTable.clearTable();
+    BeaconTable.flushBeaconTable();
+    nLastSCANChannel = 0;
+    nScanCounter = 0;
+    lastNeighbor = NULL;
+    tempLinkEntryRx = new macLinkTableEntry();
+    tempLinkEntryTx = NULL;
+    inGate = findGate("from_mac");
+    outGate = findGate("to_mac");
+    bCapablePanCoor = false;
+    if(bCapablePanCoor)
+	bIsPANCoor = par("isPANCoor").boolValue();
+    else
+	bIsPANCoor = false;
 
-        bScanBeaconCH = false;
+    bScanBeaconCH = false;
+    bAssociateDirectly = true;
+    if(AssociateTimer->isScheduled())
+	cancelAndDelete(AssociateTimer);
+    else
+	delete AssociateTimer;
 
-        AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
-        ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
-        BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
-        StartTimer = new cMessage("StartTimer", START_TIMER);
-        AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
-        ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
-        BeaconScanTimer = new cMessage("BeaconScanTimer", SCHEDULE_BEACON_SCAN_TIMER);
+    if(ScheduleTimer->isScheduled())
+	cancelAndDelete(ScheduleTimer);
+    else
+	delete ScheduleTimer;
 
-        fSensitivity = par("Sensitivity").doubleValue();
-        fPCH = par("pCh").doubleValue();
-        fTransmitterPower = par("transmitterPower").doubleValue();
-        bNotAssociated = true;
-        if(bIsPANCoor)
-        {
-    	nCluStage = 0;
-    	createInitialEntries();
+    if(BeaconTimer->isScheduled())
+	cancelAndDelete(BeaconTimer);
+    else
+	delete BeaconTimer;
 
-    	nScanDuration = -1;
-        }
-        else
-        {
-    	nCluStage = -1;
-    	nScanDuration = 0;
+    if(StartTimer->isScheduled())
+	cancelAndDelete(StartTimer);
+    else
+	delete StartTimer;
 
-        }
+    if(AssociateWaitTimer->isScheduled())
+	cancelAndDelete(AssociateWaitTimer);
+    else
+	delete AssociateWaitTimer;
 
-        double start = 0.0;
+    if(ScanTimer->isScheduled())
+	cancelAndDelete(ScanTimer);
+    else
+	delete ScanTimer;
 
-        scheduleAt(simTime(), StartTimer);
-        delete msg;
+    if(BeaconScanTimer->isScheduled())
+	cancelAndDelete(BeaconScanTimer);
+    else
+	delete BeaconScanTimer;
+
+    if(DisassociateWaitTimer->isScheduled())
+	cancelAndDelete(DisassociateWaitTimer);
+    else
+	delete DisassociateWaitTimer;
+    AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
+    ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
+    BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
+    StartTimer = new cMessage("StartTimer", START_TIMER);
+    AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
+    ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
+    BeaconScanTimer = new cMessage("BeaconScanTimer", SCHEDULE_BEACON_SCAN_TIMER);
+    DisassociateWaitTimer = new cMessage("DisassociateWaitTimer", DISASSOCIATION_WAIT_TIMER);
+
+    fSensitivity = par("Sensitivity").doubleValue();
+    fPCH = par("pCh").doubleValue();
+    fTransmitterPower = par("transmitterPower").doubleValue();
+    bNotAssociated = true;
+    if(bIsPANCoor)
+    {
+	nCluStage = 0;
+	createInitialEntries();
+
+	nScanDuration = -1;
+    }
+    else
+    {
+	nCluStage = -1;
+	nScanDuration = 0;
+
+    }
+
+    double start = 0.0;
+
+    scheduleAt(simTime(), StartTimer);
+    delete msg;
 }

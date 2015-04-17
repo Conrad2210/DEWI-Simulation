@@ -179,6 +179,7 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 	cMessage *BeaconScanTimer;
 
 	cMessage *AssociateWaitTimer;
+	cMessage *DisassociateWaitTimer;
 
 	beaconTable BeaconTable;
 	clusterTable ClusterTable;
@@ -210,6 +211,9 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 
 	//is capable to become a pan coord or not
 	bool bCapablePanCoor;
+
+	//tried to associate more than once
+	bool bAssociateDirectly;
 
 	//variable to store the channel which was scanned before
 	int nLastSCANChannel;

@@ -14,13 +14,12 @@
 // 
 
 #include <clusterTable.h>
-Register_Class(clusterTable)
+Register_Class (clusterTable)
 std::ostream& operator<<(std::ostream& os, const clusterEntry& e)
 {
     os << e.info();
     return os;
 }
-
 
 clusterTable::clusterTable()
 {
@@ -44,7 +43,7 @@ void clusterTable::initialize(int stage)
 void clusterTable::addEntry(bool ch, int stage, UINT16 shrtAddr, UINT16 PAN)
 {
     if(getEntryByShrtAddr(shrtAddr) == NULL)
-	entryTable.push_back(new clusterEntry(ch,stage,shrtAddr,PAN));
+	entryTable.push_back(new clusterEntry(ch, stage, shrtAddr, PAN));
 }
 
 clusterEntry *clusterTable::getEntryByShrtAddr(UINT16 shrtAddr)
@@ -60,14 +59,19 @@ clusterEntry *clusterTable::getEntryByShrtAddr(UINT16 shrtAddr)
 
 void clusterTable::deleteEntry(clusterEntry *entry)
 {
-    for(int i = 0; i < (int)entryTable.size(); i++)
+    if(entry != NULL)
     {
-	if(entryTable.at(i)->getShrtAddr() == entry->getShrtAddr())
+	for(int i = 0; i < (int)entryTable.size(); i++)
 	{
-	    entryTable.erase(entryTable.begin()+i);
-	    i = -1;
+	    if(entryTable.at(i)->getShrtAddr() == entry->getShrtAddr())
+	    {
+		entryTable.erase(entryTable.begin() + i);
+		i = -1;
+	    }
 	}
     }
+    else
+	return;
 }
 
 void clusterTable::clearTable()

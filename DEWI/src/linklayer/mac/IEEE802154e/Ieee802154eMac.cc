@@ -213,6 +213,7 @@ Ieee802154eMac::Ieee802154eMac()
  * Destructor */
 Ieee802154eMac::~Ieee802154eMac()
 {
+    //queueModule->clear();
     cancelAndDelete(backoffTimer);
     cancelAndDelete(deferCCATimer);
     cancelAndDelete(bcnRxTimer);
@@ -9706,6 +9707,11 @@ void Ieee802154eMac::handleAsnTimer()
 		    else
 			// for the case td == 0, to have the td == -1 for the recalculation of the transmission delay
 			activeNeighborEntry->decrTransDelay();
+		}
+		else
+		{
+		    if(retries > mpib.macMaxFrameRetries)
+			EV << "Whats going on???";
 		}
 
 		taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) = true;
