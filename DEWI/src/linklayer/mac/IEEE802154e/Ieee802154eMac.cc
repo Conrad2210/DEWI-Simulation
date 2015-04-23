@@ -10561,7 +10561,7 @@ void Ieee802154eMac::updateNeighbor(Ieee802154eFrame *frame, FrameCtrl frmCtrl)
 
 void Ieee802154eMac::handleAwaitingBeaconTimer()
 {
-    awaitingNextBeacon = true;
+    awaitingNextBeacon = false;
 }
 
 void Ieee802154eMac::handle_RESTART_request(cMessage *msg)

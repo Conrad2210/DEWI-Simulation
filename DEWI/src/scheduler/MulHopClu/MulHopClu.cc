@@ -140,11 +140,11 @@ void MulHopClu::initialize(int stage)
     ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
     BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
     StartTimer = new cMessage("StartTimer", START_TIMER);
-    AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
+    AssociateWaitTimer = new cMessage("AssociationWaitTimer", ASSOCIATION_WAIT_TIMER);
     ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
     BeaconScanTimer = new cMessage("BeaconScanTimer", SCHEDULE_BEACON_SCAN_TIMER);
     DisassociateWaitTimer = new cMessage("DisassociateWaitTimer", DISASSOCIATION_WAIT_TIMER);
-
+    nRestartCounter = 0;
     fSensitivity = par("Sensitivity").doubleValue();
     fPCH = par("pCh").doubleValue();
     fTransmitterPower = par("transmitterPower").doubleValue();
@@ -318,6 +318,11 @@ void MulHopClu::handleSelfMessage(cMessage *msg)
 	    MLME_DISASSOCIATE_request(NULL);
 	    break;
 	}
+	case ASSOCIATION_WAIT_TIMER:
+	{
+	    MLME_ASSOCIATE_request(NULL);
+	    break;
+	}
 	default:
 	{
 	    break;
@@ -336,7 +341,7 @@ void MulHopClu::MLME_ASSOCIATE_request(cMessage *msg)
 	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("AssociationRequest", TP_MLME_ASSOCIATE_REQUEST);
 	    tmp->setPanCoordinator(bIsPANCoor);
 	    send(tmp->dup(), outGate);
-	    scheduleAt(simTime() + par("AssociateWaitTime"), AssociateWaitTimer);
+	    scheduleAt(simTime() + 5, AssociateWaitTimer);
 	    delete tmp;
 	}
 
@@ -728,7 +733,13 @@ void MulHopClu::handle_MLME_SCAN_confirm(cMessage *msg)
 
 		bIsPANCoor = true;
 	    }
-
+	    else if(nRestartCounter < 3)
+	    {
+		nRestartCounter++;
+		BeaconTable.flushBeaconTable();
+		RESTART_request(NULL);
+	    }
+	    tmpBcn = BeaconTable.returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
 	    if(tmpBcn != NULL)
 		MLME_SET_BEACON_request(tmpBcn);
 
@@ -776,7 +787,7 @@ void MulHopClu::handle_MLME_SET_BEACON_confirm(cMessage *msg)
     {
 	if(bNotAssociated)
 	{
-	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (120 - 0);
+	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (200 - 0);
 	    if(!AssociateTimer->isScheduled())
 		scheduleAt(simTime() + waitTime, AssociateTimer);
 	}
@@ -788,7 +799,7 @@ void MulHopClu::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (10 - 0);
 	    if(!bAssociateDirectly)
 	    {
-		waitTime = 150 + ((double)rand() / RAND_MAX) * (180 - 150); //FIXME: Make it variable or changable by init parameters;
+		waitTime = 300 + ((double)rand() / RAND_MAX) * (700 - 300); //FIXME: Make it variable or changable by init parameters;
 		bAssociateDirectly = true;
 	    }
 	    if(!AssociateTimer->isScheduled())
@@ -1404,7 +1415,7 @@ void MulHopClu::handle_RESTART_confirm(cMessage *msg)
     ClusterTable.clearTable();
     BeaconTable.flushBeaconTable();
     nLastSCANChannel = 0;
-    nScanCounter = 0;
+    nScanCounter = 3;
     lastNeighbor = NULL;
     tempLinkEntryRx = new macLinkTableEntry();
     tempLinkEntryTx = NULL;
@@ -1417,7 +1428,7 @@ void MulHopClu::handle_RESTART_confirm(cMessage *msg)
 	bIsPANCoor = false;
 
     bScanBeaconCH = false;
-    bAssociateDirectly = true;
+    bAssociateDirectly = false;
     if(AssociateTimer->isScheduled())
 	cancelAndDelete(AssociateTimer);
     else
@@ -1461,7 +1472,7 @@ void MulHopClu::handle_RESTART_confirm(cMessage *msg)
     ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
     BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
     StartTimer = new cMessage("StartTimer", START_TIMER);
-    AssociateWaitTimer = new cMessage("AssociationTimer", ASSOCIATION_WAIT_TIMER);
+    AssociateWaitTimer = new cMessage("AssociationWaitTimer", ASSOCIATION_WAIT_TIMER);
     ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
     BeaconScanTimer = new cMessage("BeaconScanTimer", SCHEDULE_BEACON_SCAN_TIMER);
     DisassociateWaitTimer = new cMessage("DisassociateWaitTimer", DISASSOCIATION_WAIT_TIMER);

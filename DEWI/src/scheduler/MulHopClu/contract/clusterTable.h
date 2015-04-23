@@ -31,7 +31,7 @@ class INET_API clusterTable : public cObject
 	void addEntry(bool ch, int stage, UINT16 shrtAddr,UINT16 PAN);
 	void deleteEntry(clusterEntry *entry);
 	clusterEntry *getEntryByShrtAddr(UINT16 shrtAddr);
-
+	int getNumEntries(){return entryTable.size();}
 
 	//deletes all entries
 	virtual void clearTable();

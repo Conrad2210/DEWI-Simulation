@@ -208,4 +208,6 @@ message Ieee802154eNetworkCtrlInfo
 	
 	int stage;
 	
+	int WaitConstant;
+	
 }

@@ -221,6 +221,8 @@
  * 
  *     int stage;
  * 
+ *     int WaitConstant;
+ * 
  * }
  * </pre>
  */
@@ -359,6 +361,7 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     unsigned int ackPayload_arraysize;
     bool receivedByACK_var;
     int stage_var;
+    int WaitConstant_var;
 
   private:
     void copy(const Ieee802154eNetworkCtrlInfo& other);
@@ -642,6 +645,8 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     virtual void setReceivedByACK(bool receivedByACK);
     virtual int getStage() const;
     virtual void setStage(int stage);
+    virtual int getWaitConstant() const;
+    virtual void setWaitConstant(int WaitConstant);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eNetworkCtrlInfo& obj) {obj.parsimPack(b);}

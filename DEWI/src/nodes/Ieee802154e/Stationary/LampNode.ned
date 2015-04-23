@@ -25,7 +25,7 @@ import dewi.mobility.models.StaticGridMobility;
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.nic.Ieee802154eNic;
+import dewi.nic.Ieee802154eNic;
 
 //Applications
 //UDPApp

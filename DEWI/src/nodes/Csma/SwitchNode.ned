@@ -23,7 +23,7 @@ import dewi.mobility.models.StationaryMobility;
 import dewi.nodes.inet.NetworkLayer;
 
 //NIC
-import dewi.linklayer.nic.Ieee802154csmaNic;
+import dewi.nic.Ieee802154csmaNic;
 
 //Applications
 //UDPApp

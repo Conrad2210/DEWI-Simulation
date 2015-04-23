@@ -229,6 +229,9 @@ class MulHopClu : public cSimpleModule, public IbaseScheduler
 
 	//stores the transmitpower
 	double fTransmitterPower;
+
+	//counts the restarts
+	int nRestartCounter;
 };
 
 #endif /* MULHOPCLU_H_ */

@@ -188,6 +188,7 @@ Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const char *name, int kin
     this->ackPayload_var = 0;
     this->receivedByACK_var = 0;
     this->stage_var = 0;
+    this->WaitConstant_var = 0;
 }
 
 Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const Ieee802154eNetworkCtrlInfo& other) : ::cMessage(other)
@@ -407,6 +408,7 @@ void Ieee802154eNetworkCtrlInfo::copy(const Ieee802154eNetworkCtrlInfo& other)
         this->ackPayload_var[i] = other.ackPayload_var[i];
     this->receivedByACK_var = other.receivedByACK_var;
     this->stage_var = other.stage_var;
+    this->WaitConstant_var = other.WaitConstant_var;
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
@@ -544,6 +546,7 @@ void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
     doPacking(b,this->ackPayload_var,ackPayload_arraysize);
     doPacking(b,this->receivedByACK_var);
     doPacking(b,this->stage_var);
+    doPacking(b,this->WaitConstant_var);
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
@@ -747,6 +750,7 @@ void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
     }
     doUnpacking(b,this->receivedByACK_var);
     doUnpacking(b,this->stage_var);
+    doUnpacking(b,this->WaitConstant_var);
 }
 
 bool Ieee802154eNetworkCtrlInfo::getToParent() const
@@ -2179,6 +2183,16 @@ void Ieee802154eNetworkCtrlInfo::setStage(int stage)
     this->stage_var = stage;
 }
 
+int Ieee802154eNetworkCtrlInfo::getWaitConstant() const
+{
+    return WaitConstant_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setWaitConstant(int WaitConstant)
+{
+    this->WaitConstant_var = WaitConstant;
+}
+
 class Ieee802154eNetworkCtrlInfoDescriptor : public cClassDescriptor
 {
   public:
@@ -2226,7 +2240,7 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getProperty(const char *proper
 int Ieee802154eNetworkCtrlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 121+basedesc->getFieldCount(object) : 121;
+    return basedesc ? 122+basedesc->getFieldCount(object) : 122;
 }
 
 unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -2359,8 +2373,9 @@ unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *objec
         FD_ISARRAY | FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<121) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<122) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int field) const
@@ -2493,8 +2508,9 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int
         "ackPayload",
         "receivedByACK",
         "stage",
+        "WaitConstant",
     };
-    return (field>=0 && field<121) ? fieldNames[field] : NULL;
+    return (field>=0 && field<122) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fieldName) const
@@ -2622,6 +2638,7 @@ int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fi
     if (fieldName[0]=='a' && strcmp(fieldName, "ackPayload")==0) return base+118;
     if (fieldName[0]=='r' && strcmp(fieldName, "receivedByACK")==0) return base+119;
     if (fieldName[0]=='s' && strcmp(fieldName, "stage")==0) return base+120;
+    if (fieldName[0]=='W' && strcmp(fieldName, "WaitConstant")==0) return base+121;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -2755,8 +2772,9 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeString(void *objec
         "uint8_t",
         "bool",
         "int",
+        "int",
     };
-    return (field>=0 && field<121) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<122) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -2934,6 +2952,7 @@ std::string Ieee802154eNetworkCtrlInfoDescriptor::getFieldAsString(void *object,
         case 118: return ulong2string(pp->getAckPayload(i));
         case 119: return bool2string(pp->getReceivedByACK());
         case 120: return long2string(pp->getStage());
+        case 121: return long2string(pp->getWaitConstant());
         default: return "";
     }
 }
@@ -3068,6 +3087,7 @@ bool Ieee802154eNetworkCtrlInfoDescriptor::setFieldAsString(void *object, int fi
         case 118: pp->setAckPayload(i,string2ulong(value)); return true;
         case 119: pp->setReceivedByACK(string2bool(value)); return true;
         case 120: pp->setStage(string2long(value)); return true;
+        case 121: pp->setWaitConstant(string2long(value)); return true;
         default: return false;
     }
 }
