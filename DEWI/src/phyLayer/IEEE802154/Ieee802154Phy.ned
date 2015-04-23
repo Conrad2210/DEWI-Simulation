@@ -1,4 +1,4 @@
-package dewi.phyLayer;
+package dewi.phyLayer.IEEE802154;
 simple Ieee802154Phy
 {
     parameters:

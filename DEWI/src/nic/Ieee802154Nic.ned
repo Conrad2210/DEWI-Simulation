@@ -5,7 +5,7 @@ package dewi.nic;
 
 import dewi.linklayer.base.IOutputQueue;
 import dewi.linklayer.mac.IEEE802154.Ieee802154Mac;
-import dewi.phyLayer.Ieee802154Phy;
+import dewi.phyLayer.IEEE802154.Ieee802154Phy;
 
 module Ieee802154Nic
 {

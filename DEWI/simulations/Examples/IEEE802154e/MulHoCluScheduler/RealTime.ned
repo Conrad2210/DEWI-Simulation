@@ -16,12 +16,12 @@
 // 
 // 
 
-package dewi.simulations.Testing;
+package dewi.simulations.Examples.IEEE802154e.MulHoCluScheduler;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.nodes.Ieee802154e.Rectangular.RLL.LampNode;
-import dewi.nodes.Ieee802154e.Rectangular.RLL.LightSwitch;
+import dewi.nodes.Ieee802154e.Rectangular.LampNode;
+import dewi.nodes.Ieee802154e.Rectangular.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 
@@ -71,6 +71,5 @@ network Network
             //            networkAddress="145.236.0.0";
             @display("p=3.16,0.6");
         }
-  
 }
 

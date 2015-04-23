@@ -22,7 +22,7 @@ import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
 import dewi.linklayer.common.Ieee802154e.macTimeslotTable.macTimeslotTable;
 import dewi.scheduler.IScheduler;
 
-module Ieee802154eNic
+module RLLNic
 {
     parameters:
         // name of the interface queue type
@@ -50,12 +50,8 @@ module Ieee802154eNic
                 @display("p=70,280;i=block/wrxtx");
         }
 
-        scheduler: <scheduleTyp> like IScheduler {
-            parameters:
-                @display("p=180,180;i=block/segm;q=IFQueue");
-        }
-
     connections:
+              		allowunconnected;
         radioIn --> phy.radioIn;
         phy.upperLayerOut --> { @display("m=m,50,50,75,0"); } --> mac.lowerLayerIn;
         phy.upperLayerIn <-- { @display("m=m,25,0,25,0"); } <-- mac.lowerLayerOut;
@@ -63,6 +59,6 @@ module Ieee802154eNic
         mac.upperLayerIn <-- upperLayerIn;
         ifq.in <-- mac.queueOut;	// to handle the IEEE 802.15.4e-2012 mgs's for the links
         ifq.out --> mac.queueIn; 	// to handle the IEEE 802.15.4e-2012 mgs's for the links
-        scheduler.from_mac <-- mac.schedulerOut;
-        scheduler.to_mac --> mac.schedulerIn;
+        
+       
 }

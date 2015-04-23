@@ -228,16 +228,31 @@ Ieee802154eMac::~Ieee802154eMac()
     cancelAndDelete(gtsTimer);
 
     // TSCH timer
-    cancelAndDelete(asnTimer);
-    cancelAndDelete(tsCCAOffsetTimer);
+    if(asnTimer->isScheduled())
+	cancelAndDelete(asnTimer);
+    else
+	delete asnTimer;
+
+    if(tsCCAOffsetTimer->isScheduled())
+	cancelAndDelete(tsCCAOffsetTimer);
+    else
+	delete tsCCAOffsetTimer;
     cancelAndDelete(tsTxOffsetTimer);
     cancelAndDelete(tsRxAckDelayTimer);
     cancelAndDelete(tsAckWaitTimer);
     cancelAndDelete(tsRxOffsetTimer);
     cancelAndDelete(tsRxWaitTimer);
     cancelAndDelete(tsTxAckDelayTimer);
-    cancelAndDelete(scanTimer);
-    cancelAndDelete(awaitingBeacon);
+
+    if(scanTimer->isScheduled())
+	cancelAndDelete(scanTimer);
+    else
+	delete scanTimer;
+
+    if(awaitingBeacon->isScheduled())
+	cancelAndDelete(awaitingBeacon);
+    else
+	delete awaitingBeacon;
 
     emptyHListLink(&hlistBLink1, &hlistBLink2);
     emptyHListLink(&hlistDLink1, &hlistDLink2);
@@ -315,9 +330,16 @@ void Ieee802154eMac::commonInitialize()
     mLowerLayerOut = findGate("lowerLayerOut");
     mQueueIn = findGate("queueIn");
     mQueueOut = findGate("queueOut");
-    mSchedulerIn = findGate("schedulerIn");
-    mSchedulerOut = findGate("schedulerOut");
-
+    if(findModuleWherever("RLL", this->getParentModule()->getParentModule()) == NULL)
+    {
+	mSchedulerIn = findGate("schedulerIn");
+	mSchedulerOut = findGate("schedulerOut");
+    }
+    else
+    {
+	mSchedulerIn = findGate("upperLayerIn");
+	mSchedulerOut = findGate("upperLayerOut");
+    }
     // get a pointer to the SlotframeTable Module
     slotframeTable = check_and_cast<IMacSlotframeTable *>(getModuleByPath(par("macSlotframeTableModule")));
     // get a pointer to the LinkTable Module
@@ -720,6 +742,7 @@ void Ieee802154eMac::initialize(int stage)
 //            }
 	    PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
 	}
+
     }
 }
 
@@ -10803,6 +10826,6 @@ void Ieee802154eMac::handle_RESTART_request(cMessage *msg)
 
 void Ieee802154eMac::RESTART_confirm(cMessage *msg)
 {
-    send(msg->dup(),mSchedulerOut);
+    send(msg->dup(), mSchedulerOut);
     delete msg;
 }
