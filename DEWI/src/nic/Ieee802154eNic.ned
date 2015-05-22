@@ -15,7 +15,7 @@
 
 package dewi.nic;
 import dewi.linklayer.base.IOutputQueue;
-import dewi.linklayer.mac.IEEE802154e.Ieee802154eMac;
+import dewi.linklayer.mac.IEEE802154e.Plain.Ieee802154eMac;
 import dewi.phyLayer.IEEE802154e.Ieee802154ePhy;
 import dewi.linklayer.common.Ieee802154e.macLinkTable.macLinkTable;
 import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
@@ -27,7 +27,6 @@ module Ieee802154eNic
     parameters:
         // name of the interface queue type
         string ifqType; // name of the interface queue type
-        string scheduleTyp;
         int numHosts;
     gates:
         input upperLayerIn; // to upper layers
@@ -50,11 +49,6 @@ module Ieee802154eNic
                 @display("p=70,280;i=block/wrxtx");
         }
 
-        scheduler: <scheduleTyp> like IScheduler {
-            parameters:
-                @display("p=180,180;i=block/segm;q=IFQueue");
-        }
-
     connections:
         radioIn --> phy.radioIn;
         phy.upperLayerOut --> { @display("m=m,50,50,75,0"); } --> mac.lowerLayerIn;
@@ -63,6 +57,5 @@ module Ieee802154eNic
         mac.upperLayerIn <-- upperLayerIn;
         ifq.in <-- mac.queueOut;	// to handle the IEEE 802.15.4e-2012 mgs's for the links
         ifq.out --> mac.queueIn; 	// to handle the IEEE 802.15.4e-2012 mgs's for the links
-        scheduler.from_mac <-- mac.schedulerOut;
-        scheduler.to_mac --> mac.schedulerIn;
+
 }

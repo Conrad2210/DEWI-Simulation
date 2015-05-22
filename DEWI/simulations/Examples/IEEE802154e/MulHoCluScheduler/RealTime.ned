@@ -20,8 +20,8 @@ package dewi.simulations.Examples.IEEE802154e.MulHoCluScheduler;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.nodes.Ieee802154e.Rectangular.LampNode;
-import dewi.nodes.Ieee802154e.Rectangular.LightSwitch;
+import dewi.nodes.Ieee802154e.Scheduler.Rectangular.LampNode;
+import dewi.nodes.Ieee802154e.Scheduler.Rectangular.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 

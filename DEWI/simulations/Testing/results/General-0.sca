@@ -1,0 +1,2217 @@
+version 2
+run General-0-20150522-09:41:23-8700
+attr configname General
+attr datetime 20150522-09:41:23
+attr experiment General
+attr inifile RLL.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network dewi.simulations.Testing.Network
+attr processid 8700
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+
+scalar Network.lightSwitch.wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lightSwitch.wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lightSwitch.wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lightSwitch.wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lightSwitch.wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lightSwitch.wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lightSwitch.wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lightSwitch.wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lightSwitch.wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lightSwitch.wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lightSwitch.wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lightSwitch.wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lightSwitch.wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lightSwitch.wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lightSwitch.wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.gateWay.wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.gateWay.wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.gateWay.wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.gateWay.wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.gateWay.wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.gateWay.wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.gateWay.wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.gateWay.wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.gateWay.wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.gateWay.wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.gateWay.wlan.phy 	radioState:count 	1
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.gateWay.wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.gateWay.wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.gateWay.wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.gateWay.wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[0].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[0].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[0].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[0].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[0].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[0].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[0].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[0].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[0].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[0].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[0].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[0].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[0].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[0].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[0].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[1].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[1].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[1].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[1].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[1].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[1].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[1].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[1].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[1].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[1].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[1].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[1].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[1].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[1].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[1].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[2].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[2].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[2].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[2].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[2].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[2].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[2].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[2].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[2].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[2].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[2].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[2].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[2].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[2].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[2].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[3].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[3].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[3].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[3].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[3].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[3].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[3].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[3].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[3].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[3].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[3].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[3].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[3].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[3].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[3].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[4].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[4].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[4].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[4].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[4].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[4].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[4].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[4].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[4].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[4].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[4].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[4].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[4].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[4].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[4].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[5].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[5].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[5].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[5].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[5].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[5].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[5].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[5].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[5].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[5].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[5].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[5].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[5].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[5].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[5].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[6].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[6].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[6].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[6].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[6].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[6].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[6].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[6].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[6].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[6].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[6].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[6].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[6].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[6].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[6].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[7].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[7].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[7].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[7].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[7].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[7].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[7].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[7].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[7].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[7].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[7].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[7].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[7].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[7].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[7].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[8].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[8].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[8].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[8].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[8].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[8].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[8].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[8].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[8].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[8].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[8].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[8].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[8].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[8].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[8].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[9].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[9].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[9].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[9].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[9].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[9].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[9].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[9].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[9].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[9].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[9].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[9].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[9].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[9].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[9].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[10].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[10].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[10].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[10].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[10].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[10].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[10].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[10].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[10].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[10].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[10].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[10].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[10].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[10].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[10].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[11].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[11].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[11].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[11].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[11].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[11].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[11].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[11].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[11].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[11].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[11].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[11].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[11].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[11].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[11].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[12].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[12].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[12].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[12].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[12].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[12].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[12].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[12].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[12].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[12].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[12].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[12].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[12].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[12].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[12].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[13].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[13].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[13].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[13].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[13].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[13].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[13].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[13].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[13].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[13].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[13].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[13].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[13].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[13].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[13].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[14].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[14].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[14].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[14].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[14].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[14].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[14].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[14].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[14].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[14].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[14].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[14].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[14].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[14].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[14].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[15].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[15].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[15].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[15].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[15].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[15].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[15].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[15].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[15].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[15].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[15].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[15].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[15].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[15].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[15].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[16].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[16].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[16].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[16].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[16].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[16].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[16].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[16].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[16].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[16].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[16].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[16].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[16].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[16].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[16].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[17].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[17].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[17].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[17].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[17].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[17].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[17].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[17].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[17].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[17].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[17].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[17].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[17].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[17].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[17].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[18].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[18].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[18].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[18].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[18].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[18].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[18].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[18].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[18].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[18].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[18].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[18].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[18].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[18].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[18].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps
+scalar Network.lamp[19].wlan.ifq 	queueLength:max 	0
+attr interpolationmode  sample-hold
+attr title  "queue length, max"
+scalar Network.lamp[19].wlan.ifq 	queueLength:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "queue length, timeavg"
+statistic Network.lamp[19].wlan.ifq 	queueingTime:histogram
+field count 0
+field mean nan
+field stddev nan
+field sum 0
+field sqrsum 0
+field min nan
+field max nan
+attr interpolationmode  none
+attr title  "queueing time, histogram"
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	-6.9388939039072e-018	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Network.lamp[19].wlan.ifq 	dropPk:count 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, count"
+scalar Network.lamp[19].wlan.ifq 	dropPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkByQueue
+attr title  "dropped packets, sum(packetBytes)"
+scalar Network.lamp[19].wlan.ifq 	rcvdPk:count 	0
+attr interpolationmode  none
+attr title  "received packets, count"
+scalar Network.lamp[19].wlan.ifq 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr title  "received packets, sum(packetBytes)"
+scalar Network.lamp[19].wlan.phy 	lossRate:min 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, min"
+scalar Network.lamp[19].wlan.phy 	lossRate:max 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, max"
+scalar Network.lamp[19].wlan.phy 	lossRate:timeavg 	nan
+attr interpolationmode  backward-sample-hold
+attr title  "packet loss rate, timeavg"
+scalar Network.lamp[19].wlan.phy 	radioState:count 	2
+attr interpolationmode  sample-hold
+attr title  "radio state (enum), count"
+statistic Network.lamp[19].wlan.phy 	channelNo:histogram
+field count 1
+field mean 11
+field stddev nan
+field sum 11
+field sqrsum 121
+field min 11
+field max 11
+attr interpolationmode  sample-hold
+attr title  "channel no, histogram"
+bin	-INF	0
+bin	10	0
+bin	11	1
+bin	12	0
+scalar Network.lamp[19].wlan.phy 	bitrate:min 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, min"
+attr unit  bps
+scalar Network.lamp[19].wlan.phy 	bitrate:max 	250000
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, max"
+attr unit  bps
+scalar Network.lamp[19].wlan.phy 	bitrate:timeavg 	nan
+attr interpolationmode  sample-hold
+attr title  "tx bitrate, timeavg"
+attr unit  bps

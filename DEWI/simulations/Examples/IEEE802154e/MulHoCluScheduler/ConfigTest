@@ -1,0 +1,309 @@
+<config>
+   <interface hosts="Network.lightSwitch" names="wlan" address="10.0.0.91" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.gateWay" names="wlan" address="10.0.0.77" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[0]" names="wlan" address="10.0.0.76" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[1]" names="wlan" address="10.0.0.75" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[2]" names="wlan" address="10.0.0.74" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[3]" names="wlan" address="10.0.0.73" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[4]" names="wlan" address="10.0.0.72" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[5]" names="wlan" address="10.0.0.71" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[6]" names="wlan" address="10.0.0.70" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[7]" names="wlan" address="10.0.0.69" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[8]" names="wlan" address="10.0.0.68" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[9]" names="wlan" address="10.0.0.67" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[10]" names="wlan" address="10.0.0.66" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[11]" names="wlan" address="10.0.0.52" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[12]" names="wlan" address="10.0.0.64" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[13]" names="wlan" address="10.0.0.63" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[14]" names="wlan" address="10.0.0.62" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[15]" names="wlan" address="10.0.0.61" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[16]" names="wlan" address="10.0.0.60" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[17]" names="wlan" address="10.0.0.59" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[18]" names="wlan" address="10.0.0.58" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[19]" names="wlan" address="10.0.0.57" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[20]" names="wlan" address="10.0.0.56" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[21]" names="wlan" address="10.0.0.55" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[22]" names="wlan" address="10.0.0.54" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[23]" names="wlan" address="10.0.0.53" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[24]" names="wlan" address="10.0.0.65" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[25]" names="wlan" address="10.0.0.102" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[26]" names="wlan" address="10.0.0.101" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[27]" names="wlan" address="10.0.0.100" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[28]" names="wlan" address="10.0.0.99" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[29]" names="wlan" address="10.0.0.98" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[30]" names="wlan" address="10.0.0.97" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[31]" names="wlan" address="10.0.0.96" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[32]" names="wlan" address="10.0.0.95" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[33]" names="wlan" address="10.0.0.94" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[34]" names="wlan" address="10.0.0.93" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[35]" names="wlan" address="10.0.0.92" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[36]" names="wlan" address="10.0.0.78" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[37]" names="wlan" address="10.0.0.90" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[38]" names="wlan" address="10.0.0.89" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[39]" names="wlan" address="10.0.0.88" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[40]" names="wlan" address="10.0.0.87" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[41]" names="wlan" address="10.0.0.86" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[42]" names="wlan" address="10.0.0.85" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[43]" names="wlan" address="10.0.0.84" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[44]" names="wlan" address="10.0.0.83" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[45]" names="wlan" address="10.0.0.82" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[46]" names="wlan" address="10.0.0.81" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[47]" names="wlan" address="10.0.0.80" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[48]" names="wlan" address="10.0.0.79" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[49]" names="wlan" address="10.0.0.40" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[50]" names="wlan" address="10.0.0.26" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[51]" names="wlan" address="10.0.0.25" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[52]" names="wlan" address="10.0.0.24" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[53]" names="wlan" address="10.0.0.23" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[54]" names="wlan" address="10.0.0.22" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[55]" names="wlan" address="10.0.0.21" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[56]" names="wlan" address="10.0.0.20" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[57]" names="wlan" address="10.0.0.19" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[58]" names="wlan" address="10.0.0.18" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[59]" names="wlan" address="10.0.0.17" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[60]" names="wlan" address="10.0.0.16" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[61]" names="wlan" address="10.0.0.15" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[62]" names="wlan" address="10.0.0.1" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[63]" names="wlan" address="10.0.0.13" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[64]" names="wlan" address="10.0.0.12" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[65]" names="wlan" address="10.0.0.11" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[66]" names="wlan" address="10.0.0.10" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[67]" names="wlan" address="10.0.0.9" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[68]" names="wlan" address="10.0.0.8" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[69]" names="wlan" address="10.0.0.7" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[70]" names="wlan" address="10.0.0.6" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[71]" names="wlan" address="10.0.0.5" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[72]" names="wlan" address="10.0.0.4" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[73]" names="wlan" address="10.0.0.3" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[74]" names="wlan" address="10.0.0.2" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[75]" names="wlan" address="10.0.0.14" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[76]" names="wlan" address="10.0.0.51" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[77]" names="wlan" address="10.0.0.50" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[78]" names="wlan" address="10.0.0.49" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[79]" names="wlan" address="10.0.0.48" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[80]" names="wlan" address="10.0.0.47" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[81]" names="wlan" address="10.0.0.46" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[82]" names="wlan" address="10.0.0.45" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[83]" names="wlan" address="10.0.0.44" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[84]" names="wlan" address="10.0.0.43" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[85]" names="wlan" address="10.0.0.42" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[86]" names="wlan" address="10.0.0.41" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[87]" names="wlan" address="10.0.0.27" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[88]" names="wlan" address="10.0.0.39" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[89]" names="wlan" address="10.0.0.38" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[90]" names="wlan" address="10.0.0.37" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[91]" names="wlan" address="10.0.0.36" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[92]" names="wlan" address="10.0.0.35" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[93]" names="wlan" address="10.0.0.34" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[94]" names="wlan" address="10.0.0.33" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[95]" names="wlan" address="10.0.0.32" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[96]" names="wlan" address="10.0.0.31" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[97]" names="wlan" address="10.0.0.30" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[98]" names="wlan" address="10.0.0.29" netmask="255.255.255.128" metric="-2147483648"/>
+   <interface hosts="Network.lamp[99]" names="wlan" address="10.0.0.28" netmask="255.255.255.128" metric="-2147483648"/>
+   <multicast-group hosts="Network.lightSwitch" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.gateWay" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[0]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[1]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[2]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[3]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[4]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[5]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[6]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[7]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[8]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[9]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[10]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[11]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[12]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[13]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[14]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[15]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[16]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[17]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[18]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[19]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[20]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[21]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[22]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[23]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[24]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[25]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[26]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[27]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[28]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[29]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[30]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[31]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[32]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[33]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[34]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[35]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[36]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[37]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[38]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[39]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[40]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[41]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[42]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[43]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[44]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[45]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[46]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[47]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[48]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[49]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[50]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[51]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[52]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[53]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[54]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[55]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[56]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[57]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[58]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[59]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[60]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[61]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[62]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[63]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[64]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[65]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[66]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[67]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[68]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[69]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[70]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[71]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[72]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[73]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[74]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[75]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[76]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[77]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[78]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[79]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[80]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[81]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[82]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[83]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[84]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[85]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[86]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[87]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[88]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[89]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[90]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[91]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[92]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[93]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[94]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[95]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[96]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[97]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[98]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <multicast-group hosts="Network.lamp[99]" interfaces="wlan" address="224.0.0.1 224.0.0.2"/>
+   <wireless interfaces="Network.lightSwitch%wlan Network.gateWay%wlan Network.lamp[0]%wlan Network.lamp[1]%wlan Network.lamp[2]%wlan Network.lamp[3]%wlan Network.lamp[4]%wlan Network.lamp[5]%wlan Network.lamp[6]%wlan Network.lamp[7]%wlan Network.lamp[8]%wlan Network.lamp[9]%wlan Network.lamp[10]%wlan Network.lamp[11]%wlan Network.lamp[12]%wlan Network.lamp[13]%wlan Network.lamp[14]%wlan Network.lamp[15]%wlan Network.lamp[16]%wlan Network.lamp[17]%wlan Network.lamp[18]%wlan Network.lamp[19]%wlan Network.lamp[20]%wlan Network.lamp[21]%wlan Network.lamp[22]%wlan Network.lamp[23]%wlan Network.lamp[24]%wlan Network.lamp[25]%wlan Network.lamp[26]%wlan Network.lamp[27]%wlan Network.lamp[28]%wlan Network.lamp[29]%wlan Network.lamp[30]%wlan Network.lamp[31]%wlan Network.lamp[32]%wlan Network.lamp[33]%wlan Network.lamp[34]%wlan Network.lamp[35]%wlan Network.lamp[36]%wlan Network.lamp[37]%wlan Network.lamp[38]%wlan Network.lamp[39]%wlan Network.lamp[40]%wlan Network.lamp[41]%wlan Network.lamp[42]%wlan Network.lamp[43]%wlan Network.lamp[44]%wlan Network.lamp[45]%wlan Network.lamp[46]%wlan Network.lamp[47]%wlan Network.lamp[48]%wlan Network.lamp[49]%wlan Network.lamp[50]%wlan Network.lamp[51]%wlan Network.lamp[52]%wlan Network.lamp[53]%wlan Network.lamp[54]%wlan Network.lamp[55]%wlan Network.lamp[56]%wlan Network.lamp[57]%wlan Network.lamp[58]%wlan Network.lamp[59]%wlan Network.lamp[60]%wlan Network.lamp[61]%wlan Network.lamp[62]%wlan Network.lamp[63]%wlan Network.lamp[64]%wlan Network.lamp[65]%wlan Network.lamp[66]%wlan Network.lamp[67]%wlan Network.lamp[68]%wlan Network.lamp[69]%wlan Network.lamp[70]%wlan Network.lamp[71]%wlan Network.lamp[72]%wlan Network.lamp[73]%wlan Network.lamp[74]%wlan Network.lamp[75]%wlan Network.lamp[76]%wlan Network.lamp[77]%wlan Network.lamp[78]%wlan Network.lamp[79]%wlan Network.lamp[80]%wlan Network.lamp[81]%wlan Network.lamp[82]%wlan Network.lamp[83]%wlan Network.lamp[84]%wlan Network.lamp[85]%wlan Network.lamp[86]%wlan Network.lamp[87]%wlan Network.lamp[88]%wlan Network.lamp[89]%wlan Network.lamp[90]%wlan Network.lamp[91]%wlan Network.lamp[92]%wlan Network.lamp[93]%wlan Network.lamp[94]%wlan Network.lamp[95]%wlan Network.lamp[96]%wlan Network.lamp[97]%wlan Network.lamp[98]%wlan Network.lamp[99]%wlan"/>
+   <route hosts="Network.lightSwitch" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.gateWay" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[0]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[1]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[2]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[3]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[4]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[5]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[6]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[7]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[8]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[9]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[10]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[11]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[12]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[13]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[14]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[15]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[16]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[17]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[18]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[19]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[20]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[21]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[22]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[23]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[24]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[25]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[26]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[27]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[28]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[29]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[30]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[31]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[32]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[33]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[34]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[35]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[36]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[37]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[38]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[39]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[40]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[41]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[42]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[43]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[44]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[45]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[46]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[47]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[48]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[49]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[50]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[51]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[52]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[53]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[54]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[55]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[56]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[57]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[58]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[59]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[60]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[61]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[62]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[63]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[64]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[65]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[66]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[67]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[68]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[69]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[70]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[71]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[72]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[73]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[74]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[75]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[76]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[77]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[78]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[79]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[80]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[81]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[82]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[83]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[84]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[85]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[86]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[87]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[88]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[89]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[90]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[91]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[92]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[93]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[94]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[95]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[96]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[97]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[98]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+   <route hosts="Network.lamp[99]" destination="10.0.0.0" netmask="255.255.255.128" gateway="*" interface="wlan" metric="-2147483648"/>
+</config>

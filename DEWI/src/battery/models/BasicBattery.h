@@ -102,6 +102,8 @@ class INET_API BasicBattery : public cSimpleModule, public INotifiable
     }
     double GetEnergy() {return residualCapacity;}
 
+    double GetNominalEnergy() {return nominalCapacity;}
+
 
     // OPERATIONS
 
