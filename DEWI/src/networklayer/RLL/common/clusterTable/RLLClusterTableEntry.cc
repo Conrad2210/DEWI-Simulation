@@ -19,12 +19,38 @@
 RLLClusterTableEntry::RLLClusterTableEntry()
 {
     // TODO Auto-generated constructor stub
+    ownerp = new RLLClusterTable();
 
+
+    clusterModule = new cModule();
+
+    id = -1;
+    stage = -1;
+    address = 0x00;
+    nodeName = "";
+    isCH = false;
+
+}
+
+RLLClusterTableEntry::RLLClusterTableEntry(const RLLClusterTableEntry &entry)
+{
+    ownerp = new RLLClusterTable();
+    *ownerp = *entry.ownerp;
+
+    clusterModule = new cModule();
+    this->setClusterModule(entry.clusterModule);
+    id = entry.id;
+    stage = entry.stage;
+    address = entry.address;
+    nodeName = entry.nodeName;
+    isCH = entry.isCH;
 }
 
 RLLClusterTableEntry::~RLLClusterTableEntry()
 {
     // TODO Auto-generated destructor stub
+    delete ownerp;
+    delete clusterModule;
 }
 
 std::string RLLClusterTableEntry::info()const

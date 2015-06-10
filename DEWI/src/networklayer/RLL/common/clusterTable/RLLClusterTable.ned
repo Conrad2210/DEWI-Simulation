@@ -19,7 +19,7 @@ package dewi.networklayer.RLL.common.clusterTable;
 // Copyright(c) 2014: Nimbus Centre for Embedded Systems Research, Cork, Ireland
 // Copyright(c) 2014: Cork Institute of Technology, Cork, Ireland
 
-simple clusterTable
+simple RLLClusterTable
 {
 	parameters:
     

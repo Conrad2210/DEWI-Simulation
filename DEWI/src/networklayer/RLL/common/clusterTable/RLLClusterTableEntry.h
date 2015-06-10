@@ -26,6 +26,8 @@ class INET_API RLLClusterTableEntry : public cObject
 {
     public:
 	RLLClusterTableEntry();
+	RLLClusterTableEntry(const RLLClusterTableEntry &entry);
+
 	virtual ~RLLClusterTableEntry();
 
     protected:

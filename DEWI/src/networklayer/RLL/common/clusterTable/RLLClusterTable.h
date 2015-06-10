@@ -35,7 +35,14 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 
     protected:
 
+	virtual void updateDisplayString();
+	    virtual int numInitStages() const { return 3;}
 
+	    virtual void initialize(int stage);
+
+	    virtual void handleMessage(cMessage *msg);
+
+	    int tmpNumEntries;
 
     public:
 	RLLClusterTable();
@@ -43,7 +50,7 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 
 	virtual cModule *getHostModule();
 
-	virtual int getNumSlotframes();
+	virtual int getNumEntries();
 
 	/*
 	 * Adds an slotframe to macSlotframeTable. Slotframes are allowed to be modified
@@ -51,6 +58,7 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 	 * allows macSlotframeTable internals to be updated on a Slotframe entry change.)
 	 */
 	virtual bool addEntry(RLLClusterTableEntry *entry);
+	virtual bool addEntry(int stage,UINT_16 address, char* name, bool is);
 
 	/*
 	 * Deletes the given slotframe from the macSlotframeTable.
@@ -69,7 +77,7 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 	 * maintaining internal data structures and firing "macLinkTable changed"
 	 * notifications
 	 */
-	virtual void entryChanged(RLLClusterTableEntry *entry, int category);
+	virtual void entryChanged();
 
 	/*
 	 * Returns the link from the macLinkTable
