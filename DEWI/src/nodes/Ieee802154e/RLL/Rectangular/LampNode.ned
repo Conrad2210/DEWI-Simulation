@@ -30,6 +30,7 @@ import dewi.applications.RLLApp.RLLApp;
 
 //RoutingTable
 import dewi.networklayer.RLL.RLL;
+import dewi.networklayer.RLL.common.clusterTable.RLLClusterTable;
 
 //TransportLayer
 //UDP
@@ -102,7 +103,12 @@ module LampNode
                 //InterfaceTable
         interfaceTable: InterfaceTable {
             parameters:
-                @display("p=60,150;i=block/table");
+                @display("p=60,224;i=block/table");
+        }
+
+        clusterTable: RLLClusterTable {
+            parameters:
+                @display("p=60,325;i=block/table");
         }
 
 
