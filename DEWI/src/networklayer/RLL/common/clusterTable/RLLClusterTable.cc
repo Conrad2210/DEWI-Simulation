@@ -133,6 +133,9 @@ bool RLLClusterTable::addEntry(int stage, UINT_16 address, char* name, bool is)
  */
 bool RLLClusterTable::deleteEntry(RLLClusterTableEntry *entry)
 {
+    if(entry == NULL)
+	return false;
+
     if(entry != getEntryById(entry->getEntryId()))
 	throw cRuntimeError("deleteEntry(): entry '%d' not found in clusterTable", entry->getEntryId());
     entryTable[entry->getEntryId()] = NULL;
@@ -226,6 +229,16 @@ RLLClusterTableEntry *RLLClusterTable::getEntryById(int id)
 
     return NULL;
 }
+RLLClusterTableEntry *RLLClusterTable::getEntryByShrtAddr(UINT_16 address)
+{
+    for(int i = 0; i < entryTable.size(); i++)
+    {
+	if(address == entryTable.at(i)->getAddress())
+	    return entryTable.at(i);
+    }
+    return NULL;
+}
+
 //deletes all entries
 void RLLClusterTable::clearTable()
 {

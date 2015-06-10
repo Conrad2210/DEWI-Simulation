@@ -86,6 +86,8 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 
 	virtual RLLClusterTableEntry *getEntryById(int id);
 
+	virtual RLLClusterTableEntry *getEntryByShrtAddr(UINT_16 address);
+
 	//deletes all entries
 	virtual void clearTable();
 };
