@@ -28,6 +28,8 @@ simple RLL
     
 	bool isPANCoor = default(false);
 	bool capablePanCoor = default(true);
+	double StartTime @unit(s) = default(0s);
+	double AssociateWaitTime @unit(s) = default(0.5s);
     
     gates:
 

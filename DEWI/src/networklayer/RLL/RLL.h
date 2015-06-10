@@ -70,18 +70,6 @@ class INET_API RLL : public cSimpleModule
 
 	virtual void handle_MLME_BEACON_indication(cMessage *msg);
 
-	virtual void MLME_SETSLOTFRAME_request(cMessage *msg);
-
-	virtual void handle_MLME_SETSLOTFRAME_confirm(cMessage *msg);
-
-	virtual void MLME_SETLINK_request(cMessage *msg);
-
-	virtual void handle_MLME_SETLINK_confirm(cMessage *msg);
-
-	virtual void MLME_TSCHMODE_request(cMessage *msg);
-
-	virtual void handle_MLME_TSCHMODE_confirm(cMessage *msg);
-
 	//START
 	virtual void MLME_START_request(cMessage *msg);
 
@@ -141,6 +129,11 @@ class INET_API RLL : public cSimpleModule
     protected:
 	cMessage *AssociateTimer;
 	cMessage *AssociateWaitTimer;
+	cMessage *ScheduleTimer;
+	cMessage *BeaconScanTimer;
+	cMessage *DisassociateWaitTimer;
+	cMessage *BeaconTimer;
+	cMessage *ScanTimer;
 
     protected:
 	//is associated or not
@@ -153,6 +146,33 @@ class INET_API RLL : public cSimpleModule
 
 	//saves the cluster stage
 	int nCluStage;
+
+	//Beacon Order
+	int nBO;
+
+	//Superframe order
+	int nSO;
+
+	//BeaconIntervaltime
+	double fBI;
+
+	//variable to store the channel which was scanned before
+	int nLastSCANChannel = 0;
+
+	// Variable to set the length of the initial channel scan period
+	int nScanDuration;
+
+    private:
+	////////////////////////////////////////////////////////////////////////
+	//			Helper Functions
+	////////////////////////////////////////////////////////////////////////
+	void createInitialEntries();
+
+	void setSchedule();
+	void setScheduleChStUn();
+	void setScheduleChStZe();
+	void setScheduleChInit();
+	void setScheduleCs();
 };
 
 #endif /* RLL_H_ */

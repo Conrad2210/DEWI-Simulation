@@ -485,6 +485,9 @@ void MulHopClu::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	}
 	setSchedule();
 
+	if(AssociateTimer->isScheduled())
+	    cancelEvent(AssociateTimer);
+
     }
     else
     {
@@ -500,14 +503,12 @@ void MulHopClu::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	{
 	    tempStr->parse("b=1.5,1.5,oval,yellow;i=status/bulb");
 	}
+	if(AssociateTimer->isScheduled())
+	    cancelEvent(AssociateTimer);
 	scheduleAt(simTime(), AssociateTimer);
 	parentDisp->updateWith(*tempStr);
     }
-    if(AssociateTimer->isScheduled())
-	cancelEvent(AssociateTimer);
 
-    if(AssociateWaitTimer->isScheduled())
-	cancelEvent(AssociateWaitTimer);
     delete tmp;
 }
 
