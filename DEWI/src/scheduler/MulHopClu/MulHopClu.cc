@@ -197,7 +197,7 @@ void MulHopClu::handleMessage(cMessage *msg)
     {
 	if(ev.isGUI())
 	{
-	    EV << "Undefined Message type; Dropp Message" << endl;
+	    EV << "Undefined Message type; Drop Message" << endl;
 
 	}
 	delete msg;
