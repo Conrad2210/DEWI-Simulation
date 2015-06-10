@@ -19,10 +19,22 @@ package dewi.networklayer.RLL;
 
 simple RLL
 {
+    string macSlotframeTableModule = default("^.slotframeTable");
+    string macLinkTableModule = default("^.linkTable");
+    string macTimeslotTableModule = default("^.timeslotTemplate");
+    string macHoppingSequenceListModule = default("^.hoppingSequenceList");
+    string macNeighborTableModule = default("^.neighborTable");
+    string RLLClusterTableModule = default("^.clusterTable");
+    
+	bool isPANCoor = default(false);
+	bool capablePanCoor = default(true);
+    
     gates:
-        
+
         input lowerLayerIn;
         input upperLayerIn;
         output lowerLayerOut;
         output upperLayerOut;
+
+
 }
