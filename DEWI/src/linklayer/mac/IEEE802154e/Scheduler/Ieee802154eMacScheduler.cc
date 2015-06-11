@@ -1005,6 +1005,10 @@ void Ieee802154eMacScheduler::handle_MLME_START_request(cMessage *msg)
 	// start ASN
 	//mpib.macPANId;
 	BE = mpib.macMinBE; // for shared links (TSCH CSMA-CA)
+	if(asnTimer->isScheduled())
+	{
+	    cancelEvent(asnTimer);
+	}
 	scheduleAt(simTime() + (double)startRe->getStartTime(), asnTimer);
 	//startDevice();
     }
