@@ -31,6 +31,7 @@ import dewi.applications.RLLApp.RLLApp;
 //RoutingTable
 import dewi.networklayer.RLL.RLL;
 import dewi.networklayer.RLL.common.clusterTable.RLLClusterTable;
+import dewi.networklayer.RLL.common.beaconTable.cBeaconTable;
 
 //TransportLayer
 //UDP
@@ -109,6 +110,11 @@ module LampNode
         clusterTable: RLLClusterTable {
             parameters:
                 @display("p=60,325;i=block/table");
+        }
+
+        beaconTable: cBeaconTable {
+            parameters:
+                @display("p=360,325");
         }
 
 

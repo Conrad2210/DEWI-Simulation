@@ -40,6 +40,7 @@ import dewi.base.NotificationBoard;
 //MANETRouting
 import dewi.networklayer.IManetRouting;
 import dewi.networklayer.RLL.common.clusterTable.RLLClusterTable;
+import dewi.networklayer.RLL.common.beaconTable.cBeaconTable;
 
 import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
 import dewi.linklayer.common.Ieee802154e.macLinkTable.macLinkTable;
@@ -91,6 +92,11 @@ module LightSwitch
         clusterTable: RLLClusterTable {
             parameters:
                 @display("p=60,325;i=block/table");
+        }
+
+        beaconTable: cBeaconTable {
+            parameters:
+                @display("p=360,325");
         }
 
         //Routing
