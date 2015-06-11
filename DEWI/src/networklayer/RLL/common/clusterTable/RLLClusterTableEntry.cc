@@ -29,6 +29,7 @@ RLLClusterTableEntry::RLLClusterTableEntry()
     address = 0x00;
     nodeName = "";
     isCH = false;
+    panId = 0x00;
 
 }
 
@@ -44,6 +45,7 @@ RLLClusterTableEntry::RLLClusterTableEntry(const RLLClusterTableEntry &entry)
     address = entry.address;
     nodeName = entry.nodeName;
     isCH = entry.isCH;
+    panId = entry.panId;
 }
 
 RLLClusterTableEntry::~RLLClusterTableEntry()
@@ -61,6 +63,7 @@ std::string RLLClusterTableEntry::info()const
     out << ", Stage: " << stage;
     out << ", Address: " << address;
     out << ", isCH: " << isCH;
+    out << ", panId: " << panId;
     return out.str();
 }
 

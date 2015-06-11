@@ -38,6 +38,7 @@ class INET_API RLLClusterTableEntry : public cObject
 	UINT_16 address;
 	char* nodeName;
 	bool isCH;
+	UINT_16 panId;
 
     public:
 
@@ -64,6 +65,9 @@ class INET_API RLLClusterTableEntry : public cObject
 
 	bool getIsCH() {return isCH;}
 	void setIsCH(bool b = false){isCH = b;}
+
+	void setPanId(UINT16 ui){panId = ui;}
+	UINT16 getPanId(){return panId;}
 
 
 };
