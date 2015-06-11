@@ -25,6 +25,7 @@ simple RLL
     string macHoppingSequenceListModule = default("^.hoppingSequenceList");
     string macNeighborTableModule = default("^.neighborTable");
     string RLLClusterTableModule = default("^.clusterTable");
+    string cBeaconTableModule = default("^.beaconTable");
     
 	bool isPANCoor = default(false);
 	bool capablePanCoor = default(true);

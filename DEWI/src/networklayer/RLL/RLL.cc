@@ -16,6 +16,7 @@
 #include <RLL.h>
 #include <Ieee802154eNetworkCtrlInfo_m.h>
 #include "Ieee802154eFrame_m.h"
+#include <Radio80211aControlInfo_m.h>
 
 Define_Module(RLL);
 
@@ -46,13 +47,45 @@ RLL::RLL()
 RLL::~RLL()
 {
 
-    delete AssociateTimer;
-    delete AssociateWaitTimer;
-    delete ScheduleTimer;
-    delete BeaconScanTimer;
-    delete DisassociateWaitTimer;
-    delete BeaconTimer;
-    delete ScanTimer;
+    if(AssociateTimer->isScheduled())
+	cancelAndDelete(AssociateTimer);
+    else
+	delete AssociateTimer;
+
+    if(ScheduleTimer->isScheduled())
+	cancelAndDelete(ScheduleTimer);
+    else
+	delete ScheduleTimer;
+
+    if(BeaconTimer->isScheduled())
+	cancelAndDelete(BeaconTimer);
+    else
+	delete BeaconTimer;
+
+    if(StartTimer->isScheduled())
+	cancelAndDelete(StartTimer);
+    else
+	delete StartTimer;
+
+    if(AssociateWaitTimer->isScheduled())
+	cancelAndDelete(AssociateWaitTimer);
+    else
+	delete AssociateWaitTimer;
+
+    if(ScanTimer->isScheduled())
+	cancelAndDelete(ScanTimer);
+    else
+	delete ScanTimer;
+
+    if(BeaconScanTimer->isScheduled())
+	cancelAndDelete(BeaconScanTimer);
+    else
+	delete BeaconScanTimer;
+
+    if(DisassociateWaitTimer->isScheduled())
+	cancelAndDelete(DisassociateWaitTimer);
+    else
+	delete DisassociateWaitTimer;
 }
 
 void RLL::initialize(int stage)
@@ -82,6 +115,7 @@ void RLL::initialize(int stage)
 
 	clusterTable = check_and_cast<IRLLClusterTable *>(getModuleByPath(par("RLLClusterTableModule")));
 
+	beaconTable = check_and_cast<cBeaconTable *>(getModuleByPath(par("cBeaconTableModule")));
 	lowerLayerIn = findGate("lowerLayerIn");
 	lowerLayerOut = findGate("lowerLayerOut");
 	upperLayerIn = findGate("upperLayerIn");
@@ -98,6 +132,7 @@ void RLL::initialize(int stage)
 	DisassociateWaitTimer = new cMessage("DisassociateWaitTimer", DISASSOCIATION_WAIT_TIMER);
 	BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
 	ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
+	StartTimer = new cMessage("StartTimer", START_TIMER);
     }
     else if(stage == 4)
     {
@@ -112,9 +147,26 @@ void RLL::initialize(int stage)
 	    nCluStage = -1;
 	    nScanDuration = 0;
 	}
+	nRestartCounter = 0;
+	bNotAssociated = true;
+	bAssociateDirectly = false;
+	nScanCounter = 0;
 
 	WATCH(nLastSCANChannel);
 	WATCH(nScanDuration);
+
+	double start = 0.0;
+	if(!bIsPANCoor)
+	{
+
+	    start = par("StartTime").doubleValue();
+
+	}
+	else
+	{
+	    start = 0;
+	}
+	scheduleAt(simTime() + start, StartTimer);
     }
 }
 void RLL::finish()
@@ -213,6 +265,7 @@ void RLL::handleMACMessage(cMessage *msg)
 	    break;
 	}
 	    // TODO: Add case for handling data messages
+
 	default:
 	{
 	    delete msg;
@@ -295,7 +348,7 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
     Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     if(tmp->getPanCoordinator() && bIsPANCoor)
     {
-	clusterTable->addEntry(nCluStage + 1, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator());
+	clusterTable->addEntry(nCluStage + 1, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
 	//tmp->getPanCoordinator(), nCluStage + 1, tmp->getAssocShortAddress(), tmp->getPanId());
 	macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	tmpEntry->setStage(nCluStage + 1);
@@ -307,7 +360,7 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
     }
     else if(tmp->getPanCoordinator() && !bIsPANCoor)
     {
-	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator());
+	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
 	macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	tmpEntry->setStage(nCluStage);
 	tmpEntry->isMyCH(tmp->getPanCoordinator());
@@ -319,7 +372,7 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
     }
     else
     {
-	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", false);
+	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", false, tmp->getPanId());
 	macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	tmpEntry->setStage(nCluStage);
 	tmpEntry->isNextStageCH(false);
@@ -360,7 +413,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
 	cDisplayString* tempStr = new cDisplayString();
 
-	const char* temp = getParentModule()->getParentModule()->getName();
+	const char* temp = getParentModule()->getName();
 	if(!strcmp(temp, "lightSwitch"))
 	{
 	    tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
@@ -377,7 +430,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	if(tmp->getPanCoordinator() && bIsPANCoor)
 	{
 	    nCluStage = tmp->getStage() + 1;
-	    clusterTable->addEntry(nCluStage - 1, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator());
+	    clusterTable->addEntry(nCluStage - 1, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
 	    macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	    tmpEntry->setStage(nCluStage - 1);
 	    tmpEntry->isNextStageCH(false);
@@ -389,7 +442,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	else if(tmp->getPanCoordinator() && !bIsPANCoor)
 	{
 	    nCluStage = tmp->getStage();
-	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator());
+	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
 	    macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	    tmpEntry->setStage(nCluStage);
 	    tmpEntry->isMyCH(tmp->getPanCoordinator());
@@ -401,7 +454,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	}
 	else
 	{
-	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", false);
+	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", false, tmp->getPanId());
 	    macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	    tmpEntry->setStage(nCluStage);
 	    tmpEntry->isNextStageCH(false);
@@ -433,7 +486,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	bNotAssociated = true;
 	cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
 	cDisplayString* tempStr = new cDisplayString();
-	const char* temp = getParentModule()->getParentModule()->getName();
+	const char* temp = getParentModule()->getName();
 	if(!strcmp(temp, "lightSwitch"))
 	{
 	    tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
@@ -538,7 +591,7 @@ void RLL::handle_MLME_START_confirm(cMessage *msg)
     Ieee802154eNetworkCtrlInfo *startCo = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
     cDisplayString* tempStr = new cDisplayString();
-    const char* temp = getParentModule()->getParentModule()->getName();
+    const char* temp = getParentModule()->getName();
     if(!strcmp(temp, "lightSwitch"))
     {
 	tempStr->parse("b=0.1,0.1,rect;i=lighting/lightswitch");
@@ -586,7 +639,7 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	    if(nScanDuration > 6)
 		nScanDuration = 0;
 
-	    if(BeaconTable.getNumberBeacons() == 0)
+	    if(beaconTable->getNumberBeacons() == 0)
 	    {
 		scanReq->setChannel(channelList[0]);
 		nLastSCANChannel = channelList[0];
@@ -625,45 +678,295 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 
 void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 {
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg) && bNotAssociated)
+    {
+
+	Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	Radio80211aControlInfo *control = check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo());
+	if(!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
+	    beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime(), control->getLossRate(), calcDistance(control->getLossRate(), control->getRecPow()));
+	else
+	    beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime());
+    }
+    else
+    {
+	if(msg == NULL)
+	{
+
+	    double rxpower, rssi, txPower, distance;
+	    Ieee802154EnhancedBeaconFrame *tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
+
+	    if(rssi < 20 && bCapablePanCoor)
+	    {
+
+		bIsPANCoor = true;
+	    }
+	    else if(nRestartCounter < 3)
+	    {
+		nRestartCounter++;
+		beaconTable->flushBeaconTable();
+		RESTART_request(NULL);
+	    }
+	    tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
+	    if(tmpBcn != NULL)
+		MLME_SET_BEACON_request(tmpBcn);
+
+	    beaconTable->flushBeaconTable();
+	}
+    }
 }
 
 //set Beacon
 void RLL::MLME_SET_BEACON_request(cMessage *msg)
 {
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
+    {
+
+	Ieee802154EnhancedBeaconFrame * tmp = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	if(bIsPANCoor)
+	{
+	    nBO = tmp->getBO();
+	    nSO = tmp->getSO();
+	}
+	tmp->setKind(TP_MLME_SET_BEACON_REQUEST);
+	tmp->setName("SetSlotRequest");
+	send(tmp->dup(), lowerLayerOut);
+	delete tmp;
+    }
+    else
+    {
+
+	Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("SetSlotRequest", TP_MLME_SET_BEACON_REQUEST);
+
+	send(tmp->dup(), lowerLayerOut);
+	delete tmp;
+	delete msg;
+    }
 }
 
 void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 {
+    EV << "[SCHEDULER]: Recieved information from coordinator, start Association process" << endl;
+
+    if(bIsPANCoor)
+	fBI = pow(2, nBO) * nSO * timeslotTable->getTemplate(0)->getTimeslotLengthDbl();
+
+    if(bIsPANCoor)
+    {
+	if(bNotAssociated)
+	{
+	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (200 - 0);
+	    if(!AssociateTimer->isScheduled())
+		scheduleAt(simTime() + waitTime, AssociateTimer);
+	}
+    }
+    else
+    {
+	if(bNotAssociated)
+	{
+	    double waitTime = 0 + ((double)rand() / RAND_MAX) * (10 - 0);
+	    if(!bAssociateDirectly)
+	    {
+		waitTime = 300 + ((double)rand() / RAND_MAX) * (700 - 300); //FIXME: Make it variable or changable by init parameters;
+		bAssociateDirectly = true;
+	    }
+	    if(!AssociateTimer->isScheduled())
+		scheduleAt(simTime() + waitTime, AssociateTimer);
+	}
+    }
+
+    delete msg;
 }
 
 //retrieve schedule
 void RLL::SCHEDULE_request(cMessage *msg)
 {
+    Ieee802154eMulHoCluFrame *scheduleFrame = new Ieee802154eMulHoCluFrame("ScheduleRequest", TP_SCHEDULE_REQUEST);
+    if(neighborTable->getAddressFromCH() != MACAddress::UNSPECIFIED_ADDRESS)
+    {
+	scheduleFrame->setDstAddr(neighborTable->getAddressFromCH());
+	scheduleFrame->setDstPanId(clusterTable->getEntryByShrtAddr(neighborTable->getNeighborByEAddr(neighborTable->getAddressFromCH())->getShortAddress())->getPanId());
+	scheduleFrame->setTimeslot(linkTable->getTimeSlotByOffset(-1));
+    }
+    else
+	return;
+
+    send(scheduleFrame->dup(), lowerLayerOut);
+    delete scheduleFrame;
 }
 void RLL::handle_SCHEDULE_indication(cMessage *msg)
 {
+    Ieee802154eMulHoCluFrame *scheduleFrame = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
+    scheduleFrame->setChannelOffset(linkTable->getOffsetByTimeslot(scheduleFrame->getTimeslot()));
+
+    SCHEDULE_response(scheduleFrame->dup());
+
+    delete scheduleFrame;
 }
 void RLL::SCHEDULE_response(cMessage *msg)
 {
+    Ieee802154eMulHoCluFrame *scheduleFrame = new Ieee802154eMulHoCluFrame("ScheduleResponse", TP_SCHEDULE_RESPONSE);
+    Ieee802154eMulHoCluFrame *tempFrame = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
+
+    scheduleFrame->setDstAddr(tempFrame->getSrcAddr());
+    scheduleFrame->setDstPanId(tempFrame->getSrcPanId());
+    scheduleFrame->setTimeslot(tempFrame->getTimeslot());
+    scheduleFrame->setChannelOffset(tempFrame->getChannelOffset());
+
+    send(scheduleFrame->dup(), lowerLayerOut);
+    delete scheduleFrame;
+    delete tempFrame;
 }
 void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 {
+    if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+    {
+	Ieee802154eMulHoCluFrame *frame = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
+
+	macLinkTableEntry *entry = linkTable->getLinkByTimeslot(frame->getTimeslot());
+	entry->setChannelOffset(frame->getChannelOffset());
+
+	if(linkTable->getTimeSlotByOffset(-1) != -1)
+	{
+	    if(ScheduleTimer->isScheduled())
+		cancelEvent(ScheduleTimer);
+	    scheduleAt(simTime(), ScheduleTimer);
+	}
+	delete frame;
+    }
+    else
+	delete msg;
+
 }
 
 //PAN COORD check for beacon from CH same stage
 void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 {
+    if(nScanCounter < 4)
+    {
+	nScanCounter++;
+	int waitConstant = intuniform(2, 5);
+	if(!BeaconScanTimer->isScheduled())
+	    scheduleAt(simTime() + (fBI * waitConstant), BeaconScanTimer);
+    }
+    else
+    {
+	if(beaconTable->CHinDistance(15))
+	{
+	    MLME_DISASSOCIATE_request(NULL);
+	}
+	else
+	    MLME_BEACON_request(NULL);
+    }
 }
 void RLL::handle_BEACON_CH_SAME_STAGE(cMessage *msg)
 {
+    Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+    Radio80211aControlInfo *control = check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo());
+    if(!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
+	beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime(), control->getLossRate(), calcDistance(control->getLossRate(), control->getRecPow()));
+    else
+	beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime());
 }
 
 void RLL::RESTART_request(cMessage *msg)
 {
+    Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("Restart", TP_RESTART_REQUEST);
+
+    send(cnt->dup(), lowerLayerOut);
+    delete cnt;
+    delete msg;
 }
 
 void RLL::handle_RESTART_confirm(cMessage *msg)
 {
+    linkTable->clearTable();
+    neighborTable->clearTable();
+    hoppingSequenceList->clearTable();
+    timeslotTable->clearTable();
+    slotframeTable->clearTable();
+    clusterTable->clearTable();
+    beaconTable->flushBeaconTable();
+    nLastSCANChannel = 0;
+    nScanCounter = 3;
+
+    bCapablePanCoor = false;
+    if(bCapablePanCoor)
+	bIsPANCoor = par("isPANCoor").boolValue();
+    else
+	bIsPANCoor = false;
+
+    bAssociateDirectly = false;
+    if(AssociateTimer->isScheduled())
+	cancelAndDelete(AssociateTimer);
+    else
+	delete AssociateTimer;
+
+    if(ScheduleTimer->isScheduled())
+	cancelAndDelete(ScheduleTimer);
+    else
+	delete ScheduleTimer;
+
+    if(BeaconTimer->isScheduled())
+	cancelAndDelete(BeaconTimer);
+    else
+	delete BeaconTimer;
+
+    if(StartTimer->isScheduled())
+	cancelAndDelete(StartTimer);
+    else
+	delete StartTimer;
+
+    if(AssociateWaitTimer->isScheduled())
+	cancelAndDelete(AssociateWaitTimer);
+    else
+	delete AssociateWaitTimer;
+
+    if(ScanTimer->isScheduled())
+	cancelAndDelete(ScanTimer);
+    else
+	delete ScanTimer;
+
+    if(BeaconScanTimer->isScheduled())
+	cancelAndDelete(BeaconScanTimer);
+    else
+	delete BeaconScanTimer;
+
+    if(DisassociateWaitTimer->isScheduled())
+	cancelAndDelete(DisassociateWaitTimer);
+    else
+	delete DisassociateWaitTimer;
+    AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
+    ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
+    BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
+    StartTimer = new cMessage("StartTimer", START_TIMER);
+    AssociateWaitTimer = new cMessage("AssociationWaitTimer", ASSOCIATION_WAIT_TIMER);
+    ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
+    BeaconScanTimer = new cMessage("BeaconScanTimer", SCHEDULE_BEACON_SCAN_TIMER);
+    DisassociateWaitTimer = new cMessage("DisassociateWaitTimer", DISASSOCIATION_WAIT_TIMER);
+
+//    fSensitivity = par("Sensitivity").doubleValue();
+//    fPCH = par("pCh").doubleValue();
+//    fTransmitterPower = par("transmitterPower").doubleValue();
+    bNotAssociated = true;
+    if(bIsPANCoor)
+    {
+	nCluStage = 0;
+	createInitialEntries();
+
+	nScanDuration = -1;
+    }
+    else
+    {
+	nCluStage = -1;
+	nScanDuration = 0;
+
+    }
+
+    double start = 0.0;
+
+    scheduleAt(simTime(), StartTimer);
+    delete msg;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1138,4 +1441,15 @@ void RLL::setScheduleCs()
     linkEntry->setTimeslot(11);
     linkEntry->setLinkId(linkTable->getNumLinks());
     linkTable->addLink(linkEntry);
+}
+
+double RLL::calcDistance(double transPowmW, double minRecvPowermW)
+{
+    double lambda = SPEED_OF_LIGHT / 2.4e9;
+    double temp1 = transPowmW * pow(lambda, 2);
+    double temp2 = (16 * pow(3.14, 2) * minRecvPowermW);
+    double temp3 = temp1 / temp2;
+    double temp4 = 1.0 / 3.0;
+    double temp5 = pow(temp3, temp4);
+    return temp5;
 }

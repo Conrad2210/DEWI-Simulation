@@ -23,6 +23,7 @@
 #include "IMacTimeslotTable.h"
 #include "IMacHoppingSequenceList.h"
 #include "IMacNeighborTable.h"
+#include "cBeaconTable.h"
 
 class INET_API RLL : public cSimpleModule
 {
@@ -125,8 +126,11 @@ class INET_API RLL : public cSimpleModule
 	// @brief cluster information table
 	IRLLClusterTable *clusterTable;
 
+	cBeaconTable *beaconTable;
+
 	//TIMER
     protected:
+	cMessage *StartTimer;
 	cMessage *AssociateTimer;
 	cMessage *AssociateWaitTimer;
 	cMessage *ScheduleTimer;
@@ -162,6 +166,16 @@ class INET_API RLL : public cSimpleModule
 	// Variable to set the length of the initial channel scan period
 	int nScanDuration;
 
+	//counts the restarts
+	int nRestartCounter;
+
+	//tried to associate more than once
+	bool bAssociateDirectly;
+
+	//For PanCoord,
+	//after association store's the number of scans for beacon
+	int nScanCounter;
+
     private:
 	////////////////////////////////////////////////////////////////////////
 	//			Helper Functions
@@ -173,6 +187,18 @@ class INET_API RLL : public cSimpleModule
 	void setScheduleChStZe();
 	void setScheduleChInit();
 	void setScheduleCs();
+
+	double calcDistance(double transPowmW, double minRecvPowermW);
+
+	double mWTodBm(double mW)
+	{
+	    return 10 * log10(mW);
+	}
+
+	double dBmTomW(double dBm)
+	{
+	    return pow(10, dBm / 10);
+	}
 };
 
 #endif /* RLL_H_ */
