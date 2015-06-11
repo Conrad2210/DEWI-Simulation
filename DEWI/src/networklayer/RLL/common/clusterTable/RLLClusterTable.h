@@ -58,7 +58,7 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 	 * allows macSlotframeTable internals to be updated on a Slotframe entry change.)
 	 */
 	virtual bool addEntry(RLLClusterTableEntry *entry);
-	virtual bool addEntry(int stage,UINT_16 address, char* name, bool is);
+	virtual bool addEntry(int stage,UINT_16 address, char* name, bool is, UINT_16 id);
 
 	/*
 	 * Deletes the given slotframe from the macSlotframeTable.

@@ -106,7 +106,7 @@ bool RLLClusterTable::addEntry(RLLClusterTableEntry *entry)
 
 }
 
-bool RLLClusterTable::addEntry(int stage, UINT_16 address, char* name, bool is)
+bool RLLClusterTable::addEntry(int stage, UINT_16 address, char* name, bool is, UINT_16 id)
 {
     RLLClusterTableEntry *entry = new RLLClusterTableEntry();
 
@@ -121,6 +121,7 @@ bool RLLClusterTable::addEntry(int stage, UINT_16 address, char* name, bool is)
     entry->setAddress(address);
     entry->setNodeName(name);
     entry->setIsCH(is);
+    entry->setPanId(id);
     entryTable.push_back(entry);
 
     return true;
