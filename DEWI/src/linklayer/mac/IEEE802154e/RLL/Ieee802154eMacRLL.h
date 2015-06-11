@@ -29,6 +29,59 @@ class Ieee802154eMacRLL : public Ieee802154eMac
 	    return 5;
 	}
 	virtual void initialize(int stage);
+    protected:
+	virtual void handleMessage(cMessage *msg);
+	virtual void handleSchedulerMsg(cMessage *msg);
+	virtual void handleLowerMsg(cPacket*);
+	virtual void handleSelfMsg(cMessage*);
+
+
+
+	virtual void handle_MLME_ASSOCIATE_request(cMessage *msg);
+	virtual void MLME_ASSOCIATE_indication(cMessage *msg);
+	virtual void handle_MLME_ASSOCIATE_response(cMessage *msg);
+	virtual void MLME_ASSOCIATE_confirm(cMessage *msg);
+	virtual void handle_MLME_DISASSOCIATE_request(cMessage *msg);
+	virtual void MLME_DISASSOCIATE_indication(cMessage *msg);
+	virtual void handle_MLME_DISASSOCIATE_response(cMessage *msg);
+	virtual void MLME_DISASSOCIATE_confirm(cMessage *msg);
+
+	virtual void handle_MLME_SCAN_request(cMessage *msg);
+	virtual void MLME_SCAN_confirm(cMessage *msg);
+
+	virtual void handle_MLME_START_request(cMessage *msg);
+	virtual void MLME_START_confirm(MACenum status);
+
+	virtual void handle_MLME_BEACON_request(cMessage *msg);
+	virtual void MLME_BEACON_confirm(MACenum status);
+	virtual void MLME_BEACON_NOTIFY_indication(cMessage *msg);
+
+	virtual void handle_MLME_SET_SLOTFRAME_request(cMessage *msg);
+
+	//SCHEDULE
+
+	virtual void handle_SCHEDULE_request(cMessage *msg);
+	virtual void SCHEDULE_indication(cMessage *msg);
+	virtual void handle_SCHEDULE_response(cMessage *msg);
+	virtual void SCHEDULE_confirm(cMessage *msg, bool ack);
+
+	//Multihop CLustering
+	virtual void handle_RESTART_request(cMessage *msg);
+	virtual void RESTART_confirm(cMessage *msg);
+
+	virtual void handleAwaitingBeaconTimer();
+
+	virtual void handleEB(cMessage *msg);
+	virtual void handleAck(Ieee802154eFrame *frame);
+
+	virtual void handleAsnTimer();
+	virtual void handleTsAckWait();
+
+    protected:
+	bool awaitingNextBeacon;
+
+	cMessage* awaitingBeacon;
+	cMessage *scanTimer;
 };
 
 #endif /* IEEE802154EMACRLL_H_ */
