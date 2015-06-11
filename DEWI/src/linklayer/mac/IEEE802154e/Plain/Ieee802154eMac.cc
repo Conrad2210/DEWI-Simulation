@@ -981,7 +981,7 @@ void Ieee802154eMac::handleMessage(cMessage* msg)
 
 /**@author: 2014    Stefan Reis     (modified)
  * (the structure is copied from the PHY layer) */
-void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP (Command messages) - XXX: not in use
+bool Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP (Command messages) - XXX: not in use
 {
     Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     switch(msgkind)
@@ -1055,9 +1055,13 @@ void Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
 	    break;
 
 	default:
-	    error("[MAC]: unknown primitive received (msgkind=%d)", msgkind);
+	    if(ev.isGUI())
+		EV <<"[MAC]: unknown primitive received (msgkind=%d)" << msgkind;
+	    //delete primitive;
+	    return false;
 	    break;
     }
+    return true;
 }
 
 /**@author: 2014    Stefan Reis     (modified) */

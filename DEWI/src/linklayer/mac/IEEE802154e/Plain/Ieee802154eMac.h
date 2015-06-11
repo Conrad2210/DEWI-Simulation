@@ -219,7 +219,7 @@ class INET_API Ieee802154eMac : public WirelessMacBase
 	virtual void handleMessage(cMessage *msg);
 	virtual void handleSelfMsg(cMessage*);
 	virtual void handleUpperMsg(cPacket*);   // for MCPS-SAP (Data)
-	virtual void handlePrimitive(int msgkind, cMessage *msg);  // for MLME-SAP (Commands)
+	virtual bool handlePrimitive(int msgkind, cMessage *msg);  // for MLME-SAP (Commands)
 	virtual void handleLowerMsg(cPacket*);
 	virtual void handleMacPhyPrimitive(int, cMessage*);
 	virtual void handleBeacon(Ieee802154eFrame*);
