@@ -161,7 +161,7 @@ class INET_API RLL : public cSimpleModule
 	double fBI;
 
 	//variable to store the channel which was scanned before
-	int nLastSCANChannel = 0;
+	int nLastSCANChannel;
 
 	// Variable to set the length of the initial channel scan period
 	int nScanDuration;
