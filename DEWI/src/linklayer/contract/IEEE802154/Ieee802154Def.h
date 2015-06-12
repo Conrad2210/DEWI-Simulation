@@ -9,6 +9,11 @@ typedef uint32_t      UINT_32;
 typedef uint64_t      UINT_64;
 typedef MACAddress    IE3ADDR;    //actually this should be a 64-bit address, but we use 16-bit address here for convenience (in this way, we don't need to distinguish IEEE address from short logical address or worry about platform compatibility problems caused by 64-bit integer or byte order)
 
+
+typedef uint8_t       UINT8;
+typedef uint16_t      UINT16;
+typedef uint32_t      UINT32;
+typedef uint64_t      UINT64;
 #endif
 
 
