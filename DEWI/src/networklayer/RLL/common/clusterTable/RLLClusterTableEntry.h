@@ -61,7 +61,7 @@ class INET_API RLLClusterTableEntry : public cObject
 	void setAddress(UINT_16 i = 0x00) {address = i;}
 
 	char *getNodeName(){return nodeName;}
-	void setNodeName(char *c = ""){nodeName = c;}
+	void setNodeName(char *c = (char*)""){nodeName = c;}
 
 	bool getIsCH() {return isCH;}
 	void setIsCH(bool b = false){isCH = b;}

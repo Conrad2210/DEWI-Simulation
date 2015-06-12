@@ -338,6 +338,7 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 	    send(tmp->dup(), lowerLayerOut);
 	    scheduleAt(simTime() + 5, AssociateWaitTimer);
 	    delete tmp;
+	    tmp = NULL;
 	}
     }
 
@@ -348,7 +349,7 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
     Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     if(tmp->getPanCoordinator() && bIsPANCoor)
     {
-	clusterTable->addEntry(nCluStage + 1, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
+	clusterTable->addEntry(nCluStage + 1, tmp->getAssocShortAddress(), (char*)"", tmp->getPanCoordinator(), tmp->getPanId());
 	//tmp->getPanCoordinator(), nCluStage + 1, tmp->getAssocShortAddress(), tmp->getPanId());
 	macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	tmpEntry->setStage(nCluStage + 1);
@@ -360,7 +361,7 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
     }
     else if(tmp->getPanCoordinator() && !bIsPANCoor)
     {
-	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
+	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*)"", tmp->getPanCoordinator(), tmp->getPanId());
 	macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	tmpEntry->setStage(nCluStage);
 	tmpEntry->isMyCH(tmp->getPanCoordinator());
@@ -372,7 +373,7 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
     }
     else
     {
-	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", false, tmp->getPanId());
+	clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*)"", false, tmp->getPanId());
 	macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	tmpEntry->setStage(nCluStage);
 	tmpEntry->isNextStageCH(false);
@@ -410,7 +411,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
     if(tmp->getStatus() == mac_FastA_successful)
     {
 	bNotAssociated = false;
-	cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+	cDisplayString* parentDisp = &getParentModule()->getDisplayString();
 	cDisplayString* tempStr = new cDisplayString();
 
 	const char* temp = getParentModule()->getName();
@@ -430,7 +431,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	if(tmp->getPanCoordinator() && bIsPANCoor)
 	{
 	    nCluStage = tmp->getStage() + 1;
-	    clusterTable->addEntry(nCluStage - 1, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
+	    clusterTable->addEntry(nCluStage - 1, tmp->getAssocShortAddress(), (char*)"", tmp->getPanCoordinator(), tmp->getPanId());
 	    macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	    tmpEntry->setStage(nCluStage - 1);
 	    tmpEntry->isNextStageCH(false);
@@ -442,7 +443,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	else if(tmp->getPanCoordinator() && !bIsPANCoor)
 	{
 	    nCluStage = tmp->getStage();
-	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", tmp->getPanCoordinator(), tmp->getPanId());
+	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*)"", tmp->getPanCoordinator(), tmp->getPanId());
 	    macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	    tmpEntry->setStage(nCluStage);
 	    tmpEntry->isMyCH(tmp->getPanCoordinator());
@@ -454,7 +455,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	}
 	else
 	{
-	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), "", false, tmp->getPanId());
+	    clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*)"", false, tmp->getPanId());
 	    macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 	    tmpEntry->setStage(nCluStage);
 	    tmpEntry->isNextStageCH(false);
@@ -484,7 +485,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
     else
     {
 	bNotAssociated = true;
-	cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+	cDisplayString* parentDisp = &getParentModule()->getDisplayString();
 	cDisplayString* tempStr = new cDisplayString();
 	const char* temp = getParentModule()->getName();
 	if(!strcmp(temp, "lightSwitch"))
@@ -501,6 +502,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
     }
 
     delete tmp;
+    tmp = NULL;
 }
 
 //Dissassociation Process
@@ -510,6 +512,7 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
     //scheduleAt(simTime()+2,DisassociateWaitTimer);
     send(cnt->dup(), lowerLayerOut);
     delete cnt;
+    cnt = NULL;
 }
 
 void RLL::handle_MLME_DIASSOCIATE_indication(cMessage *msg)
@@ -520,6 +523,7 @@ void RLL::handle_MLME_DIASSOCIATE_indication(cMessage *msg)
     MLME_DISASSOCIATE_response(tmpMsg->dup());
 
     delete tmpMsg;
+    tmpMsg = NULL;
 }
 void RLL::MLME_DISASSOCIATE_response(cMessage *msg)
 {
@@ -527,6 +531,7 @@ void RLL::MLME_DISASSOCIATE_response(cMessage *msg)
     tmpMsg->setKind(TP_MLME_DISASSOCIATE_RESPONSE);
     send(tmpMsg->dup(), lowerLayerOut);
     delete tmpMsg;
+    tmpMsg = NULL;
 
 }
 
@@ -539,6 +544,7 @@ void RLL::handle_MLME_DIASSOCIATE_confirm(cMessage *msg)
     RESTART_request(NULL);
 
     delete tmpMsg;
+    tmpMsg = NULL;
 }
 
 //Advertisment
@@ -551,7 +557,9 @@ void RLL::MLME_BEACON_request(cMessage *msg)
 
     send(tempMsg->dup(), lowerLayerOut);
     delete tempMsg;
+    tempMsg = NULL;
     delete msg;
+    msg = NULL;
 }
 
 void RLL::handle_MLME_BEACON_confirm(cMessage *msg)
@@ -562,6 +570,7 @@ void RLL::handle_MLME_BEACON_confirm(cMessage *msg)
 	cancelEvent(BeaconTimer);
     scheduleAt(simTime() + time, BeaconTimer);
     delete beaconCon;
+    beaconCon = NULL;
 }
 
 void RLL::handle_MLME_BEACON_indication(cMessage *msg)
@@ -584,12 +593,13 @@ void RLL::MLME_START_request(cMessage *msg)
     startMsg->setStartTime((uint32_t)par("StartTime").doubleValue());
     send(startMsg->dup(), lowerLayerOut);
     delete startMsg;
+    startMsg = NULL;
 }
 
 void RLL::handle_MLME_START_confirm(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *startCo = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-    cDisplayString* parentDisp = &getParentModule()->getParentModule()->getDisplayString();
+    cDisplayString* parentDisp = &getParentModule()->getDisplayString();
     cDisplayString* tempStr = new cDisplayString();
     const char* temp = getParentModule()->getName();
     if(!strcmp(temp, "lightSwitch"))
@@ -609,13 +619,17 @@ void RLL::handle_MLME_START_confirm(cMessage *msg)
     }
     if(startCo->getPanCoordinator())
     {
-	MLME_BEACON_request(msg);
+	MLME_BEACON_request(msg->dup());
     }
     else
     {
-	MLME_SCAN_request(msg);
+	MLME_SCAN_request(msg->dup());
     }
     parentDisp->updateWith(*tempStr);
+    delete startCo;
+    startCo = NULL;
+    msg = NULL;
+
 }
 
 //SCAN
@@ -673,7 +687,9 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 
     }
     delete scanReq;
+    scanReq = NULL;
     delete msg;
+    msg = NULL;
 }
 
 void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
@@ -709,8 +725,10 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 	    }
 	    tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
 	    if(tmpBcn != NULL)
-		MLME_SET_BEACON_request(tmpBcn);
+		MLME_SET_BEACON_request(tmpBcn->dup());
 
+	    delete tmpBcn;
+	    tmpBcn = NULL;
 	    beaconTable->flushBeaconTable();
 	}
     }
@@ -732,6 +750,8 @@ void RLL::MLME_SET_BEACON_request(cMessage *msg)
 	tmp->setName("SetSlotRequest");
 	send(tmp->dup(), lowerLayerOut);
 	delete tmp;
+	tmp = NULL;
+	msg = NULL;
     }
     else
     {
@@ -740,7 +760,9 @@ void RLL::MLME_SET_BEACON_request(cMessage *msg)
 
 	send(tmp->dup(), lowerLayerOut);
 	delete tmp;
+	tmp = NULL;
 	delete msg;
+	msg = NULL;
     }
 }
 
@@ -776,6 +798,7 @@ void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
     }
 
     delete msg;
+    msg = NULL;
 }
 
 //retrieve schedule
@@ -793,6 +816,7 @@ void RLL::SCHEDULE_request(cMessage *msg)
 
     send(scheduleFrame->dup(), lowerLayerOut);
     delete scheduleFrame;
+    scheduleFrame = NULL;
 }
 void RLL::handle_SCHEDULE_indication(cMessage *msg)
 {
@@ -802,6 +826,9 @@ void RLL::handle_SCHEDULE_indication(cMessage *msg)
     SCHEDULE_response(scheduleFrame->dup());
 
     delete scheduleFrame;
+    scheduleFrame = NULL;
+    delete msg;
+    msg = NULL;
 }
 void RLL::SCHEDULE_response(cMessage *msg)
 {
@@ -815,7 +842,11 @@ void RLL::SCHEDULE_response(cMessage *msg)
 
     send(scheduleFrame->dup(), lowerLayerOut);
     delete scheduleFrame;
+    scheduleFrame = NULL;
     delete tempFrame;
+    tempFrame = NULL;
+    delete msg;
+    msg = NULL;
 }
 void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 {
@@ -833,9 +864,15 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 	    scheduleAt(simTime(), ScheduleTimer);
 	}
 	delete frame;
+	frame = NULL;
+	delete msg;
+	msg = NULL;
     }
     else
+    {
 	delete msg;
+	msg = NULL;
+    }
 
 }
 
@@ -875,7 +912,9 @@ void RLL::RESTART_request(cMessage *msg)
 
     send(cnt->dup(), lowerLayerOut);
     delete cnt;
+    cnt = NULL;
     delete msg;
+    msg = NULL;
 }
 
 void RLL::handle_RESTART_confirm(cMessage *msg)
@@ -963,7 +1002,7 @@ void RLL::handle_RESTART_confirm(cMessage *msg)
 
     }
 
-    double start = 0.0;
+    //double start = 0.0;
 
     scheduleAt(simTime(), StartTimer);
     delete msg;

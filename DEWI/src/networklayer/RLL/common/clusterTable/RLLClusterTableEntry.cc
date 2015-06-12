@@ -27,7 +27,7 @@ RLLClusterTableEntry::RLLClusterTableEntry()
     id = -1;
     stage = -1;
     address = 0x00;
-    nodeName = "";
+    nodeName = (char*)"";
     isCH = false;
     panId = 0x00;
 
@@ -80,7 +80,7 @@ void RLLClusterTableEntry::resetEntry()
     ownerp = NULL;
     stage = -1;
     address = 0x00;
-    nodeName  = "";
+    nodeName  = (char*)"";
     isCH = false;
 
 }

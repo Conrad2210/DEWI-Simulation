@@ -31,7 +31,7 @@ class Ieee802154eMacRLL : public Ieee802154eMac
 	virtual void initialize(int stage);
     protected:
 	virtual void handleMessage(cMessage *msg);
-	virtual void handleSchedulerMsg(cMessage *msg);
+	virtual bool handleSchedulerMsg(cMessage *msg);
 	virtual void handleLowerMsg(cPacket*);
 	virtual void handleSelfMsg(cMessage*);
 

@@ -63,6 +63,7 @@ cModule *RLLClusterTable::getHostModule()
 {
 
     // return findContainingNode(this);
+    return NULL;
 }
 
 void RLLClusterTable::handleMessage(cMessage *msg)
@@ -94,7 +95,7 @@ bool RLLClusterTable::addEntry(RLLClusterTableEntry *entry)
 
     entry->setEntryId(entryTable.size());
 
-    if(getEntryById(entry->getEntryId() != NULL))
+    if(getEntryById(entry->getEntryId()) != NULL)
     {
 	throw cRuntimeError("addTable(): cluster entry '%d' already exists in clusterTable", entry->getEntryId());
 	return false;
@@ -111,7 +112,7 @@ bool RLLClusterTable::addEntry(int stage, UINT_16 address, char* name, bool is, 
     RLLClusterTableEntry *entry = new RLLClusterTableEntry();
 
     entry->setEntryId(entryTable.size());
-    if(getEntryById(entry->getEntryId() != NULL))
+    if(getEntryById(entry->getEntryId()) != NULL)
     {
 	throw cRuntimeError("addTable(): cluster entry '%d' already exists in clusterTable", entry->getEntryId());
 	return false;
@@ -232,7 +233,7 @@ RLLClusterTableEntry *RLLClusterTable::getEntryById(int id)
 }
 RLLClusterTableEntry *RLLClusterTable::getEntryByShrtAddr(UINT_16 address)
 {
-    for(int i = 0; i < entryTable.size(); i++)
+    for(int i = 0; i < (int)entryTable.size(); i++)
     {
 	if(address == entryTable.at(i)->getAddress())
 	    return entryTable.at(i);

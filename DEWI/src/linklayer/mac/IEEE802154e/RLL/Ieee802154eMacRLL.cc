@@ -20,8 +20,8 @@ Define_Module(Ieee802154eMacRLL);
 Ieee802154eMacRLL::Ieee802154eMacRLL()
 {
 
-	awaitingBeacon = NULL;
-	scanTimer = NULL;
+    awaitingBeacon = NULL;
+    scanTimer = NULL;
 
 }
 
@@ -60,18 +60,16 @@ void Ieee802154eMacRLL::handleMessage(cMessage *msg)
 	return;
     }
 
-    if(msg->getArrivalGateId() == mUpperLayerIn && dynamic_cast<cPacket*>(msg) == NULL)
-    {
-	if(msg->getKind() == 0)
-	    error("[MAC]: message '%s' with length == 0 is supposed to be a primitive, but msg kind is also zero", msg->getName());
-
-	if(!handlePrimitive(msg->getKind(), msg)) // from NET layer - command messages
-	{
-	    handleSchedulerMsg(msg);
-	}
-	//XXX: note: not in use, not for the StarNet or the CSMA802154 example, from the NET layer comes only data packets
-	return;
-    }
+//    if(msg->getArrivalGateId() == mUpperLayerIn && dynamic_cast<cPacket*>(msg) == NULL)
+//    {
+//	if(msg->getKind() == 0)
+//	    error("[MAC]: message '%s' with length == 0 is supposed to be a primitive, but msg kind is also zero", msg->getName());
+//
+//	handlePrimitive(msg->getKind(), msg); // from NET layer - command messages
+//
+//	//XXX: note: not in use, not for the StarNet or the CSMA802154 example, from the NET layer comes only data packets
+//	return;
+//    }
     else if(msg->getArrivalGateId() == mLowerLayerIn)
     {
 	handleLowerMsg(PK(msg));    // from PHY layer - data messages
@@ -86,11 +84,12 @@ void Ieee802154eMacRLL::handleMessage(cMessage *msg)
     }
     else
     {
-	handleUpperMsg(PK(msg)); // from network layer - data and command messages
+	if(!handleSchedulerMsg(msg))
+	    handleUpperMsg(PK(msg)); // from network layer - data and command messages
     }
 }
 
-void Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
+bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 {
     switch(msg->getKind())
     {
@@ -164,11 +163,12 @@ void Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 	{
 	    if(ev.isGUI())
 	    {
-		EV << "Unknown command, delete frame" << endl;
+		EV << "Unknown command, must be Data packet" << endl;
 	    }
-	    delete msg;
+	    return false;
 	}
     }
+    return true;
 }
 
 void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
@@ -945,6 +945,8 @@ void Ieee802154eMacRLL::handle_MLME_SCAN_request(cMessage *msg)
 	isSCAN = false;
     }
     delete scanReq;
+    scanReq = NULL;
+    msg = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_SCAN_confirm(cMessage *msg)
@@ -1019,6 +1021,21 @@ void Ieee802154eMacRLL::MLME_BEACON_confirm(MACenum status)
 
 void Ieee802154eMacRLL::MLME_BEACON_NOTIFY_indication(cMessage *msg)
 {
+    if(dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg) && isPANCoor)
+    {
+	msg->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+	send(msg, mUpperLayerOut);
+    }
+    else
+    {
+	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo();
+	primitive->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
+
+	EV << "[MAC]: sending a MLME-BEACON-NOTIFY.indication to NETWORK" << endl;
+	send(primitive->dup(), mUpperLayerOut);
+	delete primitive;
+	delete msg;
+    }
 }
 
 void Ieee802154eMacRLL::handle_MLME_SET_SLOTFRAME_request(cMessage *msg)
@@ -2099,7 +2116,6 @@ void Ieee802154eMacRLL::handleAsnTimer()
 	taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) = 0;
 	resetTRX();
 	queueModule->deleteBCNQueue();
-
 
 	scheduleAt(simTime(), asnTimer);
     }

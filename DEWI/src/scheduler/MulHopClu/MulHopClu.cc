@@ -37,8 +37,6 @@
 #include <regmacros.h>
 #include <simtime.h>
 #include <simutil.h>
-#include <cstdint>
-#include <cstring>
 #include <iostream>
 #include <vector>
 #include <math.h>

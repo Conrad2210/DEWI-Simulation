@@ -3259,7 +3259,7 @@ void Ieee802154eMac::constructBCN()
 	if(mpib.macTSCHenabled)
 	{ // save in the mac queue
 	  //send(tmpEBcn, mQueueOut);
-	    queueModule->insertInQueue(tmpEBcn);
+	    queueModule->insertInQueue(tmpEBcn->dup());
 	}
 	else
 	{
