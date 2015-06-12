@@ -140,8 +140,11 @@ bool RLLClusterTable::deleteEntry(RLLClusterTableEntry *entry)
 
     if(entry != getEntryById(entry->getEntryId()))
 	throw cRuntimeError("deleteEntry(): entry '%d' not found in clusterTable", entry->getEntryId());
-    entryTable[entry->getEntryId()] = NULL;
-    delete entry;
+
+    entryTable.erase(entryTable.begin()+entry->getEntryId());
+    for(int i  = 0; i < (int)entryTable.size();i++)
+	entryTable.at(i)->setEntryId(i);
+    //delete entry;
     return true;
 }
 

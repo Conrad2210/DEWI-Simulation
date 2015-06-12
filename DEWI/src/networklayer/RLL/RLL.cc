@@ -32,7 +32,7 @@ static const int numChannel = 16;
 
 RLL::RLL()
 {
-
+    nLastSCANChannel = 0;
     bNotAssociated = false;
     nCluStage = -1;
     AssociateTimer = NULL;
@@ -151,6 +151,7 @@ void RLL::initialize(int stage)
 	bNotAssociated = true;
 	bAssociateDirectly = false;
 	nScanCounter = 0;
+	nLastSCANChannel = 0;
 
 	WATCH(nLastSCANChannel);
 	WATCH(nScanDuration);
@@ -197,6 +198,7 @@ void RLL::handleMessage(cMessage *msg)
 	}
 	delete msg;
     }
+    updatedisplay();
 }
 
 void RLL::handleMACMessage(cMessage *msg)
@@ -336,6 +338,8 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("AssociationRequest", TP_MLME_ASSOCIATE_REQUEST);
 	    tmp->setPanCoordinator(bIsPANCoor);
 	    send(tmp->dup(), lowerLayerOut);
+	    if(AssociateWaitTimer->isScheduled())
+		cancelEvent(AssociateWaitTimer);
 	    scheduleAt(simTime() + 5, AssociateWaitTimer);
 	    delete tmp;
 	    tmp = NULL;
@@ -1491,4 +1495,14 @@ double RLL::calcDistance(double transPowmW, double minRecvPowermW)
     double temp4 = 1.0 / 3.0;
     double temp5 = pow(temp3, temp4);
     return temp5;
+}
+
+void RLL::updatedisplay()
+{
+    cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+
+    char buf[40];
+
+    sprintf(buf, "Stage: %ld", nCluStage);
+    parentDisp->setTagArg("t", 0, buf);
 }

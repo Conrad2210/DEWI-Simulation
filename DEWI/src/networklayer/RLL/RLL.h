@@ -199,6 +199,8 @@ class INET_API RLL : public cSimpleModule
 	{
 	    return pow(10, dBm / 10);
 	}
+
+	void updatedisplay();
 };
 
 #endif /* RLL_H_ */
