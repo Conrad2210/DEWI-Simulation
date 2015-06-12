@@ -27,8 +27,8 @@ Ieee802154eMacRLL::Ieee802154eMacRLL()
 
 Ieee802154eMacRLL::~Ieee802154eMacRLL()
 {
-    delete awaitingBeacon;
-    delete scanTimer;
+    cancelAndDelete(awaitingBeacon);
+    cancelAndDelete(scanTimer);
 }
 
 void Ieee802154eMacRLL::initialize(int stage)
