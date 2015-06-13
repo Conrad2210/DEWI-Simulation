@@ -386,8 +386,10 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
 	tmpEntry->isMyCS(true);
 	tmpEntry->isMyCH(false);
     }
-    MLME_ASSOCIATE_response(msg->dup());
-    delete msg;
+    MLME_ASSOCIATE_response(tmp->dup());
+    delete tmp;
+    tmp = NULL;
+    msg = NULL;
 }
 
 void RLL::MLME_ASSOCIATE_response(cMessage *msg)
@@ -402,7 +404,9 @@ void RLL::MLME_ASSOCIATE_response(cMessage *msg)
     AssRes->setPanCoordinator(bIsPANCoor);
     send(AssRes->dup(), lowerLayerOut);
     delete AssRes;
+    AssRes = NULL;
     delete tmp;
+    tmp = NULL;
 }
 
 void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
@@ -528,6 +532,7 @@ void RLL::handle_MLME_DIASSOCIATE_indication(cMessage *msg)
 
     delete tmpMsg;
     tmpMsg = NULL;
+    msg = NULL;
 }
 void RLL::MLME_DISASSOCIATE_response(cMessage *msg)
 {
@@ -536,6 +541,7 @@ void RLL::MLME_DISASSOCIATE_response(cMessage *msg)
     send(tmpMsg->dup(), lowerLayerOut);
     delete tmpMsg;
     tmpMsg = NULL;
+    msg = NULL;
 
 }
 
@@ -549,6 +555,7 @@ void RLL::handle_MLME_DIASSOCIATE_confirm(cMessage *msg)
 
     delete tmpMsg;
     tmpMsg = NULL;
+    msg = NULL;
 }
 
 //Advertisment
@@ -562,8 +569,6 @@ void RLL::MLME_BEACON_request(cMessage *msg)
     send(tempMsg->dup(), lowerLayerOut);
     delete tempMsg;
     tempMsg = NULL;
-    delete msg;
-    msg = NULL;
 }
 
 void RLL::handle_MLME_BEACON_confirm(cMessage *msg)
@@ -575,6 +580,7 @@ void RLL::handle_MLME_BEACON_confirm(cMessage *msg)
     scheduleAt(simTime() + time, BeaconTimer);
     delete beaconCon;
     beaconCon = NULL;
+    msg = NULL;
 }
 
 void RLL::handle_MLME_BEACON_indication(cMessage *msg)
@@ -585,8 +591,12 @@ void RLL::handle_MLME_BEACON_indication(cMessage *msg)
     }
     else
     {
-	MLME_SET_BEACON_request(msg);
+	MLME_SET_BEACON_request(msg->dup());
+	delete msg;
+	    msg = NULL;
     }
+
+
 }
 
 //START
@@ -623,11 +633,11 @@ void RLL::handle_MLME_START_confirm(cMessage *msg)
     }
     if(startCo->getPanCoordinator())
     {
-	MLME_BEACON_request(msg->dup());
+	MLME_BEACON_request(NULL);
     }
     else
     {
-	MLME_SCAN_request(msg->dup());
+	MLME_SCAN_request(NULL);
     }
     parentDisp->updateWith(*tempStr);
     delete startCo;
@@ -665,6 +675,8 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	    else
 	    {
 		handle_MLME_SCAN_confirm(NULL);
+		delete scanReq;
+		scanReq = NULL;
 		return;
 	    }
 	}
@@ -690,10 +702,14 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	scheduleAt(simTime() + tempTime, ScanTimer);
 
     }
+    else
+    {
+	delete msg;
+	msg = NULL;
+
+    }
     delete scanReq;
     scanReq = NULL;
-    delete msg;
-    msg = NULL;
 }
 
 void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
@@ -702,11 +718,16 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
     {
 
 	Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
-	Radio80211aControlInfo *control = check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo());
+	Radio80211aControlInfo control = getRadioControl(check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo()));
 	if(!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
-	    beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime(), control->getLossRate(), calcDistance(control->getLossRate(), control->getRecPow()));
+	    beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime(), control.getLossRate(), calcDistance(control.getLossRate(), control.getRecPow()));
 	else
-	    beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime());
+	    beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime());
+
+	//delete control;
+	//control = NULL;
+
+
     }
     else
     {
@@ -724,16 +745,19 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 	    else if(nRestartCounter < 3)
 	    {
 		nRestartCounter++;
-		beaconTable->flushBeaconTable();
 		RESTART_request(NULL);
+		return;
 	    }
-	    tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
-	    if(tmpBcn != NULL)
-		MLME_SET_BEACON_request(tmpBcn->dup());
 
-	    delete tmpBcn;
-	    tmpBcn = NULL;
+	    if(tmpBcn != NULL)
+		MLME_SET_BEACON_request(tmpBcn);
+
 	    beaconTable->flushBeaconTable();
+	}
+	else
+	{
+	    delete msg;
+	    msg = NULL;
 	}
     }
 }
@@ -752,10 +776,7 @@ void RLL::MLME_SET_BEACON_request(cMessage *msg)
 	}
 	tmp->setKind(TP_MLME_SET_BEACON_REQUEST);
 	tmp->setName("SetSlotRequest");
-	send(tmp->dup(), lowerLayerOut);
-	delete tmp;
-	tmp = NULL;
-	msg = NULL;
+	send(tmp, lowerLayerOut);
     }
     else
     {
@@ -816,7 +837,11 @@ void RLL::SCHEDULE_request(cMessage *msg)
 	scheduleFrame->setTimeslot(linkTable->getTimeSlotByOffset(-1));
     }
     else
+    {
+	delete scheduleFrame;
+	scheduleFrame = NULL;
 	return;
+    }
 
     send(scheduleFrame->dup(), lowerLayerOut);
     delete scheduleFrame;
@@ -831,7 +856,6 @@ void RLL::handle_SCHEDULE_indication(cMessage *msg)
 
     delete scheduleFrame;
     scheduleFrame = NULL;
-    delete msg;
     msg = NULL;
 }
 void RLL::SCHEDULE_response(cMessage *msg)
@@ -849,7 +873,6 @@ void RLL::SCHEDULE_response(cMessage *msg)
     scheduleFrame = NULL;
     delete tempFrame;
     tempFrame = NULL;
-    delete msg;
     msg = NULL;
 }
 void RLL::handle_SCHEDULE_confirm(cMessage *msg)
@@ -869,7 +892,6 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 	}
 	delete frame;
 	frame = NULL;
-	delete msg;
 	msg = NULL;
     }
     else
@@ -903,11 +925,16 @@ void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 void RLL::handle_BEACON_CH_SAME_STAGE(cMessage *msg)
 {
     Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
-    Radio80211aControlInfo *control = check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo());
+    Radio80211aControlInfo control = getRadioControl(check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo()));
     if(!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
-	beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime(), control->getLossRate(), calcDistance(control->getLossRate(), control->getRecPow()));
+	beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime(), control.getLossRate(), calcDistance(control.getLossRate(), control.getRecPow()));
     else
-	beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control->getRecPow(), control->getSnr(), tmpBcn->getSrcPanId(), simTime());
+	beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime());
+
+
+    delete tmpBcn;
+    tmpBcn = NULL;
+    msg = NULL;
 }
 
 void RLL::RESTART_request(cMessage *msg)
@@ -1010,6 +1037,7 @@ void RLL::handle_RESTART_confirm(cMessage *msg)
 
     scheduleAt(simTime(), StartTimer);
     delete msg;
+    msg = NULL;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1039,6 +1067,7 @@ void RLL::createInitialEntries()
     slotframeEntry->setSlotframeSize(12);
     slotframeEntry->setSlotframeTable(slotframeTable);
     slotframeTable->addSlotframe(slotframeEntry);
+
 
     //Add links ino link table
     setSchedule();
@@ -1503,6 +1532,22 @@ void RLL::updatedisplay()
 
     char buf[40];
 
-    sprintf(buf, "Stage: %ld", nCluStage);
+    sprintf(buf, "Stage: %d", nCluStage);
     parentDisp->setTagArg("t", 0, buf);
+}
+
+Radio80211aControlInfo RLL::getRadioControl(Radio80211aControlInfo *cntrl)
+{
+    Radio80211aControlInfo temp;
+
+    temp.setAirtimeMetric(cntrl->getAirtimeMetric());
+    temp.setLossRate(cntrl->getLossRate());
+    temp.setModulationType(cntrl->getModulationType());
+    temp.setRecPow(cntrl->getRecPow());
+    temp.setSnr(cntrl->getSnr());
+    temp.setTestFrameDuration(cntrl->getTestFrameDuration());
+    temp.setTestFrameError(cntrl->getTestFrameError());
+    temp.setTestFrameSize(cntrl->getTestFrameSize());
+
+    return temp;
 }

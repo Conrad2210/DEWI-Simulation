@@ -66,6 +66,7 @@ void cBeaconTable::updateDisplayString()
 
 Ieee802154EnhancedBeaconFrame *cBeaconTable::returnBestBeaconMsg(double *rssi, double *rxPower, double *txPo, double *dis)
 {
+    Ieee802154EnhancedBeaconFrame *tmpMsg = NULL;
     if(entryTable.size() != 0)
     {
 	double tmpPwr = -1.0;
@@ -85,12 +86,13 @@ Ieee802154EnhancedBeaconFrame *cBeaconTable::returnBestBeaconMsg(double *rssi, d
 	    *rxPower = entryTable.at(id)->getrecvPowerdBm();
 	    *txPo = entryTable.at(id)->getTxPowermW();
 	    *dis = entryTable.at(id)->getDistance();
-	    return entryTable.at(id)->getbcnMsg();
+	    tmpMsg =  entryTable.at(id)->getbcnMsg();
+	    entryTable.at(id)->setbcnMsg(NULL);
 	}
 	else
-	    return NULL;
+	    tmpMsg =  NULL;
     }
-    return NULL;
+    return tmpMsg;
 }
 
 bool cBeaconTable::existBeaconEntry(MACAddress extAddr, UINT16 shrtAdd, UINT16 srcid)
@@ -125,6 +127,9 @@ void cBeaconTable::flushBeaconTable()
 {
     while(entryTable.size() != 0)
     {
+
+	//delete entryTable.at(0)->getbcnMsg();
+	entryTable.at(0)->setbcnMsg(NULL);
 	entryTable.erase(entryTable.begin());
     }
     updateDisplayString();

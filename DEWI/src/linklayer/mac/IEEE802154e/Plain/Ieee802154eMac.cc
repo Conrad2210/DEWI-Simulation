@@ -1789,6 +1789,8 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 
 	    frame->setTimestamp(simTime());
 	    MLME_SCAN_confirm(frame);
+	    //delete frame;
+	    //frame = NULL;
 
 	}
 	else

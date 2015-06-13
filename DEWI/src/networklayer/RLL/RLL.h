@@ -24,7 +24,7 @@
 #include "IMacHoppingSequenceList.h"
 #include "IMacNeighborTable.h"
 #include "cBeaconTable.h"
-
+#include "Radio80211aControlInfo_m.h"
 class INET_API RLL : public cSimpleModule
 {
     public:
@@ -200,6 +200,7 @@ class INET_API RLL : public cSimpleModule
 	    return pow(10, dBm / 10);
 	}
 
+	Radio80211aControlInfo getRadioControl(Radio80211aControlInfo *cntrl);
 	void updatedisplay();
 };
 

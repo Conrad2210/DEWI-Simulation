@@ -167,6 +167,7 @@ bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 	    }
 	    return false;
 	}
+	msg = NULL;
     }
     return true;
 }
@@ -178,6 +179,7 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 	case START_PAN_COOR_TIMER:
 	    startPANCoor();
 	    delete msg;     // it's a dynamic timer
+	    msg = NULL;
 	    break;
 
 	case MAC_BACKOFF_TIMER:
@@ -258,7 +260,7 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 	    break;
 
 	case MAC_SCAN_TIMER:
-	    MLME_SCAN_confirm(msg);
+	    MLME_SCAN_confirm(NULL);
 	    break;
 
 	case MAC_AWAITING_BEACON:
@@ -282,6 +284,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
     {
 	EV << "[MAC]: message from physical layer (" << msg->getClassName() << ")" << msg->getName() << " is not a subclass of Ieee802154eFrame, drop it" << endl;
 	delete frame;
+	frame = NULL;
 	return;
     }
 
@@ -297,6 +300,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
     {
 	EV << "The received frame is filtered, drop frame" << endl;
 	delete frame;
+	frame = NULL;
 	// reset the TSCH task if the pkt was dropped
 	if(mpib.macTSCHenabled)
 	{
@@ -430,6 +434,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	{
 	    EV << "[MAC]: the received CMD frame is dropped, because MAC is currently processing a MAC CMD" << endl;
 	    delete frame;
+	    frame = NULL;
 	    return;
 	}
     }
@@ -441,6 +446,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	{
 	    EV << "[MAC]: the received DATA frame is dropped, because MAC is currently processing the last received DATA frame" << endl;
 	    delete frame;
+	    frame = NULL;
 	    return;
 	}
     }
@@ -459,6 +465,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
     {
 	EV << "[MAC]: duplication detected, drop frame" << endl;
 	delete frame;
+	frame = NULL;
 
 	if(frmType == Ieee802154e_DATA && mpib.macMetricsEnabled)
 	    mpib.macDuplicateFrameCount++;
@@ -496,28 +503,33 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	    EV << "[MAC} continue to process received association response pkt" << endl;
 	    MLME_ASSOCIATE_confirm(frame->dup());
 	    delete frame;
+	    frame = NULL;
 	    break;
 	case Ieee802154e_DISASSOCIATION_REQUEST:
 	    EV << "[MAC} continue to process received association response pkt" << endl;
 	    MLME_DISASSOCIATE_indication(frame->dup());
 	    delete frame;
+	    frame = NULL;
 	    break;
 
 	case Ieee802154e_DISASSOCIATION_RESPONSE:
 	    EV << "[MAC} continue to process received association response pkt" << endl;
 	    MLME_DISASSOCIATE_confirm(frame->dup());
 	    delete frame;
+	    frame = NULL;
 	    break;
 
 	case Ieee802154e_SCHEDULER_REQUEST:
 	    EV << "[MAC] continue to process received scheduler request pkt" << endl;
 	    SCHEDULE_indication(frame->dup());
 	    delete frame;
+	    frame = NULL;
 	    break;
 	case Ieee802154e_SCHEDULER_RESPONSE:
 	    EV << "[MAC] continue to process received scheduler response pkt" << endl;
 	    SCHEDULE_confirm(frame->dup(), false);
 	    delete frame;
+	    frame = NULL;
 	    break;
 	default:
 	    error("[MAC]: undefined MAC frame type: %d", frmType);
@@ -617,6 +629,9 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 
     delete dataFrame;
     delete AssReq;
+
+    dataFrame = NULL;
+    AssReq = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_ASSOCIATE_indication(cMessage *msg)
@@ -636,6 +651,9 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_indication(cMessage *msg)
     send(primitive->dup(), mUpperLayerOut);
     delete primitive;
     delete tmp;
+
+    primitive = NULL;
+    tmp = NULL;
 }
 
 void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
@@ -721,6 +739,8 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
 
     delete AssReq;
     delete dataFrame;
+    AssReq = NULL;
+    dataFrame = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
@@ -748,6 +768,9 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 
     delete primitive;
     delete tmp;
+
+    primitive = NULL;
+    tmp = NULL;
 }
 
 void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_request(cMessage *msg)
@@ -826,6 +849,8 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_request(cMessage *msg)
 
     delete dataFrame;
     delete AssReq;
+    dataFrame = NULL;
+    AssReq = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_DISASSOCIATE_indication(cMessage *msg)
@@ -833,7 +858,10 @@ void Ieee802154eMacRLL::MLME_DISASSOCIATE_indication(cMessage *msg)
     Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
     tmpMsg->setKind(TP_MLME_DISASSOCIATE_INDICATION);
     EV << "[MAC]: sending a MLME-DISASSOCIATE.indication to NETWORK" << endl;
-    send(tmpMsg, mUpperLayerOut);
+    send(tmpMsg->dup(), mUpperLayerOut);
+    delete tmpMsg;
+    tmpMsg = NULL;
+    msg = NULL;
 }
 
 void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_response(cMessage *msg)
@@ -912,6 +940,10 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_response(cMessage *msg)
     delete AssReq;
     delete dataFrame;
     delete tmpMsg;
+
+    AssReq = NULL;
+    dataFrame = NULL;
+    tmpMsg = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_DISASSOCIATE_confirm(cMessage *msg)
@@ -922,6 +954,7 @@ void Ieee802154eMacRLL::MLME_DISASSOCIATE_confirm(cMessage *msg)
     EV << "[MAC]: sending a MLME-DISASSOCIATE.confirm to NETWORK" << endl;
     send(tmpMsg->dup(), mUpperLayerOut);
     delete tmpMsg;
+    tmpMsg = NULL;
 }
 
 void Ieee802154eMacRLL::handle_MLME_SCAN_request(cMessage *msg)
@@ -952,9 +985,13 @@ void Ieee802154eMacRLL::handle_MLME_SCAN_request(cMessage *msg)
 void Ieee802154eMacRLL::MLME_SCAN_confirm(cMessage *msg)
 {
     Ieee802154EnhancedBeaconFrame * frame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+    msg = NULL;
     frame->setName("ScanConfirm");
     frame->setKind(TP_MLME_SCAN_CONFIRM);
     send(frame, mUpperLayerOut);
+//    delete frame;
+//    frame = NULL;
+//    msg = NULL;
 }
 
 void Ieee802154eMacRLL::handle_MLME_START_request(cMessage *msg)
@@ -982,6 +1019,7 @@ void Ieee802154eMacRLL::handle_MLME_START_request(cMessage *msg)
 
     MLME_START_confirm(mac_SUCCESS);
     delete startRe;
+    startRe = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_START_confirm(MACenum status)
@@ -997,6 +1035,7 @@ void Ieee802154eMacRLL::MLME_START_confirm(MACenum status)
     send(startCo->dup(), mUpperLayerOut);
 
     delete startCo;
+    startCo = NULL;
 }
 
 void Ieee802154eMacRLL::handle_MLME_BEACON_request(cMessage *msg)
@@ -1004,6 +1043,7 @@ void Ieee802154eMacRLL::handle_MLME_BEACON_request(cMessage *msg)
     txBeaconNow = true;
 
     delete msg;
+    msg = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_BEACON_confirm(MACenum status)
@@ -1017,6 +1057,7 @@ void Ieee802154eMacRLL::MLME_BEACON_confirm(MACenum status)
     EV << "[MAC]: sending a MLME_BEACON.confirm to NETWORK" << endl;
     send(primitive->dup(), mUpperLayerOut);
     delete primitive;
+    primitive = NULL;
 }
 
 void Ieee802154eMacRLL::MLME_BEACON_NOTIFY_indication(cMessage *msg)
@@ -1035,6 +1076,8 @@ void Ieee802154eMacRLL::MLME_BEACON_NOTIFY_indication(cMessage *msg)
 	send(primitive->dup(), mUpperLayerOut);
 	delete primitive;
 	delete msg;
+	primitive = NULL;
+	msg = NULL;
     }
 }
 
@@ -1101,6 +1144,9 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 	    queueModule->insertInQueue(tmpSchedul->dup());
 	delete tmpNetCn;
 	delete tmpSchedul;
+
+	tmpNetCn = NULL;
+	tmpSchedul = NULL;
     }
     else
     {
@@ -1170,6 +1216,8 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 	    queueModule->insertInQueue(tmpSchedul->dup());
 	delete tmpNetCn;
 	delete tmpSchedul;
+	tmpNetCn = NULL;
+	tmpSchedul = NULL;
     }
 }
 
@@ -1181,6 +1229,7 @@ void Ieee802154eMacRLL::SCHEDULE_indication(cMessage *msg)
 	msg->setKind(TP_SCHEDULE_INDICATION);
 	send(msg->dup(), mUpperLayerOut);
 	delete msg;
+	msg = NULL;
     }
     else
     {
@@ -1202,6 +1251,8 @@ void Ieee802154eMacRLL::SCHEDULE_indication(cMessage *msg)
 
 	delete Ctrl;
 	delete scheduler;
+	Ctrl = NULL;
+	scheduler = NULL;
     }
 }
 
@@ -1262,6 +1313,8 @@ void Ieee802154eMacRLL::handle_SCHEDULE_response(cMessage *msg)
 	    queueModule->insertInQueue(tmpSchedul->dup());
 	delete tmpNetCn;
 	delete tmpSchedul;
+	tmpNetCn = NULL;
+	tmpSchedul = NULL;
     }
     else
     {
@@ -1331,6 +1384,9 @@ void Ieee802154eMacRLL::handle_SCHEDULE_response(cMessage *msg)
 	    queueModule->insertInQueue(tmpSchedul->dup());
 	delete tmpNetCn;
 	delete tmpSchedul;
+
+	tmpNetCn = NULL;
+	tmpSchedul = NULL;
     }
 }
 
@@ -1342,6 +1398,7 @@ void Ieee802154eMacRLL::SCHEDULE_confirm(cMessage *msg, bool ack)
 	send(msg->dup(), mUpperLayerOut);
 
 	delete msg;
+	msg = NULL;
     }
     else
     {
@@ -1370,6 +1427,7 @@ void Ieee802154eMacRLL::SCHEDULE_confirm(cMessage *msg, bool ack)
 
 	//delete Ctrl;
 	delete scheduler;
+	scheduler = NULL;
     }
 
 }
@@ -1616,6 +1674,7 @@ void Ieee802154eMacRLL::RESTART_confirm(cMessage *msg)
 {
     send(msg->dup(), mUpperLayerOut);
     delete msg;
+    msg = NULL;
 }
 
 void Ieee802154eMacRLL::handleAwaitingBeaconTimer()
@@ -1638,6 +1697,7 @@ void Ieee802154eMacRLL::handleEB(cMessage *msg)
     if(dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
     {
 	rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	msg = NULL;
 	duration = calDuration(rxBeacon);
 	bcnRxTime = rxBeacon->getTimestamp() - duration;
 	firstBe = true;
@@ -1645,6 +1705,7 @@ void Ieee802154eMacRLL::handleEB(cMessage *msg)
     else
     {
 	delete msg;
+	msg = NULL;
 	duration = calDuration(rxBeacon);
 	bcnRxTime = now - duration;
     }
@@ -1739,6 +1800,7 @@ void Ieee802154eMacRLL::handleEB(cMessage *msg)
     Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SET_BEACON_CONFIRM);
     send(tmp->dup(), mUpperLayerOut);
     delete tmp;
+    tmp = NULL;
     delete rxBeacon;
     rxBeacon = NULL;
     //delete bcnFrame;
@@ -1766,6 +1828,7 @@ void Ieee802154eMacRLL::handleAck(Ieee802154eFrame *frame)
 		if(frame->getSeqNmbr() != txData->getSeqNmbr())
 		{
 		    delete frame;
+		    frame = NULL;
 		    EV << "[TSCH CCA]-Transmitter:[11] frame was dropped at the MAC layer, the SeqNumber in the ACK does not match" << endl;
 
 		    taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 11;
@@ -1842,6 +1905,7 @@ void Ieee802154eMacRLL::handleAck(Ieee802154eFrame *frame)
 		    }
 
 		    delete frame;   // delete the ACK
+		    frame = NULL;
 		    if(txPkt == txData)
 		    {
 			if(txData->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONSE)
