@@ -28,7 +28,7 @@ static const int channelList[16] =
 {
 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
 };
-static const int numChannel = 16;
+static const int numChannel = 15;
 
 RLL::RLL()
 {
@@ -47,45 +47,14 @@ RLL::RLL()
 RLL::~RLL()
 {
 
-    if(AssociateTimer->isScheduled())
 	cancelAndDelete(AssociateTimer);
-    else
-	delete AssociateTimer;
-
-    if(ScheduleTimer->isScheduled())
 	cancelAndDelete(ScheduleTimer);
-    else
-	delete ScheduleTimer;
-
-    if(BeaconTimer->isScheduled())
 	cancelAndDelete(BeaconTimer);
-    else
-	delete BeaconTimer;
-
-    if(StartTimer->isScheduled())
 	cancelAndDelete(StartTimer);
-    else
-	delete StartTimer;
-
-    if(AssociateWaitTimer->isScheduled())
 	cancelAndDelete(AssociateWaitTimer);
-    else
-	delete AssociateWaitTimer;
-
-    if(ScanTimer->isScheduled())
 	cancelAndDelete(ScanTimer);
-    else
-	delete ScanTimer;
-
-    if(BeaconScanTimer->isScheduled())
 	cancelAndDelete(BeaconScanTimer);
-    else
-	delete BeaconScanTimer;
-
-    if(DisassociateWaitTimer->isScheduled())
 	cancelAndDelete(DisassociateWaitTimer);
-    else
-	delete DisassociateWaitTimer;
 }
 
 void RLL::initialize(int stage)
@@ -657,7 +626,7 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	    scanReq->setChannel(channelList[0]);
 	    nLastSCANChannel = channelList[0];
 	}
-	else if(nLastSCANChannel == channelList[numChannel - 1])
+	else if(nLastSCANChannel == channelList[numChannel])
 	{
 	    scanReq->setScanType(0x00);
 	    send(scanReq->dup(), lowerLayerOut);
@@ -683,7 +652,7 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	else
 
 	{
-	    for(int i = 0; i < numChannel; i++)
+	    for(int i = 0; i < (numChannel + 1); i++)
 	    {
 		if(nLastSCANChannel == channelList[i] && nLastSCANChannel != channelList[numChannel])
 		{
@@ -1122,7 +1091,7 @@ void RLL::setScheduleChStUn()
 
     //new links
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1133,7 +1102,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1144,7 +1113,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1155,7 +1124,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1166,7 +1135,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1177,7 +1146,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1188,7 +1157,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1199,7 +1168,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1210,7 +1179,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset((nCluStage) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_ADVERTISING);
     linkEntry->setMacLinkTable(linkTable);
@@ -1223,7 +1192,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    int offset = nCluStage % numChannel + intuniform(0, 16);
+    int offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(offset > 16)
 	offset = offset - 16;
 
@@ -1238,7 +1207,7 @@ void RLL::setScheduleChStUn()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    offset = nCluStage % numChannel + intuniform(0, 16);
+    offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(offset > 16)
 	offset = offset - 16;
 
@@ -1262,7 +1231,7 @@ void RLL::setScheduleChStZe()
     linkTable->editLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_ADVERTISING);
     linkEntry->setMacLinkTable(linkTable);
@@ -1276,7 +1245,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1288,7 +1257,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1300,7 +1269,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset((nCluStage) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1312,7 +1281,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset((nCluStage) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1324,7 +1293,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1336,7 +1305,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset((nCluStage - 1) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1348,7 +1317,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset((nCluStage) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1360,7 +1329,7 @@ void RLL::setScheduleChStZe()
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset((nCluStage) % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1370,7 +1339,7 @@ void RLL::setScheduleChStZe()
     linkEntry->setLinkId(linkTable->getNumLinks());
     linkTable->addLink(linkEntry);
 
-    int offset = nCluStage % numChannel + intuniform(0, 16);
+    int offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(offset > 16)
 	offset = offset - 16;
 
@@ -1385,7 +1354,7 @@ void RLL::setScheduleChStZe()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    offset = nCluStage % numChannel + intuniform(0, 16);
+    offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(offset > 16)
 	offset = offset - 16;
 
@@ -1416,7 +1385,7 @@ void RLL::setScheduleChInit()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1427,7 +1396,7 @@ void RLL::setScheduleChInit()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1438,7 +1407,7 @@ void RLL::setScheduleChInit()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1449,7 +1418,7 @@ void RLL::setScheduleChInit()
     linkTable->addLink(linkEntry);
 
     linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
     linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
     linkEntry->setLinkType(LNK_TP_NORMAL);
     linkEntry->setMacLinkTable(linkTable);
@@ -1459,9 +1428,9 @@ void RLL::setScheduleChInit()
     linkEntry->setLinkId(linkTable->getNumLinks());
     linkTable->addLink(linkEntry);
 
-    int tempOffset = nCluStage % numChannel + intuniform(0, 16);
-    if(tempOffset > numChannel)
-	tempOffset = tempOffset - numChannel;
+    int tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+    if(tempOffset > (numChannel + 1))
+	tempOffset = tempOffset - (numChannel + 1);
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
@@ -1474,9 +1443,9 @@ void RLL::setScheduleChInit()
     linkEntry->setLinkId(linkTable->getNumLinks());
     linkTable->addLink(linkEntry);
 
-    tempOffset = nCluStage % numChannel + intuniform(0, 16);
-    if(tempOffset > numChannel)
-	tempOffset = tempOffset - numChannel;
+    tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+    if(tempOffset > (numChannel + 1))
+	tempOffset = tempOffset - (numChannel + 1);
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
