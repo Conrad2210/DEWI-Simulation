@@ -33,7 +33,7 @@ RLLClusterTable::RLLClusterTable()
 
 RLLClusterTable::~RLLClusterTable()
 {
-    // TODO Auto-generated destructor stub
+
 }
 
 void RLLClusterTable::initialize(int stage)

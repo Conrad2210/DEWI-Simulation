@@ -1802,6 +1802,7 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 	    else
 	    {
 		rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
+		frame = NULL;
 		Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("BeaconConfirm", TP_MLME_SCAN_CONFIRM);
 
 		tmp->setName("BeaconNotify");
@@ -1810,280 +1811,9 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 		delete tmp;
 	    }
 	}
-//	EV << "[MAC]: starting processing received enhanced Beacon frame with frame version=" << (int)frame->getFrmCtrl().frameVersion << endl;
-//	Ieee802154EnhancedBeaconFrame *bcnFrame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(frame);
-//
 
-//
-//	// handle the IE's
-//	handleIEfield(bcnFrame);
-//
-//	// start ASN timer
-//	startAsnTimer(bcnRxTime - (timeslotTable->getTemplate(useTimeslotID)->getRxOffsetDbl() + (timeslotTable->getTemplate(useTimeslotID)->getRxWaitDbl() / 2)));
-//
-//	// reset lost beacon counter
-//	bcnLossCounter = 0;
-//
-//	// temporary solution for association process, to be modified in later version
-//	if(notAssociated) // this is my first rxed beacon, associate with this one,
-//	{
-//	    // activate the TSCH mode
-//	    mpib.macTSCHenabled = mpib.macTSCHcapable ? true:false; //activate TSCH mode only if the device is TSCH capable
-//	    backoffMethod = EXPONENTIAL;
-//	    // TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
-//	    mpib.macMinBE = 1;    // default: for CSMA-CA = 3; for TSCH-CA = 1
-//	    mpib.macMaxBE = 7;    // default: for CSMA-CA = 5; for TSCH-CA = 7
-//
-//	    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
-//	    ASSERT(mpib.macPANId == def_macPANId);
-//	    notAssociated = false;
-//
-//	    mpib.macShortAddress = (UINT_16)mpib.macExtendedAddress.getInt();
-//	    mpib.macSimpleAddress = (UINT_8)mpib.macExtendedAddress.getInt();
-//
-//	    mpib.macPANId = bcnFrame->getSrcPanId();           // store PAN id
-//	    mpib.macCoordShortAddress = getShortAddress(bcnFrame->getSrcAddr()); // store coordinator address, always use short address
-//	    mpib.macCoordExtendedAddress = bcnFrame->getSrcAddr(); // PAN coordinator uses the same address for both its own 16 and 64 bit address
-//
-//	    EV << "This is my first beacon, associate with it" << endl;
-//#if OMNETPP_VERSION >= 0x403
-//	    cModule* module =
-//	    simulation.getModuleByPath(panCoorName)->getModuleByPath(".wlan.mac");
-//#else
-//	    cModule* module = simulation.getModuleByPath(panCoorName)->getModuleByRelativePath("wlan.mac");
-//#endif
-//	    Ieee802154eMac* macModule = check_and_cast<Ieee802154eMac *>(module);
-//	    mpib.macShortAddress = macModule->associate_request_cmd(aExtendedAddress, capability);
-//	}
-//	else
-//	{
-//	    // time correction
-//	    calcTimeCorr(frame);
-//	}
-//
-//	taskP.TS_RX_CCA_tschcca = false;
-//	taskP.TS_TX_CCA_tschcca = false;
-//	taskP.TS_RX_CCA_tschcca_STEP = 0;
-//	taskP.TS_TX_CCA_tschcca_STEP = 0;
-//
-//	dispatch(phy_SUCCESS, __FUNCTION__);
-//
-//	resetTRX();
-//	delete bcnFrame;
-//	numRxBcnPkt++;
     }
-    else    // beacon frame - Std 802.15.4-2006/2011
-    {
-	// old version [SR]
-	EV << "[MAC]: starting processing received Beacon frame with frame version=" << frame->getFrmCtrl().frameVersion << endl;
-	Ieee802154eBeaconFrame *bcnFrame = check_and_cast<Ieee802154eBeaconFrame *>(frame);
 
-	simtime_t now, tmpf, w_time, duration;
-	uint16_t ifs;
-	int dataFrmLength;
-	now = simTime();
-
-	//update beacon parameters
-	rxSfSpec = bcnFrame->getSfSpec();
-	rxBO = rxSfSpec.BO;
-	rxSO = rxSfSpec.SO;
-	rxSfSlotDuration = aBaseSlotDuration * (1 << rxSO);
-
-	//calculate the time when the first bit of the beacon was received
-	duration = calDuration(frame);
-	bcnRxTime = now - duration;
-
-	/**
-	 * important: this value is calculated in <csmacaStart()>, if later on a CSMA-CA is pending
-	 *        for this bcn and backoff will resume without calling <csmacaStart()> (see <csmacaTrxBeacon()>) ,
-	 *        therefore this value will not be updated, but <csmacaCanProceed()> and other functions will
-	 *        use it and needs to be updated here
-	 */
-	schedBcnRxTime = bcnRxTime;
-	EV << "The first bit of this beacon was received by PHY layer at " << bcnRxTime << endl;
-
-	//calculate <rxBcnDuration>
-	if(bcnFrame->getByteLength() <= aMaxSIFSFrameSize)
-	    ifs = mpib.macSIFSPeriod;
-	else
-	    ifs = mpib.macLIFSPeriod;
-
-	tmpf = duration * phy_symbolrate;
-	tmpf += ifs;
-	rxBcnDuration = (uint16_t)(SIMTIME_DBL(tmpf) / aUnitBackoffPeriod);
-
-	if(fmod(tmpf, aUnitBackoffPeriod) > 0.0)
-	    rxBcnDuration++;
-
-	// TODO: store GTS fields
-	//gtsFields = bcnFrame->getGtsFields();
-
-	//update PAN descriptor
-	rxPanDescriptor.coordAddrMode = (Ieee802154eAddrMode)frame->getFrmCtrl().srcAddrMode;
-	rxPanDescriptor.coordPANId = bcnFrame->getSrcPanId();
-	rxPanDescriptor.coordAddress_16_or_64 = bcnFrame->getSrcAddr();
-	rxPanDescriptor.logicalChannel = ppib.phyCurrentChannel;
-	// rxPanDescriptor.SuperframeSpec       // ignored, store in rxSfSpec above
-	//rxPanDescriptor.GTSPermit     = gtsFields.permit;
-	// rxPanDescriptor.LinkQuality          // TODO link quality at PHY layer
-	// rxPanDescriptor.TimeStamp            // ignored, store in bcnRxTime above
-	// rxPanDescriptor.SecurityUse          // security - not implemented
-	// rxPanDescriptor.ACLEntry             // security - not implemented
-	// rxPanDescriptor.SecurityFailure      // security - not implemented
-
-	// start rxSDTimer
-	startRxSDTimer();
-
-	// reset lost beacon counter
-	bcnLossCounter = 0;
-
-	// temporary solution for association process, to be modified in later version
-	if(notAssociated) // this is my first rxed beacon, associate with this one,
-	{
-	    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
-	    ASSERT(mpib.macPANId == def_macPANId);
-	    notAssociated = false;
-
-	    mpib.macShortAddress = (UINT_16)mpib.macExtendedAddress.getInt();
-	    mpib.macSimpleAddress = (UINT_8)mpib.macExtendedAddress.getInt();
-
-	    mpib.macPANId = bcnFrame->getSrcPanId();           // store PAN id
-	    mpib.macCoordShortAddress = getShortAddress(bcnFrame->getSrcAddr()); // store coordinator address, always use short address
-	    mpib.macCoordExtendedAddress = bcnFrame->getSrcAddr(); // PAN coordinator uses the same address for both its own 16 and 64 bit address
-
-	    EV << "This is my first beacon, associate with it" << endl;
-#if OMNETPP_VERSION >= 0x403
-	    cModule* module =
-	    simulation.getModuleByPath(panCoorName)->getModuleByPath(".wlan.mac");
-#else
-	    cModule* module = simulation.getModuleByPath(panCoorName)->getModuleByRelativePath("wlan.mac");
-#endif
-	    Ieee802154eMac* macModule = check_and_cast<Ieee802154eMac *>(module);
-	    mpib.macShortAddress = macModule->associate_request_cmd(aExtendedAddress, capability);
-
-	    startBcnRxTimer();              // start tracking beacon, always on
-	    // start sending beacon from here, if I want to be a coordinator
-	    /*
-	     if ((mpib.macBeaconOrder != 15) && capability.FFD)
-	     {
-	     // actually started by mlme-start.request
-	     startBcnTxTimer(true, simtime_t startTime);     // TBD
-	     }*/
-
-	    // if GTS, calculate the required GTS length for transmitting pkts with constant length
-	    if(dataTransMode == 3) //  Std 802.15.4-2011 (4.5.2) page 13 - Note: The third transaction is the data transfer between two peer devices.
-	    {
-		// calculate the length of data frame transmitted in GTS
-		// MHR(11) + gtsPayload + MFR(2)
-		dataFrmLength = 11 + gtsPayload + 2;
-
-		if(dataFrmLength <= aMaxSIFSFrameSize)
-		    ifs = mpib.macSIFSPeriod;
-		else
-		    ifs = mpib.macLIFSPeriod;
-
-		// calculate duration of the entire data transaction
-		duration = (def_phyHeaderLength + dataFrmLength) * 8 / phy_bitrate;
-
-		if(ack4Gts)
-		    duration += (mpib.macAckWaitDuration + ifs) / phy_symbolrate;
-		else
-		    // no ACK required
-		    duration += (Ieee802154ePhy::aTurnaroundTime + ifs) / phy_symbolrate;
-		// store duration value for later evaluation in gtsCanProceed()
-		gtsTransDuration = duration;
-
-		// duration of one superframe slot (one GTS slot)
-		tmpf = rxSfSlotDuration / phy_symbolrate;
-
-		if(duration < tmpf)
-		    gtsLength = 1;
-		else
-		{
-		    gtsLength = (uint16_t)(duration / tmpf);
-		    if(fmod(duration, tmpf) > 0.0)
-			gtsLength++;
-		}
-
-		EV << "[GTS]: gtsTransDuration = " << gtsTransDuration << " s, duration of one GTS slot = " << tmpf << " s" << endl;
-
-		// call gts_request_cmd() at the PAN coordinator to apply for GTS
-		EV << "[GTS]: request " << (int)gtsLength << " GTS slots from the PAN coordinator" << endl;
-		gtsStartSlot = macModule->gts_request_cmd(mpib.macShortAddress, gtsLength, isRecvGTS);
-
-		if(gtsStartSlot != 0)      // successfully
-		    EV << "[GTS]: my GTS start slot is " << (int)gtsStartSlot << endl;
-		else        // failed
-		{
-		    // TBD: what to do if failed
-		    // EV << "[GTS]: request for GTS failed" << endl;
-		    error("[GTS]: request for GTS failed!");
-		}
-	    }
-	}
-	// can start my GTS timer only after receiving the second beacon
-	else if(gtsStartSlot != 0)
-	{
-	    tmpf = bcnRxTime + gtsStartSlot * rxSfSlotDuration / phy_symbolrate;
-	    w_time = tmpf - now;
-	    // should turn on radio receiver aTurnaroundTime symbols before GTS starts, if I have a receive GTS
-	    if(isRecvGTS)
-		w_time = w_time - Ieee802154ePhy::aTurnaroundTime / phy_symbolrate;
-	    EV << "[GTS]: schedule for my GTS with start slot #" << (int)gtsStartSlot << endl;
-	    startGtsTimer(w_time);
-
-	    // if my GTS is not the first one in the CFP, should turn radio off at the end of CAP using finalCAPTimer
-	    if(gtsStartSlot != rxSfSpec.finalCap + 1)
-	    {
-		ASSERT(gtsStartSlot > rxSfSpec.finalCap);
-		tmpf = bcnRxTime + (rxSfSpec.finalCap + 1) * rxSfSlotDuration / phy_symbolrate;
-		w_time = tmpf - now;
-		EV << "[GTS]: my GTS is not the first one in the CFP, schedule a timer to turn off radio at the end of CAP" << endl;
-		startFinalCapTimer(w_time);
-	    }
-	}
-
-	dispatch(phy_SUCCESS, __FUNCTION__);
-
-	//CSMA-CA may be waiting for the new beacon
-	if(backoffStatus == 99)
-	    csmacaTrxBeacon('r');
-
-	// TODO process pending address
-	/*
-	 #ifdef test_802154_INDIRECT_TRANS
-	 rxPaFields = bcnFrame->getPaFields();       //store pending address fields
-	 if (mpib.macAutoRequest)
-	 {
-	 //handle the pending packet
-	 pending = false;
-	 for (i=0;i<rxPaFields.numShortAddr;i++)
-	 {
-	 if (rxPaFields.addrList[i] == mpib.macShortAddress)
-	 {
-	 pending = true;
-	 break;
-	 }
-	 }
-	 if (!pending)
-	 for (i=0;i<rxPaFields.numExtendedAddr;i++)
-	 {
-	 if (rxPaFields.addrList[rxPaFields.numShortAddr + i] == aExtendedAddress)
-	 {
-	 pending = true;
-	 break;
-	 }
-	 }
-
-	 if (pending)    // mlme_poll_request TBD
-	 mlme_poll_request(frmCtrl.srcAddrMode,wph->MHR_SrcAddrInfo.panID,wph->MHR_SrcAddrInfo.addr_64,capability.secuCapable,true,true);
-	 }
-	 #endif
-	 */
-	resetTRX();
-	delete bcnFrame;
-	numRxBcnPkt++;
-    }
 }
 
 void Ieee802154eMac::handleEB(cMessage *msg)
@@ -2101,6 +1831,7 @@ void Ieee802154eMac::handleEB(cMessage *msg)
     if(dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
     {
 	rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	msg = NULL;
 	duration = calDuration(rxBeacon);
 	bcnRxTime = rxBeacon->getTimestamp() - duration;
 	firstBe = true;
@@ -3261,7 +2992,7 @@ void Ieee802154eMac::constructBCN()
 	if(mpib.macTSCHenabled)
 	{ // save in the mac queue
 	  //send(tmpEBcn, mQueueOut);
-	    queueModule->insertInQueue(tmpEBcn->dup());
+	    queueModule->insertInQueue(txBeacon->dup());
 	}
 	else
 	{
@@ -3270,101 +3001,7 @@ void Ieee802154eMac::constructBCN()
 	    sendDown(check_and_cast<Ieee802154eFrame *>(txBeacon->dup())); // no delay
 	}
     }
-    else
-    {
-	//--- construct a beacon --- Std 802.15.4-2011 (figure 38) page 61
-	Ieee802154eBeaconFrame* tmpBcn = new Ieee802154eBeaconFrame();
-	tmpBcn->setName("Ieee802154BEACON");
 
-	// construct frame control field
-	frmCtrl.frameType = Ieee802154e_BEACON;
-	frmCtrl.securityEnabled = secuBeacon;
-
-	// check if some data is pending for a device or is it the first beacon
-	// Pending Address Specification field - Std 802.15.4-2011 (figure 45) page 64
-	PendingAddrFields tmpPAF;
-
-	UINT_8 numShortAddr = 0;
-	UINT_8 numExtendedAddr = 0; // [SR] only short addresses are stored in the GTS list
-	for(int i = 0; i < 7; i++)
-	{
-	    if(gtsList[i].isTxPending == true)
-	    {
-		frmCtrl.frmPending = true;
-
-		if(gtsList[i].devShortAddr != 0xffff) // is no broadcast address - for the Pending Address Specification field
-		    tmpPAF.addrList[numShortAddr++] = (IE3ADDR)gtsList[i].devShortAddr;
-	    }
-	}
-
-	tmpPAF.numShortAddr = numShortAddr;
-	tmpPAF.numExtendedAddr = numExtendedAddr;
-
-	//[SR] TODO frame pending
-	//If a broadcast data or command frame is pending
-	frmCtrl.frmPending = false; // see Std 802.15.4-2011 (5.2.1.1.3) page 58
-
-	frmCtrl.ackReq = false;     // ignored upon reception
-	frmCtrl.frameVersion = Ieee802154_2003_compatible;
-
-	frmCtrl.seqNbSup = false;   // send Sequence number
-	frmCtrl.presIElist = false;
-
-	frmCtrl.dstAddrMode = defFrmCtrl_AddrModeNone; // 0x00, ignored upon reception
-
-	if(mpib.macShortAddress == 0xfffe)
-	{
-	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
-	    tmpBcn->setSrcAddr(mpib.macExtendedAddress);
-	}
-	else
-	{
-	    frmCtrl.srcAddrMode = defFrmCtrl_AddrMode16;
-	    tmpBcn->setSrcAddr(MACAddress(mpib.macShortAddress));
-	}
-
-	tmpBcn->setSeqNmbr(mpib.macBSN++);
-	tmpBcn->setDstPanId(0);     // ignored upon reception
-	tmpBcn->setDstAddr(MACAddress::UNSPECIFIED_ADDRESS); // ignored upon reception
-	tmpBcn->setSrcPanId(mpib.macPANId);
-
-	frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpBcn->getSrcPanId(), tmpBcn->getDstPanId());
-
-	// construct superframe specification
-	// Beacon order
-	txSfSpec.BO = mpib.macBeaconOrder;
-	txSfSpec.BI = aBaseSuperframeDuration * (1 << mpib.macBeaconOrder);
-	// superframe order
-	txSfSpec.SO = mpib.macSuperframeOrder;
-	txSfSpec.SD = aBaseSuperframeDuration * (1 << mpib.macSuperframeOrder);
-	// this parameter may vary each time when new GTS slots were allocated in last superframe
-	txSfSpec.finalCap = tmp_finalCap;
-	txSfSpec.battLifeExt = mpib.macBattLifeExt;
-	txSfSpec.panCoor = isPANCoor;
-	txSfSpec.assoPmt = mpib.macAssociationPermit;
-
-	tmpBcn->setFrmCtrl(frmCtrl);
-	tmpBcn->setSfSpec(txSfSpec);
-
-	// GTS Specification field - for GTS allocation initiated by a device - Std 802.15.4-2011 (figure 30) page 50
-	GTSFields tmpGts;
-	tmpGts.gtsDescrCnt = gtsCount;
-	tmpGts.gtsPermit = mpib.macGTSPermit;
-	tmpGts.gtsDirMask = 0; // this is set by the omnetpp.ini (isRecvGTS)
-	//tmpGts.gtsDescr
-	tmpBcn->setGtsField(tmpGts);
-
-	tmpBcn->setPendingAdrrFld(tmpPAF);
-
-	//TODO [SR] Beacon Payload field - Std 802.15.4-2011 (5.2.2.1.8) page 65
-
-	tmpBcn->setByteLength(calFrmByteLength(tmpBcn));
-
-	txBeacon = tmpBcn; // released in taskSuccess or in PD_DATA_confirm (if tx failure)
-	txPkt = tmpBcn;
-	mpib.macBeaconTxTime = SIMTIME_DBL(simTime());      // no delay
-	sendDown(check_and_cast<Ieee802154eFrame *>(txBeacon->dup()));
-    }
 }
 
 //-------------------------------------------------------------------------------/

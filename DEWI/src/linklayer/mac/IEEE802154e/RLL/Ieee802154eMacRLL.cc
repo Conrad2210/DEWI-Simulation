@@ -97,66 +97,77 @@ bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 	{
 	    handle_MLME_START_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_BEACON_REQUEST:
 	{
 	    handle_MLME_BEACON_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_SCAN_REQUEST:
 	{
 	    handle_MLME_SCAN_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_SET_BEACON_REQUEST:
 	{
 	    handleEB(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_ASSOCIATE_REQUEST:
 	{
 	    handle_MLME_ASSOCIATE_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_DISASSOCIATE_REQUEST:
 	{
 	    handle_MLME_DISASSOCIATE_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_ASSOCIATE_RESPONSE:
 	{
 	    handle_MLME_ASSOCIATE_response(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_MLME_DISASSOCIATE_RESPONSE:
 	{
 	    handle_MLME_DISASSOCIATE_response(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_SCHEDULE_REQUEST:
 	{
 	    handle_SCHEDULE_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_SCHEDULE_RESPONSE:
 	{
 	    handle_SCHEDULE_response(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	case TP_RESTART_REQUEST:
 	{
 	    handle_RESTART_request(msg->dup());
 	    delete msg;
+	    msg = NULL;
 	    break;
 	}
 	default:
@@ -167,7 +178,6 @@ bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 	    }
 	    return false;
 	}
-	msg = NULL;
     }
     return true;
 }
@@ -456,10 +466,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	i = chkAddUpdHListLink(&hlistBLink1, &hlistBLink2, frame->getSrcAddr(), frame->getSeqNmbr());
     else if(frmType != Ieee802154e_ACK) // data or cmd
 	i = chkAddUpdHListLink(&hlistDLink1, &hlistDLink2, frame->getSrcAddr(), frame->getSeqNmbr());
-    else // ACK
-    {
-	// check ACK in <handleAck()>
-    }
+
 
     if(i == 2) // duplication found in the HListLink
     {
@@ -482,12 +489,16 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 
 	case Ieee802154e_DATA:
 	    EV << "[MAC]: continue to process received DATA pkt" << endl;
-	    handleData(frame);
+	    handleData(frame->dup());
+	    delete frame;
+	    frame = NULL;
 	    break;
 
 	case Ieee802154e_ACK:
 	    EV << "[MAC]: continue to process received ACK pkt" << endl;
-	    handleAck(frame);
+	    handleAck(frame->dup());
+	    delete frame;
+	    frame = NULL;
 	    break;
 
 	    //	case Ieee802154e_CMD:
@@ -497,7 +508,9 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 
 	case Ieee802154e_ASSOCIATION_REQUEST:
 	    EV << "[MAC} continue to proxess received association request pkt" << endl;
-	    MLME_ASSOCIATE_indication(frame);
+	    MLME_ASSOCIATE_indication(frame->dup());
+	    delete frame;
+	    frame = NULL;
 	    break;
 	case Ieee802154e_ASSOCIATION_RESPONSE:
 	    EV << "[MAC} continue to process received association response pkt" << endl;
@@ -547,6 +560,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 
     Ieee802154eAssociationFrame *dataFrame = new Ieee802154eAssociationFrame(msg->getName(), msg->getKind());
     Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    msg = NULL;
     FrameCtrl frmCtrl;
 
     //Create Request
@@ -637,6 +651,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 void Ieee802154eMacRLL::MLME_ASSOCIATE_indication(cMessage *msg)
 {
     Ieee802154eAssociationFrame *tmp = check_and_cast<Ieee802154eAssociationFrame*>(msg);
+    msg = NULL;
     Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo("AssociationIndication", TP_MLME_ASSOCIATE_INDICATION);
 
     primitive->setDeviceAddress(tmp->getSrcAddr().getInt());
@@ -660,6 +675,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
 {
     Ieee802154eAssociationFrame *dataFrame = new Ieee802154eAssociationFrame();
     Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    msg = NULL;
     FrameCtrl frmCtrl;
     //Create Request
     dataFrame->setName("AssociationResponse");
@@ -746,6 +762,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
 void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 {
     Ieee802154eAssociationFrame *tmp = check_and_cast<Ieee802154eAssociationFrame *>(msg);
+    msg = NULL;
     Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo("AssociationConfirm", TP_MLME_ASSOCIATE_CONFIRM);
 
     if(tmp->getCntrlInfo().getStatus() == mac_FastA_successful)
@@ -949,6 +966,7 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_response(cMessage *msg)
 void Ieee802154eMacRLL::MLME_DISASSOCIATE_confirm(cMessage *msg)
 {
     Ieee802154eDisassociationFrame * tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
+    msg = NULL;
     neighborTable->deleteNeighbor(neighborTable->getNeighborBySAddr(getShortAddress(tmpMsg->getSrcAddr())));
     tmpMsg->setKind(TP_MLME_DISASSOCIATE_CONFIRM);
     EV << "[MAC]: sending a MLME-DISASSOCIATE.confirm to NETWORK" << endl;
@@ -960,6 +978,7 @@ void Ieee802154eMacRLL::MLME_DISASSOCIATE_confirm(cMessage *msg)
 void Ieee802154eMacRLL::handle_MLME_SCAN_request(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *scanReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+    msg = NULL;
     if(scanReq->getScanType() == 0x02)
     {
 	PHY_PIB tmpPIB;
@@ -2033,6 +2052,7 @@ void Ieee802154eMacRLL::handleAsnTimer()
 	if(tmpMsg != NULL)
 	{
 	    txData = check_and_cast<Ieee802154eFrame *>(tmpMsg);
+	    tmpMsg = NULL;
 	    //	    if(txData->getFrmCtrl().frameType == Ieee802154e_BEACON)
 	    //	    {
 	    //		//check if asn is still up to date

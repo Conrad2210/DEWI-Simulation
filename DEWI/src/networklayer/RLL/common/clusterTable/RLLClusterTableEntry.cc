@@ -53,6 +53,7 @@ RLLClusterTableEntry::~RLLClusterTableEntry()
     // TODO Auto-generated destructor stub
     delete ownerp;
     delete clusterModule;
+    delete nodeName;
 }
 
 std::string RLLClusterTableEntry::info()const
