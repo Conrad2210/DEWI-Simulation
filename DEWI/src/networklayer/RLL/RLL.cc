@@ -458,6 +458,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	    scheduleAt(simTime() + fBI * 2, BeaconScanTimer);
 	}
 	setSchedule();
+	    delete tempStr;
+	    tempStr = NULL;
     }
     else
     {
@@ -476,6 +478,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 
 	scheduleAt(simTime(), AssociateTimer);
 	parentDisp->updateWith(*tempStr);
+	    delete tempStr;
+	    tempStr = NULL;
     }
 
     delete tmp;
@@ -613,6 +617,9 @@ void RLL::handle_MLME_START_confirm(cMessage *msg)
     startCo = NULL;
     msg = NULL;
 
+
+    delete tempStr;
+    tempStr = NULL;
 }
 
 //SCAN

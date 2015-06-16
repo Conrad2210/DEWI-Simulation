@@ -33,7 +33,8 @@ RLLClusterTable::RLLClusterTable()
 
 RLLClusterTable::~RLLClusterTable()
 {
-
+    while(entryTable.size() != 0)
+	entryTable.erase(entryTable.begin());
 }
 
 void RLLClusterTable::initialize(int stage)

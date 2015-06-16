@@ -39,6 +39,7 @@ void Ieee802154eMacRLL::initialize(int stage)
 
     scanTimer = new cMessage("scanTimer", MAC_SCAN_TIMER);
     awaitingBeacon = new cMessage("awaitingBeaconTimer", MAC_AWAITING_BEACON);
+    awaitingNextBeacon = false;
 
 }
 
@@ -578,7 +579,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
     else
 	dataFrame->setCS(AssReq->getPanCoordinator());
 
-    dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setCntrlInfo(*AssReq);
     dataFrame->setSeqNmbr(mpib.macDSN++);
     //Create Frame Control
     frmCtrl.frameType = Ieee802154e_ASSOCIATION_REQUEST;
@@ -679,7 +680,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
     FrameCtrl frmCtrl;
     //Create Request
     dataFrame->setName("AssociationResponse");
-    dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setCntrlInfo(*AssReq);
     dataFrame->setSeqNmbr(mpib.macDSN++);
     if(AssReq->getPanCoordinator())
     {
@@ -801,7 +802,7 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_request(cMessage *msg)
     AssReq->setCoordPANId(mpib.macPANId);
     AssReq->setCoordAddress(mpib.macCoordShortAddress);
 
-    dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setCntrlInfo(*AssReq);
     dataFrame->setSeqNmbr(mpib.macDSN++);
     //Create Frame Control
     frmCtrl.frameType = Ieee802154e_DISASSOCIATION_REQUEST;
@@ -890,7 +891,7 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_response(cMessage *msg)
     //Create Request
     dataFrame->setName("DisassociationResponse");
     AssReq->setStatus(mac_SUCCESS);
-    dataFrame->setCntrlInfo(*AssReq->dup());
+    dataFrame->setCntrlInfo(*AssReq);
     dataFrame->setSeqNmbr(mpib.macDSN++);
     //Create Frame Control
     frmCtrl.frameType = Ieee802154e_DISASSOCIATION_RESPONSE;
@@ -1154,7 +1155,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 	auxSecHd.keySource = 0;
 	auxSecHd.keyIndex = 0;
 
-	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setCntrlInfo(*tmpNetCn);
 	tmpSchedul->setFrmCtrl(frmCtrl);
 	tmpSchedul->setAuxSecHd(auxSecHd);
 	tmpSchedul->setSeqNmbr(mpib.macDSN++);
@@ -1226,7 +1227,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 	auxSecHd.keySource = 0;
 	auxSecHd.keyIndex = 0;
 
-	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setCntrlInfo(*tmpNetCn);
 	tmpSchedul->setFrmCtrl(frmCtrl);
 	tmpSchedul->setAuxSecHd(auxSecHd);
 	tmpSchedul->setSeqNmbr(mpib.macDSN++);
@@ -1323,7 +1324,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_response(cMessage *msg)
 	auxSecHd.keySource = 0;
 	auxSecHd.keyIndex = 0;
 
-	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setCntrlInfo(*tmpNetCn);
 	tmpSchedul->setFrmCtrl(frmCtrl);
 	tmpSchedul->setAuxSecHd(auxSecHd);
 	tmpSchedul->setSeqNmbr(mpib.macDSN++);
@@ -1394,7 +1395,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_response(cMessage *msg)
 	auxSecHd.keySource = 0;
 	auxSecHd.keyIndex = 0;
 
-	tmpSchedul->setCntrlInfo(*tmpNetCn->dup());
+	tmpSchedul->setCntrlInfo(*tmpNetCn);
 	tmpSchedul->setFrmCtrl(frmCtrl);
 	tmpSchedul->setAuxSecHd(auxSecHd);
 	tmpSchedul->setSeqNmbr(mpib.macDSN++);
