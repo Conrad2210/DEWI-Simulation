@@ -2992,13 +2992,13 @@ void Ieee802154eMac::constructBCN()
 	if(mpib.macTSCHenabled)
 	{ // save in the mac queue
 	  //send(tmpEBcn, mQueueOut);
-	    queueModule->insertInQueue(txBeacon->dup());
+	    queueModule->insertInQueue(txBeacon);
 	}
 	else
 	{
 	    txPkt = tmpEBcn;
 	    mpib.macBeaconTxTime = SIMTIME_DBL(simTime());
-	    sendDown(check_and_cast<Ieee802154eFrame *>(txBeacon->dup())); // no delay
+	    sendDown(check_and_cast<Ieee802154eFrame *>(txBeacon)); // no delay
 	}
     }
 

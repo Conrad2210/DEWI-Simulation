@@ -68,7 +68,7 @@ struct PAN_ELE
             UINT_8          keyIdMode;
             UINT_64         keySource;
             UINT_8          keyIndex;
-            std::vector<int>    CodeList;
+            //std::vector<int>    CodeList;
 
             // Std 802.15.4e-2012 (table 17) page 132
 //            IE_DSME_PAN DSMESuperframeSpecification;
