@@ -19,10 +19,10 @@
 RLLClusterTableEntry::RLLClusterTableEntry()
 {
     // TODO Auto-generated constructor stub
-    ownerp = new RLLClusterTable();
+    ownerp = NULL;
 
 
-    clusterModule = new cModule();
+    clusterModule = NULL;
 
     id = -1;
     stage = -1;
@@ -35,10 +35,10 @@ RLLClusterTableEntry::RLLClusterTableEntry()
 
 RLLClusterTableEntry::RLLClusterTableEntry(const RLLClusterTableEntry &entry)
 {
-    ownerp = new RLLClusterTable();
+
     *ownerp = *entry.ownerp;
 
-    clusterModule = new cModule();
+
     this->setClusterModule(entry.clusterModule);
     id = entry.id;
     stage = entry.stage;

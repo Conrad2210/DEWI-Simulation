@@ -2982,6 +2982,7 @@ void Ieee802154eMac::constructBCN()
 	    {
 		tmpEBcn->setIePayload(i, *tmpIEPlist[i]);
 	    }
+
 	}
 
 	tmpEBcn->setFrmCtrl(frmCtrl);
@@ -3000,7 +3001,9 @@ void Ieee802154eMac::constructBCN()
 	    mpib.macBeaconTxTime = SIMTIME_DBL(simTime());
 	    sendDown(check_and_cast<Ieee802154eFrame *>(txBeacon)); // no delay
 	}
+
     }
+
 
 }
 

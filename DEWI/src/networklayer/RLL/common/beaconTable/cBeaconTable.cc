@@ -31,7 +31,7 @@ cBeaconTable::cBeaconTable()
 
 cBeaconTable::~cBeaconTable()
 {
-    // TODO Auto-generated destructor stub
+
 }
 void cBeaconTable::initialize(int stage)
 {
@@ -119,6 +119,9 @@ bool cBeaconTable::updateBeaconEntry(Ieee802154EnhancedBeaconFrame *msg, MACAddr
 	    return true;
 	}
     }
+
+    delete msg;
+    msg = NULL;
     return false;
 
 }
@@ -128,8 +131,7 @@ void cBeaconTable::flushBeaconTable()
     while(entryTable.size() != 0)
     {
 
-	//delete entryTable.at(0)->getbcnMsg();
-	entryTable.at(0)->setbcnMsg(NULL);
+
 	entryTable.erase(entryTable.begin());
     }
     updateDisplayString();

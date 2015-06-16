@@ -45,7 +45,7 @@ cBeaconTableEntry::cBeaconTableEntry(int Eid, Ieee802154EnhancedBeaconFrame *msg
 
 cBeaconTableEntry::~cBeaconTableEntry()
 {
-    // TODO Auto-generated destructor stub
+    delete bcnMsg;
 }
 
 std::string cBeaconTableEntry::info() const

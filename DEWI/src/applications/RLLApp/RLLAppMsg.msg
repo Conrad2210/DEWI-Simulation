@@ -15,6 +15,7 @@
 
 cplusplus {{
 	using namespace std;
+	#include "Ieee802154Def.h";
 }}
 
 

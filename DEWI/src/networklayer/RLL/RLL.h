@@ -176,6 +176,8 @@ class INET_API RLL : public cSimpleModule
 	//after association store's the number of scans for beacon
 	int nScanCounter;
 
+	int nDistance;
+
     private:
 	////////////////////////////////////////////////////////////////////////
 	//			Helper Functions

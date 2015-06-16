@@ -42,19 +42,20 @@ RLL::RLL()
     DisassociateWaitTimer = NULL;
     BeaconTimer = NULL;
     ScanTimer = NULL;
+    nDistance = 0;
 }
 
 RLL::~RLL()
 {
 
-	cancelAndDelete(AssociateTimer);
-	cancelAndDelete(ScheduleTimer);
-	cancelAndDelete(BeaconTimer);
-	cancelAndDelete(StartTimer);
-	cancelAndDelete(AssociateWaitTimer);
-	cancelAndDelete(ScanTimer);
-	cancelAndDelete(BeaconScanTimer);
-	cancelAndDelete(DisassociateWaitTimer);
+    cancelAndDelete(AssociateTimer);
+    cancelAndDelete(ScheduleTimer);
+    cancelAndDelete(BeaconTimer);
+    cancelAndDelete(StartTimer);
+    cancelAndDelete(AssociateWaitTimer);
+    cancelAndDelete(ScanTimer);
+    cancelAndDelete(BeaconScanTimer);
+    cancelAndDelete(DisassociateWaitTimer);
 }
 
 void RLL::initialize(int stage)
@@ -121,6 +122,8 @@ void RLL::initialize(int stage)
 	bAssociateDirectly = false;
 	nScanCounter = 0;
 	nLastSCANChannel = 0;
+
+	nDistance = par("Distance");
 
 	WATCH(nLastSCANChannel);
 	WATCH(nScanDuration);
@@ -458,8 +461,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	    scheduleAt(simTime() + fBI * 2, BeaconScanTimer);
 	}
 	setSchedule();
-	    delete tempStr;
-	    tempStr = NULL;
+	delete tempStr;
+	tempStr = NULL;
     }
     else
     {
@@ -478,8 +481,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 
 	scheduleAt(simTime(), AssociateTimer);
 	parentDisp->updateWith(*tempStr);
-	    delete tempStr;
-	    tempStr = NULL;
+	delete tempStr;
+	tempStr = NULL;
     }
 
     delete tmp;
@@ -524,6 +527,8 @@ void RLL::handle_MLME_DIASSOCIATE_confirm(cMessage *msg)
     clusterTable->deleteEntry(clusterTable->getEntryByShrtAddr(tmpMsg->getSrcAddr().getInt()));
     if(DisassociateWaitTimer->isScheduled())
 	cancelEvent(DisassociateWaitTimer);
+
+
     RESTART_request(NULL);
 
     delete tmpMsg;
@@ -566,9 +571,8 @@ void RLL::handle_MLME_BEACON_indication(cMessage *msg)
     {
 	MLME_SET_BEACON_request(msg->dup());
 	delete msg;
-	    msg = NULL;
+	msg = NULL;
     }
-
 
 }
 
@@ -616,7 +620,6 @@ void RLL::handle_MLME_START_confirm(cMessage *msg)
     delete startCo;
     startCo = NULL;
     msg = NULL;
-
 
     delete tempStr;
     tempStr = NULL;
@@ -694,6 +697,7 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
     {
 
 	Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+	msg = NULL;
 	Radio80211aControlInfo control = getRadioControl(check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo()));
 	if(!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
 	    beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime(), control.getLossRate(), calcDistance(control.getLossRate(), control.getRecPow()));
@@ -702,7 +706,6 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 
 	//delete control;
 	//control = NULL;
-
 
     }
     else
@@ -713,7 +716,7 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 	    double rxpower, rssi, txPower, distance;
 	    Ieee802154EnhancedBeaconFrame *tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
 
-	    if(rssi < 20 && bCapablePanCoor)
+	    if(rssi < nDistance && bCapablePanCoor)
 	    {
 
 		bIsPANCoor = true;
@@ -721,7 +724,10 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 	    else if(nRestartCounter < 3)
 	    {
 		nRestartCounter++;
+		delete tmpBcn;
+		tmpBcn = NULL;
 		RESTART_request(NULL);
+
 		return;
 	    }
 
@@ -890,8 +896,9 @@ void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
     }
     else
     {
-	if(beaconTable->CHinDistance(15))
+	if(beaconTable->CHinDistance(0))
 	{
+	    bCapablePanCoor = false;
 	    MLME_DISASSOCIATE_request(NULL);
 	}
 	else
@@ -906,7 +913,6 @@ void RLL::handle_BEACON_CH_SAME_STAGE(cMessage *msg)
 	beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime(), control.getLossRate(), calcDistance(control.getLossRate(), control.getRecPow()));
     else
 	beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime());
-
 
     delete tmpBcn;
     tmpBcn = NULL;
@@ -936,7 +942,7 @@ void RLL::handle_RESTART_confirm(cMessage *msg)
     nLastSCANChannel = 0;
     nScanCounter = 3;
 
-    bCapablePanCoor = false;
+    //bCapablePanCoor = false;
     if(bCapablePanCoor)
 	bIsPANCoor = par("isPANCoor").boolValue();
     else
@@ -1043,7 +1049,6 @@ void RLL::createInitialEntries()
     slotframeEntry->setSlotframeSize(12);
     slotframeEntry->setSlotframeTable(slotframeTable);
     slotframeTable->addSlotframe(slotframeEntry);
-
 
     //Add links ino link table
     setSchedule();

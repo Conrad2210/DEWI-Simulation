@@ -17,10 +17,11 @@
 
 // cplusplus {{
 	using namespace std;
+	#include "Ieee802154Def.h";
 // }}
 
 /**
- * Class generated from <tt>src/applications/RLLApp/RLLAppMsg.msg:22</tt> by nedtool.
+ * Class generated from <tt>src/applications/RLLApp/RLLAppMsg.msg:23</tt> by nedtool.
  * <pre>
  * packet RLLAppMsg
  * {
