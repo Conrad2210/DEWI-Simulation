@@ -16,13 +16,15 @@
 #include <DataVector.h>
 #include <stdio.h>
 #include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include "cmodule.h"
 #include <dirent.h>
 #include <ios>
 #include "DataFunctions.h"
+
+using namespace std;
 
 DataVector::DataVector(std::string name, std::string type) {
 
@@ -34,6 +36,7 @@ DataVector::DataVector(std::string name, std::string type) {
 
     //get pointer to DataCenter
     center = check_and_cast<DataCenter *>(center->getModuleByPath("DataCenter"));
+
 }
 
 DataVector::~DataVector() {
@@ -53,6 +56,17 @@ void DataVector::record(double value)
 }
 
 void DataVector::record(double value, std::string name)
+{
+    //declare result variable
+    std::stringstream a;
+
+    //convert double to string
+    a << value << "," << name;
+
+    //add data entry
+    Data.push_back(a.str());
+}
+void DataVector::record(double value, const char* name)
 {
     //declare result variable
     std::stringstream a;
@@ -98,28 +112,30 @@ void DataVector::saveData(std::string Path)
 {
 
     //declare path variable
-    std::stringstream path;
+    stringstream ss;
+    ss.str("");
+
 
     //set absolute path
 #ifdef WIN32
-    path << Path << "\\" << Type << "\\" << Name;
+    ss << Path << "\\" << Type << "\\" << Name;
 #elif linux
-    path << Path << "/" << Type << "/" << Name;
+    ss << Path << "/" << Type << "/" << Name;
 #endif
 
     //make directories
 
-    if(createDirectories(path.str()))
+    if(createDirectories(ss.str()))
     {
         //Set path including fileName
 #ifdef WIN32
-        path << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+	ss << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #elif linux
-        path << "/" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+	ss << "/" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #endif
 
         //Open output file
-        std::ofstream fout(path.str().c_str());
+        std::ofstream fout(ss.str().c_str());
 
         //check if output file is open
         if(fout.is_open())

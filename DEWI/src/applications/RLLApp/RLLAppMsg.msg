@@ -15,7 +15,7 @@
 
 cplusplus {{
 	using namespace std;
-	#include "Ieee802154Def.h";
+	#include "Ieee802154Def.h"
 }}
 
 
@@ -24,4 +24,6 @@ packet RLLAppMsg
     string sourceName; 	// name of the source node
     string destName;		// name of the destination node
     simtime_t creationTime; // creation time of the packet
+    int burstId;
+    int messageId;
 }

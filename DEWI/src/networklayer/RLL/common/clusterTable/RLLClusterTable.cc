@@ -76,12 +76,9 @@ int RLLClusterTable::getNumEntries()
 {
     if(tmpNumEntries == -1)
     {
-	int n = 0;
-	int maxId = entryTable.size();
-	for(int i = 0; i < maxId; i++)
-	    n++;
 
-	tmpNumEntries = n;
+	 tmpNumEntries = entryTable.size();
+
     }
     return tmpNumEntries;
 }
@@ -218,7 +215,7 @@ RLLClusterTableEntry *RLLClusterTable::getEntry(int pos)
 {
     int n = getNumEntries();
 
-    if(pos < 0 || pos >= n)
+    if(pos < 0 || pos > n)
 	throw cRuntimeError("getEntry(): clusterEntry index %d out of range 0..%d", pos, n - 1);
 
     return entryTable.at(pos);
@@ -251,4 +248,53 @@ void RLLClusterTable::clearTable()
 
     while(entryTable.size() != 0)
 	entryTable.erase(entryTable.begin());
+}
+
+
+bool RLLClusterTable::existHigherCH(int stage)
+{
+    for(int i = 0; i < (int) entryTable.size(); i++)
+    {
+	if(entryTable.at(i)->getStage() > stage && entryTable.at(i)->getIsCH())
+	    return true;
+    }
+    return false;
+
+}
+
+bool RLLClusterTable::existLowerCH(int stage)
+{
+    for(int i = 0; i < (int) entryTable.size(); i++)
+    {
+	if(entryTable.at(i)->getStage() < stage && entryTable.at(i)->getIsCH())
+	    return true;
+    }
+    return false;
+}
+
+bool RLLClusterTable::existCS(int stage)
+{
+    for(int i = 0; i < (int) entryTable.size(); i++)
+    {
+	if(entryTable.at(i)->getStage() == stage && !entryTable.at(i)->getIsCH())
+	    return true;
+    }
+    return false;
+}
+
+UINT_8 RLLClusterTable::getNumberCH()
+{
+    UINT_8 temp = 0;
+    for(int i = 0; i < (int) entryTable.size(); i++)
+    {
+	if(entryTable.at(i)->getIsCH())
+	    temp++;
+    }
+    if(temp == 0)
+	return 0;
+    else if(temp > 0)
+	return temp -1;
+    else
+	return 0;
+
 }

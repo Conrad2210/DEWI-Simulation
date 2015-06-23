@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "DataVector.h"
+#include "cAssociated.h"
 class DataVector;
 
 class INET_API DataCenter : public cSimpleModule
@@ -28,6 +29,13 @@ public:
     virtual ~DataCenter();
     void registerVector(DataVector* Vec);
     void recordScalar(std::string Data,std::string Type, std::string Index, std::string Name);
+    void registerNode(int index, char* name, bool associated);
+
+    void registerAssociatedVector(int ix, const char* na, bool as, int st, int parix, const char* parna);
+
+    void updateAssociatedVector(int ix, const char* na, bool as, int st, int parix, const char* parna);
+
+    bool allAssociated();
 
 private:
     //initialize datacenter
@@ -36,6 +44,7 @@ private:
     //finish DataCenter
     //writes values to csv files
     void finish();
+
 
 
 
@@ -49,6 +58,8 @@ private:
     bool recordValues;
 
     std::vector<DataVector*> ResultVectors;
+
+    std::vector<cAssociated *> AssociatedVector;
 };
 
 #endif /* DATACENTER_H_ */

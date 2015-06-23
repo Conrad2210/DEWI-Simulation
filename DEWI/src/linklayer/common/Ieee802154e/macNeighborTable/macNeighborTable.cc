@@ -495,7 +495,7 @@ MACAddress macNeighborTable::getAddressFromCH()
 {
     for(int i = 0; i < (int) idToNeighbor.size(); i++)
     {
-	if(idToNeighbor.at(i)->isNextStageCH())
+	if(idToNeighbor.at(i)->isMyCH())
 	    return idToNeighbor.at(i)->getExtendedAddress();
     }
     return MACAddress::UNSPECIFIED_ADDRESS;

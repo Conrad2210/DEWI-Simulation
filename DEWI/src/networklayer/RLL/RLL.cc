@@ -15,8 +15,10 @@
 
 #include <RLL.h>
 #include <Ieee802154eNetworkCtrlInfo_m.h>
+#include "Ieee802Ctrl_m.h"
 #include "Ieee802154eFrame_m.h"
 #include <Radio80211aControlInfo_m.h>
+#include "RLLAppMsg_m.h"
 
 Define_Module(RLL);
 
@@ -86,10 +88,10 @@ void RLL::initialize(int stage)
 	clusterTable = check_and_cast<IRLLClusterTable *>(getModuleByPath(par("RLLClusterTableModule")));
 
 	beaconTable = check_and_cast<cBeaconTable *>(getModuleByPath(par("cBeaconTableModule")));
-	lowerLayerIn = findGate("lowerLayerIn");
-	lowerLayerOut = findGate("lowerLayerOut");
-	upperLayerIn = findGate("upperLayerIn");
-	upperLayerOut = findGate("upperLayerOut");
+	mLowerLayerIn = findGate("lowerLayerIn");
+	mLowerLayerOut = findGate("lowerLayerOut");
+	mUpperLayerIn = findGate("upperLayerIn");
+	mUpperLayerOut = findGate("upperLayerOut");
 
     }
     else if(stage == 3)
@@ -122,6 +124,7 @@ void RLL::initialize(int stage)
 	bAssociateDirectly = false;
 	nScanCounter = 0;
 	nLastSCANChannel = 0;
+	nAssociateCounter = 0;
 
 	nDistance = par("Distance");
 
@@ -140,6 +143,8 @@ void RLL::initialize(int stage)
 	    start = 0;
 	}
 	scheduleAt(simTime() + start, StartTimer);
+
+	dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
     }
 }
 void RLL::finish()
@@ -153,13 +158,19 @@ void RLL::handleMessage(cMessage *msg)
     {
 	handleSelfMessage(msg);
     }
-    else if(msg->getArrivalGateId() == lowerLayerIn)
+    else if(msg->getArrivalGateId() == mLowerLayerIn)
     {
-	handleMACMessage(msg);
+	if(!handleLowerMessage(msg))
+	{
+	    if(ev.isGUI())
+		EV << "[RLL]: Received packet is DATA packet, process in handleData..." << endl;
+
+	    handleDataMessage(PK(msg));
+	}
     }
-    else if(msg->getArrivalGateId() == upperLayerIn)
+    else if(msg->getArrivalGateId() == mUpperLayerIn)
     {
-	//TODO: handle Upper Message
+	handleUpperMessage(PK(msg));
     }
     else
     {
@@ -173,7 +184,219 @@ void RLL::handleMessage(cMessage *msg)
     updatedisplay();
 }
 
-void RLL::handleMACMessage(cMessage *msg)
+void RLL::handleDataMessage(cPacket *msg)
+{
+    if(dynamic_cast<RLLAppMsg *>(msg) != NULL)
+    {
+	RLLAppMsg *temp = check_and_cast<RLLAppMsg *>(msg);
+	//First send it to application layer
+	send(temp->dup(), mUpperLayerOut);
+
+	//First check if stage 0
+//	if(nCluStage == 0 && bIsPANCoor)
+//	{
+//	    if(temp->getControlInfo() != NULL)
+//		temp->removeControlInfo();
+//
+//	    Ieee802154eNetworkCtrlInfo *ctrl = new Ieee802154eNetworkCtrlInfo();
+//
+//	    ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+//
+//	    temp->setControlInfo(ctrl);
+//	    send(temp, mLowerLayerOut);
+//	}
+//	else
+	if(bIsPANCoor)
+	{
+	    Ieee802154eNetworkCtrlInfo *ctrl;
+	    if(temp->getControlInfo() != NULL)
+		ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo*>(temp->removeControlInfo());
+	    else
+		ctrl = new Ieee802154eNetworkCtrlInfo();
+
+	    if(clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr()) != NULL)
+	    {
+		if(clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() > nCluStage)
+		{
+		    //handle msg if arrived from higher cluster stage
+
+		    if(clusterTable->existLowerCH(nCluStage))
+		    {
+			ctrl->setTxLowerCH(true);
+			ctrl->setTxHigherCH(false);
+			ctrl->setTxCS(false);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp->setControlInfo(ctrl);
+			send(temp, mLowerLayerOut);
+
+		    }
+
+		    RLLAppMsg *temp1 = temp->dup();
+		    ctrl = new Ieee802154eNetworkCtrlInfo();
+		    if(nCluStage == 0)
+		    {
+			if(clusterTable->existHigherCH(nCluStage))
+			{
+			    ctrl->setTxLowerCH(false);
+			    ctrl->setTxHigherCH(true);
+			    ctrl->setTxCS(false);
+			    ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			    temp->setControlInfo(ctrl);
+			    send(temp, mLowerLayerOut);
+
+			}
+		    }
+
+		    temp1 = temp->dup();
+		    ctrl = new Ieee802154eNetworkCtrlInfo();
+		    if(clusterTable->existCS(nCluStage))
+		    {
+			ctrl->setTxLowerCH(false);
+			ctrl->setTxHigherCH(false);
+			ctrl->setTxCS(true);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp1->setControlInfo(ctrl);
+			send(temp1, mLowerLayerOut);
+
+		    }
+
+		}
+		else if(clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() == nCluStage)
+		{
+		    //handle Message received from same stage (probably CS)
+
+		    if(clusterTable->existLowerCH(nCluStage))
+		    {
+			ctrl->setTxLowerCH(true);
+			ctrl->setTxHigherCH(false);
+			ctrl->setTxCS(false);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp->setControlInfo(ctrl);
+			send(temp, mLowerLayerOut);
+
+		    }
+
+		    RLLAppMsg *temp1 = temp->dup();
+
+		    ctrl = new Ieee802154eNetworkCtrlInfo();
+		    if(clusterTable->existHigherCH(nCluStage))
+		    {
+			ctrl->setTxLowerCH(false);
+			ctrl->setTxHigherCH(true);
+			ctrl->setTxCS(false);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp1->setControlInfo(ctrl);
+			send(temp1, mLowerLayerOut);
+
+		    }
+
+		    temp1 = temp->dup();
+
+		    ctrl = new Ieee802154eNetworkCtrlInfo();
+		    if(clusterTable->existCS(nCluStage))
+		    {
+			ctrl->setTxLowerCH(false);
+			ctrl->setTxHigherCH(false);
+			ctrl->setTxCS(true);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp1->setControlInfo(ctrl);
+			send(temp1, mLowerLayerOut);
+
+		    }
+
+		}
+		else if(clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() < nCluStage)
+		{
+		    //handle Message received from lower stage
+
+		    if(clusterTable->existHigherCH(nCluStage))
+		    {
+			ctrl->setTxLowerCH(false);
+			ctrl->setTxHigherCH(true);
+			ctrl->setTxCS(false);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp->setControlInfo(ctrl);
+			send(temp, mLowerLayerOut);
+
+		    }
+
+		    RLLAppMsg *temp1 = temp->dup();
+
+		    ctrl = new Ieee802154eNetworkCtrlInfo();
+		    if(clusterTable->existCS(nCluStage))
+		    {
+			ctrl->setTxLowerCH(false);
+			ctrl->setTxHigherCH(false);
+			ctrl->setTxCS(true);
+			ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+			temp1->setControlInfo(ctrl);
+			send(temp1, mLowerLayerOut);
+
+		    }
+		}
+
+	    }
+	    else
+	    {
+		delete msg;
+		msg = NULL;
+		if(ev.isGUI())
+		    EV << "[RLL]: Received packet is not for me, delete packet and resume..." << endl;
+
+	    }
+	}
+	else
+	{
+	    delete msg;
+	    msg = NULL;
+	    if(ev.isGUI())
+		EV << "[RLL]: I'm a CS nothing to do here..." << endl;
+
+	}
+
+    }
+    else
+    {
+	delete msg;
+	msg = NULL;
+
+	if(ev.isGUI())
+	    EV << "[RLL]: Received packet is not a data packet, delete packet and resume..." << endl;
+
+    }
+}
+
+void RLL::handleUpperMessage(cPacket *msg)
+{
+    RLLAppMsg *appPkt = check_and_cast<RLLAppMsg *>(msg);
+    if(bIsPANCoor)
+    {
+
+    }
+    else
+    {
+	Ieee802154eNetworkCtrlInfo *cntr = new Ieee802154eNetworkCtrlInfo();
+	if(!strcmp(appPkt->getDestName(), "Broadcast"))
+	{
+	    cntr->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+	    cntr->setTxCS(true);
+	}
+
+	appPkt->setControlInfo(cntr);
+
+	send(appPkt, mLowerLayerOut);
+    }
+}
+
+bool RLL::handleLowerMessage(cMessage *msg)
 {
     switch(msg->getKind())
     {
@@ -242,10 +465,11 @@ void RLL::handleMACMessage(cMessage *msg)
 
 	default:
 	{
-	    delete msg;
+	    return false;
 	    break;
 	}
     }
+    return true;
 }
 
 void RLL::handleSelfMessage(cMessage *msg)
@@ -305,16 +529,25 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 {
     if(bNotAssociated)
     {
-	if(!AssociateTimer->isScheduled())
+	if(nAssociateCounter < 15)
 	{
-	    Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("AssociationRequest", TP_MLME_ASSOCIATE_REQUEST);
-	    tmp->setPanCoordinator(bIsPANCoor);
-	    send(tmp->dup(), lowerLayerOut);
-	    if(AssociateWaitTimer->isScheduled())
-		cancelEvent(AssociateWaitTimer);
-	    scheduleAt(simTime() + 5, AssociateWaitTimer);
-	    delete tmp;
-	    tmp = NULL;
+	    if(!AssociateTimer->isScheduled())
+	    {
+		nAssociateCounter++;
+		Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("AssociationRequest", TP_MLME_ASSOCIATE_REQUEST);
+		tmp->setPanCoordinator(bIsPANCoor);
+		send(tmp->dup(), mLowerLayerOut);
+		if(AssociateWaitTimer->isScheduled())
+		    cancelEvent(AssociateWaitTimer);
+		scheduleAt(simTime() + 5, AssociateWaitTimer);
+		delete tmp;
+		tmp = NULL;
+	    }
+	}
+	else
+	{
+	    bAssociateDirectly = true;
+	    RESTART_request(NULL);
 	}
     }
 
@@ -369,12 +602,13 @@ void RLL::MLME_ASSOCIATE_response(cMessage *msg)
     Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
     Ieee802154eNetworkCtrlInfo *AssRes = new Ieee802154eNetworkCtrlInfo("AssociationResponse", TP_MLME_ASSOCIATE_RESPONSE);
     AssRes->setDeviceAddress(tmp->getDeviceAddress());
-    AssRes->setAssocShortAddress(tmp->getSrcAddr());
+    AssRes->setAssocShortAddress(tmp->getAssocShortAddress());
     AssRes->setStatus(mac_FastA_successful);
     AssRes->setChannelOffset(tmp->getChannelOffset());
     AssRes->setStage(nCluStage);
     AssRes->setPanCoordinator(bIsPANCoor);
-    send(AssRes->dup(), lowerLayerOut);
+    AssRes->setNumberCH(clusterTable->getNumberCH());
+    send(AssRes->dup(), mLowerLayerOut);
     delete AssRes;
     AssRes = NULL;
     delete tmp;
@@ -455,14 +689,17 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 	}
 	else
 	{
+
 	    if(BeaconScanTimer->isScheduled())
 		cancelEvent(BeaconScanTimer);
-
-	    scheduleAt(simTime() + fBI * 2, BeaconScanTimer);
+	    waitConstant = tmp->getNumberCH();
+	    scheduleAt(simTime() + tmp->getNumberCH() * 5, BeaconScanTimer);
 	}
 	setSchedule();
 	delete tempStr;
 	tempStr = NULL;
+
+	dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
     }
     else
     {
@@ -494,7 +731,7 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("DisassociationRequest", TP_MLME_DISASSOCIATE_REQUEST);
     //scheduleAt(simTime()+2,DisassociateWaitTimer);
-    send(cnt->dup(), lowerLayerOut);
+    send(cnt->dup(), mLowerLayerOut);
     delete cnt;
     cnt = NULL;
 }
@@ -514,7 +751,7 @@ void RLL::MLME_DISASSOCIATE_response(cMessage *msg)
 {
     Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
     tmpMsg->setKind(TP_MLME_DISASSOCIATE_RESPONSE);
-    send(tmpMsg->dup(), lowerLayerOut);
+    send(tmpMsg->dup(), mLowerLayerOut);
     delete tmpMsg;
     tmpMsg = NULL;
     msg = NULL;
@@ -528,7 +765,7 @@ void RLL::handle_MLME_DIASSOCIATE_confirm(cMessage *msg)
     if(DisassociateWaitTimer->isScheduled())
 	cancelEvent(DisassociateWaitTimer);
 
-
+    dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
     RESTART_request(NULL);
 
     delete tmpMsg;
@@ -544,7 +781,7 @@ void RLL::MLME_BEACON_request(cMessage *msg)
     tempMsg->setBeaconType(0x01);
     tempMsg->setChannel(11);
 
-    send(tempMsg->dup(), lowerLayerOut);
+    send(tempMsg->dup(), mLowerLayerOut);
     delete tempMsg;
     tempMsg = NULL;
 }
@@ -582,7 +819,7 @@ void RLL::MLME_START_request(cMessage *msg)
     Ieee802154eNetworkCtrlInfo *startMsg = new Ieee802154eNetworkCtrlInfo("StartMsg", TP_MLME_START_REQUEST);
     startMsg->setPanCoordinator(bIsPANCoor);
     startMsg->setStartTime((uint32_t)par("StartTime").doubleValue());
-    send(startMsg->dup(), lowerLayerOut);
+    send(startMsg->dup(), mLowerLayerOut);
     delete startMsg;
     startMsg = NULL;
 }
@@ -639,7 +876,7 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	else if(nLastSCANChannel == channelList[numChannel])
 	{
 	    scanReq->setScanType(0x00);
-	    send(scanReq->dup(), lowerLayerOut);
+	    send(scanReq->dup(), mLowerLayerOut);
 	    if(ScanTimer->isScheduled())
 		cancelEvent(ScanTimer);
 	    nScanDuration++;
@@ -673,7 +910,7 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 	    }
 	}
 	scanReq->setScanType(0x02);
-	send(scanReq->dup(), lowerLayerOut);
+	send(scanReq->dup(), mLowerLayerOut);
 
 	double tempTime = aBaseSuperframeDuration * pow(2, nScanDuration) / 62.5e3;
 	if(ScanTimer->isScheduled())
@@ -726,6 +963,7 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 		nRestartCounter++;
 		delete tmpBcn;
 		tmpBcn = NULL;
+		bCapablePanCoor = false;
 		RESTART_request(NULL);
 
 		return;
@@ -758,14 +996,14 @@ void RLL::MLME_SET_BEACON_request(cMessage *msg)
 	}
 	tmp->setKind(TP_MLME_SET_BEACON_REQUEST);
 	tmp->setName("SetSlotRequest");
-	send(tmp, lowerLayerOut);
+	send(tmp, mLowerLayerOut);
     }
     else
     {
 
 	Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("SetSlotRequest", TP_MLME_SET_BEACON_REQUEST);
 
-	send(tmp->dup(), lowerLayerOut);
+	send(tmp->dup(), mLowerLayerOut);
 	delete tmp;
 	tmp = NULL;
 	delete msg;
@@ -825,7 +1063,7 @@ void RLL::SCHEDULE_request(cMessage *msg)
 	return;
     }
 
-    send(scheduleFrame->dup(), lowerLayerOut);
+    send(scheduleFrame->dup(), mLowerLayerOut);
     delete scheduleFrame;
     scheduleFrame = NULL;
 }
@@ -850,7 +1088,7 @@ void RLL::SCHEDULE_response(cMessage *msg)
     scheduleFrame->setTimeslot(tempFrame->getTimeslot());
     scheduleFrame->setChannelOffset(tempFrame->getChannelOffset());
 
-    send(scheduleFrame->dup(), lowerLayerOut);
+    send(scheduleFrame->dup(), mLowerLayerOut);
     delete scheduleFrame;
     scheduleFrame = NULL;
     delete tempFrame;
@@ -887,16 +1125,15 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 //PAN COORD check for beacon from CH same stage
 void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 {
-    if(nScanCounter < 4)
+    if(nScanCounter < waitConstant)
     {
 	nScanCounter++;
-	int waitConstant = intuniform(2, 5);
 	if(!BeaconScanTimer->isScheduled())
-	    scheduleAt(simTime() + (fBI * waitConstant), BeaconScanTimer);
+	    scheduleAt(simTime() + 5, BeaconScanTimer);
     }
     else
     {
-	if(beaconTable->CHinDistance(0))
+	if(beaconTable->CHinDistance(nDistance))
 	{
 	    bCapablePanCoor = false;
 	    MLME_DISASSOCIATE_request(NULL);
@@ -923,7 +1160,7 @@ void RLL::RESTART_request(cMessage *msg)
 {
     Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("Restart", TP_RESTART_REQUEST);
 
-    send(cnt->dup(), lowerLayerOut);
+    send(cnt->dup(), mLowerLayerOut);
     delete cnt;
     cnt = NULL;
     delete msg;
@@ -941,53 +1178,24 @@ void RLL::handle_RESTART_confirm(cMessage *msg)
     beaconTable->flushBeaconTable();
     nLastSCANChannel = 0;
     nScanCounter = 3;
-
+    dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
     //bCapablePanCoor = false;
     if(bCapablePanCoor)
 	bIsPANCoor = par("isPANCoor").boolValue();
     else
 	bIsPANCoor = false;
 
-    bAssociateDirectly = false;
-    if(AssociateTimer->isScheduled())
-	cancelAndDelete(AssociateTimer);
-    else
-	delete AssociateTimer;
+    //bAssociateDirectly = false;
 
-    if(ScheduleTimer->isScheduled())
-	cancelAndDelete(ScheduleTimer);
-    else
-	delete ScheduleTimer;
+    cancelAndDelete(AssociateTimer);
+    cancelAndDelete(ScheduleTimer);
+    cancelAndDelete(BeaconTimer);
+    cancelAndDelete(StartTimer);
+    cancelAndDelete(AssociateWaitTimer);
+    cancelAndDelete(ScanTimer);
+    cancelAndDelete(BeaconScanTimer);
+    cancelAndDelete(DisassociateWaitTimer);
 
-    if(BeaconTimer->isScheduled())
-	cancelAndDelete(BeaconTimer);
-    else
-	delete BeaconTimer;
-
-    if(StartTimer->isScheduled())
-	cancelAndDelete(StartTimer);
-    else
-	delete StartTimer;
-
-    if(AssociateWaitTimer->isScheduled())
-	cancelAndDelete(AssociateWaitTimer);
-    else
-	delete AssociateWaitTimer;
-
-    if(ScanTimer->isScheduled())
-	cancelAndDelete(ScanTimer);
-    else
-	delete ScanTimer;
-
-    if(BeaconScanTimer->isScheduled())
-	cancelAndDelete(BeaconScanTimer);
-    else
-	delete BeaconScanTimer;
-
-    if(DisassociateWaitTimer->isScheduled())
-	cancelAndDelete(DisassociateWaitTimer);
-    else
-	delete DisassociateWaitTimer;
     AssociateTimer = new cMessage("AssociationTimer", ASSOCIATION_TIMER);
     ScheduleTimer = new cMessage("ScheduleTimer", SCHEDULE_TIMER);
     BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
@@ -1014,6 +1222,7 @@ void RLL::handle_RESTART_confirm(cMessage *msg)
 	nScanDuration = 0;
 
     }
+    nAssociateCounter = 0;
 
     //double start = 0.0;
 
@@ -1099,7 +1308,12 @@ void RLL::setScheduleChStUn()
     macLinkTableEntry *linkEntry = linkTable->getLink(0);
     linkEntry->isprevStage(true);
     linkEntry->setLinkType(LNK_TP_JOIN);
-    linkTable->editLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+//    if(!linkTable->editLink(linkEntry))
+//    {
+//	EV << "Coudlnt add link table entry" << endl;
+//    }
 
     //new links
     linkEntry = new macLinkTableEntry();
@@ -1111,7 +1325,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(1);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1122,7 +1342,15 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(2);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1133,7 +1361,14 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(3);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1144,7 +1379,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(4);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1155,7 +1396,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(5);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1166,7 +1413,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(6);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1177,7 +1430,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(7);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset((nCluStage - 1) % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1188,7 +1447,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(8);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1201,7 +1466,11 @@ void RLL::setScheduleChStUn()
     linkEntry->setLinkId(linkTable->getNumLinks());
     linkEntry->issameStage(true);
     linkEntry->isnextStage(true);
-    linkTable->addLink(linkEntry);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     int offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
@@ -1216,7 +1485,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(10);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
@@ -1231,7 +1506,13 @@ void RLL::setScheduleChStUn()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(11);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
 }
 
@@ -1239,8 +1520,13 @@ void RLL::setScheduleChStZe()
 {
     macLinkTableEntry *linkEntry = linkTable->getLink(0);
     linkEntry->isprevStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->issameStage(false);
     linkEntry->setLinkType(LNK_TP_JOIN);
-    linkTable->editLink(linkEntry);
+//    if(!linkTable->addLink(linkEntry))
+//    {
+//	EV << "Coudlnt add link table entry" << endl;
+//    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1251,9 +1537,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(0);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->isnextStage(true);
     linkEntry->issameStage(true);
-    linkTable->addLink(linkEntry);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
@@ -1265,7 +1555,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(1);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
@@ -1277,7 +1573,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(2);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
@@ -1289,7 +1591,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(3);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
@@ -1301,7 +1609,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(4);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
@@ -1313,7 +1627,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(5);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(true);
@@ -1325,7 +1645,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(6);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(true);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
@@ -1337,7 +1663,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(7);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->isprevStage(false);
@@ -1349,8 +1681,15 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(8);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
+    linkEntry = new macLinkTableEntry();
     int offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(offset > 16)
 	offset = offset - 16;
@@ -1363,7 +1702,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(10);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
@@ -1378,7 +1723,13 @@ void RLL::setScheduleChStZe()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(11);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 }
 
 void RLL::setScheduleChInit()
@@ -1392,9 +1743,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(0);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->isnextStage(true);
     linkEntry->issameStage(true);
-    linkTable->addLink(linkEntry);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1405,7 +1760,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(3);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1416,7 +1777,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(4);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1427,7 +1794,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(7);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
@@ -1438,7 +1811,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(8);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(false);
+    linkEntry->isnextStage(true);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     int tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(tempOffset > (numChannel + 1))
@@ -1453,7 +1832,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(10);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
     if(tempOffset > (numChannel + 1))
@@ -1468,7 +1853,13 @@ void RLL::setScheduleChInit()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(11);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 }
 
 void RLL::setScheduleCs()
@@ -1482,7 +1873,13 @@ void RLL::setScheduleCs()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(10);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 
     linkEntry = new macLinkTableEntry();
     linkEntry->setChannelOffset(-1); //Advertisment always with channelOffset 0;
@@ -1493,7 +1890,13 @@ void RLL::setScheduleCs()
     linkEntry->setSlotframeId(0);
     linkEntry->setTimeslot(11);
     linkEntry->setLinkId(linkTable->getNumLinks());
-    linkTable->addLink(linkEntry);
+    linkEntry->issameStage(true);
+    linkEntry->isnextStage(false);
+    linkEntry->isprevStage(false);
+    if(!linkTable->addLink(linkEntry))
+    {
+	EV << "Coudlnt add link table entry" << endl;
+    }
 }
 
 double RLL::calcDistance(double transPowmW, double minRecvPowermW)

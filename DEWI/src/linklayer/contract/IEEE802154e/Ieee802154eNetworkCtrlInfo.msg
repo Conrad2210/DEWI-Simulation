@@ -203,11 +203,14 @@ message Ieee802154eNetworkCtrlInfo
 	uint8_t		numBackoffs;
 	uint8_t		ackPayload[];
 	
-	bool receivedByACK;
-	
-	
-	int stage;
-	
+	bool receivedByACK;	
+	int stage;	
 	int WaitConstant;
+	
+	bool txCS;
+	bool txLowerCH;
+	bool txHigherCH;
+	
+	uint8_t numberCH;
 	
 }

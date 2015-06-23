@@ -25,6 +25,8 @@
 #include "IMacNeighborTable.h"
 #include "cBeaconTable.h"
 #include "Radio80211aControlInfo_m.h"
+
+#include "DataCenter.h"
 class INET_API RLL : public cSimpleModule
 {
     public:
@@ -43,7 +45,11 @@ class INET_API RLL : public cSimpleModule
 
 	virtual void handleSelfMessage(cMessage *msg);
 
-	virtual void handleMACMessage(cMessage *msg);
+	virtual bool handleLowerMessage(cMessage *msg);
+
+	virtual void handleUpperMessage(cPacket *msg);
+
+	virtual void handleDataMessage(cPacket *msg);
 
     protected:
 	//Association Process
@@ -101,10 +107,10 @@ class INET_API RLL : public cSimpleModule
 	virtual void handle_RESTART_confirm(cMessage *msg);
 
     protected:
-	int lowerLayerIn;
-	int upperLayerIn;
-	int lowerLayerOut;
-	int upperLayerOut;
+	int mLowerLayerIn;
+	int mUpperLayerIn;
+	int mLowerLayerOut;
+	int mUpperLayerOut;
 
 	/** @brief Link table */
 	IMacLinkTable* linkTable;
@@ -172,11 +178,17 @@ class INET_API RLL : public cSimpleModule
 	//tried to associate more than once
 	bool bAssociateDirectly;
 
+	int nAssociateCounter;
+
 	//For PanCoord,
 	//after association store's the number of scans for beacon
 	int nScanCounter;
 
 	int nDistance;
+
+	int waitConstant;
+
+	DataCenter *dataCenter;
 
     private:
 	////////////////////////////////////////////////////////////////////////

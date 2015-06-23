@@ -4358,6 +4358,7 @@ void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8021
 
 	// set length and encapsulate msdu
 	tmpData->setByteLength(calFrmByteLength(tmpData));
+	tmpData->setControlInfo(msdu->removeControlInfo());
 	tmpData->encapsulate(msdu);     // the length of msdu is added to mpdu
 	EV << "[MAC]: MPDU constructed: " << tmpData->getName() << " (" << tmpData->getEncapsulatedPacket()->getName() << "), #" << (int)tmpData->getSeqNmbr() << ", " << tmpData->getByteLength() << " Bytes" << endl;
     }
@@ -4649,9 +4650,8 @@ void Ieee802154eMac::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_
     }
 
     EV << "[MAC]: sending received " << msg->getName() << " frame to upper layer" << endl;
-    send(msg->dup(), mUpperLayerOut);
+    send(msg, mUpperLayerOut);
     delete msdu;
-    delete msg;
 }
 
 /**@author: 2014    Stefan Reis

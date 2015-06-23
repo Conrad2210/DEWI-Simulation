@@ -19,6 +19,7 @@
 #include "INETDefs.h"
 
 #include "RLLClusterTableEntry.h"
+#include "Ieee802154Def.h"
 
 
 class INET_API IRLLClusterTable
@@ -66,6 +67,14 @@ class INET_API IRLLClusterTable
 	virtual RLLClusterTableEntry *getEntryById(int id) = 0;
 
 	virtual RLLClusterTableEntry *getEntryByShrtAddr(UINT_16 address) = 0;
+
+	virtual bool existHigherCH(int stage) = 0;
+
+	virtual bool existLowerCH(int stage) = 0;
+
+	virtual bool existCS(int stage) = 0;
+
+	virtual UINT_8 getNumberCH() = 0;
 
 	//deletes all entries
 	virtual void clearTable() = 0;

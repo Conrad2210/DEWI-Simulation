@@ -217,11 +217,14 @@
  *     uint8_t ackPayload[];
  * 
  *     bool receivedByACK;
- * 
- * 
  *     int stage;
- * 
  *     int WaitConstant;
+ * 
+ *     bool txCS;
+ *     bool txLowerCH;
+ *     bool txHigherCH;
+ * 
+ *     uint8_t numberCH;
  * 
  * }
  * </pre>
@@ -362,6 +365,10 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     bool receivedByACK_var;
     int stage_var;
     int WaitConstant_var;
+    bool txCS_var;
+    bool txLowerCH_var;
+    bool txHigherCH_var;
+    uint8_t numberCH_var;
 
   private:
     void copy(const Ieee802154eNetworkCtrlInfo& other);
@@ -647,6 +654,14 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     virtual void setStage(int stage);
     virtual int getWaitConstant() const;
     virtual void setWaitConstant(int WaitConstant);
+    virtual bool getTxCS() const;
+    virtual void setTxCS(bool txCS);
+    virtual bool getTxLowerCH() const;
+    virtual void setTxLowerCH(bool txLowerCH);
+    virtual bool getTxHigherCH() const;
+    virtual void setTxHigherCH(bool txHigherCH);
+    virtual uint8_t getNumberCH() const;
+    virtual void setNumberCH(uint8_t numberCH);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eNetworkCtrlInfo& obj) {obj.parsimPack(b);}

@@ -34,8 +34,10 @@ class Ieee802154eMacRLL : public Ieee802154eMac
 	virtual bool handleSchedulerMsg(cMessage *msg);
 	virtual void handleLowerMsg(cPacket*);
 	virtual void handleSelfMsg(cMessage*);
+	virtual void handleUpperMsg(cPacket *);
 
 
+	virtual void MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF, Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart, UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM);
 
 	virtual void handle_MLME_ASSOCIATE_request(cMessage *msg);
 	virtual void MLME_ASSOCIATE_indication(cMessage *msg);

@@ -23,6 +23,7 @@
 #include "MACAddress.h"
 
 #include "PassiveQueueBase.h"
+#include "macLinkTableEntry.h"
 
 /**
  * Ieee802154e queue. See NED for more info.
@@ -70,6 +71,7 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
      * request a specific packet from the queue for a MACAdress without/with specific msduHandle
      */
     virtual cMessage *requestSpcPacket(MACAddress addr);
+    virtual cMessage *requestSpcPacket(MACAddress dstAddr, macLinkTableEntry *entry);
 
     virtual cMessage *requestAdvPacket();
 

@@ -40,6 +40,8 @@ public:
     //record value with name
     void record(double value, std::string name);
 
+    void record(double value, const char* name);
+
     //record value with Id
     void record(double value, int id);
 
@@ -62,6 +64,7 @@ private:
     //Result Vector
     std::vector<std::string> Data;
 
+
     //Vector Name
     std::string Name;
 
@@ -70,6 +73,7 @@ private:
 
     //Pointer to DataCenter
     DataCenter* center;
+
 
 
 

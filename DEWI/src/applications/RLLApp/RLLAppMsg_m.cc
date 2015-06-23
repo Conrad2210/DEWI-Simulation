@@ -60,6 +60,8 @@ RLLAppMsg::RLLAppMsg(const char *name, int kind) : ::cPacket(name,kind)
     this->sourceName_var = 0;
     this->destName_var = 0;
     this->creationTime_var = 0;
+    this->burstId_var = 0;
+    this->messageId_var = 0;
 }
 
 RLLAppMsg::RLLAppMsg(const RLLAppMsg& other) : ::cPacket(other)
@@ -84,6 +86,8 @@ void RLLAppMsg::copy(const RLLAppMsg& other)
     this->sourceName_var = other.sourceName_var;
     this->destName_var = other.destName_var;
     this->creationTime_var = other.creationTime_var;
+    this->burstId_var = other.burstId_var;
+    this->messageId_var = other.messageId_var;
 }
 
 void RLLAppMsg::parsimPack(cCommBuffer *b)
@@ -92,6 +96,8 @@ void RLLAppMsg::parsimPack(cCommBuffer *b)
     doPacking(b,this->sourceName_var);
     doPacking(b,this->destName_var);
     doPacking(b,this->creationTime_var);
+    doPacking(b,this->burstId_var);
+    doPacking(b,this->messageId_var);
 }
 
 void RLLAppMsg::parsimUnpack(cCommBuffer *b)
@@ -100,6 +106,8 @@ void RLLAppMsg::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->sourceName_var);
     doUnpacking(b,this->destName_var);
     doUnpacking(b,this->creationTime_var);
+    doUnpacking(b,this->burstId_var);
+    doUnpacking(b,this->messageId_var);
 }
 
 const char * RLLAppMsg::getSourceName() const
@@ -130,6 +138,26 @@ simtime_t RLLAppMsg::getCreationTime() const
 void RLLAppMsg::setCreationTime(simtime_t creationTime)
 {
     this->creationTime_var = creationTime;
+}
+
+int RLLAppMsg::getBurstId() const
+{
+    return burstId_var;
+}
+
+void RLLAppMsg::setBurstId(int burstId)
+{
+    this->burstId_var = burstId;
+}
+
+int RLLAppMsg::getMessageId() const
+{
+    return messageId_var;
+}
+
+void RLLAppMsg::setMessageId(int messageId)
+{
+    this->messageId_var = messageId;
 }
 
 class RLLAppMsgDescriptor : public cClassDescriptor
@@ -179,7 +207,7 @@ const char *RLLAppMsgDescriptor::getProperty(const char *propertyname) const
 int RLLAppMsgDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
+    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
 }
 
 unsigned int RLLAppMsgDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -194,8 +222,10 @@ unsigned int RLLAppMsgDescriptor::getFieldTypeFlags(void *object, int field) con
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
 }
 
 const char *RLLAppMsgDescriptor::getFieldName(void *object, int field) const
@@ -210,8 +240,10 @@ const char *RLLAppMsgDescriptor::getFieldName(void *object, int field) const
         "sourceName",
         "destName",
         "creationTime",
+        "burstId",
+        "messageId",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : NULL;
+    return (field>=0 && field<5) ? fieldNames[field] : NULL;
 }
 
 int RLLAppMsgDescriptor::findField(void *object, const char *fieldName) const
@@ -221,6 +253,8 @@ int RLLAppMsgDescriptor::findField(void *object, const char *fieldName) const
     if (fieldName[0]=='s' && strcmp(fieldName, "sourceName")==0) return base+0;
     if (fieldName[0]=='d' && strcmp(fieldName, "destName")==0) return base+1;
     if (fieldName[0]=='c' && strcmp(fieldName, "creationTime")==0) return base+2;
+    if (fieldName[0]=='b' && strcmp(fieldName, "burstId")==0) return base+3;
+    if (fieldName[0]=='m' && strcmp(fieldName, "messageId")==0) return base+4;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -236,8 +270,10 @@ const char *RLLAppMsgDescriptor::getFieldTypeString(void *object, int field) con
         "string",
         "string",
         "simtime_t",
+        "int",
+        "int",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *RLLAppMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -280,6 +316,8 @@ std::string RLLAppMsgDescriptor::getFieldAsString(void *object, int field, int i
         case 0: return oppstring2string(pp->getSourceName());
         case 1: return oppstring2string(pp->getDestName());
         case 2: return double2string(pp->getCreationTime());
+        case 3: return long2string(pp->getBurstId());
+        case 4: return long2string(pp->getMessageId());
         default: return "";
     }
 }
@@ -297,6 +335,8 @@ bool RLLAppMsgDescriptor::setFieldAsString(void *object, int field, int i, const
         case 0: pp->setSourceName((value)); return true;
         case 1: pp->setDestName((value)); return true;
         case 2: pp->setCreationTime(string2double(value)); return true;
+        case 3: pp->setBurstId(string2long(value)); return true;
+        case 4: pp->setMessageId(string2long(value)); return true;
         default: return false;
     }
 }

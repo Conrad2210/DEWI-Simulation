@@ -17,7 +17,7 @@
 
 // cplusplus {{
 	using namespace std;
-	#include "Ieee802154Def.h";
+	#include "Ieee802154Def.h"
 // }}
 
 /**
@@ -28,6 +28,8 @@
  *     string sourceName; 	// name of the source node
  *     string destName;		// name of the destination node
  *     simtime_t creationTime; // creation time of the packet
+ *     int burstId;
+ *     int messageId;
  * }
  * </pre>
  */
@@ -37,6 +39,8 @@ class RLLAppMsg : public ::cPacket
     opp_string sourceName_var;
     opp_string destName_var;
     simtime_t creationTime_var;
+    int burstId_var;
+    int messageId_var;
 
   private:
     void copy(const RLLAppMsg& other);
@@ -61,6 +65,10 @@ class RLLAppMsg : public ::cPacket
     virtual void setDestName(const char * destName);
     virtual simtime_t getCreationTime() const;
     virtual void setCreationTime(simtime_t creationTime);
+    virtual int getBurstId() const;
+    virtual void setBurstId(int burstId);
+    virtual int getMessageId() const;
+    virtual void setMessageId(int messageId);
 };
 
 inline void doPacking(cCommBuffer *b, RLLAppMsg& obj) {obj.parsimPack(b);}

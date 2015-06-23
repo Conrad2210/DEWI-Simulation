@@ -162,13 +162,13 @@ int macLinkTable::getNumLinks()
     if(tmpNumLinks == -1)
     {
 	//count non-NULL elements
-	int n = 0;
-	int maxId = idToLink.size();
-	for(int i = 0; i < maxId; i++)
-	{
-	    n++;
-	}
-	tmpNumLinks = n;
+	//int n = 0;
+	//int maxId = idToLink.size();
+//	for(int i = 0; i < maxId; i++)
+//	{
+//	    n++;
+//	}
+	tmpNumLinks = idToLink.size();
     }
     return tmpNumLinks;
 }

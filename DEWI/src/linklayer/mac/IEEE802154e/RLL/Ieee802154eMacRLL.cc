@@ -14,6 +14,9 @@
 // 
 
 #include "Ieee802154eMacRLL.h"
+#include "Ieee802154ePhy.h"
+#include "MACAddress.h"
+#include "Ieee802154eNetworkCtrlInfo_m.h"
 
 Define_Module(Ieee802154eMacRLL);
 
@@ -22,6 +25,7 @@ Ieee802154eMacRLL::Ieee802154eMacRLL()
 
     awaitingBeacon = NULL;
     scanTimer = NULL;
+    awaitingNextBeacon = NULL;
 
 }
 
@@ -117,9 +121,7 @@ bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 	}
 	case TP_MLME_SET_BEACON_REQUEST:
 	{
-	    handleEB(msg->dup());
-	    delete msg;
-	    msg = NULL;
+	    handleEB(msg);
 	    break;
 	}
 	case TP_MLME_ASSOCIATE_REQUEST:
@@ -284,6 +286,130 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
     }
 }
 
+void Ieee802154eMacRLL::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF, Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart, UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM)
+{
+    numRxDataPkt++;
+    //}
+
+    if(mpib.macMetricsEnabled)
+    {
+	mpib.macRXSuccessCount++;
+    }
+
+    cPacket * msg = msdu->decapsulate();
+
+    Ieee802154eNetworkCtrlInfo* cinfo = new Ieee802154eNetworkCtrlInfo();
+    MACAddress destination = srcAddr;
+    if(srcAddr.isBroadcast())
+	destination = MACAddress::BROADCAST_ADDRESS;
+    else
+	destination.convert48();
+
+    cinfo->setSrcAddr(destination.getInt());
+    msg->setControlInfo(cinfo);
+    EV << "[MAC]: sending received " << msg->getName() << " frame to upper layer" << endl;
+    send(msg, mUpperLayerOut);
+    delete msdu;
+}
+
+void Ieee802154eMacRLL::handleUpperMsg(cPacket* msg) // MCPS-SAP
+{
+    uint16_t index;
+    IE3ADDR destAddr;
+    UINT_16 destPanId;
+    UINT_8 srcAddrMode;
+    bool gtsFound = false;
+    numUpperPkt++;
+
+    /** brief:  TRUE if a GTS is to be used for transmission, FALSE indicates that the CAP will be used.
+     *          see Std 802.15.4-2011 (6.3.1 MCPS-DATA.request) page 118 */
+    bool gtsTX = false;
+
+    /** brief:  TRUE if indirect transmission is to be used, FALSE otherwise.
+     *
+     *  note:   If the TxOptions parameter specifies that an indirect transmission is required and
+     *          if the device receiving this primitive is not a coordinator, the destination
+     *          address is not present, or the TxOptions parameter also specifies a GTS transmission,
+     *          the indirect transmission option will be ignored. - see Std 802.15.4-2006 (7.1.1.1.3 Effect on receipt) page 70
+     *
+     *  note:   Specifying a GTS transmission in the TxOptions parameter overrides an
+     *          indirect transmission request. - see Std 802.15.4-2011 (6.3.1 MCPS-DATA.request) page 118
+     *
+     *  note:   If the TxOptions parameter specifies that an indirect transmission is not required, the MAC sublayer will
+     *          transmit the MSDU using CSMA-CA either in the CAP for a beacon-enabled PAN or immediately for a
+     *          nonbeacon-enabled PAN, or at the next timeslot to the destination address if in TSCH mode.
+     *          - see Std 802.15.4e-2012 (6.3.1 MCPS-DATA.request) page 168 */
+    bool indirectTX = false;
+
+    // MAC layer can process only one data request at a time
+    // If no ifq exists, upper layer is not aware of the current state of MAC layer
+    // Check if MAC is busy processing one data request, if true, drop it
+    // if ifq exists, request another msg from the ifq whenever MAC is idle and ready for next data transmission
+    if(taskP.taskStatus(TP_MCPS_DATA_REQUEST))
+    {
+	EV << "[MAC]: an " << msg->getName() << " (#" << numUpperPkt << ") received from the upper layer, but drop it due to busy MAC" << endl;
+	MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_TRANSACTION_EXPIRED, 0, 0, msg);
+	delete msg;
+	numUpperPktLost++;
+	reqtMsgFromIFq();
+	return;
+    }
+
+    //check if parameters valid or not, only check msdu size here
+    if(PK(msg)->getByteLength() > Ieee802154ePhy::aMaxMACFrameSize)
+    {
+	EV << "[MAC]: an " << msg->getName() <<" (#" << numUpperPkt << ") received from the upper layer, but drop it due to oversize" << endl;
+	MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, msg);
+	delete msg;
+	numUpperPktLost++;
+	reqtMsgFromIFq();
+	return;
+    }
+
+    Ieee802154eNetworkCtrlInfo *controlInfo = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg->removeControlInfo());
+    destAddr = MACAddress(controlInfo->getDstAddr());
+
+    if(destAddr.isBroadcast()) //  packet destined as broadcast
+    {
+	destAddr = (IE3ADDR)0xffff; // broadcast address - Std 802.15.4-2006 (7.3.1.1) page 150
+	destPanId = 0xffff; // broadcast PAN ID - Std 802.15.4-2006 (7.3.1.1) page 150
+	gtsTX = false;              // send in the CAP
+	indirectTX = false;         // send direct
+    }
+    EV << "[MAC]: an " << msg->getName() << " (#" << numUpperPkt << ", " << PK(msg)->getByteLength() << " Bytes, destined for MAC address " << destAddr << ", transfer mode " << dataTransMode << ") received from the upper layer" << endl;
+    msg->setControlInfo(controlInfo);
+    /** brief: Corresponding to the options in the multipurpose frame control
+     *         or general frame control for frame version 0b10. - see Std 802.15.4e-2012 (table 46) page 168 */
+    FrameCrlOptions frameControlOptions;
+    frameControlOptions.panIDsuppressed = false;            //default: false
+    frameControlOptions.iesIncluded = (useTSCH) ? true:false; //TODO:[SR] handel of the IE's list
+    frameControlOptions.seqSuppressed = false;
+
+    std::vector<Ieee802154eIEHeaderType> headerIElist(Ieee802154eIEHeaderType(0x1a));
+    std::vector<Ieee802154eIEPayloadType> payloadIElist(Ieee802154eIEHeaderType(0x00));
+
+    if(mpib.macShortAddress == 0xfffe) // if the device is not associated with a coordinator - Std 802.15.4-2011
+	srcAddrMode = defFrmCtrl_AddrMode64;
+    else
+	srcAddrMode = defFrmCtrl_AddrMode16;
+
+    if(mpib.macTSCHenabled) // in the timeslots it may used a 2-octet address - Std 802.15.4e-2012 (5.1.2.6 TSCH PAN formation) page 24
+	srcAddrMode = defFrmCtrl_AddrMode16;
+
+    // for the acknowledge of the transmission
+    bool ackTX;
+    if(destAddr == (IE3ADDR)0xffff) //no ACK at broadcast - see Std 802.15.4-2006 (7.5.6.4) page 189
+	ackTX = false;
+    else if(dataTransMode == 3 && ack4Gts)
+	ackTX = true;
+    else
+	ackTX = ack4Data;
+
+    MCPS_DATA_request((Ieee802154eAddrMode)srcAddrMode, (Ieee802154eAddrMode)(destAddr.getFlagEui64() ?
+    defFrmCtrl_AddrMode64:
+													defFrmCtrl_AddrMode16), destPanId, destAddr, (UINT_8)msg->getByteLength(), msg, mpib.macDSN++/*msduHandle (FIXME [SR] we have no msduHandle from the NETWORK layer)*/, ackTX, gtsTX, indirectTX, secuData/*securityLevel*/, 0/*keyIdMode*/, 0/*keySource*/, 0/*keyIndex*/, UWBPRF_PRF_OFF, RANGING_OFF, 0/*uwbPreambleSymbolRepetitions,*/, 0/*dataRate*/, frameControlOptions, headerIElist, payloadIElist, false /*sendMultipurpose*/);
+
+}
 void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 {
     //[SR] old version
@@ -467,7 +593,6 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	i = chkAddUpdHListLink(&hlistBLink1, &hlistBLink2, frame->getSrcAddr(), frame->getSeqNmbr());
     else if(frmType != Ieee802154e_ACK) // data or cmd
 	i = chkAddUpdHListLink(&hlistDLink1, &hlistDLink2, frame->getSrcAddr(), frame->getSeqNmbr());
-
 
     if(i == 2) // duplication found in the HListLink
     {
@@ -781,6 +906,7 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
     primitive->setPanCoordinator(tmp->getCH());
     primitive->setStage(tmp->getCntrlInfo().getStage());
     primitive->setPanId(tmp->getSrcPanId());
+    primitive->setNumberCH(tmp->getCntrlInfo().getNumberCH());
     EV << "[MAC]: sending a MLME-ASSOCIATE.confirm to NETWORK" << endl;
     send(primitive->dup(), mUpperLayerOut);
 
@@ -1792,7 +1918,6 @@ void Ieee802154eMacRLL::handleEB(cMessage *msg)
 
     //    ASSERT(mpib.macCoordShortAddress == def_macCoordShortAddress);
     //    ASSERT(mpib.macPANId == def_macPANId);
-    notAssociated = notAssociated;
 
     mpib.macShortAddress = (UINT_16)mpib.macExtendedAddress.getInt();
     mpib.macSimpleAddress = (UINT_8)mpib.macExtendedAddress.getInt();
@@ -1989,7 +2114,7 @@ void Ieee802154eMacRLL::handleAsnTimer()
 	switch(activeLinkEntry->getLinkType())
 	{
 	    case LNK_TP_NORMAL:
-		tmpMsg = queueModule->requestSpcPacket((IE3ADDR)activeLinkEntry->getNodeAddress());
+		tmpMsg = queueModule->requestSpcPacket((IE3ADDR)activeLinkEntry->getNodeAddress(),activeLinkEntry);
 		break;
 	    case LNK_TP_ADVERTISING:
 		if(!awaitingNextBeacon || isPANCoor)

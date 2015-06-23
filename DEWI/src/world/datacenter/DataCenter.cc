@@ -29,6 +29,7 @@ DataCenter::DataCenter() {
     // TODO Auto-generated constructor stub
     ResultPath = "";
 
+
 }
 
 DataCenter::~DataCenter() {
@@ -58,6 +59,36 @@ void DataCenter::finish()
             }
         }
 
+}
+
+
+bool DataCenter::allAssociated()
+{
+    for(int i = 0; i < (int)AssociatedVector.size(); i++)
+	if(!AssociatedVector.at(i)->getAssosicated())
+	    return false;
+
+    return true;
+}
+
+void DataCenter::registerAssociatedVector(int ix, const char* na, bool as, int st, int parix, const char* parna)
+{
+    AssociatedVector.push_back(new cAssociated(ix,na,as,st,parix,parna));
+}
+
+void DataCenter::updateAssociatedVector(int ix, const char* na, bool as, int st, int parix, const char* parna)
+{
+    for(int i = 0; i < (int)AssociatedVector.size(); i++)
+    {
+	if(AssociatedVector.at(i)->getIndex() == ix && !strcmp(AssociatedVector.at(i)->getName(),na))
+	{
+	    AssociatedVector.at(i)->setAssociated(as);
+	    AssociatedVector.at(i)->setStage(st);
+	    AssociatedVector.at(i)->setParentIndex(parix);
+	    AssociatedVector.at(i)->setParentName(parna);
+	    return;
+	}
+    }
 }
 
 void DataCenter::registerVector(DataVector *Vec)

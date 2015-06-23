@@ -17,6 +17,8 @@
 #define RLLAPP_H_
 
 #include <TrafGenPar.h>
+#include "DataCenter.h"
+#include "DataVector.h"
 
 class RLLApp : public TrafGenPar
 {
@@ -27,6 +29,11 @@ class RLLApp : public TrafGenPar
 	virtual void initialize(int);
 	virtual void finish();
 
+	virtual int numInitStages() const
+	{
+	    return 5;
+	}
+
     protected:
 
 	// OPERATIONS
@@ -35,12 +42,37 @@ class RLLApp : public TrafGenPar
 
 	virtual void SendTraf(cPacket *msg, const char*);
 
+	virtual void startBurst();
+	virtual void sendNextBurstMessage();
+	virtual void endSim();
+	virtual void checkAssociation();
+
     private:
 	bool m_debug;        // debug switch
 	int mLowerLayerIn;
 	int mLowerLayerOut;
+	DataCenter *dataCenter;
+        DataVector *E2E;
+        DataVector *Hop;
+
+	bool m_isLightSwitch;
 
 	const char* m_moduleName;
+	int m_numberMessageToSend;
+	int m_numberMessageSend;
+	int m_burstCounter;
+	int m_messageCounter;
+
+	double m_AppStartTime;
+	double m_AppStopTime;
+	double m_burstDuration;
+	double m_interArrivalTime;
+	double m_BurstPause;
+
+	cMessage *BurstTimer;
+	cMessage *BurstMessageTimer;
+	cMessage *StopTimer;
+	cMessage *AssTimer;
 };
 
 #endif /* RLLAPP_H_ */

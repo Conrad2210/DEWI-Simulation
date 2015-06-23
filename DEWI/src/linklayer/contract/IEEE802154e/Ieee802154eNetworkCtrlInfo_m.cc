@@ -189,6 +189,10 @@ Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const char *name, int kin
     this->receivedByACK_var = 0;
     this->stage_var = 0;
     this->WaitConstant_var = 0;
+    this->txCS_var = 0;
+    this->txLowerCH_var = 0;
+    this->txHigherCH_var = 0;
+    this->numberCH_var = 0;
 }
 
 Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const Ieee802154eNetworkCtrlInfo& other) : ::cMessage(other)
@@ -409,6 +413,10 @@ void Ieee802154eNetworkCtrlInfo::copy(const Ieee802154eNetworkCtrlInfo& other)
     this->receivedByACK_var = other.receivedByACK_var;
     this->stage_var = other.stage_var;
     this->WaitConstant_var = other.WaitConstant_var;
+    this->txCS_var = other.txCS_var;
+    this->txLowerCH_var = other.txLowerCH_var;
+    this->txHigherCH_var = other.txHigherCH_var;
+    this->numberCH_var = other.numberCH_var;
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
@@ -547,6 +555,10 @@ void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
     doPacking(b,this->receivedByACK_var);
     doPacking(b,this->stage_var);
     doPacking(b,this->WaitConstant_var);
+    doPacking(b,this->txCS_var);
+    doPacking(b,this->txLowerCH_var);
+    doPacking(b,this->txHigherCH_var);
+    doPacking(b,this->numberCH_var);
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
@@ -751,6 +763,10 @@ void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->receivedByACK_var);
     doUnpacking(b,this->stage_var);
     doUnpacking(b,this->WaitConstant_var);
+    doUnpacking(b,this->txCS_var);
+    doUnpacking(b,this->txLowerCH_var);
+    doUnpacking(b,this->txHigherCH_var);
+    doUnpacking(b,this->numberCH_var);
 }
 
 bool Ieee802154eNetworkCtrlInfo::getToParent() const
@@ -2193,6 +2209,46 @@ void Ieee802154eNetworkCtrlInfo::setWaitConstant(int WaitConstant)
     this->WaitConstant_var = WaitConstant;
 }
 
+bool Ieee802154eNetworkCtrlInfo::getTxCS() const
+{
+    return txCS_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setTxCS(bool txCS)
+{
+    this->txCS_var = txCS;
+}
+
+bool Ieee802154eNetworkCtrlInfo::getTxLowerCH() const
+{
+    return txLowerCH_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setTxLowerCH(bool txLowerCH)
+{
+    this->txLowerCH_var = txLowerCH;
+}
+
+bool Ieee802154eNetworkCtrlInfo::getTxHigherCH() const
+{
+    return txHigherCH_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setTxHigherCH(bool txHigherCH)
+{
+    this->txHigherCH_var = txHigherCH;
+}
+
+uint8_t Ieee802154eNetworkCtrlInfo::getNumberCH() const
+{
+    return numberCH_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNumberCH(uint8_t numberCH)
+{
+    this->numberCH_var = numberCH;
+}
+
 class Ieee802154eNetworkCtrlInfoDescriptor : public cClassDescriptor
 {
   public:
@@ -2240,7 +2296,7 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getProperty(const char *proper
 int Ieee802154eNetworkCtrlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 122+basedesc->getFieldCount(object) : 122;
+    return basedesc ? 126+basedesc->getFieldCount(object) : 126;
 }
 
 unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -2374,8 +2430,12 @@ unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *objec
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<122) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<126) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int field) const
@@ -2509,8 +2569,12 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int
         "receivedByACK",
         "stage",
         "WaitConstant",
+        "txCS",
+        "txLowerCH",
+        "txHigherCH",
+        "numberCH",
     };
-    return (field>=0 && field<122) ? fieldNames[field] : NULL;
+    return (field>=0 && field<126) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fieldName) const
@@ -2639,6 +2703,10 @@ int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fi
     if (fieldName[0]=='r' && strcmp(fieldName, "receivedByACK")==0) return base+119;
     if (fieldName[0]=='s' && strcmp(fieldName, "stage")==0) return base+120;
     if (fieldName[0]=='W' && strcmp(fieldName, "WaitConstant")==0) return base+121;
+    if (fieldName[0]=='t' && strcmp(fieldName, "txCS")==0) return base+122;
+    if (fieldName[0]=='t' && strcmp(fieldName, "txLowerCH")==0) return base+123;
+    if (fieldName[0]=='t' && strcmp(fieldName, "txHigherCH")==0) return base+124;
+    if (fieldName[0]=='n' && strcmp(fieldName, "numberCH")==0) return base+125;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -2773,8 +2841,12 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeString(void *objec
         "bool",
         "int",
         "int",
+        "bool",
+        "bool",
+        "bool",
+        "uint8_t",
     };
-    return (field>=0 && field<122) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<126) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -2953,6 +3025,10 @@ std::string Ieee802154eNetworkCtrlInfoDescriptor::getFieldAsString(void *object,
         case 119: return bool2string(pp->getReceivedByACK());
         case 120: return long2string(pp->getStage());
         case 121: return long2string(pp->getWaitConstant());
+        case 122: return bool2string(pp->getTxCS());
+        case 123: return bool2string(pp->getTxLowerCH());
+        case 124: return bool2string(pp->getTxHigherCH());
+        case 125: return ulong2string(pp->getNumberCH());
         default: return "";
     }
 }
@@ -3088,6 +3164,10 @@ bool Ieee802154eNetworkCtrlInfoDescriptor::setFieldAsString(void *object, int fi
         case 119: pp->setReceivedByACK(string2bool(value)); return true;
         case 120: pp->setStage(string2long(value)); return true;
         case 121: pp->setWaitConstant(string2long(value)); return true;
+        case 122: pp->setTxCS(string2bool(value)); return true;
+        case 123: pp->setTxLowerCH(string2bool(value)); return true;
+        case 124: pp->setTxHigherCH(string2bool(value)); return true;
+        case 125: pp->setNumberCH(string2ulong(value)); return true;
         default: return false;
     }
 }

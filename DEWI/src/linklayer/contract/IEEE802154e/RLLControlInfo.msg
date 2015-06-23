@@ -11,23 +11,41 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
-package dewi.applications.RLLApp;
-
-
-import  dewi.applications.trafgen.TrafGenPar;
-
-simple RLLApp extends TrafGenPar
+cplusplus {{
+    using namespace std;
+    #include "Ieee802154eField.h"
+    #include "Ieee802154eEnum.h"
+}}
+enum MACenum;
+message RLLControlInfo
 {
-   @class(RLLApp);
-   bool debug;
-   
-   bool LightSwitch = default(false);
-   
-   double burstDuration @unit(s) = default(2s);
-   double interArrivalTime @unit(s) = default(0.1s);
-   double BurstPause @unit(s) = default(10s);
-   double StartTime @unit(s) = default(5s);
-   double StopTime @unit(s) = default(1d);
+    bool 	 toParent;
+    string   destName;
+    
+   	uint8_t 	dstAddrMode; 
+   	int64_t 	dstAddr;
+   	uint8_t 	srcAddrMode; 
+   	int64_t 	srcAddr;
+   	
+   	bool panCoordinator;
+   	
+   	uint64_t deviceAddress;
+   	
+    short status  @enum(MACenum);
+    uint16_t channelOffset;
+    uint16_t assocShortAddress;
+    
+    uint8_t beaconType;
+    uint8_t channel;
+    uint8_t beaconOrder;
+    uint8_t superframeOrder;
+    
+    uint32_t startTime;
+    uint8_t scanType;
+    
+    
+    
+    
 }
