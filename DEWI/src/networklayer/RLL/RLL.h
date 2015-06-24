@@ -140,6 +140,7 @@ class INET_API RLL : public cSimpleModule
 	cMessage *AssociateTimer;
 	cMessage *AssociateWaitTimer;
 	cMessage *ScheduleTimer;
+	cMessage *ScheduleWaitTimer;
 	cMessage *BeaconScanTimer;
 	cMessage *DisassociateWaitTimer;
 	cMessage *BeaconTimer;

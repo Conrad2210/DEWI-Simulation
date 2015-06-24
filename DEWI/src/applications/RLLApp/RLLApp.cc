@@ -128,6 +128,9 @@ void RLLApp::handleLowerMsg(cMessage* msg)
     RLLAppMsg *tmp = check_and_cast<RLLAppMsg *>(msg);
     msg = NULL;
 
+    std::stringstream ss;
+    ss << "Received: " << tmp->getName();
+    getParentModule()->bubble(ss.str().c_str());
     E2E->record((now - tmp->getCreationTime().dbl()),tmp->getName());
     delete tmp;
 }

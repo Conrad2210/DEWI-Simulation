@@ -67,6 +67,8 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
      */
     virtual bool isEmpty();
 
+    virtual bool contains(cObject *o){return queue.contains(o);}
+
     /**
      * request a specific packet from the queue for a MACAdress without/with specific msduHandle
      */
@@ -81,11 +83,14 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
 
     virtual cMessage *requestBeaconPacket();
 
-    virtual bool existSchedRes(MACAddress addr);
-    virtual bool existAssRes(MACAddress addr);
     virtual bool existAssReq(MACAddress addr);
+    virtual bool existAssRes(MACAddress addr);
+
+    virtual bool existDisAssReq(MACAddress addr);
+    virtual bool existDisAssRes(MACAddress addr);
 
     virtual bool existSchedReq(MACAddress addr);
+    virtual bool existSchedRes(MACAddress addr);
 
     /**
      * delete a specific one/all packet(s) from the queue
