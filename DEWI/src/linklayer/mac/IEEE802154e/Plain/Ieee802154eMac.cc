@@ -7913,7 +7913,10 @@ double Ieee802154eMac::getRate(char bitOrSymbol)
  * check if the msg goes to the PAN coordinator */
 bool Ieee802154eMac::toParent(Ieee802154eFrame* frame)
 {
-	ASSERT(frame);
+	if(frame == NULL){
+		delete frame;
+		return false;
+	}
 	Ieee802154eFrame* tmpFrame = check_and_cast<Ieee802154eFrame *>(frame);
 
 	if (((tmpFrame->getFrmCtrl().dstAddrMode == defFrmCtrl_AddrMode16) && (tmpFrame->getDstAddr().getInt() == mpib.macCoordShortAddress)) || ((tmpFrame->getFrmCtrl().dstAddrMode == defFrmCtrl_AddrMode64) && (tmpFrame->getDstAddr() == mpib.macCoordExtendedAddress)) || (tmpFrame->getDstAddr() == (IE3ADDR) 0xffff))

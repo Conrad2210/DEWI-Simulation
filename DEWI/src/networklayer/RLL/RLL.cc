@@ -748,6 +748,13 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 	if (DisassociateWaitTimer->isScheduled())
 		cancelEvent(DisassociateWaitTimer);
 
+	if(bIsPANCoor)
+	{
+		cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+			cDisplayString* tempStr = new cDisplayString();
+			tempStr->parse("b=1.5,1.5,oval,blue;i=device/accesspoint");
+			parentDisp->updateWith(*tempStr);
+	}
 	Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("DisassociationRequest", TP_MLME_DISASSOCIATE_REQUEST);
 	double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
 	scheduleAt(simTime() + temp, DisassociateWaitTimer);
