@@ -417,6 +417,13 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	//[SR] old version
 	bool noAck;
 	int i = 0;
+	if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+	{
+		i = i+1-1;
+		i++;
+		i--;
+
+	}
 	Ieee802154eFrame* frame = dynamic_cast<Ieee802154eFrame *>(msg);
 
 	if (!frame)
@@ -685,7 +692,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 	 UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
 	 UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID
 	 */
-
+	ASSERT(msg);
 	Ieee802154eAssociationFrame *dataFrame = new Ieee802154eAssociationFrame(msg->getName(), msg->getKind());
 	Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 	msg = NULL;
@@ -777,7 +784,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 }
 
 void Ieee802154eMacRLL::MLME_ASSOCIATE_indication(cMessage *msg)
-{
+{ASSERT(msg);
 	Ieee802154eAssociationFrame *tmp = check_and_cast<Ieee802154eAssociationFrame*>(msg);
 	msg = NULL;
 	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo("AssociationIndication", TP_MLME_ASSOCIATE_INDICATION);
@@ -801,6 +808,7 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_indication(cMessage *msg)
 
 void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eAssociationFrame *dataFrame = new Ieee802154eAssociationFrame();
 	Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 	msg = NULL;
@@ -889,6 +897,7 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
 
 void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eAssociationFrame *tmp = check_and_cast<Ieee802154eAssociationFrame *>(msg);
 	msg = NULL;
 	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo("AssociationConfirm", TP_MLME_ASSOCIATE_CONFIRM);
@@ -898,6 +907,8 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 		notAssociated = false;
 		panCoorName = tmp->getSenderModule()->getFullName();
 		mpib.macShortAddress = tmp->getCntrlInfo().getAssocShortAddress();
+
+		queueModule->deleteMsgQueue(tmp->getSrcAddr(),false);
 	}
 	else
 	{
@@ -922,6 +933,7 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_request(cMessage *msg)
 {
 	Ieee802154eDisassociationFrame *dataFrame = new Ieee802154eDisassociationFrame(msg->getName(), TP_MLME_DISASSOCIATE_REQUEST);
+	ASSERT(msg);
 	Ieee802154eNetworkCtrlInfo *AssReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 	FrameCtrl frmCtrl;
 
@@ -1001,6 +1013,7 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_request(cMessage *msg)
 
 void Ieee802154eMacRLL::MLME_DISASSOCIATE_indication(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
 	tmpMsg->setKind(TP_MLME_DISASSOCIATE_INDICATION);
 	EV << "[MAC]: sending a MLME-DISASSOCIATE.indication to NETWORK" << endl;
@@ -1012,6 +1025,7 @@ void Ieee802154eMacRLL::MLME_DISASSOCIATE_indication(cMessage *msg)
 
 void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_response(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eDisassociationFrame *tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
 	Ieee802154eDisassociationFrame *dataFrame = new Ieee802154eDisassociationFrame("DisassociationResponse", TP_MLME_DISASSOCIATE_RESPONSE);
 	Ieee802154eNetworkCtrlInfo *AssReq = new Ieee802154eNetworkCtrlInfo();
@@ -1094,6 +1108,7 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_response(cMessage *msg)
 
 void Ieee802154eMacRLL::MLME_DISASSOCIATE_confirm(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eDisassociationFrame * tmpMsg = check_and_cast<Ieee802154eDisassociationFrame *>(msg);
 	msg = NULL;
 	neighborTable->deleteNeighbor(neighborTable->getNeighborBySAddr(getShortAddress(tmpMsg->getSrcAddr())));
@@ -1106,6 +1121,7 @@ void Ieee802154eMacRLL::MLME_DISASSOCIATE_confirm(cMessage *msg)
 
 void Ieee802154eMacRLL::handle_MLME_SCAN_request(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eNetworkCtrlInfo *scanReq = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 	msg = NULL;
 	if (scanReq->getScanType() == 0x02)
@@ -1132,6 +1148,7 @@ void Ieee802154eMacRLL::handle_MLME_SCAN_request(cMessage *msg)
 
 void Ieee802154eMacRLL::MLME_SCAN_confirm(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154EnhancedBeaconFrame * frame = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
 	msg = NULL;
 	frame->setName("ScanConfirm");
@@ -1144,6 +1161,7 @@ void Ieee802154eMacRLL::MLME_SCAN_confirm(cMessage *msg)
 
 void Ieee802154eMacRLL::handle_MLME_START_request(cMessage *msg)
 {
+	ASSERT(msg);
 	Ieee802154eNetworkCtrlInfo *startRe = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 	if (startRe->getPanCoordinator())
 	{
@@ -1240,6 +1258,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 	Ieee802154eNetworkCtrlInfo *tmpNetCn;
 	if (dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
 	{
+		ASSERT(msg);
 		Ieee802154eMulHoCluFrame *tmpSchedul = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
 		tmpNetCn = new Ieee802154eNetworkCtrlInfo();
 		FrameCtrl frmCtrl;
@@ -1288,7 +1307,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 		tmpSchedul->setAuxSecHd(auxSecHd);
 		tmpSchedul->setSeqNmbr(mpib.macDSN++);
 
-		if (!queueModule->existSchedReq(tmpDstAddr))
+		if (!queueModule->existSchedReq(tmpSchedul->getDstAddr()))
 			queueModule->insertInQueue(tmpSchedul->dup());
 		delete tmpNetCn;
 		delete tmpSchedul;
@@ -1299,6 +1318,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 	else
 	{
 		Ieee802154eScheduleFrame *tmpSchedul = new Ieee802154eScheduleFrame("SchedulerRequest", TP_SCHEDULE_REQUEST);
+		ASSERT(msg);
 		tmpNetCn = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 		FrameCtrl frmCtrl;
 		frmCtrl.frameType = Ieee802154e_SCHEDULER_REQUEST;
@@ -1381,6 +1401,7 @@ void Ieee802154eMacRLL::SCHEDULE_indication(cMessage *msg)
 	}
 	else
 	{
+		ASSERT(msg);
 		Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
 		Ieee802154eNetworkCtrlInfo *Ctrl = new Ieee802154eNetworkCtrlInfo("SchedulerRequest", TP_SCHEDULE_INDICATION);
 		Ctrl->setTimeslot(scheduler->getCntrlInfo().getTimeslot());
@@ -1409,6 +1430,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_response(cMessage *msg)
 	Ieee802154eNetworkCtrlInfo *tmpNetCn;
 	if (dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
 	{
+		ASSERT(msg);
 		Ieee802154eMulHoCluFrame *tmpSchedul = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
 		tmpNetCn = new Ieee802154eNetworkCtrlInfo();
 		FrameCtrl frmCtrl;
@@ -1466,6 +1488,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_response(cMessage *msg)
 	}
 	else
 	{
+		ASSERT(msg);
 		Ieee802154eScheduleFrame *tmpSchedul = new Ieee802154eScheduleFrame("SchedulerResponse", TP_SCHEDULE_RESPONSE);
 		tmpNetCn = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 		FrameCtrl frmCtrl;
@@ -1550,6 +1573,7 @@ void Ieee802154eMacRLL::SCHEDULE_confirm(cMessage *msg, bool ack)
 	}
 	else
 	{
+		ASSERT(msg);
 
 		Ieee802154eScheduleFrame *scheduler = check_and_cast<Ieee802154eScheduleFrame *>(msg);
 		Ieee802154eNetworkCtrlInfo *Ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(&scheduler->getCntrlInfo());
@@ -1844,6 +1868,7 @@ void Ieee802154eMacRLL::handleEB(cMessage *msg)
 
 	if (dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
 	{
+		ASSERT(msg);
 		rxBeacon = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
 		msg = NULL;
 		duration = calDuration(rxBeacon);
@@ -2185,6 +2210,7 @@ void Ieee802154eMacRLL::handleAsnTimer()
 
 		if (tmpMsg != NULL)
 		{
+			ASSERT(tmpMsg);
 			txData = check_and_cast<Ieee802154eFrame *>(tmpMsg);
 			tmpMsg = NULL;
 			//	    if(txData->getFrmCtrl().frameType == Ieee802154e_BEACON)

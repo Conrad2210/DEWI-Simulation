@@ -44,6 +44,7 @@ RLL::RLL()
 	ScanTimer = NULL;
 	nDistance = 0;
 	ScheduleWaitTimer = NULL;
+	generalCheckTimer = NULL;
 }
 
 RLL::~RLL()
@@ -58,6 +59,7 @@ RLL::~RLL()
 	cancelAndDelete(BeaconScanTimer);
 	cancelAndDelete(DisassociateWaitTimer);
 	cancelAndDelete(ScheduleWaitTimer);
+	cancelAndDelete(generalCheckTimer);
 }
 
 void RLL::initialize(int stage)
@@ -106,6 +108,7 @@ void RLL::initialize(int stage)
 		BeaconTimer = new cMessage("BeaconTimer", BEACON_REQUEST);
 		ScanTimer = new cMessage("ScanTimer", MAC_SCAN_TIMER);
 		StartTimer = new cMessage("StartTimer", START_TIMER);
+		generalCheckTimer = new cMessage("CheckTimer", CHECK_TIMER);
 	}
 	else if (stage == 4)
 	{
@@ -144,6 +147,7 @@ void RLL::initialize(int stage)
 			start = 0;
 		}
 		scheduleAt(simTime() + start, StartTimer);
+		scheduleAt(simTime() + 100, generalCheckTimer);
 
 		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 	}
@@ -522,6 +526,11 @@ void RLL::handleSelfMessage(cMessage *msg)
 		MLME_ASSOCIATE_request(NULL);
 		break;
 	}
+	case CHECK_TIMER:
+	{
+		GENERAL_CHECK(NULL);
+		break;
+	}
 	default:
 	{
 		break;
@@ -545,7 +554,9 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 				send(tmp->dup(), mLowerLayerOut);
 				if (AssociateWaitTimer->isScheduled())
 					cancelEvent(AssociateWaitTimer);
-				scheduleAt(simTime() + 5, AssociateWaitTimer);
+
+				double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+				scheduleAt(simTime() + temp, AssociateWaitTimer);
 				delete tmp;
 				tmp = NULL;
 			}
@@ -690,8 +701,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 		{
 			if (ScheduleTimer->isScheduled())
 				cancelEvent(ScheduleTimer);
-
-			scheduleAt(simTime() + ((double) rand() / (RAND_MAX)), ScheduleTimer);
+			double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+			scheduleAt(simTime() + temp, ScheduleTimer);
 		}
 		else
 		{
@@ -705,8 +716,6 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 		delete tempStr;
 		tempStr = NULL;
 
-		if (bIsPANCoor)
-			dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
 	}
 	else
 	{
@@ -740,7 +749,8 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 		cancelEvent(DisassociateWaitTimer);
 
 	Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("DisassociationRequest", TP_MLME_DISASSOCIATE_REQUEST);
-	scheduleAt(simTime() + 5, DisassociateWaitTimer);
+	double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+	scheduleAt(simTime() + temp, DisassociateWaitTimer);
 	dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
 	send(cnt->dup(), mLowerLayerOut);
 	delete cnt;
@@ -967,6 +977,7 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 			{
 
 				bIsPANCoor = true;
+				beaconTable->flushBeaconTable();
 			}
 			else if (nRestartCounter < 3)
 			{
@@ -975,19 +986,19 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 				tmpBcn = NULL;
 				bCapablePanCoor = false;
 				RESTART_request(NULL);
-
+				beaconTable->flushBeaconTable();
 				return;
 			}
 
 			if (tmpBcn != NULL)
 				MLME_SET_BEACON_request(tmpBcn);
 
-			beaconTable->flushBeaconTable();
 		}
 		else
 		{
 			delete msg;
 			msg = NULL;
+			beaconTable->flushBeaconTable();
 		}
 	}
 }
@@ -1044,7 +1055,7 @@ void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 			double waitTime = 0 + ((double) rand() / RAND_MAX) * (10 - 0);
 			if (!bAssociateDirectly)
 			{
-				waitTime = 50 + ((double) rand() / RAND_MAX) * (10 - 0); //FIXME: Make it variable or changable by init parameters;
+				waitTime = 50 + ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
 				bAssociateDirectly = true;
 			}
 			if (!AssociateTimer->isScheduled())
@@ -1072,6 +1083,10 @@ void RLL::SCHEDULE_request(cMessage *msg)
 		scheduleFrame->setDstAddr(neighborTable->getAddressFromCH());
 		scheduleFrame->setDstPanId(clusterTable->getEntryByShrtAddr(neighborTable->getNeighborByEAddr(neighborTable->getAddressFromCH())->getShortAddress())->getPanId());
 		scheduleFrame->setTimeslot(linkTable->getTimeSlotByOffset(-1));
+		scheduleFrame->setSrcName(getParentModule()->getName());
+		scheduleFrame->setSrcIndex(getParentModule()->getIndex());
+		scheduleFrame->setDestIndex(-1);
+		scheduleFrame->setDestName("");
 	}
 	else
 	{
@@ -1083,10 +1098,10 @@ void RLL::SCHEDULE_request(cMessage *msg)
 	send(scheduleFrame->dup(), mLowerLayerOut);
 	delete scheduleFrame;
 
-	if(ScheduleWaitTimer->isScheduled())
+	if (ScheduleWaitTimer->isScheduled())
 		cancelEvent(ScheduleWaitTimer);
 
-	scheduleAt(simTime() + 5,ScheduleWaitTimer);
+	scheduleAt(simTime() + 5, ScheduleWaitTimer);
 }
 void RLL::handle_SCHEDULE_indication(cMessage *msg)
 {
@@ -1109,6 +1124,10 @@ void RLL::SCHEDULE_response(cMessage *msg)
 	scheduleFrame->setDstPanId(tempFrame->getSrcPanId());
 	scheduleFrame->setTimeslot(tempFrame->getTimeslot());
 	scheduleFrame->setChannelOffset(tempFrame->getChannelOffset());
+	scheduleFrame->setDestName(tempFrame->getSrcName());
+	scheduleFrame->setDestIndex(tempFrame->getSrcIndex());
+	scheduleFrame->setSrcName(getParentModule()->getName());
+	scheduleFrame->setSrcIndex(getParentModule()->getIndex());
 
 	send(scheduleFrame->dup(), mLowerLayerOut);
 	delete scheduleFrame;
@@ -1120,7 +1139,7 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 {
 	if (dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
 	{
-		if(ScheduleWaitTimer->isScheduled())
+		if (ScheduleWaitTimer->isScheduled())
 			cancelEvent(ScheduleWaitTimer);
 		Ieee802154eMulHoCluFrame *frame = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
 
@@ -1129,6 +1148,12 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 			int i = 0;
 			i = i + 1;
 		}
+
+		if (frame->getChannelOffset() == 0 || frame->getChannelOffset() == -1)
+		{
+			delete frame;
+			return;
+		}
 		macLinkTableEntry *entry = linkTable->getLinkByTimeslot(frame->getTimeslot());
 		entry->setChannelOffset(frame->getChannelOffset());
 
@@ -1136,7 +1161,8 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 		{
 			if (ScheduleTimer->isScheduled())
 				cancelEvent(ScheduleTimer);
-			scheduleAt(simTime(), ScheduleTimer);
+			double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+			scheduleAt(simTime() + temp, ScheduleTimer);
 		}
 		else
 		{
@@ -1173,7 +1199,12 @@ void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 			MLME_DISASSOCIATE_request(NULL);
 		}
 		else
+		{
 			MLME_BEACON_request(NULL);
+			if (bIsPANCoor)
+				dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
+
+		}
 	}
 }
 void RLL::handle_BEACON_CH_SAME_STAGE(cMessage *msg)
@@ -1212,7 +1243,6 @@ void RLL::handle_RESTART_confirm(cMessage *msg)
 	beaconTable->flushBeaconTable();
 	nLastSCANChannel = 0;
 	nScanCounter = 3;
-	dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
 	//bCapablePanCoor = false;
 	if (bCapablePanCoor)
 		bIsPANCoor = par("isPANCoor").boolValue();
@@ -1509,11 +1539,17 @@ void RLL::setScheduleChStUn()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	int offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
-	if (offset > 16)
-		offset = offset - 16;
+	int tempOffset = 0;
 
-	linkEntry->setChannelOffset(offset); //Advertisment always with channelOffset 0;
+	while (tempOffset == 0)
+	{
+		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+
+		if (tempOffset > (numChannel + 1))
+			tempOffset = tempOffset - (numChannel + 1);
+	}
+
+	linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
@@ -1530,11 +1566,16 @@ void RLL::setScheduleChStUn()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
-	if (offset > 16)
-		offset = offset - 16;
+	tempOffset = 0;
 
-	linkEntry->setChannelOffset(offset); //Advertisment always with channelOffset 0;
+	while (tempOffset == 0)
+	{
+		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+
+		if (tempOffset > (numChannel + 1))
+			tempOffset = tempOffset - (numChannel + 1);
+	}
+	linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
@@ -1726,11 +1767,17 @@ void RLL::setScheduleChStZe()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	int offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
-	if (offset > 16)
-		offset = offset - 16;
+	int tempOffset = 0;
 
-	linkEntry->setChannelOffset(offset); //Advertisment always with channelOffset 0;
+	while (tempOffset == 0)
+	{
+		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+
+		if (tempOffset > (numChannel + 1))
+			tempOffset = tempOffset - (numChannel + 1);
+	}
+
+	linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
@@ -1747,11 +1794,17 @@ void RLL::setScheduleChStZe()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	offset = nCluStage % (numChannel + 1) + intuniform(0, 16);
-	if (offset > 16)
-		offset = offset - 16;
+	tempOffset = 0;
 
-	linkEntry->setChannelOffset(offset); //Advertisment always with channelOffset 0;
+	while (tempOffset == 0)
+	{
+		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+
+		if (tempOffset > (numChannel + 1))
+			tempOffset = tempOffset - (numChannel + 1);
+	}
+
+	linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
@@ -1855,9 +1908,15 @@ void RLL::setScheduleChInit()
 		EV << "Coudlnt add link table entry" << endl;
 	}
 
-	int tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
-	if (tempOffset > (numChannel + 1))
-		tempOffset = tempOffset - (numChannel + 1);
+	int tempOffset = 0;
+
+	while (tempOffset == 0)
+	{
+		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+
+		if (tempOffset > (numChannel + 1))
+			tempOffset = tempOffset - (numChannel + 1);
+	}
 
 	linkEntry = new macLinkTableEntry();
 	linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
@@ -1876,9 +1935,15 @@ void RLL::setScheduleChInit()
 		EV << "Coudlnt add link table entry" << endl;
 	}
 
-	tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
-	if (tempOffset > (numChannel + 1))
-		tempOffset = tempOffset - (numChannel + 1);
+	tempOffset = 0;
+
+	while (tempOffset == 0)
+	{
+		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
+
+		if (tempOffset > (numChannel + 1))
+			tempOffset = tempOffset - (numChannel + 1);
+	}
 
 	linkEntry = new macLinkTableEntry();
 	linkEntry->setChannelOffset(tempOffset); //Advertisment always with channelOffset 0;
@@ -1970,4 +2035,69 @@ Radio80211aControlInfo RLL::getRadioControl(Radio80211aControlInfo *cntrl)
 	temp.setTestFrameSize(cntrl->getTestFrameSize());
 
 	return temp;
+}
+
+void RLL::GENERAL_CHECK(cMessage *msg)
+{
+
+	if (bNotAssociated)
+	{
+		if (StartTimer->isScheduled() || ScanTimer->isScheduled() || AssociateTimer->isScheduled() || AssociateWaitTimer->isScheduled())
+		{
+			setCheckTimer();
+			return;
+		}
+		else
+		{
+			RESTART_request(NULL);
+			return;
+		}
+
+	}
+	else
+	{
+		if (bIsPANCoor)
+		{
+			setCheckTimer();
+			return;
+		}
+		else
+		{
+			if (ScheduleTimer->isScheduled() || ScheduleWaitTimer->isScheduled())
+			{
+				setCheckTimer();
+				return;
+			}
+
+			if (DisassociateWaitTimer->isScheduled())
+			{
+				setCheckTimer();
+				return;
+			}
+		}
+
+		if (linkTable->getTimeSlotByOffset(-1) == -1)
+		{
+			setCheckTimer();
+			return;
+		}
+		else
+		{
+			SCHEDULE_request(NULL);
+			setCheckTimer();
+			return;
+		}
+
+	}
+
+	setCheckTimer();
+
+}
+
+void RLL::setCheckTimer()
+{
+	if (generalCheckTimer->isScheduled())
+		cancelEvent(generalCheckTimer);
+
+	scheduleAt(simTime() + 10, generalCheckTimer);
 }

@@ -513,6 +513,12 @@ inline void doUnpacking(cCommBuffer *b, Ieee802154eScheduleFrame& obj) {obj.pars
  *     int BO;
  *     int SO;
  * 
+ *     string srcName;
+ *     int srcIndex;
+ * 
+ *     string destName;
+ *     int destIndex;
+ * 
  * }
  * </pre>
  */
@@ -527,6 +533,10 @@ class Ieee802154eMulHoCluFrame : public ::Ieee802154eFrame
     int timeslot_var;
     int BO_var;
     int SO_var;
+    opp_string srcName_var;
+    int srcIndex_var;
+    opp_string destName_var;
+    int destIndex_var;
 
   private:
     void copy(const Ieee802154eMulHoCluFrame& other);
@@ -562,13 +572,21 @@ class Ieee802154eMulHoCluFrame : public ::Ieee802154eFrame
     virtual void setBO(int BO);
     virtual int getSO() const;
     virtual void setSO(int SO);
+    virtual const char * getSrcName() const;
+    virtual void setSrcName(const char * srcName);
+    virtual int getSrcIndex() const;
+    virtual void setSrcIndex(int srcIndex);
+    virtual const char * getDestName() const;
+    virtual void setDestName(const char * destName);
+    virtual int getDestIndex() const;
+    virtual void setDestIndex(int destIndex);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eMulHoCluFrame& obj) {obj.parsimPack(b);}
 inline void doUnpacking(cCommBuffer *b, Ieee802154eMulHoCluFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Plain/Ieee802154eFrame.msg:156</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Plain/Ieee802154eFrame.msg:162</tt> by nedtool.
  * <pre>
  * // ********************************				
  * // MAC command frame format - Std 802.15.4e-2012 (figure 48) page 67
@@ -612,7 +630,7 @@ inline void doPacking(cCommBuffer *b, Ieee802154eCmdFrame& obj) {obj.parsimPack(
 inline void doUnpacking(cCommBuffer *b, Ieee802154eCmdFrame& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>src/linklayer/mac/IEEE802154e/Plain/Ieee802154eFrame.msg:164</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/mac/IEEE802154e/Plain/Ieee802154eFrame.msg:170</tt> by nedtool.
  * <pre>
  * packet Ieee802154eMPFrame extends Ieee802154eFrame
  * {

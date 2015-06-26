@@ -2719,6 +2719,10 @@ Ieee802154eMulHoCluFrame::Ieee802154eMulHoCluFrame(const char *name, int kind) :
     this->timeslot_var = 0;
     this->BO_var = 0;
     this->SO_var = 0;
+    this->srcName_var = 0;
+    this->srcIndex_var = 0;
+    this->destName_var = 0;
+    this->destIndex_var = 0;
 }
 
 Ieee802154eMulHoCluFrame::Ieee802154eMulHoCluFrame(const Ieee802154eMulHoCluFrame& other) : ::Ieee802154eFrame(other)
@@ -2748,6 +2752,10 @@ void Ieee802154eMulHoCluFrame::copy(const Ieee802154eMulHoCluFrame& other)
     this->timeslot_var = other.timeslot_var;
     this->BO_var = other.BO_var;
     this->SO_var = other.SO_var;
+    this->srcName_var = other.srcName_var;
+    this->srcIndex_var = other.srcIndex_var;
+    this->destName_var = other.destName_var;
+    this->destIndex_var = other.destIndex_var;
 }
 
 void Ieee802154eMulHoCluFrame::parsimPack(cCommBuffer *b)
@@ -2761,6 +2769,10 @@ void Ieee802154eMulHoCluFrame::parsimPack(cCommBuffer *b)
     doPacking(b,this->timeslot_var);
     doPacking(b,this->BO_var);
     doPacking(b,this->SO_var);
+    doPacking(b,this->srcName_var);
+    doPacking(b,this->srcIndex_var);
+    doPacking(b,this->destName_var);
+    doPacking(b,this->destIndex_var);
 }
 
 void Ieee802154eMulHoCluFrame::parsimUnpack(cCommBuffer *b)
@@ -2774,6 +2786,10 @@ void Ieee802154eMulHoCluFrame::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->timeslot_var);
     doUnpacking(b,this->BO_var);
     doUnpacking(b,this->SO_var);
+    doUnpacking(b,this->srcName_var);
+    doUnpacking(b,this->srcIndex_var);
+    doUnpacking(b,this->destName_var);
+    doUnpacking(b,this->destIndex_var);
 }
 
 Ieee802154eNetworkCtrlInfo& Ieee802154eMulHoCluFrame::getCntrlInfo()
@@ -2856,6 +2872,46 @@ void Ieee802154eMulHoCluFrame::setSO(int SO)
     this->SO_var = SO;
 }
 
+const char * Ieee802154eMulHoCluFrame::getSrcName() const
+{
+    return srcName_var.c_str();
+}
+
+void Ieee802154eMulHoCluFrame::setSrcName(const char * srcName)
+{
+    this->srcName_var = srcName;
+}
+
+int Ieee802154eMulHoCluFrame::getSrcIndex() const
+{
+    return srcIndex_var;
+}
+
+void Ieee802154eMulHoCluFrame::setSrcIndex(int srcIndex)
+{
+    this->srcIndex_var = srcIndex;
+}
+
+const char * Ieee802154eMulHoCluFrame::getDestName() const
+{
+    return destName_var.c_str();
+}
+
+void Ieee802154eMulHoCluFrame::setDestName(const char * destName)
+{
+    this->destName_var = destName;
+}
+
+int Ieee802154eMulHoCluFrame::getDestIndex() const
+{
+    return destIndex_var;
+}
+
+void Ieee802154eMulHoCluFrame::setDestIndex(int destIndex)
+{
+    this->destIndex_var = destIndex;
+}
+
 class Ieee802154eMulHoCluFrameDescriptor : public cClassDescriptor
 {
   public:
@@ -2903,7 +2959,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getProperty(const char *property
 int Ieee802154eMulHoCluFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 8+basedesc->getFieldCount(object) : 8;
+    return basedesc ? 12+basedesc->getFieldCount(object) : 12;
 }
 
 unsigned int Ieee802154eMulHoCluFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -2923,8 +2979,12 @@ unsigned int Ieee802154eMulHoCluFrameDescriptor::getFieldTypeFlags(void *object,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<8) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<12) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eMulHoCluFrameDescriptor::getFieldName(void *object, int field) const
@@ -2944,8 +3004,12 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldName(void *object, int f
         "timeslot",
         "BO",
         "SO",
+        "srcName",
+        "srcIndex",
+        "destName",
+        "destIndex",
     };
-    return (field>=0 && field<8) ? fieldNames[field] : NULL;
+    return (field>=0 && field<12) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eMulHoCluFrameDescriptor::findField(void *object, const char *fieldName) const
@@ -2960,6 +3024,10 @@ int Ieee802154eMulHoCluFrameDescriptor::findField(void *object, const char *fiel
     if (fieldName[0]=='t' && strcmp(fieldName, "timeslot")==0) return base+5;
     if (fieldName[0]=='B' && strcmp(fieldName, "BO")==0) return base+6;
     if (fieldName[0]=='S' && strcmp(fieldName, "SO")==0) return base+7;
+    if (fieldName[0]=='s' && strcmp(fieldName, "srcName")==0) return base+8;
+    if (fieldName[0]=='s' && strcmp(fieldName, "srcIndex")==0) return base+9;
+    if (fieldName[0]=='d' && strcmp(fieldName, "destName")==0) return base+10;
+    if (fieldName[0]=='d' && strcmp(fieldName, "destIndex")==0) return base+11;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -2980,8 +3048,12 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldTypeString(void *object,
         "int",
         "int",
         "int",
+        "string",
+        "int",
+        "string",
+        "int",
     };
-    return (field>=0 && field<8) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<12) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eMulHoCluFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -3029,6 +3101,10 @@ std::string Ieee802154eMulHoCluFrameDescriptor::getFieldAsString(void *object, i
         case 5: return long2string(pp->getTimeslot());
         case 6: return long2string(pp->getBO());
         case 7: return long2string(pp->getSO());
+        case 8: return oppstring2string(pp->getSrcName());
+        case 9: return long2string(pp->getSrcIndex());
+        case 10: return oppstring2string(pp->getDestName());
+        case 11: return long2string(pp->getDestIndex());
         default: return "";
     }
 }
@@ -3050,6 +3126,10 @@ bool Ieee802154eMulHoCluFrameDescriptor::setFieldAsString(void *object, int fiel
         case 5: pp->setTimeslot(string2long(value)); return true;
         case 6: pp->setBO(string2long(value)); return true;
         case 7: pp->setSO(string2long(value)); return true;
+        case 8: pp->setSrcName((value)); return true;
+        case 9: pp->setSrcIndex(string2long(value)); return true;
+        case 10: pp->setDestName((value)); return true;
+        case 11: pp->setDestIndex(string2long(value)); return true;
         default: return false;
     }
 }

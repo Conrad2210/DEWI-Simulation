@@ -37,6 +37,9 @@ public:
 
     bool allAssociated();
 
+    int getNumAssNodes(){return numAssoNodes;}
+    int getNumRegisteredAssVectors(){return numRegisteredAssVectors;}
+
 private:
     //initialize datacenter
     void initialize(int stage);
@@ -56,6 +59,8 @@ private:
     //Path where results get stored when call finish;
     std::string ResultPath;
     bool recordValues;
+    int numRegisteredAssVectors;
+    int numAssoNodes;
 
     std::vector<DataVector*> ResultVectors;
 

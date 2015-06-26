@@ -106,6 +106,10 @@ class INET_API RLL : public cSimpleModule
 
 	virtual void handle_RESTART_confirm(cMessage *msg);
 
+	virtual void GENERAL_CHECK(cMessage *msg);
+
+	virtual void setCheckTimer();
+
     protected:
 	int mLowerLayerIn;
 	int mUpperLayerIn;
@@ -145,6 +149,7 @@ class INET_API RLL : public cSimpleModule
 	cMessage *DisassociateWaitTimer;
 	cMessage *BeaconTimer;
 	cMessage *ScanTimer;
+	cMessage *generalCheckTimer;
 
     protected:
 	//is associated or not

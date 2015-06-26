@@ -146,6 +146,12 @@ message Ieee802154eMulHoCluFrame extends Ieee802154eFrame
     int timeslot;
     int BO;
     int SO;
+    
+    string srcName;
+    int srcIndex;
+    
+    string destName;
+    int destIndex;
  	   
 }
 

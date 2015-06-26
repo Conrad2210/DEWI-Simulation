@@ -25,111 +25,116 @@
 
 Define_Module(DataCenter);
 
-DataCenter::DataCenter() {
-    // TODO Auto-generated constructor stub
-    ResultPath = "";
-
+DataCenter::DataCenter()
+{
+	// TODO Auto-generated constructor stub
+	ResultPath = "";
 
 }
 
-DataCenter::~DataCenter() {
-    // TODO Auto-generated destructor stub
+DataCenter::~DataCenter()
+{
+	// TODO Auto-generated destructor stub
 }
 
 void DataCenter::initialize(int stage)
 {
-    if(stage == 0)
-    {
-	recordValues = par("recordValues").boolValue();
-	if(recordValues)
-	    ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
+	if (stage == 0)
+	{
+		recordValues = par("recordValues").boolValue();
+		if (recordValues)
+			ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
 
-    }
+		numAssoNodes = 0;
+		numRegisteredAssVectors = 0;
+	}
 }
-
 
 void DataCenter::finish()
 {
 
-        if(recordValues)
-        {
-            for(int i = 0; i < (int)ResultVectors.size(); i++)
-            {
-                ResultVectors.at(i)->saveData(ResultPath);
-            }
-        }
+	if (recordValues)
+	{
+		for (int i = 0; i < (int) ResultVectors.size(); i++)
+		{
+			ResultVectors.at(i)->saveData(ResultPath);
+		}
+	}
 
 }
 
-
 bool DataCenter::allAssociated()
 {
-    for(int i = 0; i < (int)AssociatedVector.size(); i++)
-	if(!AssociatedVector.at(i)->getAssosicated())
-	    return false;
+	for (int i = 0; i < (int) AssociatedVector.size(); i++)
+		if (!AssociatedVector.at(i)->getAssosicated())
+			return false;
 
-    return true;
+	return true;
 }
 
 void DataCenter::registerAssociatedVector(int ix, const char* na, bool as, int st, int parix, const char* parna)
 {
-    AssociatedVector.push_back(new cAssociated(ix,na,as,st,parix,parna));
+	AssociatedVector.push_back(new cAssociated(ix, na, as, st, parix, parna));
+	numRegisteredAssVectors = (int) AssociatedVector.size();
 }
 
 void DataCenter::updateAssociatedVector(int ix, const char* na, bool as, int st, int parix, const char* parna)
 {
-    for(int i = 0; i < (int)AssociatedVector.size(); i++)
-    {
-	if(AssociatedVector.at(i)->getIndex() == ix && !strcmp(AssociatedVector.at(i)->getName(),na))
+	numAssoNodes = 0;
+	for (int i = 0; i < (int) AssociatedVector.size(); i++)
 	{
-	    AssociatedVector.at(i)->setAssociated(as);
-	    AssociatedVector.at(i)->setStage(st);
-	    AssociatedVector.at(i)->setParentIndex(parix);
-	    AssociatedVector.at(i)->setParentName(parna);
-	    return;
+		if (AssociatedVector.at(i)->getIndex() == ix && !strcmp(AssociatedVector.at(i)->getName(), na))
+		{
+			AssociatedVector.at(i)->setAssociated(as);
+			AssociatedVector.at(i)->setStage(st);
+			AssociatedVector.at(i)->setParentIndex(parix);
+			AssociatedVector.at(i)->setParentName(parna);
+		}
+
+		if(AssociatedVector.at(i)->getAssosicated())
+			numAssoNodes++;
 	}
-    }
 }
 
 void DataCenter::registerVector(DataVector *Vec)
 {
-    ResultVectors.push_back(Vec);
+	ResultVectors.push_back(Vec);
 }
 
-void DataCenter::recordScalar(std::string Data,std::string Type, std::string Index, std::string Name)
+void DataCenter::recordScalar(std::string Data, std::string Type, std::string Index, std::string Name)
 {
-    //declare Path variable
-    std::stringstream path;
+	//declare Path variable
+	std::stringstream path;
 
-    //create absolute path
+	//create absolute path
 #ifdef WIN32
-    path << ResultPath << "\\" << Type << "\\" << Index;
+	path << ResultPath << "\\" << Type << "\\" << Index;
 #elif linux
-    path << ResultPath << "/" << Type << "/" << Index;
+	path << ResultPath << "/" << Type << "/" << Index;
 #endif
-    //Create Directories
-    if(createDirectories(path.str()))
-    {
-        //Set path including file name
+	//Create Directories
+	if (createDirectories(path.str()))
+	{
+		//Set path including file name
 #ifdef WIN32
-        path << "\\" << Name << ".csv";
+		path << "\\" << Name << ".csv";
 #elif linux
-        path << "/" << Name << ".csv";
+		path << "/" << Name << ".csv";
 #endif
 
-        //open output file
-        std::ofstream fout(path.str().c_str());
+		//open output file
+		std::ofstream fout(path.str().c_str());
 
-        //check if outputfile is open
-        if(fout.is_open())
-        {
-            //write data to output file
-            fout << Type << ",\n";
-            fout << Data << ",\n";
-        }
+		//check if outputfile is open
+		if (fout.is_open())
+		{
+			//write data to output file
+			fout << Type << ",\n";
+			fout << Data << ",\n";
+		}
 
-        //close file
-        fout.close();
-    }
+		//close file
+		fout.close();
+	}
 }
 
