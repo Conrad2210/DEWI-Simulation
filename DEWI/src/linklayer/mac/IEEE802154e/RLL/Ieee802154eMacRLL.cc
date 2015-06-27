@@ -195,50 +195,50 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 		msg = NULL;
 		break;
 
-	case MAC_BACKOFF_TIMER:
-		handleBackoffTimer();
-		break;
-
-	case MAC_DEFER_CCA_TIMER:
-		handleDeferCCATimer();
-		break;
-
-	case MAC_BCN_RX_TIMER:
-		handleBcnRxTimer();
-		break;
-
-	case MAC_BCN_TX_TIMER:
-		handleBcnTxTimer();
-		break;
-
-	case MAC_ACK_TIMEOUT_TIMER:
-		handleAckTimeoutTimer();
-		break;
-
-	case MAC_TX_ACK_BOUND_TIMER:
-		handleTxAckBoundTimer();
-		break;
-
-	case MAC_TX_CMD_DATA_BOUND_TIMER:
-		handleTxCmdDataBoundTimer();
-		break;
-
-	case MAC_IFS_TIMER:
-		handleIfsTimer();
-		break;
-
-	case MAC_TX_SD_TIMER:
-	case MAC_RX_SD_TIMER:
-		handleSDTimer();
-		break;
-
-	case MAC_FINAL_CAP_TIMER:
-		handleFinalCapTimer();
-		break;
-
-	case MAC_GTS_TIMER:
-		handleGtsTimer();
-		break;
+//	case MAC_BACKOFF_TIMER:
+//		handleBackoffTimer();
+//		break;
+//
+//	case MAC_DEFER_CCA_TIMER:
+//		handleDeferCCATimer();
+//		break;
+//
+//	case MAC_BCN_RX_TIMER:
+//		handleBcnRxTimer();
+//		break;
+//
+//	case MAC_BCN_TX_TIMER:
+//		handleBcnTxTimer();
+//		break;
+//
+//	case MAC_ACK_TIMEOUT_TIMER:
+//		handleAckTimeoutTimer();
+//		break;
+//
+//	case MAC_TX_ACK_BOUND_TIMER:
+//		handleTxAckBoundTimer();
+//		break;
+//
+//	case MAC_TX_CMD_DATA_BOUND_TIMER:
+//		handleTxCmdDataBoundTimer();
+//		break;
+//
+//	case MAC_IFS_TIMER:
+//		handleIfsTimer();
+//		break;
+//
+//	case MAC_TX_SD_TIMER:
+//	case MAC_RX_SD_TIMER:
+//		handleSDTimer();
+//		break;
+//
+//	case MAC_FINAL_CAP_TIMER:
+//		handleFinalCapTimer();
+//		break;
+//
+//	case MAC_GTS_TIMER:
+//		handleGtsTimer();
+//		break;
 
 	case MAC_ASN_TIMER:
 		handleAsnTimer();

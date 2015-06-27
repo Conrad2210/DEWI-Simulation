@@ -4013,72 +4013,7 @@ void Ieee802154eMac::handle_PLME_SET_TRX_STATE_confirm(PHYenum status)
 		}
 	}
 
-	//[SR] old version
-	simtime_t delay;
 
-	if (backoffStatus == 99)
-	{
-		if (trx_state_req == phy_RX_ON)
-		{
-			if (taskP.taskStatus(TP_RX_ON_CSMACA))
-			{
-				taskP.taskStatus(TP_RX_ON_CSMACA) = false;
-				csmaca_handle_RX_ON_confirm(status);
-			}
-		}
-	}
-	/*else
-	 dispatch(status,__FUNCTION__,trx_state_req);*/
-
-	if (status != phy_TX_ON)
-		return;
-	// wait the phy_succes
-
-	//transmit the packet
-	if (beaconWaitingTx)        // periodically tx beacon
-	{
-		// to synchronize better, we don't transmit the beacon here
-	}
-	else if (txAck)
-	{
-		//although no CSMA-CA required for the transmission of ack.,
-		//but we still need to locate the backoff period boundary if beacon enabled
-		//(refer to page 157, line 25-31)
-		if ((mpib.macBeaconOrder == 15) && (rxBO == 15))  //non-beacon enabled
-			delay = 0.0;
-//         else if (txAck->getIsGTS())
-//             delay = 0.0;
-		else                                //beacon enabled
-		{
-			// here we use the hidden dst addr that we already set in ACK on purpose
-
-			delay = csmacaLocateBoundary((getShortAddress(txAck->getDstAddr()) == mpib.macCoordShortAddress), 0.0);
-			ASSERT(delay < bPeriod);
-		}
-
-		if (delay == 0.0)
-			handleTxAckBoundTimer();
-		else
-			startTxAckBoundTimer(delay);
-	}
-	else if (txGTS)
-	{
-		// send data frame in GTS here, no delay
-		txPkt = txGTS;
-		PD_DATA_request(txGTS->getByteLength(), check_and_cast<Ieee802154eFrame *>(txGTS->dup()));
-	}
-	else        // tx cmd or data
-	{
-		if ((mpib.macBeaconOrder == 15) && (rxBO == 15))  //non-beacon enabled
-			delay = 0.0;
-		else
-			delay = csmacaLocateBoundary(toParent(txCsmaca), 0.0);
-
-		if (delay == 0.0)
-			handleTxCmdDataBoundTimer();            //transmit immediately
-		else
-			startTxCmdDataBoundTimer(delay);
-	}
 }
 
 /**@author: 2014    Stefan Reis
