@@ -1002,7 +1002,7 @@ void Ieee802154eMacRLL::handle_MLME_DISASSOCIATE_request(cMessage *msg)
 	dataFrame->setFrmCtrl(frmCtrl);
 	dataFrame->setAuxSecHd(auxSecHd);
 
-	if (!queueModule->existAssReq(tmpDstAddr))
+	if (!queueModule->existDisAssReq(tmpDstAddr))
 		queueModule->insertInQueue(dataFrame->dup());
 
 	delete dataFrame;
