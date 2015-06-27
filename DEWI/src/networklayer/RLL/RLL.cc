@@ -701,8 +701,9 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 		{
 			if (ScheduleTimer->isScheduled())
 				cancelEvent(ScheduleTimer);
-			double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
-			scheduleAt(simTime() + temp, ScheduleTimer);
+			double waitTime = 50 + ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
+
+			scheduleAt(simTime() + waitTime, ScheduleTimer);
 		}
 		else
 		{
@@ -711,6 +712,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 				cancelEvent(BeaconScanTimer);
 			waitConstant = tmp->getNumberCH();
 			scheduleAt(simTime() + tmp->getNumberCH() * 5, BeaconScanTimer);
+			tempStr->parse("b=1.5,1.5,oval,orange");
+			parentDisp->updateWith(*tempStr);
 		}
 		setSchedule();
 		delete tempStr;
