@@ -372,23 +372,27 @@ bool Ieee802154eQueue::existDisAssRes(MACAddress addr)
 	return false;
 }
 
-void Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
+int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
 {
 	int i = 0;
+	int deleted = 0;
 	while(!queue.empty() && i < queue.length())
 	{
 		cPacket *queueMsg = PK(queue.get(i));
 		if(dynamic_cast<Ieee802154eFrame *>(queueMsg))
 		{
-			if(queueMsg->getCreationTime() < msg->getCreationTime())
+
+			if(queueMsg->getCreationTime() < msg->getCreationTime() && queueMsg->getKind() == msg->getKind())
 			{
 				queue.remove(queue.get(i));
 				i = 0;
+				deleted++;
 			}
 			else
 				i++;
 		}
 	}
+	return deleted;
 }
 
 cMessage *Ieee802154eQueue::requestSchdulePacket()
