@@ -652,11 +652,10 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 		}
 		else
 		{
-			tempStr->parse("b=1.5,1.5,oval,green;i=status/bulb");
+			tempStr->parse("b=1.5,1.5,oval,orange;i=status/bulb");
 
-			bubble("test");
 			if (bIsPANCoor)
-				tempStr->parse("b=1.5,1.5,oval,green;i=device/accesspoint");
+				tempStr->parse("b=1.5,1.5,oval,orange;i=device/accesspoint");
 		}
 
 		if (tmp->getPanCoordinator() && bIsPANCoor)
@@ -1174,6 +1173,12 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 		}
 		else
 		{
+			cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+			cDisplayString* tempStr = new cDisplayString();
+			tempStr->parse("b=1.5,1.5,oval,green;");
+			parentDisp->updateWith(*tempStr);
+			delete tempStr;
+
 			if (!bIsPANCoor)
 				dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
 
