@@ -417,9 +417,9 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	//[SR] old version
 	bool noAck;
 	int i = 0;
-	if(dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
+	if (dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
 	{
-		i = i+1-1;
+		i = i + 1 - 1;
 		i++;
 		i--;
 
@@ -685,6 +685,280 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	}
 }
 
+void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, cPacket* msdu, UINT_8 msduHandle, bool ackTX, bool gtsTX, bool indirectTX, UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, Ieee802154eUWBFType uwbPRF, RangingControl ranging,
+		UINT_16 uwbPreambleSymbolRepetitions, UINT_8 dataRate, FrameCrlOptions frameControlOptions, std::vector<Ieee802154eIEHeaderType> headerIElist, std::vector<Ieee802154eIEPayloadType> payloadIElist, bool sendMultipurpose)
+{
+	Ieee802154eMacTaskType task = TP_MCPS_DATA_REQUEST;
+	if (!mpib.macTSCHenabled)
+	{
+		checkTaskOverflow(task); // reset step to 0 if no task of this type is pending
+		taskP.taskStatus(task) = true;
+	}
+
+	//--- construct MPDU - Std 802.15.4-2011 (figure 46) page 65 ---
+
+	Ieee802154eDataFrame* tmpData = new Ieee802154eDataFrame();
+	Ieee802154eMPFrame* tmpMPData = new Ieee802154eMPFrame();
+
+	// construct frame control field
+	FrameCtrl frmCtrl;
+	MPFrameCtrl mpfrmCtrl; // for Multipurpose frame
+
+	IE3ADDR tmpDstAddr;
+	IE3ADDR tmpSrcAddr;
+	UINT_16 tmpDstPanId;
+	UINT_16 tmpSrcPanId;
+
+	if (sendMultipurpose) // see Std 802.15.4e-2012 page 168 // see packet structure Std 802.15.4e-2012 (figure 48k) page 75
+	{
+		delete tmpData; // release the unused pointer
+		frmCtrl.frameType = Ieee802154e_MULTI;  //multipurpose type
+		tmpMPData->setName("Ieee802154eMULTI");
+		mpfrmCtrl.lngFrameCtrl = true; //no default value in the Std 802.15.4e-2012
+	}
+	else
+	{
+		delete tmpMPData; // release the unused pointer
+		frmCtrl.frameType = Ieee802154e_DATA;   //data type
+		tmpData->setName("Ieee802154DATA");
+	}
+
+	//    frmCtrl.intraPan = (SrcPANId == DstPANId)? true:false;
+	frmCtrl.dstAddrMode = dstAddrMode;
+	frmCtrl.srcAddrMode = srcAddrMode;
+
+	if (sendMultipurpose && mpfrmCtrl.lngFrameCtrl)
+	{
+		mpfrmCtrl.presPANID = frameControlOptions.panIDsuppressed; //by default: false
+		frmCtrl.securityEnabled = (securityLevel == ASH_SLVL_NONE) ? false : true; //by default: false
+		frmCtrl.seqNbSup = frameControlOptions.seqSuppressed;
+		frmCtrl.frmPending = false;
+		frmCtrl.frameVersion = Ieee802154_compatible;
+		frmCtrl.ackReq = ackTX;
+		frmCtrl.presIElist = frameControlOptions.iesIncluded;
+
+		if (!frmCtrl.seqNbSup)
+			tmpMPData->setSeqNmbr(msduHandle);
+	}
+	else
+	{
+		frmCtrl.securityEnabled = (securityLevel == ASH_SLVL_NONE) ? false : true; //secuData;
+		frmCtrl.frmPending = false;
+		frmCtrl.ackReq = ackTX;
+
+		// see Std 802.15.4-2011 page 118 or see Std 802.15.4e-2012 (5.2.3 Frame compatibility) page 79
+		if (msduLength > aMaxMACSafePayloadSize || msdu->getByteLength() > aMaxMACSafePayloadSize)
+			frmCtrl.frameVersion = Ieee802154_2006_introduced;
+		else
+			frmCtrl.frameVersion = Ieee802154_2003_compatible; // Frames are compatible between IEEE Std 802.15.4-2003 and IEEE Std 802.15.4e-2012
+
+		// for Std 802.15.4e-2012 TSCH
+		if (mpib.macTSCHenabled)
+			frmCtrl.frameVersion = Ieee802154_compatible;
+
+		if (frmCtrl.frameVersion == Ieee802154_2003_compatible || frmCtrl.frameVersion == Ieee802154_2006_introduced)
+		{
+			frmCtrl.seqNbSup = false;
+			tmpData->setSeqNmbr(msduHandle);        // == macDSN
+		}
+		else
+			frmCtrl.seqNbSup = frameControlOptions.seqSuppressed; // for the Std 802.15.4e-2012
+
+		tmpData->setSeqNmbr(!frmCtrl.seqNbSup ? msduHandle : 0);
+
+	}
+
+	if (frmCtrl.dstAddrMode == defFrmCtrl_AddrModeNone)
+	{ // no address
+		tmpDstPanId = 0;
+		tmpDstAddr = (IE3ADDR) 0xffff;
+	}
+	else if (frmCtrl.dstAddrMode == defFrmCtrl_AddrMode8)
+	{ // 8 bit address
+		tmpDstPanId = dstPANId;
+		tmpDstAddr = IE3ADDR((UINT_8) dstAddr.getInt());
+	}
+	else if (frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+		tmpDstPanId = dstPANId;
+		tmpDstAddr = IE3ADDR((UINT_16) dstAddr.getInt());
+	}
+	else
+	{ // 64 bit address
+		tmpDstPanId = dstPANId;
+		tmpDstAddr = dstAddr;
+	}
+
+	if (frmCtrl.srcAddrMode == defFrmCtrl_AddrModeNone)
+	{ // no address
+		tmpSrcPanId = 0;
+		tmpSrcAddr = (IE3ADDR) 0xffff;
+	}
+	else if (frmCtrl.srcAddrMode == defFrmCtrl_AddrMode8)
+	{ // 8 bit address
+		tmpSrcPanId = mpib.macPANId;
+		tmpSrcAddr = (IE3ADDR) mpib.macSimpleAddress;
+	}
+	else if (frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
+	{ // 16 bit address
+		tmpSrcPanId = mpib.macPANId;
+		tmpSrcAddr = (IE3ADDR) mpib.macShortAddress;
+	}
+	else
+	{ // 64 bit address
+		tmpSrcPanId = mpib.macPANId;
+		tmpSrcAddr = (IE3ADDR) mpib.macExtendedAddress;
+	}
+
+	if (sendMultipurpose)
+	{
+		if (mpfrmCtrl.presPANID)
+		{ // see Std 802.15.4e-2012 (5.2.2.6.13) page77
+			tmpMPData->setDstPanId(dstPANId);
+			tmpMPData->setSrcPanId(dstPANId);
+		}
+		else
+		{
+			tmpMPData->setDstPanId(0);
+			tmpMPData->setSrcPanId(0);
+		}
+
+		tmpMPData->setDstAddr(tmpDstAddr);
+		tmpMPData->setSrcAddr(tmpSrcAddr);
+	}
+	else
+	{
+		tmpData->setDstPanId(tmpDstPanId);
+		tmpData->setDstAddr(tmpDstAddr);
+		tmpData->setSrcPanId(tmpSrcPanId);
+		tmpData->setSrcAddr(tmpSrcAddr);
+	}
+
+	AuxiliarySecurityHeader auxSecHd;
+	auxSecHd.secLvl = (Ieee802154eASHSeclvlType) securityLevel;
+	auxSecHd.keyIdentMode = keyIdMode;
+	auxSecHd.keySource = keySource;
+	auxSecHd.keyIndex = keyIndex;
+
+	if (sendMultipurpose)
+	{
+		frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpMPData->getSrcPanId(), tmpMPData->getDstPanId()); // PAN ID Compression field
+		//        tmpMPData->setIsGTS(gtsTX);
+
+		tmpMPData->setFrmCtrl(frmCtrl);
+		tmpMPData->setMpFrmCtrl(mpfrmCtrl);
+		tmpMPData->setAuxSecHd(auxSecHd);
+
+		// set length and encapsulate msdu
+		tmpMPData->setByteLength(calFrmByteLength(tmpMPData));
+		tmpMPData->encapsulate(msdu);     // the length of msdu is added to mpdu
+		EV << "[MAC]: MPDU constructed: " << tmpMPData->getName() << " (" << tmpMPData->getEncapsulatedPacket()->getName() << "), #" << (int) tmpMPData->getSeqNmbr() << ", " << tmpMPData->getByteLength() << " Bytes" << endl;
+	}
+	else
+	{
+		frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpData->getSrcPanId(), tmpData->getDstPanId()); // PAN ID Compression
+		//tmpData->setIsGTS(gtsTX);
+
+		tmpData->setFrmCtrl(frmCtrl);
+		tmpData->setAuxSecHd(auxSecHd);
+
+		// set length and encapsulate msdu
+		tmpData->setByteLength(calFrmByteLength(tmpData));
+		tmpData->setControlInfo(msdu->removeControlInfo());
+		tmpData->encapsulate(msdu);     // the length of msdu is added to mpdu
+		EV << "[MAC]: MPDU constructed: " << tmpData->getName() << " (" << tmpData->getEncapsulatedPacket()->getName() << "), #" << (int) tmpData->getSeqNmbr() << ", " << tmpData->getByteLength() << " Bytes" << endl;
+	}
+
+	//***********************************************
+	//********* decide the transmission mode ********
+	//***********************************************
+	Ieee802154eTxOption TxOption;
+
+	if (gtsTX)
+		TxOption = GTS_TRANS;
+	else if (indirectTX)
+		TxOption = INDIRECT_TRANS;
+	else
+		TxOption = DIRECT_TRANS;
+
+	taskP.mcps_data_request_TxOption = TxOption;
+
+	switch (TxOption)
+	{
+	case DIRECT_TRANS: // send in the CAP or at the Link for TSCH transmission
+	{
+		// TSCH CSME-CA algorithm - Std 802.15.4e-2012 (figure 11a) page 14
+		if (mpib.macTSCHenabled)
+		{
+			// check the could send in a timeslot (TSCH CCA - macTsMaxTX time)
+			simtime_t duration;
+			if (sendMultipurpose)
+				duration = calDuration(tmpMPData);
+			else
+				duration = calDuration(tmpData);
+
+			if (duration > timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl()) // delete msg and report MLME_DATA_confirm
+			{
+				EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is bigger then " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be discarded" << endl;
+
+				if (sendMultipurpose)
+					MCPS_DATA_confirm(tmpMPData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpMPData);
+				else
+					MCPS_DATA_confirm(tmpData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpData);
+
+				delete tmpMPData;
+				delete tmpData;
+				numUpperPktLost++;
+				reqtMsgFromIFq();
+				return;
+			}
+			else
+			{
+				EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is smaller or equal as the " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be saved and transmitted later in the Tx timeslot to the dest Addr" << endl;
+
+				if (sendMultipurpose)
+				{ // if a timeslot is linked to the device
+					if (linkTable->existLink((UINT_16) tmpMPData->getDstAddr().getInt()))
+					{
+						//send(tmpMPData, mQueueOut);
+						queueModule->insertInQueue(tmpMPData);
+					}
+					else
+					{
+						EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
+						delete tmpMPData;
+						numUpperPktLost++;
+					}
+				}
+				else
+				{   // if a timeslot is linked to the device
+					if (linkTable->existLink((UINT_16) tmpData->getDstAddr().getInt()))
+					{
+						//send(tmpData, mQueueOut);
+
+						numUpperPktLost = numUpperPktLost +queueModule->checkForNewerControlMessage(tmpData);
+						queueModule->insertInQueue(tmpData);
+					}
+					else
+					{
+						EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
+						delete tmpData;
+						numUpperPktLost++;
+					}
+				}
+			}
+		}
+
+	}
+
+	default:
+	{
+		error("[MAC]: undefined txOption: %d!", TxOption);
+		break;
+	}
+	}
+}
+
 void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 {
 	/*UINT_8 channelNumber, UINT_8 channelPage, Ieee802154eAddrMode coordAddrMode,
@@ -784,7 +1058,8 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_request(cMessage *msg)
 }
 
 void Ieee802154eMacRLL::MLME_ASSOCIATE_indication(cMessage *msg)
-{ASSERT(msg);
+{
+	ASSERT(msg);
 	Ieee802154eAssociationFrame *tmp = check_and_cast<Ieee802154eAssociationFrame*>(msg);
 	msg = NULL;
 	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo("AssociationIndication", TP_MLME_ASSOCIATE_INDICATION);
@@ -908,7 +1183,7 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 		panCoorName = tmp->getSenderModule()->getFullName();
 		mpib.macShortAddress = tmp->getCntrlInfo().getAssocShortAddress();
 
-		queueModule->deleteMsgQueue(tmp->getSrcAddr(),false);
+		queueModule->deleteMsgQueue(tmp->getSrcAddr(), false);
 	}
 	else
 	{
@@ -2147,11 +2422,11 @@ void Ieee802154eMacRLL::handleAsnTimer()
 			if (!awaitingNextBeacon || isPANCoor)
 			{
 
-	        	if (!strcmp("gateWay", getParentModule()->getParentModule()->getName())) //TODO: remove after fixed
-	        	{
-	        		int i = 0;
-	        		i = i + 1;
-	        	}
+				if (!strcmp("gateWay", getParentModule()->getParentModule()->getName())) //TODO: remove after fixed
+				{
+					int i = 0;
+					i = i + 1;
+				}
 				tmpMsg = queueModule->requestBeaconPacket();
 
 				if (tmpMsg == NULL)

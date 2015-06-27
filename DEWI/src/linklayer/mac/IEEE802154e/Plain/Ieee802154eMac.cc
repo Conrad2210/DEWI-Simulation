@@ -4324,7 +4324,10 @@ void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8021
 					if (linkTable->existLink((UINT_16) tmpData->getDstAddr().getInt()))
 					{
 						//send(tmpData, mQueueOut);
+
 						queueModule->insertInQueue(tmpData);
+
+						numUpperPktLost++;
 					}
 					else
 					{
