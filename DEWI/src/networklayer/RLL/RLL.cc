@@ -1190,8 +1190,13 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 //PAN COORD check for beacon from CH same stage
 void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 {
+	cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+	cDisplayString* tempStr = new cDisplayString();
+	tempStr->parse("b=1.5,1.5,oval,orange");
+	parentDisp->updateWith(*tempStr);
 	if (nScanCounter < waitConstant)
 	{
+
 		nScanCounter++;
 		if (!BeaconScanTimer->isScheduled())
 			scheduleAt(simTime() + 5, BeaconScanTimer);
@@ -1205,6 +1210,8 @@ void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 		}
 		else
 		{
+			tempStr->parse("b=1.5,1.5,oval,green");
+			parentDisp->updateWith(*tempStr);
 			MLME_BEACON_request(NULL);
 			if (bIsPANCoor)
 				dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
