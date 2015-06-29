@@ -528,7 +528,7 @@ void RLL::handleSelfMessage(cMessage *msg)
 	}
 	case CHECK_TIMER:
 	{
-		GENERAL_CHECK(NULL);
+		//GENERAL_CHECK(NULL);
 		break;
 	}
 	default:
@@ -690,8 +690,10 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tmpEntry->isMyCH(true);
 
 			setSchedule();
-			linkTable->getLinkByTimeslot(10)->setChannelOffset(tmp->getChannelOffset10());
-			linkTable->getLinkByTimeslot(11)->setChannelOffset(tmp->getChannelOffset11());
+            if(linkTable->getLinkByTimeslot(10) != NULL)
+			    linkTable->getLinkByTimeslot(10)->setChannelOffset(tmp->getChannelOffset10());
+            if(linkTable->getLinkByTimeslot(11) != NULL)
+                linkTable->getLinkByTimeslot(11)->setChannelOffset(tmp->getChannelOffset11());
 		}
 		else
 		{
