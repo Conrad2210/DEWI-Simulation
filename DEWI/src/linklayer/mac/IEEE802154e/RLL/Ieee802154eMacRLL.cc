@@ -948,7 +948,7 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 				}
 			}
 		}
-
+		break;
 	}
 
 	default:
