@@ -1195,6 +1195,8 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 	primitive->setStage(tmp->getCntrlInfo().getStage());
 	primitive->setPanId(tmp->getSrcPanId());
 	primitive->setNumberCH(tmp->getCntrlInfo().getNumberCH());
+	primitive->setChannelOffset10(tmp->getCntrlInfo().getChannelOffset10());
+	primitive->setChannelOffset11(tmp->getCntrlInfo().getChannelOffset11());
 	EV << "[MAC]: sending a MLME-ASSOCIATE.confirm to NETWORK" << endl;
 	send(primitive->dup(), mUpperLayerOut);
 

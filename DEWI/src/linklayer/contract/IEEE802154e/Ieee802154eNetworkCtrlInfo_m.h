@@ -226,6 +226,9 @@
  * 
  *     uint8_t numberCH;
  * 
+ *     int channelOffset10;
+ *     int channelOffset11;
+ * 
  * }
  * </pre>
  */
@@ -369,6 +372,8 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     bool txLowerCH_var;
     bool txHigherCH_var;
     uint8_t numberCH_var;
+    int channelOffset10_var;
+    int channelOffset11_var;
 
   private:
     void copy(const Ieee802154eNetworkCtrlInfo& other);
@@ -662,6 +667,10 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     virtual void setTxHigherCH(bool txHigherCH);
     virtual uint8_t getNumberCH() const;
     virtual void setNumberCH(uint8_t numberCH);
+    virtual int getChannelOffset10() const;
+    virtual void setChannelOffset10(int channelOffset10);
+    virtual int getChannelOffset11() const;
+    virtual void setChannelOffset11(int channelOffset11);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eNetworkCtrlInfo& obj) {obj.parsimPack(b);}

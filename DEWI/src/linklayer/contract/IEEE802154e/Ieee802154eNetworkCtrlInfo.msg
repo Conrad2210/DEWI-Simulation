@@ -213,4 +213,7 @@ message Ieee802154eNetworkCtrlInfo
 	
 	uint8_t numberCH;
 	
+	int channelOffset10;
+	int channelOffset11;
+	
 }

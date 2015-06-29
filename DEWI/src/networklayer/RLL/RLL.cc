@@ -625,6 +625,8 @@ void RLL::MLME_ASSOCIATE_response(cMessage *msg)
 	AssRes->setStage(nCluStage);
 	AssRes->setPanCoordinator(bIsPANCoor);
 	AssRes->setNumberCH(clusterTable->getNumberCH());
+	AssRes->setChannelOffset10(linkTable->getLinkByTimeslot(10)->getChannelOffset());
+	AssRes->setChannelOffset11(linkTable->getLinkByTimeslot(11)->getChannelOffset());
 	send(AssRes->dup(), mLowerLayerOut);
 	delete AssRes;
 	AssRes = NULL;
@@ -669,10 +671,14 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tmpEntry->isPrevStageCH(true);
 			tmpEntry->isMyCS(false);
 			tmpEntry->isMyCH(false);
+
+			setSchedule();
 		}
 		else if (tmp->getPanCoordinator() && !bIsPANCoor)
 		{
+
 			nCluStage = tmp->getStage();
+
 			clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*) "", tmp->getPanCoordinator(), tmp->getPanId());
 			macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
 			tmpEntry->setStage(nCluStage);
@@ -682,6 +688,10 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tmpEntry->isPrevStageCH(false);
 			tmpEntry->isMyCS(false);
 			tmpEntry->isMyCH(true);
+
+			setSchedule();
+			linkTable->getLinkByTimeslot(10)->setChannelOffset(tmp->getChannelOffset10());
+			linkTable->getLinkByTimeslot(11)->setChannelOffset(tmp->getChannelOffset11());
 		}
 		else
 		{
@@ -693,16 +703,17 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tmpEntry->isPrevStageCH(false);
 			tmpEntry->isMyCS(true);
 			tmpEntry->isMyCH(false);
+
+			setSchedule();
 		}
 		parentDisp->updateWith(*tempStr);
 
 		if (!bIsPANCoor)
 		{
-			if (ScheduleTimer->isScheduled())
-				cancelEvent(ScheduleTimer);
-			double waitTime = 50 + ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
+			tempStr->parse("b=1.5,1.5,oval,green");
+			parentDisp->updateWith(*tempStr);
+			dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
 
-			scheduleAt(simTime() + waitTime, ScheduleTimer);
 		}
 		else
 		{
@@ -714,7 +725,6 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tempStr->parse("b=1.5,1.5,oval,orange");
 			parentDisp->updateWith(*tempStr);
 		}
-		setSchedule();
 		delete tempStr;
 		tempStr = NULL;
 
