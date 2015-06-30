@@ -25,6 +25,9 @@
 #include "PassiveQueueBase.h"
 #include "macLinkTableEntry.h"
 
+#include "DataCenter.h"
+#include "DataVector.h"
+
 /**
  * Ieee802154e queue. See NED for more info.
  * @author: Stefan Reis     2014    (modified)
@@ -60,6 +63,10 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
      * Redefined from PassiveQueueBase.
      */
     virtual void sendOut(cMessage *msg);
+
+
+	DataCenter *dataCenter;
+	DataVector *delMsg;
 
   public:
     /**

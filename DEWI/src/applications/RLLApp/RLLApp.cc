@@ -59,7 +59,7 @@ void RLLApp::initialize(int stage)
 		m_AppStartTime = par("StartTime").doubleValue();
 		m_totalBurstToSend = par("numberOfBursts");
 
-		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
+		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime) + 1;
 
 		BurstTimer = new cMessage("BurstTimer");
 		BurstMessageTimer = new cMessage("BurstMessageTimer");
@@ -80,8 +80,11 @@ void RLLApp::initialize(int stage)
 	}
 	if (1 == stage)
 	{
-		Hop->registerVector();
-		E2E->registerVector();
+		if (strcmp("lamp", getParentModule()->getName()))
+		{
+			Hop->registerVector();
+			E2E->registerVector();
+		}
 		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 		if (strcmp("gateWay", getParentModule()->getName()))
 			dataCenter->registerAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");

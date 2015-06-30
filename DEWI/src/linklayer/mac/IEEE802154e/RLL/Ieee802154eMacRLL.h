@@ -17,6 +17,8 @@
 #define IEEE802154EMACRLL_H_
 
 #include "Ieee802154eMac.h"
+#include "DataCenter.h"
+#include "DataVector.h"
 
 class Ieee802154eMacRLL : public Ieee802154eMac
 {
@@ -86,6 +88,8 @@ class Ieee802154eMacRLL : public Ieee802154eMac
 
 	cMessage* awaitingBeacon;
 	cMessage *scanTimer;
+
+
 };
 
 #endif /* IEEE802154EMACRLL_H_ */

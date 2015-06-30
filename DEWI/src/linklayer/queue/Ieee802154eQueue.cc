@@ -41,6 +41,18 @@ void Ieee802154eQueue::initialize()
 
 	// configuration
 	frameCapacity = par("frameCapacity");
+
+	std::stringstream a;
+	a << getParentModule()->getParentModule()->getIndex();
+	//EndToEndDelay = new cOutVector(a.str().c_str());
+	delMsg = new DataVector(a.str(), "DelMsg");
+
+	if (strcmp("lamp", getParentModule()->getParentModule()->getName()))
+	{
+		delMsg->registerVector();
+	}
+	dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
+
 }
 
 cMessage *Ieee802154eQueue::enqueue(cMessage *msg)
@@ -384,7 +396,10 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
 
 			if (queueMsg->getCreationTime() < msg->getCreationTime() && queueMsg->getKind() == msg->getKind())
 			{
-				queue.remove(queue.get(i));
+				Ieee802154eFrame *tmpmsg = check_and_cast<Ieee802154eFrame *>(queue.get(i));
+				if (tmpmsg->getEncapsulatedMsg() != NULL)
+					delMsg->record(tmpmsg->getEncapsulatedMsg()->getName());
+				queue.remove(tmpmsg);
 				i = 0;
 				deleted++;
 			}
@@ -394,8 +409,6 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
 	}
 	return deleted;
 }
-
-
 
 cMessage *Ieee802154eQueue::requestSchdulePacket()
 {
@@ -423,7 +436,7 @@ bool Ieee802154eQueue::deleteMsgFromQueu(cMessage *msg)
 		{
 			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if(tmpMsg == msg)
+			if (tmpMsg == msg)
 			{
 				queue.remove(queue.get(i));
 				i = 0; // start from the beginning, to prevent an NULL pointer

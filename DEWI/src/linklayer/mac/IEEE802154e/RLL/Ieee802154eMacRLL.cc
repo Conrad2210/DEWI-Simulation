@@ -45,6 +45,7 @@ void Ieee802154eMacRLL::initialize(int stage)
 	awaitingBeacon = new cMessage("awaitingBeaconTimer", MAC_AWAITING_BEACON);
 	awaitingNextBeacon = false;
 
+
 }
 
 void Ieee802154eMacRLL::handleMessage(cMessage *msg)
@@ -934,8 +935,10 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 				{   // if a timeslot is linked to the device
 					if (linkTable->existLink((UINT_16) tmpData->getDstAddr().getInt()))
 					{
-						//send(tmpData, mQueueOut);
 
+
+						//send(tmpData, mQueueOut);
+						queueModule->checkForNewerControlMessage(tmpData);
 						queueModule->insertInQueue(tmpData);
 					}
 					else
