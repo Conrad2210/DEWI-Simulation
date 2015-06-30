@@ -93,7 +93,7 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
     virtual bool existSchedRes(MACAddress addr);
 
     virtual int checkForNewerControlMessage(cMessage *msg);
-
+    virtual bool deleteMsgFromQueu(cMessage *msg);
     /**
      * delete a specific one/all packet(s) from the queue
      */

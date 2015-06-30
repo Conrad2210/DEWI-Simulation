@@ -376,13 +376,13 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
 {
 	int i = 0;
 	int deleted = 0;
-	while(!queue.empty() && i < queue.length())
+	while (!queue.empty() && i < queue.length())
 	{
 		cPacket *queueMsg = PK(queue.get(i));
-		if(dynamic_cast<Ieee802154eFrame *>(queueMsg))
+		if (dynamic_cast<Ieee802154eFrame *>(queueMsg))
 		{
 
-			if(queueMsg->getCreationTime() < msg->getCreationTime() && queueMsg->getKind() == msg->getKind())
+			if (queueMsg->getCreationTime() < msg->getCreationTime() && queueMsg->getKind() == msg->getKind())
 			{
 				queue.remove(queue.get(i));
 				i = 0;
@@ -394,6 +394,8 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
 	}
 	return deleted;
 }
+
+
 
 cMessage *Ieee802154eQueue::requestSchdulePacket()
 {
@@ -409,7 +411,36 @@ cMessage *Ieee802154eQueue::requestSchdulePacket()
 	}
 	return NULL;
 }
+bool Ieee802154eQueue::deleteMsgFromQueu(cMessage *msg)
+{
+	int i = 0;
+	bool foundFirst = false;
 
+	while (!queue.empty() && i < queue.length())
+	{
+		cPacket *msg = PK(queue.get(i));
+		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		{
+			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+			if(tmpMsg == msg)
+			{
+				queue.remove(queue.get(i));
+				i = 0; // start from the beginning, to prevent an NULL pointer
+			}
+			else
+				i++;
+		}
+		else
+			i++;
+	}
+	if (!foundFirst)
+		EV << "Ieee802154eQueue: msg couldn't delete from the queue" << endl;
+
+	emit(queueLengthSignal, queue.length());
+
+	return foundFirst ? true : false;
+}
 //@author: Stefan Reis      2014
 bool Ieee802154eQueue::deleteMsgQueue(MACAddress dstAddr, bool all)
 {
