@@ -62,6 +62,7 @@ class RLLApp : public TrafGenPar
 	int m_numberMessageSend;
 	int m_burstCounter;
 	int m_messageCounter;
+	int m_totalBurstToSend;
 
 	double m_AppStartTime;
 	double m_AppStopTime;

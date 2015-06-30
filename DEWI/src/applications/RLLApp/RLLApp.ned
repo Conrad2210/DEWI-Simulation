@@ -29,5 +29,5 @@ simple RLLApp extends TrafGenPar
    double interArrivalTime @unit(s) = default(0.1s);
    double BurstPause @unit(s) = default(10s);
    double StartTime @unit(s) = default(5s);
-   double StopTime @unit(s) = default(1d);
+   int numberOfBursts  = default(5000);
 }

@@ -936,7 +936,6 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 					{
 						//send(tmpData, mQueueOut);
 
-						numUpperPktLost = numUpperPktLost +queueModule->checkForNewerControlMessage(tmpData);
 						queueModule->insertInQueue(tmpData);
 					}
 					else
