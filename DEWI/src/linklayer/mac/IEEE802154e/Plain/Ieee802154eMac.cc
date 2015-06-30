@@ -3474,7 +3474,8 @@ void Ieee802154eMac::handle_PD_DATA_confirm(PHYenum status)
 							activeNeighborEntry->incrNumTxData();
 					}
 
-					queueModule->deleteMsgQueue(tmpPkt->getDstAddr(), false);
+					//queueModule->deleteMsgQueue(tmpPkt->getDstAddr(), false);
+					queueModule->deleteMsgFromQueu(tmpPkt);
 
 					if (txPkt == txBeacon)
 					{
