@@ -729,42 +729,105 @@ void Ieee802154eMac::finish()
 	if (t == 0)
 		return;
 
-	recordScalar("Total simulation time", t);
-	recordScalar("total num of upper pkts received", numUpperPkt);
-	recordScalar("num of upper pkts dropped", numUpperPktLost);
-	recordScalar("num of BEACON pkts sent", numTxBcnPkt);
-	recordScalar("num of DATA pkts sent successfully", numTxDataSucc);
-	recordScalar("num of DATA pkts failed", numTxDataFail);
-	recordScalar("num of DATA pkts sent successfully in GTS", numTxGTSSucc);
-	recordScalar("num of DATA pkts failed in GTS", numTxGTSFail);
-	recordScalar("num of ACK pkts sent", numTxAckPkt);
-	recordScalar("num of BEACON pkts received", numRxBcnPkt);
-	recordScalar("num of BEACON pkts lost", numLostBcn);
-	recordScalar("num of DATA pkts received", numRxDataPkt);
-	recordScalar("num of DATA pkts received in GTS", numRxGTSPkt);
-	recordScalar("num of ACK pkts received", numRxAckPkt);
-	recordScalar("num of collisions", numCollision);
+//	recordScalar("Total simulation time", t);
+//	recordScalar("total num of upper pkts received", numUpperPkt);
+//	recordScalar("num of upper pkts dropped", numUpperPktLost);
+//	recordScalar("num of BEACON pkts sent", numTxBcnPkt);
+//	recordScalar("num of DATA pkts sent successfully", numTxDataSucc);
+//	recordScalar("num of DATA pkts failed", numTxDataFail);
+//	recordScalar("num of DATA pkts sent successfully in GTS", numTxGTSSucc);
+//	recordScalar("num of DATA pkts failed in GTS", numTxGTSFail);
+//	recordScalar("num of ACK pkts sent", numTxAckPkt);
+//	recordScalar("num of BEACON pkts received", numRxBcnPkt);
+//	recordScalar("num of BEACON pkts lost", numLostBcn);
+//	recordScalar("num of DATA pkts received", numRxDataPkt);
+//	recordScalar("num of DATA pkts received in GTS", numRxGTSPkt);
+//	recordScalar("num of ACK pkts received", numRxAckPkt);
+//	recordScalar("num of collisions", numCollision);
+//
+//	// MAC-performance-metrics-specific / Std 802.15.4e-2012 (6.4.3.9 MAC-performance-metrics-specific MAC PIB attributes) page 182
+//	if (mpib.macMetricsEnabled)
+//	{
+//		recordScalar("num of frames sent successfully one retry", mpib.macRetryCount);
+//		recordScalar("num of frames sent successfully multi retry", mpib.macMultipleRetryCount);
+//		recordScalar("num of frames sent failed", mpib.macTXFailCount);
+//		recordScalar("num of frames sent successfully within macAckWaitDuration", mpib.macTXSuccessCount);
+//		recordScalar("num of frames with FCS error", mpib.macFCSErrorCount);
+//
+//		if (mpib.macSecurityEnabled)
+//			recordScalar("num of frames with security error", mpib.macSecurityFailure);
+//
+//		recordScalar("num of duplicated frames received", mpib.macDuplicateFrameCount);
+//		recordScalar("num of frames received successfully", mpib.macRXSuccessCount);
+//		recordScalar("num of ACK/NACK timing correction IE with NACK", mpib.macNACKcount);
+//	}
+//
+//	recordScalar("num of frames sent successfully two retry", numRetryTwo);
+//	recordScalar("num of frames sent successfully three retry", numRetryThree);
+//	recordScalar("num of frames sent successfully four retry", numRetryFour);
 
-	// MAC-performance-metrics-specific / Std 802.15.4e-2012 (6.4.3.9 MAC-performance-metrics-specific MAC PIB attributes) page 182
-	if (mpib.macMetricsEnabled)
-	{
-		recordScalar("num of frames sent successfully one retry", mpib.macRetryCount);
-		recordScalar("num of frames sent successfully multi retry", mpib.macMultipleRetryCount);
-		recordScalar("num of frames sent failed", mpib.macTXFailCount);
-		recordScalar("num of frames sent successfully within macAckWaitDuration", mpib.macTXSuccessCount);
-		recordScalar("num of frames with FCS error", mpib.macFCSErrorCount);
+	cancelEvent(backoffTimer);
 
-		if (mpib.macSecurityEnabled)
-			recordScalar("num of frames with security error", mpib.macSecurityFailure);
+		/** @brief timer for locating backoff boundary before sending a CCA request */
+		cancelEvent(deferCCATimer);
 
-		recordScalar("num of duplicated frames received", mpib.macDuplicateFrameCount);
-		recordScalar("num of frames received successfully", mpib.macRXSuccessCount);
-		recordScalar("num of ACK/NACK timing correction IE with NACK", mpib.macNACKcount);
-	}
+		/** @brief timer for tracking beacons */
+		cancelEvent(bcnRxTimer);
 
-	recordScalar("num of frames sent successfully two retry", numRetryTwo);
-	recordScalar("num of frames sent successfully three retry", numRetryThree);
-	recordScalar("num of frames sent successfully four retry", numRetryFour);
+		/** @brief timer for transmitting beacon periodically */
+		cancelEvent(bcnTxTimer);
+
+		/** @brief timer for timer for ACK timeout */
+		cancelEvent(ackTimeoutTimer);
+
+		/** @brief timer for locating backoff boundary before txing ACK if beacon-enabled */
+		cancelEvent(txAckBoundTimer);
+
+		/** @brief timer for locating backoff boundary before txing Cmd or data if beacon-enabled */
+		cancelEvent(txCmdDataBoundTimer);
+
+		/** @brief timer for delay of IFS after receiving a data or cmd pkt */
+		cancelEvent(ifsTimer);
+
+		/** @brief timer for indicating being in the active period of outgoing (txing) superframe */
+		cancelEvent(txSDTimer);
+
+		/** @brief timer for indicating being in the active period of incoming (rxed) superframe */
+		cancelEvent(rxSDTimer);
+
+		/** @brief timer for indicating the end of CAP and the starting of CFP
+		 used only by devices to put radio into sleep at the end of CAP if my GTS is not the first one in the CFP */
+		cancelEvent(finalCAPTimer);
+
+		/** @brief timer for scheduling of GTS, shared by both PAN coordinator and devices */
+		cancelEvent(gtsTimer);
+
+		/** @brief timer for scheduling of the ASN, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(asnTimer);
+
+		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsCCAOffsetTimer);
+
+		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsTxOffsetTimer);
+
+		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsRxAckDelayTimer);
+
+		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsAckWaitTimer);
+
+		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsRxOffsetTimer);
+
+		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsRxWaitTimer);
+
+		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsTxAckDelayTimer);
+
+		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+		cancelEvent(tsMaxAckTimer);
 
 }
 

@@ -12,11 +12,12 @@
     #endif
 #endif
 
-#if WIN32
+#ifdef WIN32
     #ifndef WITH_WIN
         #define WITH_WIN
     #endif
 #endif
+
 bool createDirectories(std::string path)
 {
 #ifdef WITH_LINUX

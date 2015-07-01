@@ -48,6 +48,12 @@ void Ieee802154eMacRLL::initialize(int stage)
 
 }
 
+void Ieee802154eMacRLL::finish()
+{
+	cancelEvent(awaitingBeacon);
+	cancelEvent(scanTimer);
+}
+
 void Ieee802154eMacRLL::handleMessage(cMessage *msg)
 {
 

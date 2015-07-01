@@ -25,7 +25,7 @@ class Ieee802154eMacRLL : public Ieee802154eMac
     public:
 	Ieee802154eMacRLL();
 	virtual ~Ieee802154eMacRLL();
-
+	virtual void finish();
 	virtual int numInitStages() const
 	{
 	    return 5;

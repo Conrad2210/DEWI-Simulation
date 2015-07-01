@@ -154,7 +154,16 @@ void RLL::initialize(int stage)
 }
 void RLL::finish()
 {
-
+	cancelEvent(StartTimer);
+	cancelEvent(AssociateTimer);
+	cancelEvent(AssociateWaitTimer);
+	cancelEvent(ScheduleTimer);
+	cancelEvent(ScheduleWaitTimer);
+	cancelEvent(BeaconScanTimer);
+	cancelEvent(DisassociateWaitTimer);
+	cancelEvent(BeaconTimer);
+	cancelEvent(ScanTimer);
+	cancelEvent(generalCheckTimer);
 }
 
 void RLL::handleMessage(cMessage *msg)

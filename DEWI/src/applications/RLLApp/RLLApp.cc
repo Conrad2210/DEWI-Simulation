@@ -93,7 +93,10 @@ void RLLApp::initialize(int stage)
 
 void RLLApp::finish()
 {
-
+	cancelEvent(BurstTimer);
+	cancelEvent(BurstMessageTimer);
+	cancelEvent(StopTimer);
+	cancelEvent(AssTimer);
 }
 
 // OPERATIONS
