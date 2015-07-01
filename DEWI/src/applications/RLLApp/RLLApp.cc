@@ -59,7 +59,7 @@ void RLLApp::initialize(int stage)
 		m_AppStartTime = par("StartTime").doubleValue();
 		m_totalBurstToSend = par("numberOfBursts");
 
-		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime) + 1;
+		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
 
 		BurstTimer = new cMessage("BurstTimer");
 		BurstMessageTimer = new cMessage("BurstMessageTimer");

@@ -30,7 +30,7 @@ bool createDirectories(std::string path)
 
          if( stat( newPath.c_str(), &st) != 0)
          {
-             if( mkdir( newPath.c_str(), 0x660) != 0 && errno != EEXIST )
+             if( mkdir( newPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0 && errno != EEXIST )
              {
                 //return false;
              }
