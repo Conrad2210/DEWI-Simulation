@@ -64,6 +64,7 @@ void RLLApp::initialize(int stage)
 		BurstTimer = new cMessage("BurstTimer");
 		BurstMessageTimer = new cMessage("BurstMessageTimer");
 		StopTimer = new cMessage("AppStopTimer");
+		AssTimer = new cMessage("AssTimer");
 
 		std::stringstream a;
 		a << getParentModule()->getIndex();
@@ -80,7 +81,7 @@ void RLLApp::initialize(int stage)
 	}
 	if (1 == stage)
 	{
-		if (strcmp("lamp", getParentModule()->getName()))
+		if (!strcmp("lamp", getParentModule()->getName()))
 		{
 			Hop->registerVector();
 			E2E->registerVector();
