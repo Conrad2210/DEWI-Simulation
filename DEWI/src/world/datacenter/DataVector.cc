@@ -22,10 +22,20 @@
 #include "cmodule.h"
 #include <dirent.h>
 #include <ios>
-#include "DataFunctions.h"
+#include "DataFunctions.h"e
 
 using namespace std;
+#if linux
+    #ifndef WITH_LINUX
+        #define WITH_LINUX
+    #endif
+#endif
 
+#if WIN32
+    #ifndef WITH_WIN
+        #define WITH_WIN
+    #endif
+#endif
 DataVector::DataVector(std::string name, std::string type) {
 
     //set Name (e.g. NodeIndex)
@@ -117,9 +127,11 @@ void DataVector::saveData(std::string Path)
 
 
     //set absolute path
-#ifdef WIN32
+#ifdef WITH_WIN
     ss << Path << "\\" << Type << "\\" << Name;
-#elif linux
+
+#endif
+#ifdef WITH_LINUX
     ss << Path << "/" << Type << "/" << Name;
 #endif
 
@@ -128,9 +140,10 @@ void DataVector::saveData(std::string Path)
     if(createDirectories(ss.str()))
     {
         //Set path including fileName
-#ifdef WIN32
+#ifdef WITH_WIN
 	ss << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
-#elif linux
+#endif
+#ifdef WITH_LINUX
 	ss << "/" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #endif
 

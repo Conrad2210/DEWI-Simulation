@@ -6,10 +6,20 @@
  */
 
 #include "DataFunctions.h"
+#if linux
+    #ifndef WITH_LINUX
+        #define WITH_LINUX
+    #endif
+#endif
 
+#if WIN32
+    #ifndef WITH_WIN
+        #define WITH_WIN
+    #endif
+#endif
 bool createDirectories(std::string path)
 {
-#ifdef linux
+#ifdef WITH_LINUX
     struct stat st;
 
     for( std::string::iterator iter = path.begin() ; iter != path.end(); )
@@ -41,7 +51,9 @@ bool createDirectories(std::string path)
          }
     }
     return true;
-#elif WIN32
+
+#endif
+#ifdef WITH_WIN
     struct stat st;
 
     for( std::string::iterator iter = path.begin() ; iter != path.end(); )
@@ -74,6 +86,7 @@ bool createDirectories(std::string path)
     }
     return true;
 #endif
+return false;
 }
 
 

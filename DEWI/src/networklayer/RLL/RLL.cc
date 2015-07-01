@@ -555,7 +555,7 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 				if (AssociateWaitTimer->isScheduled())
 					cancelEvent(AssociateWaitTimer);
 
-				double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+				double temp = 5 +  uniform(5,15);// (rand() / RAND_MAX) * (15 - 5);
 				scheduleAt(simTime() + temp, AssociateWaitTimer);
 				delete tmp;
 				tmp = NULL;
@@ -768,7 +768,7 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 	parentDisp->updateWith(*tempStr);
 
 	Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("DisassociationRequest", TP_MLME_DISASSOCIATE_REQUEST);
-	double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+	double temp = 5 + uniform(5,15);//(rand() / RAND_MAX) * (15 - 5);
 	scheduleAt(simTime() + temp, DisassociateWaitTimer);
 	dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
 	send(cnt->dup(), mLowerLayerOut);
@@ -1062,7 +1062,7 @@ void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 	{
 		if (bNotAssociated)
 		{
-			double waitTime = 0 + ((double) rand() / RAND_MAX) * (10 - 0);
+			double waitTime = 0 + uniform(0,10);//((double) rand() / RAND_MAX) * (10 - 0);
 			if (!AssociateTimer->isScheduled())
 				scheduleAt(simTime() + waitTime, AssociateTimer);
 		}
@@ -1071,10 +1071,10 @@ void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 	{
 		if (bNotAssociated)
 		{
-			double waitTime = 0 + ((double) rand() / RAND_MAX) * (10 - 0);
+			double waitTime = 0 + uniform(0,10);//(double) rand() / RAND_MAX) * (10 - 0);
 			if (!bAssociateDirectly)
 			{
-				waitTime = 50 + ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
+				waitTime = 50 + uniform(((double) dataCenter->getNumRegisteredAssVectors() / 2.0),(double) dataCenter->getNumRegisteredAssVectors() * 2.0);//  ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
 				bAssociateDirectly = true;
 			}
 			if (!AssociateTimer->isScheduled())
@@ -1180,7 +1180,7 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 		{
 			if (ScheduleTimer->isScheduled())
 				cancelEvent(ScheduleTimer);
-			double temp = 5 + (rand() / RAND_MAX) * (15 - 5);
+			double temp = 5 + uniform(5,15);//(rand() / RAND_MAX) * (15 - 5);
 			scheduleAt(simTime() + temp, ScheduleTimer);
 		}
 		else

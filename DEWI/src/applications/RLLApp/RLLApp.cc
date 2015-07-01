@@ -231,5 +231,6 @@ void RLLApp::sendNextBurstMessage()
 
 void RLLApp::endSim()
 {
-	cSimulation::getActiveSimulation()->callFinish();
+    simulation.callFinish();
+    simulation.endRun();
 }
