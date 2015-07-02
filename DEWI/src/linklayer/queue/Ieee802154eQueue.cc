@@ -43,14 +43,13 @@ void Ieee802154eQueue::initialize()
 	frameCapacity = par("frameCapacity");
 
 	std::stringstream a;
-	a << getParentModule()->getParentModule()->getIndex();
+	a << getParentModule()->getParentModule()->getName() << " " << getParentModule()->getParentModule()->getIndex();
 	//EndToEndDelay = new cOutVector(a.str().c_str());
 	delMsg = new DataVector(a.str(), "DelMsg");
 
-	if (strcmp("lamp", getParentModule()->getParentModule()->getName()))
-	{
+
 		delMsg->registerVector();
-	}
+
 	dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 
 }
@@ -132,89 +131,86 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEnt
 
 	switch (direction)
 	{
-	case 0:
-	{
+		case 0: {
 
-		for (int i = 0; i < queue.length(); ++i)
-		{
-			cPacket *msg = PK(queue.get(i));
-			if (dynamic_cast<Ieee802154eFrame *>(msg))
+			for (int i = 0; i < queue.length(); ++i)
 			{
-				Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
-
-				if (tmpMsg->getDstAddr() == dstAddr)
+				cPacket *msg = PK(queue.get(i));
+				if (dynamic_cast<Ieee802154eFrame *>(msg))
 				{
-					if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
-					{
-						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxCS())
-						{
-							tmpMsg->removeControlInfo();
+					Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-							emit(dequeuePkSignal, msg);
-							emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-							return msg;
+					if (tmpMsg->getDstAddr() == dstAddr)
+					{
+						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
+						{
+							if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxCS())
+							{
+								tmpMsg->removeControlInfo();
+
+								emit(dequeuePkSignal, msg);
+								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+								return msg;
+							}
 						}
 					}
 				}
 			}
+			break;
 		}
-		break;
-	}
-	case 1:
-	{
-		for (int i = 0; i < queue.length(); ++i)
-		{
-			cPacket *msg = PK(queue.get(i));
-			if (dynamic_cast<Ieee802154eFrame *>(msg))
+		case 1: {
+			for (int i = 0; i < queue.length(); ++i)
 			{
-				Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
-
-				if (tmpMsg->getDstAddr() == dstAddr)
+				cPacket *msg = PK(queue.get(i));
+				if (dynamic_cast<Ieee802154eFrame *>(msg))
 				{
-					if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
-					{
-						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxHigherCH())
-						{
-							tmpMsg->removeControlInfo();
+					Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-							emit(dequeuePkSignal, msg);
-							emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-							return msg;
+					if (tmpMsg->getDstAddr() == dstAddr)
+					{
+						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
+						{
+							if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxHigherCH())
+							{
+								tmpMsg->removeControlInfo();
+
+								emit(dequeuePkSignal, msg);
+								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+								return msg;
+							}
 						}
 					}
 				}
 			}
+			break;
 		}
-		break;
-	}
-	case -1:
-	{
-		for (int i = 0; i < queue.length(); ++i)
-		{
-			cPacket *msg = PK(queue.get(i));
-			if (dynamic_cast<Ieee802154eFrame *>(msg))
+		case -1: {
+			for (int i = 0; i < queue.length(); ++i)
 			{
-				Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
-
-				if (tmpMsg->getDstAddr() == dstAddr)
+				cPacket *msg = PK(queue.get(i));
+				if (dynamic_cast<Ieee802154eFrame *>(msg))
 				{
-					if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
+					Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+					if (tmpMsg->getDstAddr() == dstAddr)
 					{
-						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxLowerCH())
+						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
 						{
-							tmpMsg->removeControlInfo();
-							emit(dequeuePkSignal, msg);
-							emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-							return msg;
+							if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxLowerCH())
+							{
+								tmpMsg->removeControlInfo();
+								emit(dequeuePkSignal, msg);
+								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+								return msg;
+							}
 						}
 					}
 				}
 			}
+			break;
 		}
-		break;
-	}
-	default:
-		return NULL;
+		default:
+			return NULL;
 	}
 	return NULL;
 }
@@ -224,11 +220,16 @@ cMessage *Ieee802154eQueue::requestAdvPacket()
 	for (int i = 0; i < queue.length(); ++i)
 	{
 		cPacket *msg = PK(queue.get(i));
-		if ((strcmp(msg->getName(), "AssociationRequest") == 0 || strcmp(msg->getName(), "AssociationResponse") == 0))
+		if (dynamic_cast<Ieee802154eFrame *>(msg))
 		{
-			emit(dequeuePkSignal, msg);
-			emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-			return msg;
+			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
+			if ((strcmp(tmpMsg->getName(), "AssociationRequest") == 0 || strcmp(tmpMsg->getName(), "AssociationResponse") == 0))
+			{
+				emit(dequeuePkSignal, msg);
+				emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+				return msg;
+			}
 		}
 	}
 	return NULL;
@@ -267,11 +268,13 @@ cMessage *Ieee802154eQueue::requestBeaconPacket()
 	for (int i = 0; i < queue.length(); ++i)
 	{
 		cPacket *msg = PK(queue.get(i));
-		if (strcmp(msg->getName(), "Ieee802154BEACON") == 0)
+		if (dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
 		{
+
 			emit(dequeuePkSignal, msg);
 			emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
 			return msg;
+
 		}
 	}
 	return NULL;

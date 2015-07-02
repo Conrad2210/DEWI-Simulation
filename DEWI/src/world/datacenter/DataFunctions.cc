@@ -6,11 +6,11 @@
  */
 
 #include "DataFunctions.h"
-#if linux
+
     #ifndef WITH_LINUX
         #define WITH_LINUX
     #endif
-#endif
+
 
 #ifdef WIN32
     #ifndef WITH_WIN

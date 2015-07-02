@@ -98,7 +98,7 @@ def_macEBAutoSA };
 /**@author: 2014    Stefan Reis
  * for the debug output */
 string Ieee802154eMac::frameTypeTxt[] =
-{ "unknown type", "Ieee802154e_BEACON", "Ieee802154e_DATA", "Ieee802154e_ACK", "Ieee802154e_CMD", "Ieee802154e_LLDN", "Ieee802154e_MULTI", "Ieee802154e_Asscociation" };
+{ "unknown type", "Ieee802154e_BEACON", "Ieee802154e_DATA", "Ieee802154e_ACK", "Ieee802154e_CMD", "Ieee802154e_LLDN", "Ieee802154e_MULTI", "Ieee802154e_Asscociation", "Ieee802154e_Asscociation", "Ieee802154e_Scheduler", "Ieee802154e_Scheduler", "Ieee802154e_Disasscociation", "Ieee802154e_Disasscociation" };
 
 /**@author: 2014    Stefan Reis
  * for the debug output */
@@ -164,6 +164,7 @@ Ieee802154eMac::Ieee802154eMac()
 	hlistBLink2 = NULL;
 	hlistDLink1 = NULL;
 	hlistDLink2 = NULL;
+	activeNeighborEntry = NULL;
 }
 
 /**@author: 2014    Stefan Reis     (modified)
@@ -827,7 +828,7 @@ void Ieee802154eMac::finish()
 		cancelEvent(tsTxAckDelayTimer);
 
 		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsMaxAckTimer);
+		//cancelEvent(tsMaxAckTimer);
 
 }
 

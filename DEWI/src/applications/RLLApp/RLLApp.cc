@@ -67,10 +67,9 @@ void RLLApp::initialize(int stage)
 		AssTimer = new cMessage("AssTimer");
 
 		std::stringstream a;
-		a << getParentModule()->getIndex();
+		a << getParentModule()->getName() << " " << getParentModule()->getIndex();
 		//EndToEndDelay = new cOutVector(a.str().c_str());
 		E2E = new DataVector(a.str(), "latency");
-		Hop = new DataVector(a.str(), "Hops");
 
 		if (m_isLightSwitch)
 		{
@@ -81,11 +80,9 @@ void RLLApp::initialize(int stage)
 	}
 	if (1 == stage)
 	{
-		if (!strcmp("lamp", getParentModule()->getName()))
-		{
-			Hop->registerVector();
+
 			E2E->registerVector();
-		}
+
 		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 		if (strcmp("gateWay", getParentModule()->getName()))
 			dataCenter->registerAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");

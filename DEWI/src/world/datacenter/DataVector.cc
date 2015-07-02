@@ -26,16 +26,14 @@
 
 using namespace std;
 
-#if linux
-    #ifndef WITH_LINUX
-        #define WITH_LINUX
-    #endif
+#ifndef WITH_LINUX
+#define WITH_LINUX
 #endif
 
 #ifdef WIN32
-    #ifndef WITH_WIN
-        #define WITH_WIN
-    #endif
+#ifndef WITH_WIN
+#define WITH_WIN
+#endif
 #endif
 
 DataVector::DataVector(std::string name, std::string type) {
@@ -47,7 +45,8 @@ DataVector::DataVector(std::string name, std::string type) {
     Type = type;
 
     //get pointer to DataCenter
-    center = check_and_cast<DataCenter *>(center->getModuleByPath("DataCenter"));
+    center = check_and_cast<DataCenter *>(
+            center->getModuleByPath("DataCenter"));
 
 }
 
@@ -55,8 +54,7 @@ DataVector::~DataVector() {
 
 }
 
-void DataVector::record(double value)
-{
+void DataVector::record(double value) {
     //declare result variable
     std::stringstream a;
 
@@ -67,8 +65,7 @@ void DataVector::record(double value)
     Data.push_back(a.str());
 }
 
-void DataVector::record(double value, std::string name)
-{
+void DataVector::record(double value, std::string name) {
     //declare result variable
     std::stringstream a;
 
@@ -78,8 +75,7 @@ void DataVector::record(double value, std::string name)
     //add data entry
     Data.push_back(a.str());
 }
-void DataVector::record(double value, const char* name)
-{
+void DataVector::record(double value, const char* name) {
     //declare result variable
     std::stringstream a;
 
@@ -90,8 +86,7 @@ void DataVector::record(double value, const char* name)
     Data.push_back(a.str());
 }
 
-void DataVector::record(double value, int id)
-{
+void DataVector::record(double value, int id) {
     //declare result variable
     std::stringstream a;
 
@@ -102,8 +97,7 @@ void DataVector::record(double value, int id)
     Data.push_back(a.str());
 }
 
-void DataVector::record(int value)
-{
+void DataVector::record(int value) {
     //declare result variable
     std::stringstream a;
 
@@ -114,19 +108,16 @@ void DataVector::record(int value)
     Data.push_back(a.str());
 }
 
-void DataVector::record(std::string value)
-{
+void DataVector::record(std::string value) {
     //add data entry
     Data.push_back(value);
 }
 
-void DataVector::saveData(std::string Path)
-{
+void DataVector::saveData(std::string Path) {
 
     //declare path variable
     stringstream ss;
     ss.str("");
-
 
     //set absolute path
 #ifdef WITH_WIN
@@ -139,26 +130,24 @@ void DataVector::saveData(std::string Path)
 
     //make directories
 
-    if(createDirectories(ss.str()))
-    {
+    if (createDirectories(ss.str())) {
         //Set path including fileName
 #ifdef WITH_WIN
-	ss << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+        ss << "\\" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #endif
 #ifdef WITH_LINUX
-	ss << "/" << ev.getConfigEx()->getActiveConfigName() << "_" << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+        ss << "/" << ev.getConfigEx()->getActiveConfigName() << "_"
+                << ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #endif
 
         //Open output file
         std::ofstream fout(ss.str().c_str());
 
         //check if output file is open
-        if(fout.is_open())
-        {
+        if (fout.is_open()) {
             //write data to file
             fout << Type << ",\n";
-            for(int i = 0; i < (int) Data.size(); i++)
-            {
+            for (int i = 0; i < (int) Data.size(); i++) {
                 //each data value in an new row
                 fout << Data.at(i) << ",\n";
             }
@@ -168,8 +157,7 @@ void DataVector::saveData(std::string Path)
     }
 }
 
-void DataVector::registerVector()
-{
+void DataVector::registerVector() {
     //register vector to datacenter
     center->registerVector(this);
 }

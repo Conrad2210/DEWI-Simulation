@@ -50,6 +50,7 @@ void Ieee802154eMacRLL::initialize(int stage)
 
 void Ieee802154eMacRLL::finish()
 {
+    Ieee802154eMac::finish();
 	cancelEvent(awaitingBeacon);
 	cancelEvent(scanTimer);
 }
@@ -194,7 +195,7 @@ bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 
 void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 {
-	switch (msg->getKind())
+		switch (msg->getKind())
 	{
 	case START_PAN_COOR_TIMER:
 		startPANCoor();
@@ -248,6 +249,7 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 //		break;
 
 	case MAC_ASN_TIMER:
+
 		handleAsnTimer();
 		break;
 
@@ -291,7 +293,8 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 		error("[MAC]: unknown MAC timer type!");
 		break;
 	}
-}
+
+	}
 
 void Ieee802154eMacRLL::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF,
 		Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart, UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM)
@@ -2384,10 +2387,14 @@ void Ieee802154eMacRLL::handleAck(Ieee802154eFrame *frame)
 			}
 		}
 	}
+
 }
 
 void Ieee802154eMacRLL::handleAsnTimer()
 {
+    // request the frame for this dest address
+        cMessage *tmpMsg = NULL;
+
 	if (mpib.macTSCHenabled && !taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) && !taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA))
 	{
 		startTimeslot = simTime(); // start time of this timeslot
@@ -2420,8 +2427,6 @@ void Ieee802154eMacRLL::handleAsnTimer()
 			txBeaconNow = false;
 		}
 
-		// request the frame for this dest address
-		cMessage *tmpMsg = NULL;
 
 		switch (activeLinkEntry->getLinkType())
 		{
@@ -2432,11 +2437,6 @@ void Ieee802154eMacRLL::handleAsnTimer()
 			if (!awaitingNextBeacon || isPANCoor)
 			{
 
-				if (!strcmp("gateWay", getParentModule()->getParentModule()->getName())) //TODO: remove after fixed
-				{
-					int i = 0;
-					i = i + 1;
-				}
 				tmpMsg = queueModule->requestBeaconPacket();
 
 				if (tmpMsg == NULL)
@@ -2452,12 +2452,7 @@ void Ieee802154eMacRLL::handleAsnTimer()
 				{
 					tmpMsg = queueModule->requestSchdulePacket();
 				}
-
-				if (tmpMsg == NULL)
-					tmpMsg = NULL;
 			}
-			else
-				tmpMsg = NULL;
 			break;
 
 		case LNK_TP_JOIN:
@@ -2478,37 +2473,14 @@ void Ieee802154eMacRLL::handleAsnTimer()
 
 		}
 
-		//	if(activeLinkEntry->getLinkType() == LNK_TP_NORMAL)
-		//	    tmpMsg = queueModule->requestSpcPacket((IE3ADDR)activeLinkEntry->getNodeAddress());
-		//
-		//	if(activeLinkEntry)
-		//
-		//	if(tmpMsg == NULL && activeLinkEntry->getLinkType() == LNK_TP_ADVERTISING)
-		//	{
-		//	    //check if packet is available for advertisment
-		//	    tmpMsg = queueModule->requestAdvPacket();
-		//	}
-		//	if(tmpMsg == NULL && activeLinkEntry->getLinkType() == LNK_TP_ADVERTISING)
-		//	{
-		//	    tmpMsg = queueModule->requestSchdulePacket();
-		//	}
-
 		if (tmpMsg != NULL)
 		{
-			ASSERT(tmpMsg);
 			txData = check_and_cast<Ieee802154eFrame *>(tmpMsg);
-			tmpMsg = NULL;
-			//	    if(txData->getFrmCtrl().frameType == Ieee802154e_BEACON)
-			//	    {
-			//		//check if asn is still up to date
-			//		checkBeaconASN(txData);
-			//
-			//	    }
-
 		}
-
 		else
 			txData = NULL;
+
+
 
 		MACTSCHLinkOptions linkOption = activeLinkEntry->getLinkOption();
 
@@ -2536,14 +2508,14 @@ void Ieee802154eMacRLL::handleAsnTimer()
 					if (activeNeighborEntry == NULL)
 						return; // Cancel the transmission if we have no neighbor for this data pkt
 				}
+				std::string tmpTxt = (txData->getFrmCtrl().frameType == Ieee802154e_DATA) ? txData->getEncapsulatedPacket()->getName() : frameTypeTxt[txData->getFrmCtrl().frameType];
 
-				string tmpTxt = (txData->getFrmCtrl().frameType == Ieee802154e_DATA) ? txData->getEncapsulatedPacket()->getName() : frameTypeTxt[txData->getFrmCtrl().frameType];
 				EV << "[TSCH CCA]-Transmitter: " << retries << " retries for this " << txData->getName() << "(" << tmpTxt << ") frame" << endl;
 
 				if (tschSharedLink && backoffMethod == EXPONENTIAL && retries <= mpib.macMaxFrameRetries && retries > 0 && activeNeighborEntry != NULL)
 				{ // in TSCH mode the device shall use an exponential backoff mechanism - Std 802.15.4e-2012 (5.1.1.4.3 TSCH CSMA-CA algorithm) page 14
 					int td = activeNeighborEntry->getTransDelay(); // transmission delayed
-
+//
 					if (td < 0)
 					{ // calculation from the cmsa802154.cc file
 						double d = pow((double) 2, (int) BE);
@@ -2553,8 +2525,8 @@ void Ieee802154eMacRLL::handleAsnTimer()
 						activeNeighborEntry->setTransDelay(r);
 						EV << "[TSCH CCA]-Transmitter (shared links): retransmission delayed for " << r << " for shared links" << endl;
 					}
-
-					// check if we need to delay the transmission
+//
+//					// check if we need to delay the transmission
 					if (td > 0)
 					{
 						EV << "[TSCH CCA]-Transmitter (shared links): transmission delay for " << td << " shared links" << endl;
@@ -2576,15 +2548,10 @@ void Ieee802154eMacRLL::handleAsnTimer()
 						// for the case td == 0, to have the td == -1 for the recalculation of the transmission delay
 						activeNeighborEntry->decrTransDelay();
 				}
-				else
-				{
-					if (retries > mpib.macMaxFrameRetries)
-						EV << "Whats going on???";
-				}
 
 				taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) = true;
 				taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 1;
-
+//
 				if (useCCA)
 				{
 					taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 1;
@@ -2601,12 +2568,17 @@ void Ieee802154eMacRLL::handleAsnTimer()
 				{
 					taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 100;
 
-					// start the macTsCCAOffset timer
+//					// start the macTsCCAOffset timer
 					if (tsTxOffsetTimer->isScheduled())
 						cancelEvent(tsTxOffsetTimer);
-
+//
 					EV << "[TSCH CCA]-Transmitter:[100] no CCA, wait the TsTxOffsetTime" << endl;
-					scheduleAt(simTime() + timeslotTable->getTemplate(useTimeslotID)->getTxOffsetDbl(), tsTxOffsetTimer);
+					double fTime = timeslotTable->getTemplate(useTimeslotID)->getTxOffsetDbl();
+
+
+
+					scheduleAt(simTime() + fTime, tsTxOffsetTimer);
+
 					// next step in handleTsTxOffset()
 				}
 			}
@@ -2648,6 +2620,7 @@ void Ieee802154eMacRLL::handleAsnTimer()
 
 		scheduleAt(simTime(), asnTimer);
 	}
+
 }
 
 void Ieee802154eMacRLL::handleTsAckWait()
