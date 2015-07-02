@@ -16,7 +16,7 @@
 // 
 // 
 
-package dewi.simulations.Testing;
+package dewi.simulations.UseCase1_Lighting.Dimming.RLL;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;

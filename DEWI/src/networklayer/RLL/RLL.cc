@@ -732,7 +732,25 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			if (BeaconScanTimer->isScheduled())
 				cancelEvent(BeaconScanTimer);
 			waitConstant = tmp->getNumberCH();
-			scheduleAt(simTime() + tmp->getNumberCH() * 5, BeaconScanTimer);
+
+			switch(nCluStage)
+			{
+				case 0:
+					scheduleAt(simTime(), BeaconScanTimer);
+					break;
+				case 1:
+					scheduleAt(simTime() + tmp->getNumberCH() * 10, BeaconScanTimer);
+					break;
+				case 2:
+					scheduleAt(simTime()+ 300 + pow(2,tmp->getNumberCH()),BeaconScanTimer);
+					break;
+				case 3:
+					scheduleAt(simTime() + 400 + pow(2,tmp->getNumberCH()),BeaconScanTimer);
+					break;
+				default:
+					scheduleAt(simTime() + pow(3,tmp->getNumberCH()),BeaconScanTimer);
+					break;
+			}
 			tempStr->parse("b=1.5,1.5,oval,orange");
 			parentDisp->updateWith(*tempStr);
 		}
