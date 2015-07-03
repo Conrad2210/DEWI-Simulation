@@ -233,7 +233,7 @@ void RLL::handleDataMessage(cPacket *msg)
 				if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() > nCluStage)
 				{
 					//handle msg if arrived from higher cluster stage
-
+					RLLAppMsg *temp1 = temp->dup();
 					if (clusterTable->existLowerCH(nCluStage))
 					{
 						ctrl->setTxLowerCH(true);
@@ -241,12 +241,11 @@ void RLL::handleDataMessage(cPacket *msg)
 						ctrl->setTxCS(false);
 						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-						temp->setControlInfo(ctrl);
-						send(temp, mLowerLayerOut);
+						temp1->setControlInfo(ctrl);
+						send(temp1, mLowerLayerOut);
 
 					}
-
-					RLLAppMsg *temp1 = temp->dup();
+					temp1 = temp->dup();
 					ctrl = new Ieee802154eNetworkCtrlInfo();
 					if (nCluStage == 0)
 					{
@@ -257,8 +256,8 @@ void RLL::handleDataMessage(cPacket *msg)
 							ctrl->setTxCS(false);
 							ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-							temp->setControlInfo(ctrl);
-							send(temp, mLowerLayerOut);
+							temp1->setControlInfo(ctrl);
+							send(temp1, mLowerLayerOut);
 
 						}
 					}
@@ -277,11 +276,13 @@ void RLL::handleDataMessage(cPacket *msg)
 
 					}
 
+					delete temp;
+
 				}
 				else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() == nCluStage)
 				{
 					//handle Message received from same stage (probably CS)
-
+					RLLAppMsg *temp1 = temp->dup();
 					if (clusterTable->existLowerCH(nCluStage))
 					{
 						ctrl->setTxLowerCH(true);
@@ -289,12 +290,12 @@ void RLL::handleDataMessage(cPacket *msg)
 						ctrl->setTxCS(false);
 						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-						temp->setControlInfo(ctrl);
-						send(temp, mLowerLayerOut);
+						temp1->setControlInfo(ctrl);
+						send(temp1, mLowerLayerOut);
 
 					}
+					temp1 = temp->dup();
 
-					RLLAppMsg *temp1 = temp->dup();
 
 					ctrl = new Ieee802154eNetworkCtrlInfo();
 					if (clusterTable->existHigherCH(nCluStage))
@@ -323,12 +324,13 @@ void RLL::handleDataMessage(cPacket *msg)
 						send(temp1, mLowerLayerOut);
 
 					}
+					delete temp;
 
 				}
 				else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() < nCluStage)
 				{
 					//handle Message received from lower stage
-
+					RLLAppMsg *temp1 = temp->dup();
 					if (clusterTable->existHigherCH(nCluStage))
 					{
 						ctrl->setTxLowerCH(false);
@@ -336,12 +338,12 @@ void RLL::handleDataMessage(cPacket *msg)
 						ctrl->setTxCS(false);
 						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-						temp->setControlInfo(ctrl);
-						send(temp, mLowerLayerOut);
+						temp1->setControlInfo(ctrl);
+						send(temp1, mLowerLayerOut);
 
 					}
 
-					RLLAppMsg *temp1 = temp->dup();
+					temp1 = temp->dup();
 
 					ctrl = new Ieee802154eNetworkCtrlInfo();
 					if (clusterTable->existCS(nCluStage))
@@ -355,6 +357,7 @@ void RLL::handleDataMessage(cPacket *msg)
 						send(temp1, mLowerLayerOut);
 
 					}
+					delete temp;
 				}
 
 			}
