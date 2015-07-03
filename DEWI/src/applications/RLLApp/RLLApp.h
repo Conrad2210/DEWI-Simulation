@@ -53,7 +53,7 @@ class RLLApp : public TrafGenPar
 	int mLowerLayerOut;
 	DataCenter *dataCenter;
         DataVector *E2E;
-        DataVector *Hop;
+    	DataVector *receivedMSG;
 
 	bool m_isLightSwitch;
 

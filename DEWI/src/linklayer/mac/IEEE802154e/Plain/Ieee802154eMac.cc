@@ -1983,21 +1983,7 @@ void Ieee802154eMac::handleData(Ieee802154eFrame* frame)
 		}
 		else
 		{
-			// [SR] old version
-			/** pass the data packet to upper layer
-			 *  (we need some time to process the packet -- so delay SIFS/LIFS symbols from now or after finishing sending the ack.)
-			 *  (refer to Std 802.15.4-2006 (figure 68-IFS) page 170 for details of SIFS/LIFS) */
-			ASSERT(rxData == NULL);
-			rxData = frame;
-			//rxDataTime = simTime();
-			if (!frame->getFrmCtrl().ackReq)
-			{
-				if (frame->getByteLength() <= aMaxSIFSFrameSize)
-					isSIFS = true;
-
-				startIfsTimer(isSIFS);
-			}
-			//else  //schedule and dispatch after finishing ack. transmission
+			delete frame;
 		}
 	}
 }

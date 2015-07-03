@@ -31,6 +31,7 @@ Ieee802154eMacRLL::Ieee802154eMacRLL()
 
 Ieee802154eMacRLL::~Ieee802154eMacRLL()
 {
+
 	cancelAndDelete(awaitingBeacon);
 	cancelAndDelete(scanTimer);
 }
@@ -45,12 +46,11 @@ void Ieee802154eMacRLL::initialize(int stage)
 	awaitingBeacon = new cMessage("awaitingBeaconTimer", MAC_AWAITING_BEACON);
 	awaitingNextBeacon = false;
 
-
 }
 
 void Ieee802154eMacRLL::finish()
 {
-    Ieee802154eMac::finish();
+	Ieee802154eMac::finish();
 	cancelEvent(awaitingBeacon);
 	cancelEvent(scanTimer);
 }
@@ -106,102 +106,90 @@ bool Ieee802154eMacRLL::handleSchedulerMsg(cMessage *msg)
 {
 	switch (msg->getKind())
 	{
-	case TP_MLME_START_REQUEST:
-	{
-		handle_MLME_START_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_MLME_BEACON_REQUEST:
-	{
-		handle_MLME_BEACON_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_MLME_SCAN_REQUEST:
-	{
-		handle_MLME_SCAN_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_MLME_SET_BEACON_REQUEST:
-	{
-		handleEB(msg);
-		break;
-	}
-	case TP_MLME_ASSOCIATE_REQUEST:
-	{
-		handle_MLME_ASSOCIATE_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_MLME_DISASSOCIATE_REQUEST:
-	{
-		handle_MLME_DISASSOCIATE_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_MLME_ASSOCIATE_RESPONSE:
-	{
-		handle_MLME_ASSOCIATE_response(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_MLME_DISASSOCIATE_RESPONSE:
-	{
-		handle_MLME_DISASSOCIATE_response(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_SCHEDULE_REQUEST:
-	{
-		handle_SCHEDULE_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_SCHEDULE_RESPONSE:
-	{
-		handle_SCHEDULE_response(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	case TP_RESTART_REQUEST:
-	{
-		handle_RESTART_request(msg->dup());
-		delete msg;
-		msg = NULL;
-		break;
-	}
-	default:
-	{
-		if (ev.isGUI())
-		{
-			EV << "Unknown command, must be Data packet" << endl;
+		case TP_MLME_START_REQUEST: {
+			handle_MLME_START_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
 		}
-		return false;
-	}
+		case TP_MLME_BEACON_REQUEST: {
+			handle_MLME_BEACON_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_MLME_SCAN_REQUEST: {
+			handle_MLME_SCAN_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_MLME_SET_BEACON_REQUEST: {
+			handleEB(msg);
+			break;
+		}
+		case TP_MLME_ASSOCIATE_REQUEST: {
+			handle_MLME_ASSOCIATE_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_MLME_DISASSOCIATE_REQUEST: {
+			handle_MLME_DISASSOCIATE_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_MLME_ASSOCIATE_RESPONSE: {
+			handle_MLME_ASSOCIATE_response(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_MLME_DISASSOCIATE_RESPONSE: {
+			handle_MLME_DISASSOCIATE_response(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_SCHEDULE_REQUEST: {
+			handle_SCHEDULE_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_SCHEDULE_RESPONSE: {
+			handle_SCHEDULE_response(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		case TP_RESTART_REQUEST: {
+			handle_RESTART_request(msg->dup());
+			delete msg;
+			msg = NULL;
+			break;
+		}
+		default: {
+			if (ev.isGUI())
+			{
+				EV << "Unknown command, must be Data packet" << endl;
+			}
+			return false;
+		}
 	}
 	return true;
 }
 
 void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 {
-		switch (msg->getKind())
+	switch (msg->getKind())
 	{
-	case START_PAN_COOR_TIMER:
-		startPANCoor();
-		delete msg;     // it's a dynamic timer
-		msg = NULL;
-		break;
+		case START_PAN_COOR_TIMER:
+			startPANCoor();
+			delete msg;     // it's a dynamic timer
+			msg = NULL;
+			break;
 
 //	case MAC_BACKOFF_TIMER:
 //		handleBackoffTimer();
@@ -248,56 +236,56 @@ void Ieee802154eMacRLL::handleSelfMsg(cMessage *msg)
 //		handleGtsTimer();
 //		break;
 
-	case MAC_ASN_TIMER:
+		case MAC_ASN_TIMER:
 
-		handleAsnTimer();
-		break;
+			handleAsnTimer();
+			break;
 
-	case MAC_TS_CCA_OFFSET_TIMER:
-		handleTsCCAOffset();
-		break;
+		case MAC_TS_CCA_OFFSET_TIMER:
+			handleTsCCAOffset();
+			break;
 
-	case MAC_TS_TX_OFFSET_TIMER:
-		handleTsTxOffset();
-		break;
+		case MAC_TS_TX_OFFSET_TIMER:
+			handleTsTxOffset();
+			break;
 
-	case MAC_TS_RX_ACK_DELAY_TIMER:
-		handleTsRxAckDelay();
-		break;
+		case MAC_TS_RX_ACK_DELAY_TIMER:
+			handleTsRxAckDelay();
+			break;
 
-	case MAC_TS_ACK_WAIT_TIMER:
-		handleTsAckWait();
-		break;
+		case MAC_TS_ACK_WAIT_TIMER:
+			handleTsAckWait();
+			break;
 
-	case MAC_TS_RX_OFFSET_TIMER:
-		handleTsRxOffset();
-		break;
+		case MAC_TS_RX_OFFSET_TIMER:
+			handleTsRxOffset();
+			break;
 
-	case MAC_TS_RX_WAIT_TIMER:
-		handleTsRxWait();
-		break;
+		case MAC_TS_RX_WAIT_TIMER:
+			handleTsRxWait();
+			break;
 
-	case MAC_TS_TX_ACK_DELAY_TIMER:
-		handleTsTxAckDelay();
-		break;
+		case MAC_TS_TX_ACK_DELAY_TIMER:
+			handleTsTxAckDelay();
+			break;
 
-	case MAC_SCAN_TIMER:
-		MLME_SCAN_confirm(NULL);
-		break;
+		case MAC_SCAN_TIMER:
+			MLME_SCAN_confirm(NULL);
+			break;
 
-	case MAC_AWAITING_BEACON:
-		handleAwaitingBeaconTimer();
-		break;
+		case MAC_AWAITING_BEACON:
+			handleAwaitingBeaconTimer();
+			break;
 
-	default:
-		error("[MAC]: unknown MAC timer type!");
-		break;
+		default:
+			error("[MAC]: unknown MAC timer type!");
+			break;
 	}
 
-	}
+}
 
-void Ieee802154eMacRLL::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF,
-		Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart, UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM)
+void Ieee802154eMacRLL::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF, Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart,
+        UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM)
 {
 	numRxDataPkt++;
 	//}
@@ -325,11 +313,9 @@ void Ieee802154eMacRLL::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UI
 
 void Ieee802154eMacRLL::handleUpperMsg(cPacket* msg) // MCPS-SAP
 {
-	uint16_t index;
 	IE3ADDR destAddr;
 	UINT_16 destPanId;
 	UINT_8 srcAddrMode;
-	bool gtsFound = false;
 	numUpperPkt++;
 
 	/** brief:  TRUE if a GTS is to be used for transmission, FALSE indicates that the CAP will be used.
@@ -418,8 +404,7 @@ void Ieee802154eMacRLL::handleUpperMsg(cPacket* msg) // MCPS-SAP
 
 	MCPS_DATA_request((Ieee802154eAddrMode) srcAddrMode, (Ieee802154eAddrMode) (destAddr.getFlagEui64() ?
 	defFrmCtrl_AddrMode64 :
-																											defFrmCtrl_AddrMode16), destPanId, destAddr, (UINT_8) msg->getByteLength(), msg, mpib.macDSN++/*msduHandle (FIXME [SR] we have no msduHandle from the NETWORK layer)*/, ackTX, gtsTX, indirectTX, secuData/*securityLevel*/, 0/*keyIdMode*/, 0/*keySource*/, 0/*keyIndex*/, UWBPRF_PRF_OFF,
-			RANGING_OFF, 0/*uwbPreambleSymbolRepetitions,*/, 0/*dataRate*/, frameControlOptions, headerIElist, payloadIElist, false /*sendMultipurpose*/);
+	defFrmCtrl_AddrMode16), destPanId, destAddr, (UINT_8) msg->getByteLength(), msg, mpib.macDSN++/*msduHandle (FIXME [SR] we have no msduHandle from the NETWORK layer)*/, ackTX, gtsTX, indirectTX, secuData/*securityLevel*/, 0/*keyIdMode*/, 0/*keySource*/, 0/*keyIndex*/, UWBPRF_PRF_OFF, RANGING_OFF, 0/*uwbPreambleSymbolRepetitions,*/, 0/*dataRate*/, frameControlOptions, headerIElist, payloadIElist, false /*sendMultipurpose*/);
 
 }
 void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
@@ -427,13 +412,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 	//[SR] old version
 	bool noAck;
 	int i = 0;
-	if (dynamic_cast<Ieee802154eMulHoCluFrame *>(msg))
-	{
-		i = i + 1 - 1;
-		i++;
-		i--;
 
-	}
 	Ieee802154eFrame* frame = dynamic_cast<Ieee802154eFrame *>(msg);
 
 	if (!frame)
@@ -544,7 +523,7 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 				}
 				else
 				{    // old version [SR]
-					 //stop CSMA-CA if it is pending (it will be restored after the transmission of ACK)
+				     //stop CSMA-CA if it is pending (it will be restored after the transmission of ACK)
 					if (backoffStatus == 99)
 					{
 						EV << "[MAC]: CSMA-CA is pending, stop it, it will resume after sending ACK" << endl;
@@ -627,76 +606,77 @@ void Ieee802154eMacRLL::handleLowerMsg(cPacket *msg)
 
 	switch (frmType)
 	{
-	case Ieee802154e_BEACON:
-		EV << "[MAC]: continue to process received BEACON pkt" << endl;
-		handleBeacon(frame);
-		break;
+		case Ieee802154e_BEACON:
+			EV << "[MAC]: continue to process received BEACON pkt" << endl;
+			handleBeacon(frame);
+			break;
 
-	case Ieee802154e_DATA:
-		EV << "[MAC]: continue to process received DATA pkt" << endl;
-		handleData(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
+		case Ieee802154e_DATA:
+			EV << "[MAC]: continue to process received DATA pkt" << endl;
+			handleData(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
 
-	case Ieee802154e_ACK:
-		EV << "[MAC]: continue to process received ACK pkt" << endl;
-		handleAck(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
+		case Ieee802154e_ACK:
+			EV << "[MAC]: continue to process received ACK pkt" << endl;
+			handleAck(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
 
-		//	case Ieee802154e_CMD:
-		//	    EV << "[MAC]: continue to process received CMD pkt" << endl;
-		//	    handleCommand80215(frame);
-		//	    break;
+			//	case Ieee802154e_CMD:
+			//	    EV << "[MAC]: continue to process received CMD pkt" << endl;
+			//	    handleCommand80215(frame);
+			//	    break;
 
-	case Ieee802154e_ASSOCIATION_REQUEST:
-		EV << "[MAC} continue to proxess received association request pkt" << endl;
-		MLME_ASSOCIATE_indication(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
-	case Ieee802154e_ASSOCIATION_RESPONSE:
-		EV << "[MAC} continue to process received association response pkt" << endl;
-		MLME_ASSOCIATE_confirm(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
-	case Ieee802154e_DISASSOCIATION_REQUEST:
-		EV << "[MAC} continue to process received association response pkt" << endl;
-		MLME_DISASSOCIATE_indication(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
+		case Ieee802154e_ASSOCIATION_REQUEST:
+			EV << "[MAC} continue to proxess received association request pkt" << endl;
+			MLME_ASSOCIATE_indication(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
+		case Ieee802154e_ASSOCIATION_RESPONSE:
+			EV << "[MAC} continue to process received association response pkt" << endl;
+			MLME_ASSOCIATE_confirm(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
+		case Ieee802154e_DISASSOCIATION_REQUEST:
+			EV << "[MAC} continue to process received association response pkt" << endl;
+			MLME_DISASSOCIATE_indication(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
 
-	case Ieee802154e_DISASSOCIATION_RESPONSE:
-		EV << "[MAC} continue to process received association response pkt" << endl;
-		MLME_DISASSOCIATE_confirm(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
+		case Ieee802154e_DISASSOCIATION_RESPONSE:
+			EV << "[MAC} continue to process received association response pkt" << endl;
+			MLME_DISASSOCIATE_confirm(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
 
-	case Ieee802154e_SCHEDULER_REQUEST:
-		EV << "[MAC] continue to process received scheduler request pkt" << endl;
-		SCHEDULE_indication(frame->dup());
-		delete frame;
-		frame = NULL;
-		break;
-	case Ieee802154e_SCHEDULER_RESPONSE:
-		EV << "[MAC] continue to process received scheduler response pkt" << endl;
-		SCHEDULE_confirm(frame->dup(), false);
-		delete frame;
-		frame = NULL;
-		break;
-	default:
-		error("[MAC]: undefined MAC frame type: %d", frmType);
-		break;
+		case Ieee802154e_SCHEDULER_REQUEST:
+			EV << "[MAC] continue to process received scheduler request pkt" << endl;
+			SCHEDULE_indication(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
+		case Ieee802154e_SCHEDULER_RESPONSE:
+			EV << "[MAC] continue to process received scheduler response pkt" << endl;
+			SCHEDULE_confirm(frame->dup(), false);
+			delete frame;
+			frame = NULL;
+			break;
+		default:
+			error("[MAC]: undefined MAC frame type: %d", frmType);
+			delete frame;
+			break;
 	}
 }
 
-void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, cPacket* msdu, UINT_8 msduHandle, bool ackTX, bool gtsTX, bool indirectTX, UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, Ieee802154eUWBFType uwbPRF, RangingControl ranging,
-		UINT_16 uwbPreambleSymbolRepetitions, UINT_8 dataRate, FrameCrlOptions frameControlOptions, std::vector<Ieee802154eIEHeaderType> headerIElist, std::vector<Ieee802154eIEPayloadType> payloadIElist, bool sendMultipurpose)
+void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, cPacket* msdu, UINT_8 msduHandle, bool ackTX, bool gtsTX, bool indirectTX, UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, Ieee802154eUWBFType uwbPRF, RangingControl ranging, UINT_16 uwbPreambleSymbolRepetitions, UINT_8 dataRate, FrameCrlOptions frameControlOptions,
+        std::vector<Ieee802154eIEHeaderType> headerIElist, std::vector<Ieee802154eIEPayloadType> payloadIElist, bool sendMultipurpose)
 {
 	Ieee802154eMacTaskType task = TP_MCPS_DATA_REQUEST;
 	if (!mpib.macTSCHenabled)
@@ -708,75 +688,45 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 	//--- construct MPDU - Std 802.15.4-2011 (figure 46) page 65 ---
 
 	Ieee802154eDataFrame* tmpData = new Ieee802154eDataFrame();
-	Ieee802154eMPFrame* tmpMPData = new Ieee802154eMPFrame();
 
 	// construct frame control field
 	FrameCtrl frmCtrl;
-	MPFrameCtrl mpfrmCtrl; // for Multipurpose frame
 
 	IE3ADDR tmpDstAddr;
 	IE3ADDR tmpSrcAddr;
 	UINT_16 tmpDstPanId;
 	UINT_16 tmpSrcPanId;
 
-	if (sendMultipurpose) // see Std 802.15.4e-2012 page 168 // see packet structure Std 802.15.4e-2012 (figure 48k) page 75
-	{
-		delete tmpData; // release the unused pointer
-		frmCtrl.frameType = Ieee802154e_MULTI;  //multipurpose type
-		tmpMPData->setName("Ieee802154eMULTI");
-		mpfrmCtrl.lngFrameCtrl = true; //no default value in the Std 802.15.4e-2012
-	}
-	else
-	{
-		delete tmpMPData; // release the unused pointer
-		frmCtrl.frameType = Ieee802154e_DATA;   //data type
-		tmpData->setName("Ieee802154DATA");
-	}
+	frmCtrl.frameType = Ieee802154e_DATA;   //data type
+	tmpData->setName("Ieee802154DATA");
 
 	//    frmCtrl.intraPan = (SrcPANId == DstPANId)? true:false;
 	frmCtrl.dstAddrMode = dstAddrMode;
 	frmCtrl.srcAddrMode = srcAddrMode;
 
-	if (sendMultipurpose && mpfrmCtrl.lngFrameCtrl)
-	{
-		mpfrmCtrl.presPANID = frameControlOptions.panIDsuppressed; //by default: false
-		frmCtrl.securityEnabled = (securityLevel == ASH_SLVL_NONE) ? false : true; //by default: false
-		frmCtrl.seqNbSup = frameControlOptions.seqSuppressed;
-		frmCtrl.frmPending = false;
-		frmCtrl.frameVersion = Ieee802154_compatible;
-		frmCtrl.ackReq = ackTX;
-		frmCtrl.presIElist = frameControlOptions.iesIncluded;
+	frmCtrl.securityEnabled = (securityLevel == ASH_SLVL_NONE) ? false : true; //secuData;
+	frmCtrl.frmPending = false;
+	frmCtrl.ackReq = ackTX;
 
-		if (!frmCtrl.seqNbSup)
-			tmpMPData->setSeqNmbr(msduHandle);
+	// see Std 802.15.4-2011 page 118 or see Std 802.15.4e-2012 (5.2.3 Frame compatibility) page 79
+	if (msduLength > aMaxMACSafePayloadSize || msdu->getByteLength() > aMaxMACSafePayloadSize)
+		frmCtrl.frameVersion = Ieee802154_2006_introduced;
+	else
+		frmCtrl.frameVersion = Ieee802154_2003_compatible; // Frames are compatible between IEEE Std 802.15.4-2003 and IEEE Std 802.15.4e-2012
+
+	// for Std 802.15.4e-2012 TSCH
+	if (mpib.macTSCHenabled)
+		frmCtrl.frameVersion = Ieee802154_compatible;
+
+	if (frmCtrl.frameVersion == Ieee802154_2003_compatible || frmCtrl.frameVersion == Ieee802154_2006_introduced)
+	{
+		frmCtrl.seqNbSup = false;
+		tmpData->setSeqNmbr(msduHandle);        // == macDSN
 	}
 	else
-	{
-		frmCtrl.securityEnabled = (securityLevel == ASH_SLVL_NONE) ? false : true; //secuData;
-		frmCtrl.frmPending = false;
-		frmCtrl.ackReq = ackTX;
+		frmCtrl.seqNbSup = frameControlOptions.seqSuppressed; // for the Std 802.15.4e-2012
 
-		// see Std 802.15.4-2011 page 118 or see Std 802.15.4e-2012 (5.2.3 Frame compatibility) page 79
-		if (msduLength > aMaxMACSafePayloadSize || msdu->getByteLength() > aMaxMACSafePayloadSize)
-			frmCtrl.frameVersion = Ieee802154_2006_introduced;
-		else
-			frmCtrl.frameVersion = Ieee802154_2003_compatible; // Frames are compatible between IEEE Std 802.15.4-2003 and IEEE Std 802.15.4e-2012
-
-		// for Std 802.15.4e-2012 TSCH
-		if (mpib.macTSCHenabled)
-			frmCtrl.frameVersion = Ieee802154_compatible;
-
-		if (frmCtrl.frameVersion == Ieee802154_2003_compatible || frmCtrl.frameVersion == Ieee802154_2006_introduced)
-		{
-			frmCtrl.seqNbSup = false;
-			tmpData->setSeqNmbr(msduHandle);        // == macDSN
-		}
-		else
-			frmCtrl.seqNbSup = frameControlOptions.seqSuppressed; // for the Std 802.15.4e-2012
-
-		tmpData->setSeqNmbr(!frmCtrl.seqNbSup ? msduHandle : 0);
-
-	}
+	tmpData->setSeqNmbr(!frmCtrl.seqNbSup ? msduHandle : 0);
 
 	if (frmCtrl.dstAddrMode == defFrmCtrl_AddrModeNone)
 	{ // no address
@@ -820,29 +770,10 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 		tmpSrcAddr = (IE3ADDR) mpib.macExtendedAddress;
 	}
 
-	if (sendMultipurpose)
-	{
-		if (mpfrmCtrl.presPANID)
-		{ // see Std 802.15.4e-2012 (5.2.2.6.13) page77
-			tmpMPData->setDstPanId(dstPANId);
-			tmpMPData->setSrcPanId(dstPANId);
-		}
-		else
-		{
-			tmpMPData->setDstPanId(0);
-			tmpMPData->setSrcPanId(0);
-		}
-
-		tmpMPData->setDstAddr(tmpDstAddr);
-		tmpMPData->setSrcAddr(tmpSrcAddr);
-	}
-	else
-	{
-		tmpData->setDstPanId(tmpDstPanId);
-		tmpData->setDstAddr(tmpDstAddr);
-		tmpData->setSrcPanId(tmpSrcPanId);
-		tmpData->setSrcAddr(tmpSrcAddr);
-	}
+	tmpData->setDstPanId(tmpDstPanId);
+	tmpData->setDstAddr(tmpDstAddr);
+	tmpData->setSrcPanId(tmpSrcPanId);
+	tmpData->setSrcAddr(tmpSrcAddr);
 
 	AuxiliarySecurityHeader auxSecHd;
 	auxSecHd.secLvl = (Ieee802154eASHSeclvlType) securityLevel;
@@ -850,34 +781,17 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 	auxSecHd.keySource = keySource;
 	auxSecHd.keyIndex = keyIndex;
 
-	if (sendMultipurpose)
-	{
-		frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpMPData->getSrcPanId(), tmpMPData->getDstPanId()); // PAN ID Compression field
-		//        tmpMPData->setIsGTS(gtsTX);
+	frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpData->getSrcPanId(), tmpData->getDstPanId()); // PAN ID Compression
+	//tmpData->setIsGTS(gtsTX);
 
-		tmpMPData->setFrmCtrl(frmCtrl);
-		tmpMPData->setMpFrmCtrl(mpfrmCtrl);
-		tmpMPData->setAuxSecHd(auxSecHd);
+	tmpData->setFrmCtrl(frmCtrl);
+	tmpData->setAuxSecHd(auxSecHd);
 
-		// set length and encapsulate msdu
-		tmpMPData->setByteLength(calFrmByteLength(tmpMPData));
-		tmpMPData->encapsulate(msdu);     // the length of msdu is added to mpdu
-		EV << "[MAC]: MPDU constructed: " << tmpMPData->getName() << " (" << tmpMPData->getEncapsulatedPacket()->getName() << "), #" << (int) tmpMPData->getSeqNmbr() << ", " << tmpMPData->getByteLength() << " Bytes" << endl;
-	}
-	else
-	{
-		frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpData->getSrcPanId(), tmpData->getDstPanId()); // PAN ID Compression
-		//tmpData->setIsGTS(gtsTX);
-
-		tmpData->setFrmCtrl(frmCtrl);
-		tmpData->setAuxSecHd(auxSecHd);
-
-		// set length and encapsulate msdu
-		tmpData->setByteLength(calFrmByteLength(tmpData));
-		tmpData->setControlInfo(msdu->removeControlInfo());
-		tmpData->encapsulate(msdu);     // the length of msdu is added to mpdu
-		EV << "[MAC]: MPDU constructed: " << tmpData->getName() << " (" << tmpData->getEncapsulatedPacket()->getName() << "), #" << (int) tmpData->getSeqNmbr() << ", " << tmpData->getByteLength() << " Bytes" << endl;
-	}
+	// set length and encapsulate msdu
+	tmpData->setByteLength(calFrmByteLength(tmpData));
+	tmpData->setControlInfo(msdu->removeControlInfo());
+	tmpData->encapsulate(msdu);     // the length of msdu is added to mpdu
+	EV << "[MAC]: MPDU constructed: " << tmpData->getName() << " (" << tmpData->getEncapsulatedPacket()->getName() << "), #" << (int) tmpData->getSeqNmbr() << ", " << tmpData->getByteLength() << " Bytes" << endl;
 
 	//***********************************************
 	//********* decide the transmission mode ********
@@ -895,56 +809,35 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 
 	switch (TxOption)
 	{
-	case DIRECT_TRANS: // send in the CAP or at the Link for TSCH transmission
-	{
-		// TSCH CSME-CA algorithm - Std 802.15.4e-2012 (figure 11a) page 14
-		if (mpib.macTSCHenabled)
+		case DIRECT_TRANS: // send in the CAP or at the Link for TSCH transmission
 		{
-			// check the could send in a timeslot (TSCH CCA - macTsMaxTX time)
-			simtime_t duration;
-			if (sendMultipurpose)
-				duration = calDuration(tmpMPData);
-			else
+			// TSCH CSME-CA algorithm - Std 802.15.4e-2012 (figure 11a) page 14
+			if (mpib.macTSCHenabled)
+			{
+				// check the could send in a timeslot (TSCH CCA - macTsMaxTX time)
+				simtime_t duration;
+
 				duration = calDuration(tmpData);
 
-			if (duration > timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl()) // delete msg and report MLME_DATA_confirm
-			{
-				EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is bigger then " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be discarded" << endl;
+				if (duration > timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl()) // delete msg and report MLME_DATA_confirm
+				{
+					EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is bigger then " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be discarded" << endl;
 
-				if (sendMultipurpose)
-					MCPS_DATA_confirm(tmpMPData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpMPData);
-				else
 					MCPS_DATA_confirm(tmpData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpData);
 
-				delete tmpMPData;
-				delete tmpData;
-				numUpperPktLost++;
-				reqtMsgFromIFq();
-				return;
-			}
-			else
-			{
-				EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is smaller or equal as the " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be saved and transmitted later in the Tx timeslot to the dest Addr" << endl;
-
-				if (sendMultipurpose)
-				{ // if a timeslot is linked to the device
-					if (linkTable->existLink((UINT_16) tmpMPData->getDstAddr().getInt()))
-					{
-						//send(tmpMPData, mQueueOut);
-						queueModule->insertInQueue(tmpMPData);
-					}
-					else
-					{
-						EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
-						delete tmpMPData;
-						numUpperPktLost++;
-					}
+					delete tmpData;
+					delete msdu;
+					numUpperPktLost++;
+					reqtMsgFromIFq();
+					return;
 				}
 				else
-				{   // if a timeslot is linked to the device
+				{
+					EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is smaller or equal as the " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be saved and transmitted later in the Tx timeslot to the dest Addr" << endl;
+
+					// if a timeslot is linked to the device
 					if (linkTable->existLink((UINT_16) tmpData->getDstAddr().getInt()))
 					{
-
 
 						//send(tmpData, mQueueOut);
 						queueModule->checkForNewerControlMessage(tmpData);
@@ -954,19 +847,22 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 					{
 						EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
 						delete tmpData;
+						delete msdu;
 						numUpperPktLost++;
 					}
+
 				}
 			}
+			else
+				delete tmpData;
+			break;
 		}
-		break;
-	}
 
-	default:
-	{
-		error("[MAC]: undefined txOption: %d!", TxOption);
-		break;
-	}
+		default: {
+			delete tmpData;
+			error("[MAC]: undefined txOption: %d!", TxOption);
+			break;
+		}
 	}
 }
 
@@ -1173,7 +1069,11 @@ void Ieee802154eMacRLL::handle_MLME_ASSOCIATE_response(cMessage *msg)
 	dataFrame->setAuxSecHd(auxSecHd);
 
 	if (!queueModule->existAssRes(tmpDstAddr))
-		queueModule->insertInQueue(dataFrame->dup());
+	{
+		queueModule->insertInQueue(dataFrame);
+		delete AssReq;
+		return;
+	}
 
 	delete AssReq;
 	delete dataFrame;
@@ -1185,14 +1085,15 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 {
 	ASSERT(msg);
 	Ieee802154eAssociationFrame *tmp = check_and_cast<Ieee802154eAssociationFrame *>(msg);
-	msg = NULL;
-	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo("AssociationConfirm", TP_MLME_ASSOCIATE_CONFIRM);
+	Ieee802154eNetworkCtrlInfo *primitive = new Ieee802154eNetworkCtrlInfo(tmp->getCntrlInfo());
+	primitive->setName("AssociationConfirm");
+	primitive->setKind(TP_MLME_ASSOCIATE_CONFIRM);
 
-	if (tmp->getCntrlInfo().getStatus() == mac_FastA_successful)
+	if (primitive->getStatus() == mac_FastA_successful)
 	{
 		notAssociated = false;
 		panCoorName = tmp->getSenderModule()->getFullName();
-		mpib.macShortAddress = tmp->getCntrlInfo().getAssocShortAddress();
+		mpib.macShortAddress = primitive->getAssocShortAddress();
 
 		queueModule->deleteMsgQueue(tmp->getSrcAddr(), false);
 	}
@@ -1200,21 +1101,12 @@ void Ieee802154eMacRLL::MLME_ASSOCIATE_confirm(cMessage *msg)
 	{
 		notAssociated = true;
 	}
-	primitive->setStatus(tmp->getCntrlInfo().getStatus());
-	primitive->setAssocShortAddress(getShortAddress(tmp->getSrcAddr()));
-	primitive->setPanCoordinator(tmp->getCH());
-	primitive->setStage(tmp->getCntrlInfo().getStage());
-	primitive->setPanId(tmp->getSrcPanId());
-	primitive->setNumberCH(tmp->getCntrlInfo().getNumberCH());
-	primitive->setChannelOffset10(tmp->getCntrlInfo().getChannelOffset10());
-	primitive->setChannelOffset11(tmp->getCntrlInfo().getChannelOffset11());
-	EV << "[MAC]: sending a MLME-ASSOCIATE.confirm to NETWORK" << endl;
-	send(primitive->dup(), mUpperLayerOut);
 
-	delete primitive;
+	primitive->setAssocShortAddress(getShortAddress(tmp->getSrcAddr()));
+	send(primitive, mUpperLayerOut);
+
 	delete tmp;
 
-	primitive = NULL;
 	tmp = NULL;
 }
 
@@ -2392,8 +2284,8 @@ void Ieee802154eMacRLL::handleAck(Ieee802154eFrame *frame)
 
 void Ieee802154eMacRLL::handleAsnTimer()
 {
-    // request the frame for this dest address
-        cMessage *tmpMsg = NULL;
+	// request the frame for this dest address
+	cMessage *tmpMsg = NULL;
 
 	if (mpib.macTSCHenabled && !taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) && !taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA))
 	{
@@ -2427,49 +2319,48 @@ void Ieee802154eMacRLL::handleAsnTimer()
 			txBeaconNow = false;
 		}
 
-
 		switch (activeLinkEntry->getLinkType())
 		{
-		case LNK_TP_NORMAL:
-			tmpMsg = queueModule->requestSpcPacket((IE3ADDR) activeLinkEntry->getNodeAddress(), activeLinkEntry);
-			break;
-		case LNK_TP_ADVERTISING:
-			if (!awaitingNextBeacon || isPANCoor)
-			{
-
-				tmpMsg = queueModule->requestBeaconPacket();
-
-				if (tmpMsg == NULL)
+			case LNK_TP_NORMAL:
+				tmpMsg = queueModule->requestSpcPacket((IE3ADDR) activeLinkEntry->getNodeAddress(), activeLinkEntry);
+				break;
+			case LNK_TP_ADVERTISING:
+				if (!awaitingNextBeacon || isPANCoor)
 				{
-					tmpMsg = queueModule->requestAdvPacket();
-				}
-				if (tmpMsg == NULL && activeLinkEntry->isnextStage())
-				{
-					tmpMsg = queueModule->requestDisAssPacket(true);
-				}
 
-				if (tmpMsg == NULL)
-				{
-					tmpMsg = queueModule->requestSchdulePacket();
-				}
-			}
-			break;
-
-		case LNK_TP_JOIN:
-			if (!awaitingNextBeacon)
-			{
-				if (activeLinkEntry->isprevStage())
-				{
-					tmpMsg = queueModule->requestAdvPacket();
+					tmpMsg = queueModule->requestBeaconPacket();
 
 					if (tmpMsg == NULL)
-						tmpMsg = queueModule->requestDisAssPacket(false);
+					{
+						tmpMsg = queueModule->requestAdvPacket();
+					}
+					if (tmpMsg == NULL && activeLinkEntry->isnextStage())
+					{
+						tmpMsg = queueModule->requestDisAssPacket(true);
+					}
+
+					if (tmpMsg == NULL)
+					{
+						tmpMsg = queueModule->requestSchdulePacket();
+					}
 				}
-			}
-			break;
-		default:
-			tmpMsg = NULL;
-			break;
+				break;
+
+			case LNK_TP_JOIN:
+				if (!awaitingNextBeacon)
+				{
+					if (activeLinkEntry->isprevStage())
+					{
+						tmpMsg = queueModule->requestAdvPacket();
+
+						if (tmpMsg == NULL)
+							tmpMsg = queueModule->requestDisAssPacket(false);
+					}
+				}
+				break;
+			default:
+				tmpMsg = NULL;
+				break;
 
 		}
 
@@ -2479,8 +2370,6 @@ void Ieee802154eMacRLL::handleAsnTimer()
 		}
 		else
 			txData = NULL;
-
-
 
 		MACTSCHLinkOptions linkOption = activeLinkEntry->getLinkOption();
 
@@ -2574,8 +2463,6 @@ void Ieee802154eMacRLL::handleAsnTimer()
 //
 					EV << "[TSCH CCA]-Transmitter:[100] no CCA, wait the TsTxOffsetTime" << endl;
 					double fTime = timeslotTable->getTemplate(useTimeslotID)->getTxOffsetDbl();
-
-
 
 					scheduleAt(simTime() + fTime, tsTxOffsetTimer);
 

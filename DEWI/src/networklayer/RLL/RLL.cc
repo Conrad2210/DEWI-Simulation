@@ -26,8 +26,7 @@ static const int PhyConfig = 134215680;
 static const int ExtendedBitmap = 0;
 static const int minChannelNum = 11;
 static const int maxChannelNum = 27;
-static const int channelList[16] =
-{ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+static const int channelList[16] = { 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 static const int numChannel = 15;
 
 RLL::RLL()
@@ -154,6 +153,17 @@ void RLL::initialize(int stage)
 }
 void RLL::finish()
 {
+	std::stringstream ss;
+	ss << nCluStage;
+	std::stringstream sss;
+	sss << getParentModule()->getIndex();
+
+	dataCenter->recordScalar(ss.str(), "ClusterStage", getParentModule()->getName(), sss.str());
+
+	ss.str("");
+	ss << bIsPANCoor;
+	dataCenter->recordScalar(ss.str(), "PanCoor", getParentModule()->getName(), sss.str());
+
 	cancelEvent(StartTimer);
 	cancelEvent(AssociateTimer);
 	cancelEvent(AssociateWaitTimer);
@@ -200,195 +210,150 @@ void RLL::handleMessage(cMessage *msg)
 
 void RLL::handleDataMessage(cPacket *msg)
 {
-	if (dynamic_cast<RLLAppMsg *>(msg) != NULL)
+
+	RLLAppMsg *temp = check_and_cast<RLLAppMsg *>(msg);
+	//First send it to application layer
+	send(temp->dup(), mUpperLayerOut);
+
+	if (bIsPANCoor)
 	{
-		RLLAppMsg *temp = check_and_cast<RLLAppMsg *>(msg);
-		//First send it to application layer
-		send(temp->dup(), mUpperLayerOut);
+		Ieee802154eNetworkCtrlInfo *ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(temp->removeControlInfo());
 
-		//First check if stage 0
-//	if(nCluStage == 0 && bIsPANCoor)
-//	{
-//	    if(temp->getControlInfo() != NULL)
-//		temp->removeControlInfo();
-//
-//	    Ieee802154eNetworkCtrlInfo *ctrl = new Ieee802154eNetworkCtrlInfo();
-//
-//	    ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
-//
-//	    temp->setControlInfo(ctrl);
-//	    send(temp, mLowerLayerOut);
-//	}
-//	else
-		if (bIsPANCoor)
+		if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr()) != NULL)
 		{
-			Ieee802154eNetworkCtrlInfo *ctrl;
-			if (temp->getControlInfo() != NULL)
-				ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo*>(temp->removeControlInfo());
-			else
-				ctrl = new Ieee802154eNetworkCtrlInfo();
 
-			if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr()) != NULL)
+			if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() > nCluStage)
 			{
-				if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() > nCluStage)
+				//handle msg if arrived from higher cluster stage
+				RLLAppMsg *temp1;
+				Ieee802154eNetworkCtrlInfo *ctrl1;
+				if (clusterTable->existLowerCH(nCluStage))
 				{
-					//handle msg if arrived from higher cluster stage
-					RLLAppMsg *temp1 = temp->dup();
-					if (clusterTable->existLowerCH(nCluStage))
-					{
-						ctrl->setTxLowerCH(true);
-						ctrl->setTxHigherCH(false);
-						ctrl->setTxCS(false);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
-
-						temp1->setControlInfo(ctrl);
-						send(temp1, mLowerLayerOut);
-
-					}
 					temp1 = temp->dup();
-					ctrl = new Ieee802154eNetworkCtrlInfo();
-					if (nCluStage == 0)
-					{
-						if (clusterTable->existHigherCH(nCluStage))
-						{
-							ctrl->setTxLowerCH(false);
-							ctrl->setTxHigherCH(true);
-							ctrl->setTxCS(false);
-							ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(true);
+					ctrl1->setTxHigherCH(false);
+					ctrl1->setTxCS(false);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-							temp1->setControlInfo(ctrl);
-							send(temp1, mLowerLayerOut);
-
-						}
-					}
-
-					temp1 = temp->dup();
-					ctrl = new Ieee802154eNetworkCtrlInfo();
-					if (clusterTable->existCS(nCluStage))
-					{
-						ctrl->setTxLowerCH(false);
-						ctrl->setTxHigherCH(false);
-						ctrl->setTxCS(true);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
-
-						temp1->setControlInfo(ctrl);
-						send(temp1, mLowerLayerOut);
-
-					}
-
-					delete temp;
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
 
 				}
-				else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() == nCluStage)
+
+				if (nCluStage == 0)
 				{
-					//handle Message received from same stage (probably CS)
-					RLLAppMsg *temp1 = temp->dup();
-					if (clusterTable->existLowerCH(nCluStage))
-					{
-						ctrl->setTxLowerCH(true);
-						ctrl->setTxHigherCH(false);
-						ctrl->setTxCS(false);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
-
-						temp1->setControlInfo(ctrl);
-						send(temp1, mLowerLayerOut);
-
-					}
-					temp1 = temp->dup();
-
-
-					ctrl = new Ieee802154eNetworkCtrlInfo();
 					if (clusterTable->existHigherCH(nCluStage))
 					{
-						ctrl->setTxLowerCH(false);
-						ctrl->setTxHigherCH(true);
-						ctrl->setTxCS(false);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+						temp1 = temp->dup();
+						ctrl1 = new Ieee802154eNetworkCtrlInfo();
+						ctrl1->setTxLowerCH(false);
+						ctrl1->setTxHigherCH(true);
+						ctrl1->setTxCS(false);
+						ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-						temp1->setControlInfo(ctrl);
+						temp1->setControlInfo(ctrl1);
 						send(temp1, mLowerLayerOut);
 
 					}
-
-					temp1 = temp->dup();
-
-					ctrl = new Ieee802154eNetworkCtrlInfo();
-					if (clusterTable->existCS(nCluStage))
-					{
-						ctrl->setTxLowerCH(false);
-						ctrl->setTxHigherCH(false);
-						ctrl->setTxCS(true);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
-
-						temp1->setControlInfo(ctrl);
-						send(temp1, mLowerLayerOut);
-
-					}
-					delete temp;
-
 				}
-				else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() < nCluStage)
+
+				if (clusterTable->existCS(nCluStage))
 				{
-					//handle Message received from lower stage
-					RLLAppMsg *temp1 = temp->dup();
-					if (clusterTable->existHigherCH(nCluStage))
-					{
-						ctrl->setTxLowerCH(false);
-						ctrl->setTxHigherCH(true);
-						ctrl->setTxCS(false);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
-
-						temp1->setControlInfo(ctrl);
-						send(temp1, mLowerLayerOut);
-
-					}
 
 					temp1 = temp->dup();
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(false);
+					ctrl1->setTxHigherCH(false);
+					ctrl1->setTxCS(true);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
-					ctrl = new Ieee802154eNetworkCtrlInfo();
-					if (clusterTable->existCS(nCluStage))
-					{
-						ctrl->setTxLowerCH(false);
-						ctrl->setTxHigherCH(false);
-						ctrl->setTxCS(true);
-						ctrl->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
 
-						temp1->setControlInfo(ctrl);
-						send(temp1, mLowerLayerOut);
+				}
+			}
+			else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() == nCluStage)
+			{
+				//handle Message received from same stage (probably CS)
+				RLLAppMsg *temp1;
+				Ieee802154eNetworkCtrlInfo *ctrl1;
+				if (clusterTable->existLowerCH(nCluStage))
+				{
+					temp1 = temp->dup();
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(true);
+					ctrl1->setTxHigherCH(false);
+					ctrl1->setTxCS(false);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
 
-					}
-					delete temp;
+				}
+				if (clusterTable->existHigherCH(nCluStage))
+				{
+
+					temp1 = temp->dup();
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(false);
+					ctrl1->setTxHigherCH(true);
+					ctrl1->setTxCS(false);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
 				}
 
+				if (clusterTable->existCS(nCluStage))
+				{
+					temp1 = temp->dup();
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(false);
+					ctrl1->setTxHigherCH(false);
+					ctrl1->setTxCS(true);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
+				}
 			}
-			else
+			else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() < nCluStage)
 			{
-				delete msg;
-				msg = NULL;
-				if (ev.isGUI())
-					EV << "[RLL]: Received packet is not for me, delete packet and resume..." << endl;
+				//handle Message received from lower stage
+				RLLAppMsg *temp1;
+				Ieee802154eNetworkCtrlInfo *ctrl1;
+				if (clusterTable->existHigherCH(nCluStage))
+				{
+					temp1 = temp->dup();
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(false);
+					ctrl1->setTxHigherCH(true);
+					ctrl1->setTxCS(false);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
 
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
+				}
+				if (clusterTable->existCS(nCluStage))
+				{
+					temp1 = temp->dup();
+					ctrl1 = new Ieee802154eNetworkCtrlInfo();
+					ctrl1->setTxLowerCH(false);
+					ctrl1->setTxHigherCH(false);
+					ctrl1->setTxCS(true);
+					ctrl1->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+
+					temp1->setControlInfo(ctrl1);
+					send(temp1, mLowerLayerOut);
+				}
 			}
 		}
-		else
-		{
-			delete msg;
-			msg = NULL;
-			if (ev.isGUI())
-				EV << "[RLL]: I'm a CS nothing to do here..." << endl;
 
-		}
-
+		delete ctrl;
 	}
-	else
-	{
-		delete msg;
-		msg = NULL;
 
-		if (ev.isGUI())
-			EV << "[RLL]: Received packet is not a data packet, delete packet and resume..." << endl;
+	delete temp;
 
-	}
 }
 
 void RLL::handleUpperMessage(cPacket *msg)
@@ -417,74 +382,61 @@ bool RLL::handleLowerMessage(cMessage *msg)
 {
 	switch (msg->getKind())
 	{
-	case TP_MLME_START_CONFIRM:
-	{
-		handle_MLME_START_confirm(msg);
-		break;
-	}
-	case TP_MLME_BEACON_CONFIRM:
-	{
-		handle_MLME_BEACON_confirm(msg);
-		break;
-	}
-	case TP_MLME_SCAN_CONFIRM:
-	{
-		handle_MLME_SCAN_confirm(msg);
-		break;
-	}
-	case TP_MLME_BEACON_NOTIFY_INDICATION:
-	{
-		handle_MLME_BEACON_indication(msg);
-		break;
-	}
-	case TP_MLME_SET_BEACON_CONFIRM:
-	{
-		handle_MLME_SET_BEACON_confirm(msg);
-		break;
-	}
-	case TP_MLME_ASSOCIATE_INDICATION:
-	{
-		handle_MLME_ASSOCIATE_indication(msg);
-		break;
-	}
-	case TP_MLME_ASSOCIATE_CONFIRM:
-	{
-		handle_MLME_ASSOCIATE_confirm(msg);
-		break;
-	}
-	case TP_MLME_DISASSOCIATE_INDICATION:
-	{
-		handle_MLME_DIASSOCIATE_indication(msg);
-		break;
-	}
-	case TP_MLME_DISASSOCIATE_CONFIRM:
-	{
-		handle_MLME_DIASSOCIATE_confirm(msg);
-		break;
-	}
-	case TP_SCHEDULE_INDICATION:
-	{
-		handle_SCHEDULE_indication(msg);
-		break;
-	}
-	case TP_SCHEDULE_CONFIRM:
-	{
-		handle_SCHEDULE_confirm(msg);
-		break;
-	}
-	case TP_RESTART_CONFIRM:
-	{
-		handle_RESTART_confirm(msg->dup());
-		delete msg;
-		break;
-	}
-		// TODO: Add case for handling data messages
+		case TP_MLME_START_CONFIRM: {
+			handle_MLME_START_confirm(msg);
+			break;
+		}
+		case TP_MLME_BEACON_CONFIRM: {
+			handle_MLME_BEACON_confirm(msg);
+			break;
+		}
+		case TP_MLME_SCAN_CONFIRM: {
+			handle_MLME_SCAN_confirm(msg);
+			break;
+		}
+		case TP_MLME_BEACON_NOTIFY_INDICATION: {
+			handle_MLME_BEACON_indication(msg);
+			break;
+		}
+		case TP_MLME_SET_BEACON_CONFIRM: {
+			handle_MLME_SET_BEACON_confirm(msg);
+			break;
+		}
+		case TP_MLME_ASSOCIATE_INDICATION: {
+			handle_MLME_ASSOCIATE_indication(msg);
+			break;
+		}
+		case TP_MLME_ASSOCIATE_CONFIRM: {
+			handle_MLME_ASSOCIATE_confirm(msg);
+			break;
+		}
+		case TP_MLME_DISASSOCIATE_INDICATION: {
+			handle_MLME_DIASSOCIATE_indication(msg);
+			break;
+		}
+		case TP_MLME_DISASSOCIATE_CONFIRM: {
+			handle_MLME_DIASSOCIATE_confirm(msg);
+			break;
+		}
+		case TP_SCHEDULE_INDICATION: {
+			handle_SCHEDULE_indication(msg);
+			break;
+		}
+		case TP_SCHEDULE_CONFIRM: {
+			handle_SCHEDULE_confirm(msg);
+			break;
+		}
+		case TP_RESTART_CONFIRM: {
+			handle_RESTART_confirm(msg->dup());
+			delete msg;
+			break;
+		}
+			// TODO: Add case for handling data messages
 
-	default:
-	{
-		return false;
-		break;
-	}
+		default: {
+			return false;
+			break;
+		}
 	}
 	return true;
 }
@@ -493,60 +445,49 @@ void RLL::handleSelfMessage(cMessage *msg)
 {
 	switch (msg->getKind())
 	{
-	case START_TIMER:
-	{
-		MLME_START_request(NULL);
-		break;
-	}
-	case MAC_SCAN_TIMER:
-	{
-		MLME_SCAN_request(NULL);
-		break;
-	}
-	case BEACON_REQUEST:
-	{
-		MLME_BEACON_request(NULL);
-		break;
-	}
-	case ASSOCIATION_TIMER:
-	{
-		MLME_ASSOCIATE_request(NULL);
-		break;
-	}
-	case SCHEDULE_TIMER:
-	{
-		SCHEDULE_request(NULL);
-		break;
-	}
-	case SCHEDULE_WAIT_TIMER:
-	{
-		SCHEDULE_request(NULL);
-		break;
-	}
-	case SCHEDULE_BEACON_SCAN_TIMER:
-	{
-		handle_BEACON_WAIT_timer(NULL);
-		break;
-	}
-	case DISASSOCIATION_WAIT_TIMER:
-	{
-		MLME_DISASSOCIATE_request(NULL);
-		break;
-	}
-	case ASSOCIATION_WAIT_TIMER:
-	{
-		MLME_ASSOCIATE_request(NULL);
-		break;
-	}
-	case CHECK_TIMER:
-	{
-		//GENERAL_CHECK(NULL);
-		break;
-	}
-	default:
-	{
-		break;
-	}
+		case START_TIMER: {
+			MLME_START_request(NULL);
+			break;
+		}
+		case MAC_SCAN_TIMER: {
+			MLME_SCAN_request(NULL);
+			break;
+		}
+		case BEACON_REQUEST: {
+			MLME_BEACON_request(NULL);
+			break;
+		}
+		case ASSOCIATION_TIMER: {
+			MLME_ASSOCIATE_request(NULL);
+			break;
+		}
+		case SCHEDULE_TIMER: {
+			SCHEDULE_request(NULL);
+			break;
+		}
+		case SCHEDULE_WAIT_TIMER: {
+			SCHEDULE_request(NULL);
+			break;
+		}
+		case SCHEDULE_BEACON_SCAN_TIMER: {
+			handle_BEACON_WAIT_timer(NULL);
+			break;
+		}
+		case DISASSOCIATION_WAIT_TIMER: {
+			MLME_DISASSOCIATE_request(NULL);
+			break;
+		}
+		case ASSOCIATION_WAIT_TIMER: {
+			MLME_ASSOCIATE_request(NULL);
+			break;
+		}
+		case CHECK_TIMER: {
+			//GENERAL_CHECK(NULL);
+			break;
+		}
+		default: {
+			break;
+		}
 
 	}
 }
@@ -567,7 +508,7 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 				if (AssociateWaitTimer->isScheduled())
 					cancelEvent(AssociateWaitTimer);
 
-				double temp = 5 +  uniform(5,15);// (rand() / RAND_MAX) * (15 - 5);
+				double temp = 5 + uniform(5, 15); // (rand() / RAND_MAX) * (15 - 5);
 				scheduleAt(simTime() + temp, AssociateWaitTimer);
 				delete tmp;
 				tmp = NULL;
@@ -702,10 +643,10 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tmpEntry->isMyCH(true);
 
 			setSchedule();
-            if(linkTable->getLinkByTimeslot(10) != NULL)
-			    linkTable->getLinkByTimeslot(10)->setChannelOffset(tmp->getChannelOffset10());
-            if(linkTable->getLinkByTimeslot(11) != NULL)
-                linkTable->getLinkByTimeslot(11)->setChannelOffset(tmp->getChannelOffset11());
+			if (linkTable->getLinkByTimeslot(10) != NULL)
+				linkTable->getLinkByTimeslot(10)->setChannelOffset(tmp->getChannelOffset10());
+			if (linkTable->getLinkByTimeslot(11) != NULL)
+				linkTable->getLinkByTimeslot(11)->setChannelOffset(tmp->getChannelOffset11());
 		}
 		else
 		{
@@ -736,7 +677,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 				cancelEvent(BeaconScanTimer);
 			waitConstant = tmp->getNumberCH();
 
-			switch(nCluStage)
+			switch (nCluStage)
 			{
 				case 0:
 					scheduleAt(simTime(), BeaconScanTimer);
@@ -745,13 +686,13 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 					scheduleAt(simTime() + tmp->getNumberCH() * 10, BeaconScanTimer);
 					break;
 				case 2:
-					scheduleAt(simTime()+ 300 + pow(2,tmp->getNumberCH()),BeaconScanTimer);
+					scheduleAt(simTime() + 300 + pow(2, tmp->getNumberCH()), BeaconScanTimer);
 					break;
 				case 3:
-					scheduleAt(simTime() + 400 + pow(2,tmp->getNumberCH()),BeaconScanTimer);
+					scheduleAt(simTime() + 400 + pow(2, tmp->getNumberCH()), BeaconScanTimer);
 					break;
 				default:
-					scheduleAt(simTime() + pow(3,tmp->getNumberCH()),BeaconScanTimer);
+					scheduleAt(simTime() + pow(3, tmp->getNumberCH()), BeaconScanTimer);
 					break;
 			}
 			tempStr->parse("b=1.5,1.5,oval,orange");
@@ -798,7 +739,7 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 	parentDisp->updateWith(*tempStr);
 
 	Ieee802154eNetworkCtrlInfo *cnt = new Ieee802154eNetworkCtrlInfo("DisassociationRequest", TP_MLME_DISASSOCIATE_REQUEST);
-	double temp = 5 + uniform(5,15);//(rand() / RAND_MAX) * (15 - 5);
+	double temp = 5 + uniform(5, 15); //(rand() / RAND_MAX) * (15 - 5);
 	scheduleAt(simTime() + temp, DisassociateWaitTimer);
 	dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
 	send(cnt->dup(), mLowerLayerOut);
@@ -999,63 +940,70 @@ void RLL::MLME_SCAN_request(cMessage *msg)
 
 void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 {
-	if (dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg) && bNotAssociated)
+	if (msg != NULL)
 	{
-
-		Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
-		msg = NULL;
-		Radio80211aControlInfo control = getRadioControl(check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo()));
-		if (!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
-			beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime(), control.getLossRate(), calcDistance(control.getLossRate(), control.getRecPow()));
-		else
-			beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime());
-
-		//delete control;
-		//control = NULL;
-
-	}
-	else
-	{
-		if (msg == NULL)
+		if (bNotAssociated)
 		{
+			Ieee802154EnhancedBeaconFrame *tmpBcn = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
 
-			double rxpower, rssi, txPower, distance;
-			Ieee802154EnhancedBeaconFrame *tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
+			Radio80211aControlInfo control = getRadioControl(check_and_cast<Radio80211aControlInfo *>(tmpBcn->getControlInfo()));
 
-			if (rssi < nDistance && bCapablePanCoor)
+			if (!beaconTable->existBeaconEntry(tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), tmpBcn->getSrcPanId()))
 			{
-
-				bIsPANCoor = true;
-				beaconTable->flushBeaconTable();
-			}
-			else if (nRestartCounter < 3)
-			{
-				nRestartCounter++;
-				delete tmpBcn;
-				tmpBcn = NULL;
-				bCapablePanCoor = false;
-				RESTART_request(NULL);
-				beaconTable->flushBeaconTable();
+				beaconTable->addEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime(), control.getLossRate(), calcDistance(control.getLossRate(), control.getRecPow()));
 				return;
 			}
-
-			if (tmpBcn != NULL)
-				MLME_SET_BEACON_request(tmpBcn);
-
+			else
+			{
+				beaconTable->updateBeaconEntry(tmpBcn, tmpBcn->getSrcAddr(), tmpBcn->getSrcAddr().getInt(), control.getRecPow(), control.getSnr(), tmpBcn->getSrcPanId(), simTime());
+				return;
+			}
 		}
 		else
 		{
 			delete msg;
-			msg = NULL;
+		}
+
+	}
+	else
+	{
+
+		double rxpower, rssi, txPower, distance;
+		Ieee802154EnhancedBeaconFrame *tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
+
+		if (rssi < nDistance && bCapablePanCoor)
+		{
+
+			bIsPANCoor = true;
 			beaconTable->flushBeaconTable();
 		}
+		else
+		{
+			bCapablePanCoor = false;
+		}
+
+		if (nRestartCounter < 3)
+		{
+			nRestartCounter++;
+			delete tmpBcn;
+			tmpBcn = NULL;
+
+			RESTART_request(NULL);
+			beaconTable->flushBeaconTable();
+			return;
+		}
+
+		MLME_SET_BEACON_request(tmpBcn);
+
+		beaconTable->flushBeaconTable();
+
 	}
 }
 
 //set Beacon
 void RLL::MLME_SET_BEACON_request(cMessage *msg)
 {
-	if (dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
+	if (dynamic_cast<Ieee802154EnhancedBeaconFrame*>(msg))
 	{
 
 		Ieee802154EnhancedBeaconFrame * tmp = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
@@ -1092,7 +1040,7 @@ void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 	{
 		if (bNotAssociated)
 		{
-			double waitTime = 0 + uniform(0,10);//((double) rand() / RAND_MAX) * (10 - 0);
+			double waitTime = 0 + uniform(0, 10);		//((double) rand() / RAND_MAX) * (10 - 0);
 			if (!AssociateTimer->isScheduled())
 				scheduleAt(simTime() + waitTime, AssociateTimer);
 		}
@@ -1101,10 +1049,10 @@ void RLL::handle_MLME_SET_BEACON_confirm(cMessage *msg)
 	{
 		if (bNotAssociated)
 		{
-			double waitTime = 0 + uniform(0,10);//(double) rand() / RAND_MAX) * (10 - 0);
+			double waitTime = 0 + uniform(0, 10);		//(double) rand() / RAND_MAX) * (10 - 0);
 			if (!bAssociateDirectly)
 			{
-				waitTime = 50 + uniform(((double) dataCenter->getNumRegisteredAssVectors() / 2.0),(double) dataCenter->getNumRegisteredAssVectors() * 2.0);//  ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
+				waitTime = 50 + uniform(((double) dataCenter->getNumRegisteredAssVectors() / 2.0), (double) dataCenter->getNumRegisteredAssVectors() * 2.0);		//  ((double) rand() / RAND_MAX) * ((double) dataCenter->getNumRegisteredAssVectors() * 2.0 - (double) dataCenter->getNumRegisteredAssVectors() / 2.0); //FIXME: Make it variable or changable by init parameters;
 				bAssociateDirectly = true;
 			}
 			if (!AssociateTimer->isScheduled())
@@ -1210,7 +1158,7 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 		{
 			if (ScheduleTimer->isScheduled())
 				cancelEvent(ScheduleTimer);
-			double temp = 5 + uniform(5,15);//(rand() / RAND_MAX) * (15 - 5);
+			double temp = 5 + uniform(5, 15);		//(rand() / RAND_MAX) * (15 - 5);
 			scheduleAt(simTime() + temp, ScheduleTimer);
 		}
 		else

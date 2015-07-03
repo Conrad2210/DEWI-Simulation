@@ -402,7 +402,7 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
 				Ieee802154eFrame *tmpmsg = check_and_cast<Ieee802154eFrame *>(queue.get(i));
 				if (tmpmsg->getEncapsulatedMsg() != NULL)
 					delMsg->record(tmpmsg->getEncapsulatedMsg()->getName());
-				queue.remove(tmpmsg);
+				delete queue.remove(tmpmsg);
 				i = 0;
 				deleted++;
 			}
@@ -434,10 +434,10 @@ bool Ieee802154eQueue::deleteMsgFromQueu(cMessage *msg)
 
 	while (!queue.empty() && i < queue.length())
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		cPacket *msg1 = PK(queue.get(i));
+		if (dynamic_cast<Ieee802154eFrame *>(msg1))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg1);
 
 			if (tmpMsg == msg)
 			{

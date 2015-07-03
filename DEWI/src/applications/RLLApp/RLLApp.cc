@@ -64,13 +64,12 @@ void RLLApp::initialize(int stage)
 		BurstTimer = new cMessage("BurstTimer");
 		BurstMessageTimer = new cMessage("BurstMessageTimer");
 		StopTimer = new cMessage("AppStopTimer");
-		AssTimer = new cMessage("AssTimer");
 
 		std::stringstream a;
 		a << getParentModule()->getName() << " " << getParentModule()->getIndex();
 		//EndToEndDelay = new cOutVector(a.str().c_str());
 		E2E = new DataVector(a.str(), "latency");
-
+		receivedMSG = new DataVector(a.str(),"rxMSG");
 		if (m_isLightSwitch)
 		{
 			AssTimer = new cMessage("AssTimer");
@@ -82,6 +81,7 @@ void RLLApp::initialize(int stage)
 	{
 
 			E2E->registerVector();
+			receivedMSG->registerVector();
 
 		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 		if (strcmp("gateWay", getParentModule()->getName()))
@@ -137,6 +137,7 @@ void RLLApp::handleLowerMsg(cMessage* msg)
 	ss << "Received: " << tmp->getName();
 	getParentModule()->bubble(ss.str().c_str());
 	E2E->record((now - tmp->getCreationTime().dbl()), tmp->getName());
+	receivedMSG->record(tmp->getName());
 	delete tmp;
 }
 
