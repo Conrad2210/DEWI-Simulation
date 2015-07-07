@@ -47,8 +47,7 @@ void Ieee802154eQueue::initialize()
 	//EndToEndDelay = new cOutVector(a.str().c_str());
 	delMsg = new DataVector(a.str(), "DelMsg");
 
-
-		delMsg->registerVector();
+	delMsg->registerVector();
 
 	dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 
@@ -135,21 +134,19 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEnt
 
 			for (int i = 0; i < queue.length(); ++i)
 			{
-				cPacket *msg = PK(queue.get(i));
-				if (dynamic_cast<Ieee802154eFrame *>(msg))
+				Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+				if (msg)
 				{
-					Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-					if (tmpMsg->getDstAddr() == dstAddr)
+					if (msg->getDstAddr() == dstAddr)
 					{
-						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
+						Ieee802154eNetworkCtrlInfo * tmp = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->removeControlInfo());
+						if (tmp)
 						{
-							if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxCS())
+							if (tmp->getTxCS())
 							{
-								tmpMsg->removeControlInfo();
+								delete tmp;
 
-								emit(dequeuePkSignal, msg);
-								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
 								return msg;
 							}
 						}
@@ -161,18 +158,18 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEnt
 		case 1: {
 			for (int i = 0; i < queue.length(); ++i)
 			{
-				cPacket *msg = PK(queue.get(i));
-				if (dynamic_cast<Ieee802154eFrame *>(msg))
+				Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+				if (msg)
 				{
-					Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-					if (tmpMsg->getDstAddr() == dstAddr)
+					if (msg->getDstAddr() == dstAddr)
 					{
-						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
+						Ieee802154eNetworkCtrlInfo *tmpMsg = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
+						if (tmpMsg)
 						{
-							if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxHigherCH())
+							if (tmpMsg->getTxHigherCH())
 							{
-								tmpMsg->removeControlInfo();
+								delete msg->removeControlInfo();
 
 								emit(dequeuePkSignal, msg);
 								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -187,18 +184,19 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEnt
 		case -1: {
 			for (int i = 0; i < queue.length(); ++i)
 			{
-				cPacket *msg = PK(queue.get(i));
-				if (dynamic_cast<Ieee802154eFrame *>(msg))
+				Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+				if (msg)
 				{
-					Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-					if (tmpMsg->getDstAddr() == dstAddr)
+					if (msg->getDstAddr() == dstAddr)
 					{
-						if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo()))
+						Ieee802154eNetworkCtrlInfo *tmpMsg = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
+						if (tmpMsg)
 						{
-							if (dynamic_cast<Ieee802154eNetworkCtrlInfo *>(tmpMsg->getControlInfo())->getTxLowerCH())
+							if (tmpMsg->getTxLowerCH())
 							{
-								tmpMsg->removeControlInfo();
+								delete msg->removeControlInfo();
+
 								emit(dequeuePkSignal, msg);
 								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
 								return msg;
@@ -284,12 +282,11 @@ bool Ieee802154eQueue::existSchedReq(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if ((msg))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if (tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "ScheduleRequest") == 0)
+			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "ScheduleRequest") == 0)
 			{
 				return true;
 			}
@@ -302,12 +299,11 @@ bool Ieee802154eQueue::existSchedRes(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if ((msg))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if (tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "ScheduleResponse") == 0)
+			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "ScheduleResponse") == 0)
 			{
 				return true;
 			}
@@ -320,12 +316,11 @@ bool Ieee802154eQueue::existAssRes(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if ((msg))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if (tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationResponse") == 0)
+			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationResponse") == 0)
 			{
 				return true;
 			}
@@ -338,12 +333,11 @@ bool Ieee802154eQueue::existAssReq(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if ((msg))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if (tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationRequest") == 0)
+			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationRequest") == 0)
 			{
 				return true;
 			}
@@ -355,12 +349,11 @@ bool Ieee802154eQueue::existDisAssReq(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if ((msg))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if (tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "DisassociationRequest") == 0)
+			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "DisassociationRequest") == 0)
 			{
 				return true;
 			}
@@ -373,12 +366,11 @@ bool Ieee802154eQueue::existDisAssRes(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if ((msg))
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if (tmpMsg->getDstAddr() == addr && strcmp(msg->getName(), "DisassociationResponse") == 0)
+			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "DisassociationResponse") == 0)
 			{
 				return true;
 			}
@@ -387,24 +379,29 @@ bool Ieee802154eQueue::existDisAssRes(MACAddress addr)
 	return false;
 }
 
-int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg)
+int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg, cMessage *txPaket)
 {
 	int i = 0;
 	int deleted = 0;
 	while (!queue.empty() && i < queue.length())
 	{
-		cPacket *queueMsg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(queueMsg))
+		Ieee802154eFrame *queueMsg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		if (queueMsg)
 		{
-
 			if (queueMsg->getCreationTime() < msg->getCreationTime() && queueMsg->getKind() == msg->getKind())
 			{
-				Ieee802154eFrame *tmpmsg = check_and_cast<Ieee802154eFrame *>(queue.get(i));
-				if (tmpmsg->getEncapsulatedMsg() != NULL)
-					delMsg->record(tmpmsg->getEncapsulatedMsg()->getName());
-				delete queue.remove(tmpmsg);
-				i = 0;
-				deleted++;
+				if (queueMsg != txPaket)
+				{
+					if (queueMsg->getEncapsulatedMsg())
+						delMsg->record(queueMsg->getEncapsulatedMsg()->getName());
+					delete queue.remove(queueMsg);
+					i = 0;
+					deleted++;
+				}
+				else
+				{
+					i++;
+				}
 			}
 			else
 				i++;
@@ -434,14 +431,16 @@ bool Ieee802154eQueue::deleteMsgFromQueu(cMessage *msg)
 
 	while (!queue.empty() && i < queue.length())
 	{
-		cPacket *msg1 = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg1))
-		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg1);
+		Ieee802154eFrame *msg1 = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
 
-			if (tmpMsg == msg)
+		if (msg1)
+		{
+
+			if (msg1 == msg)
 			{
-				queue.remove(queue.get(i));
+
+				queue.remove(msg1);
+
 				i = 0; // start from the beginning, to prevent an NULL pointer
 			}
 			else
@@ -467,9 +466,10 @@ bool Ieee802154eQueue::deleteMsgQueue(MACAddress dstAddr, bool all)
 	while (!queue.empty() && i < queue.length())
 	{
 		cPacket *msg = PK(queue.get(i));
-		if (dynamic_cast<Ieee802154eFrame *>(msg))
+		Ieee802154eFrame* tmpMsg = dynamic_cast<Ieee802154eFrame *>(msg);
+		if (tmpMsg)
 		{
-			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
+
 			if (tmpMsg->getDstAddr() == dstAddr)
 			{
 				countPkt++;

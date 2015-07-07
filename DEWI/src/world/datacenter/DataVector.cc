@@ -48,6 +48,7 @@ DataVector::DataVector(std::string name, std::string type) {
     center = check_and_cast<DataCenter *>(
             center->getModuleByPath("DataCenter"));
 
+
 }
 
 DataVector::~DataVector() {
@@ -63,6 +64,7 @@ void DataVector::record(double value) {
 
     //add data entry
     Data.push_back(a.str());
+
 }
 
 void DataVector::record(double value, std::string name) {
@@ -74,6 +76,7 @@ void DataVector::record(double value, std::string name) {
 
     //add data entry
     Data.push_back(a.str());
+
 }
 void DataVector::record(double value, const char* name) {
     //declare result variable
@@ -84,6 +87,7 @@ void DataVector::record(double value, const char* name) {
 
     //add data entry
     Data.push_back(a.str());
+
 }
 
 void DataVector::record(double value, int id) {
@@ -95,6 +99,7 @@ void DataVector::record(double value, int id) {
 
     //add data entry
     Data.push_back(a.str());
+
 }
 
 void DataVector::record(int value) {
@@ -106,11 +111,13 @@ void DataVector::record(int value) {
 
     //add data entry
     Data.push_back(a.str());
+
 }
 
 void DataVector::record(std::string value) {
     //add data entry
     Data.push_back(value);
+
 }
 
 void DataVector::saveData(std::string Path) {
@@ -155,9 +162,18 @@ void DataVector::saveData(std::string Path) {
             fout.close();
         }
     }
+
 }
 
 void DataVector::registerVector() {
     //register vector to datacenter
     center->registerVector(this);
+
+}
+
+void DataVector::printSize()
+{
+	std::cout<<endl<<this->Name<<": "<<endl;
+	std::cout<<"Vector Size of "<< this->Type << ": "<< sizeof(std::vector<std::string>) + (sizeof(std::string) * Data.size()) << " Bytes"<<endl;
+	std::cout<<"Number stored elements: "<<Data.size()<<endl;
 }

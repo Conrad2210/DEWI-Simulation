@@ -219,14 +219,15 @@ void RLL::handleDataMessage(cPacket *msg)
 	{
 		Ieee802154eNetworkCtrlInfo *ctrl = check_and_cast<Ieee802154eNetworkCtrlInfo *>(temp->removeControlInfo());
 
+
 		if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr()) != NULL)
 		{
 
 			if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() > nCluStage)
 			{
 				//handle msg if arrived from higher cluster stage
-				RLLAppMsg *temp1;
-				Ieee802154eNetworkCtrlInfo *ctrl1;
+				RLLAppMsg *temp1 = NULL;
+				Ieee802154eNetworkCtrlInfo *ctrl1 = NULL;
 				if (clusterTable->existLowerCH(nCluStage))
 				{
 					temp1 = temp->dup();
@@ -275,9 +276,9 @@ void RLL::handleDataMessage(cPacket *msg)
 			}
 			else if (clusterTable->getEntryByShrtAddr(ctrl->getSrcAddr())->getStage() == nCluStage)
 			{
-				//handle Message received from same stage (probably CS)
-				RLLAppMsg *temp1;
-				Ieee802154eNetworkCtrlInfo *ctrl1;
+//				//handle Message received from same stage (probably CS)
+				RLLAppMsg *temp1 = NULL;
+				Ieee802154eNetworkCtrlInfo *ctrl1 = NULL;
 				if (clusterTable->existLowerCH(nCluStage))
 				{
 					temp1 = temp->dup();
@@ -359,12 +360,21 @@ void RLL::handleDataMessage(cPacket *msg)
 void RLL::handleUpperMessage(cPacket *msg)
 {
 	RLLAppMsg *appPkt = check_and_cast<RLLAppMsg *>(msg);
-	if (bIsPANCoor)
-	{
-
-	}
-	else
-	{
+//	if (bIsPANCoor)
+//	{
+//		Ieee802154eNetworkCtrlInfo *cntr = new Ieee802154eNetworkCtrlInfo();
+//		if (!strcmp(appPkt->getDestName(), "Broadcast"))
+//		{
+//			cntr->setDstAddr(MACAddress::BROADCAST_ADDRESS.getInt());
+//			cntr->setTxCS(false);
+//		}
+//
+//		appPkt->setControlInfo(cntr);
+//
+//		send(appPkt, mLowerLayerOut);
+//	}
+//	else
+//	{
 		Ieee802154eNetworkCtrlInfo *cntr = new Ieee802154eNetworkCtrlInfo();
 		if (!strcmp(appPkt->getDestName(), "Broadcast"))
 		{
@@ -375,7 +385,8 @@ void RLL::handleUpperMessage(cPacket *msg)
 		appPkt->setControlInfo(cntr);
 
 		send(appPkt, mLowerLayerOut);
-	}
+//	}
+
 }
 
 bool RLL::handleLowerMessage(cMessage *msg)
@@ -589,7 +600,12 @@ void RLL::MLME_ASSOCIATE_response(cMessage *msg)
 
 void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 {
+
 	Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+
+
+	nChannel10 = tmp->getChannelOffset10();
+	nChannel11 = tmp->getChannelOffset11();
 	if (AssociateWaitTimer->isScheduled())
 		cancelEvent(AssociateWaitTimer);
 	if (AssociateTimer->isScheduled())
@@ -1551,7 +1567,7 @@ void RLL::setScheduleChStUn()
 	linkEntry = new macLinkTableEntry();
 	int tempOffset = 0;
 
-	while (tempOffset == 0)
+	while (tempOffset == 0 || tempOffset == nChannel10)
 	{
 		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
 
@@ -1578,7 +1594,7 @@ void RLL::setScheduleChStUn()
 	linkEntry = new macLinkTableEntry();
 	tempOffset = 0;
 
-	while (tempOffset == 0)
+	while (tempOffset == 0 || tempOffset == nChannel11)
 	{
 		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
 
@@ -1779,7 +1795,7 @@ void RLL::setScheduleChStZe()
 	linkEntry = new macLinkTableEntry();
 	int tempOffset = 0;
 
-	while (tempOffset == 0)
+	while (tempOffset == 0 || tempOffset == nChannel10)
 	{
 		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
 
@@ -1806,7 +1822,7 @@ void RLL::setScheduleChStZe()
 	linkEntry = new macLinkTableEntry();
 	tempOffset = 0;
 
-	while (tempOffset == 0)
+	while (tempOffset == 0 || tempOffset == nChannel11)
 	{
 		tempOffset = nCluStage % (numChannel + 1) + intuniform(0, 16);
 

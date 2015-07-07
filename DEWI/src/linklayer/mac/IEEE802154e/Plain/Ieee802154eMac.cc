@@ -18,8 +18,7 @@
 
 /**@author: 2014    Stefan Reis     (modified)
  * Default MAC PIB Attributes */
-MAC_PIB Ieee802154eMac::MPIB =
-{ MACAddress(0xffff)/*def_macExtendedAddress*/,
+MAC_PIB Ieee802154eMac::MPIB = { MACAddress(0xffff)/*def_macExtendedAddress*/,
 def_macAckWaitDuration,
 def_macAssociatedPANCoord,
 def_macAssociationPermit,
@@ -97,20 +96,16 @@ def_macEBAutoSA };
 
 /**@author: 2014    Stefan Reis
  * for the debug output */
-string Ieee802154eMac::frameTypeTxt[] =
-{ "unknown type", "Ieee802154e_BEACON", "Ieee802154e_DATA", "Ieee802154e_ACK", "Ieee802154e_CMD", "Ieee802154e_LLDN", "Ieee802154e_MULTI", "Ieee802154e_Asscociation", "Ieee802154e_Asscociation", "Ieee802154e_Scheduler", "Ieee802154e_Scheduler", "Ieee802154e_Disasscociation", "Ieee802154e_Disasscociation" };
+string Ieee802154eMac::frameTypeTxt[] = { "unknown type", "Ieee802154e_BEACON", "Ieee802154e_DATA", "Ieee802154e_ACK", "Ieee802154e_CMD", "Ieee802154e_LLDN", "Ieee802154e_MULTI", "Ieee802154e_Asscociation", "Ieee802154e_Asscociation", "Ieee802154e_Scheduler", "Ieee802154e_Scheduler", "Ieee802154e_Disasscociation", "Ieee802154e_Disasscociation" };
 
 /**@author: 2014    Stefan Reis
  * for the debug output */
-string Ieee802154eMac::stateTxt[] =
-{ "phy_BUSY", "phy_BUSY_RX", "phy_BUSY_TX", "phy_FORCE_TRX_OFF", "phy_IDLE", "phy_INVALID_PARAMETER", "phy_RX_ON", "phy_SUCCESS", "phy_TRX_OFF", "phy_TX_ON", "phy_UNSUPPORT_ATTRIBUTE", "phy_READ_ONLY" };
+string Ieee802154eMac::stateTxt[] = { "phy_BUSY", "phy_BUSY_RX", "phy_BUSY_TX", "phy_FORCE_TRX_OFF", "phy_IDLE", "phy_INVALID_PARAMETER", "phy_RX_ON", "phy_SUCCESS", "phy_TRX_OFF", "phy_TX_ON", "phy_UNSUPPORT_ATTRIBUTE", "phy_READ_ONLY" };
 
 /**@author: 2014    Stefan Reis
  * for the debug output */
-string Ieee802154eMac::paraTxt[] =
-{ "PHY_INVALID_PARAMETER", "PHY_CURRENT_CHANNEL", "PHY_CHANNELS_SUPPORTED", "PHY_TRANSMIT_POWER", "PHY_TX_POWER_TOLERANCE", "PHY_TX_POWER", "PHY_CCA_MODE", "PHY_CURRENT_PAGE", "PHY_MAX_FRAME_DURATION", "PHY_SHR_DURATION", "PHY_SYMBOLS_PER_OCTET", "PHY_PREAMBLE_SYMBOL_LENGTH", "PHY_UWB_DATA_RATES_SUPPORTED", "PHY_CSS_LOW_DATA_RATE_SUPPORTED", "PHY_UWB_COU_SUPPORTED", "PHY_UWB_CS_SUPPORTED",
-		"PHY_UWB_LCP_SUPPORTED", "PHY_UWB_CURRENT_PULSE_SHAPE", "PHY_UWB_COU_PULSE", "PHY_UWB_CS_PULSE", "PHY_UWB_LCP_WEIGHT_1", "PHY_UWB_LCP_WEIGHT_2", "PHY_UWB_LCP_WEIGHT_3", "PHY_UWB_LCP_WEIGHT_4", "PHY_UWB_LCP_DELAY_2", "PHY_UWB_LCP_DELAY_3", "PHY_UWB_LCP_DELAY_4", "PHY_RANGING", "PHY_RANGING_CRYSTAL_OFFSET", "PHY_RANGING_DPS", "PHY_CURRENT_CODE", "PHY_NATIVE_PRF",
-		"PHY_UWB_SCAN_BINS_PER_CHANNEL", "PHY_UWB_INSERTED_PREAMBLE_INTERVAL", "PHY_TX_RMARKER_OFFSET", "PHY_RX_RMARKER_OFFSET", "PHY_RFRAME_PROCESSING_TIME", "PHY_CCA_DURATION" };
+string Ieee802154eMac::paraTxt[] = { "PHY_INVALID_PARAMETER", "PHY_CURRENT_CHANNEL", "PHY_CHANNELS_SUPPORTED", "PHY_TRANSMIT_POWER", "PHY_TX_POWER_TOLERANCE", "PHY_TX_POWER", "PHY_CCA_MODE", "PHY_CURRENT_PAGE", "PHY_MAX_FRAME_DURATION", "PHY_SHR_DURATION", "PHY_SYMBOLS_PER_OCTET", "PHY_PREAMBLE_SYMBOL_LENGTH", "PHY_UWB_DATA_RATES_SUPPORTED", "PHY_CSS_LOW_DATA_RATE_SUPPORTED", "PHY_UWB_COU_SUPPORTED", "PHY_UWB_CS_SUPPORTED", "PHY_UWB_LCP_SUPPORTED", "PHY_UWB_CURRENT_PULSE_SHAPE",
+        "PHY_UWB_COU_PULSE", "PHY_UWB_CS_PULSE", "PHY_UWB_LCP_WEIGHT_1", "PHY_UWB_LCP_WEIGHT_2", "PHY_UWB_LCP_WEIGHT_3", "PHY_UWB_LCP_WEIGHT_4", "PHY_UWB_LCP_DELAY_2", "PHY_UWB_LCP_DELAY_3", "PHY_UWB_LCP_DELAY_4", "PHY_RANGING", "PHY_RANGING_CRYSTAL_OFFSET", "PHY_RANGING_DPS", "PHY_CURRENT_CODE", "PHY_NATIVE_PRF", "PHY_UWB_SCAN_BINS_PER_CHANNEL", "PHY_UWB_INSERTED_PREAMBLE_INTERVAL", "PHY_TX_RMARKER_OFFSET", "PHY_RX_RMARKER_OFFSET", "PHY_RFRAME_PROCESSING_TIME", "PHY_CCA_DURATION" };
 
 UINT_16 Ieee802154eMac::addrCount = 0;
 
@@ -185,16 +180,9 @@ Ieee802154eMac::~Ieee802154eMac()
 	cancelAndDelete(finalCAPTimer);
 	cancelAndDelete(gtsTimer);
 
-	// TSCH timer
-	if (asnTimer->isScheduled())
-		cancelAndDelete(asnTimer);
-	else
-		delete asnTimer;
+	cancelAndDelete(asnTimer);
 
-	if (tsCCAOffsetTimer->isScheduled())
-		cancelAndDelete(tsCCAOffsetTimer);
-	else
-		delete tsCCAOffsetTimer;
+	cancelAndDelete(tsCCAOffsetTimer);
 	cancelAndDelete(tsTxOffsetTimer);
 	cancelAndDelete(tsRxAckDelayTimer);
 	cancelAndDelete(tsAckWaitTimer);
@@ -222,6 +210,7 @@ InterfaceEntry * Ieee802154eMac::createInterfaceEntry()
 
 	e->setName(interfaceName);
 	delete[] interfaceName;
+	interfaceName = NULL;
 
 	// address
 	e->setMACAddress(macaddress);
@@ -709,6 +698,7 @@ void Ieee802154eMac::flushQueue()
 			//emit(dropPkIfaceDownSignal, msg); -- 'pkDropped' signals are missing in this module!
 
 			delete msg;
+			msg = NULL;
 		}
 		queueModule->clear(); // clear request count
 	}
@@ -769,67 +759,66 @@ void Ieee802154eMac::finish()
 
 	cancelEvent(backoffTimer);
 
-		/** @brief timer for locating backoff boundary before sending a CCA request */
-		cancelEvent(deferCCATimer);
+	/** @brief timer for locating backoff boundary before sending a CCA request */
+	cancelEvent(deferCCATimer);
 
-		/** @brief timer for tracking beacons */
-		cancelEvent(bcnRxTimer);
+	/** @brief timer for tracking beacons */
+	cancelEvent(bcnRxTimer);
 
-		/** @brief timer for transmitting beacon periodically */
-		cancelEvent(bcnTxTimer);
+	/** @brief timer for transmitting beacon periodically */
+	cancelEvent(bcnTxTimer);
 
-		/** @brief timer for timer for ACK timeout */
-		cancelEvent(ackTimeoutTimer);
+	/** @brief timer for timer for ACK timeout */
+	cancelEvent(ackTimeoutTimer);
 
-		/** @brief timer for locating backoff boundary before txing ACK if beacon-enabled */
-		cancelEvent(txAckBoundTimer);
+	/** @brief timer for locating backoff boundary before txing ACK if beacon-enabled */
+	cancelEvent(txAckBoundTimer);
 
-		/** @brief timer for locating backoff boundary before txing Cmd or data if beacon-enabled */
-		cancelEvent(txCmdDataBoundTimer);
+	/** @brief timer for locating backoff boundary before txing Cmd or data if beacon-enabled */
+	cancelEvent(txCmdDataBoundTimer);
 
-		/** @brief timer for delay of IFS after receiving a data or cmd pkt */
-		cancelEvent(ifsTimer);
+	/** @brief timer for delay of IFS after receiving a data or cmd pkt */
+	cancelEvent(ifsTimer);
 
-		/** @brief timer for indicating being in the active period of outgoing (txing) superframe */
-		cancelEvent(txSDTimer);
+	/** @brief timer for indicating being in the active period of outgoing (txing) superframe */
+	cancelEvent(txSDTimer);
 
-		/** @brief timer for indicating being in the active period of incoming (rxed) superframe */
-		cancelEvent(rxSDTimer);
+	/** @brief timer for indicating being in the active period of incoming (rxed) superframe */
+	cancelEvent(rxSDTimer);
 
-		/** @brief timer for indicating the end of CAP and the starting of CFP
-		 used only by devices to put radio into sleep at the end of CAP if my GTS is not the first one in the CFP */
-		cancelEvent(finalCAPTimer);
+	/** @brief timer for indicating the end of CAP and the starting of CFP
+	 used only by devices to put radio into sleep at the end of CAP if my GTS is not the first one in the CFP */
+	cancelEvent(finalCAPTimer);
 
-		/** @brief timer for scheduling of GTS, shared by both PAN coordinator and devices */
-		cancelEvent(gtsTimer);
+	/** @brief timer for scheduling of GTS, shared by both PAN coordinator and devices */
+	cancelEvent(gtsTimer);
 
-		/** @brief timer for scheduling of the ASN, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(asnTimer);
+	/** @brief timer for scheduling of the ASN, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(asnTimer);
 
-		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsCCAOffsetTimer);
+	/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsCCAOffsetTimer);
 
-		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsTxOffsetTimer);
+	/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsTxOffsetTimer);
 
-		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsRxAckDelayTimer);
+	/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsRxAckDelayTimer);
 
-		/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsAckWaitTimer);
+	/** @brief timer for scheduling of the transmission, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsAckWaitTimer);
 
-		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsRxOffsetTimer);
+	/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsRxOffsetTimer);
 
-		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsRxWaitTimer);
+	/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsRxWaitTimer);
 
-		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
-		cancelEvent(tsTxAckDelayTimer);
+	/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+	cancelEvent(tsTxAckDelayTimer);
 
-		/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
-		//cancelEvent(tsMaxAckTimer);
-
+	/** @brief timer for scheduling of the receiving, for the TSCH Std 802.15.4e-2012 */
+	//cancelEvent(tsMaxAckTimer);
 }
 
 /**@author: 2014    Stefan Reis     (modified) */
@@ -841,68 +830,68 @@ void Ieee802154eMac::receiveChangeNotification(int category, const cPolymorphic 
 
 	switch (category)
 	{
-	if (check_and_cast<RadioState *>(details)->getRadioId() != getRadioModuleId())
-		return;
+		if (check_and_cast<RadioState *>(details)->getRadioId() != getRadioModuleId())
+			return;
 
-case NF_RADIO_CHANNEL_CHANGED:
-	ppib.phyCurrentChannel = check_and_cast<RadioState *>(details)->getChannelNumber();
-	bitrate = getRate('b');
-	phy_bitrate = bitrate;
-	phy_symbolrate = getRate('s');
-	bPeriod = aUnitBackoffPeriod / phy_symbolrate;
-	break;
-case NF_RADIOSTATE_CHANGED:
-	radioState = check_and_cast<RadioState *>(details)->getState();
+	case NF_RADIO_CHANNEL_CHANGED:
+		ppib.phyCurrentChannel = check_and_cast<RadioState *>(details)->getChannelNumber();
+		bitrate = getRate('b');
+		phy_bitrate = bitrate;
+		phy_symbolrate = getRate('s');
+		bPeriod = aUnitBackoffPeriod / phy_symbolrate;
+		break;
+	case NF_RADIOSTATE_CHANGED:
+		radioState = check_and_cast<RadioState *>(details)->getState();
 
-	// for TSCH CCA -  cancel the TsWaitTimer
-	if (radioState == RadioState::RECV && mpib.macTSCHenabled)
-	{
-		if (taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) == 9)
+		// for TSCH CCA -  cancel the TsWaitTimer
+		if (radioState == RadioState::RECV && mpib.macTSCHenabled)
 		{
-			taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 10;
-			EV << "[TSCH CCA]-Transmitter:[10] start to receive a frame before TsAckWaitTimer timeout, cancel timeout timer" << endl;
+			if (taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) == 9)
+			{
+				taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 10;
+				EV << "[TSCH CCA]-Transmitter:[10] start to receive a frame before TsAckWaitTimer timeout, cancel timeout timer" << endl;
 
-			if (tsAckWaitTimer->isScheduled())
-				cancelEvent(tsAckWaitTimer);
-			/* two possible next steps:
-			 * 1. receiveChangeNotification() (failed of the receiving of the ACK pkt)
-			 * 2. handleLowerMsg() (successful receive a pkt) */
-		}
-		else if (taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) == 4)
-		{
-			taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) = 5;
-			EV << "[TSCH CCA]-Receiver:[5] start to receive a frame before TsRxWaitTimer timeout, cancel timeout timer" << endl;
+				if (tsAckWaitTimer->isScheduled())
+					cancelEvent(tsAckWaitTimer);
+				/* two possible next steps:
+				 * 1. receiveChangeNotification() (failed of the receiving of the ACK pkt)
+				 * 2. handleLowerMsg() (successful receive a pkt) */
+			}
+			else if (taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) == 4)
+			{
+				taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) = 5;
+				EV << "[TSCH CCA]-Receiver:[5] start to receive a frame before TsRxWaitTimer timeout, cancel timeout timer" << endl;
 
-			if (tsRxWaitTimer->isScheduled())
-				cancelEvent(tsRxWaitTimer);
-			/* two possible next steps:
-			 * 1. receiveChangeNotification() (failed of the receiving of the ACK pkt)
-			 * 2. handleLowerMsg() (successful receive a pkt) */
+				if (tsRxWaitTimer->isScheduled())
+					cancelEvent(tsRxWaitTimer);
+				/* two possible next steps:
+				 * 1. receiveChangeNotification() (failed of the receiving of the ACK pkt)
+				 * 2. handleLowerMsg() (successful receive a pkt) */
+			}
 		}
-	}
-	break;
-case NF_PHY_PKT_DISCARDED:     // a frame is discarded at the PHY layer
-	if (mpib.macTSCHenabled)
-	{ // we need this, to detect that the PHY layer finished the receiving of a frame
-		if (taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) == 10)
-		{
-			taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 11;
-			EV << "[TSCH CCA]-Transmitter:[11] frame was dropped at the PHY layer" << endl;
-			handleTsAckWait();
-			// next step in handleTsAckWait()
+		break;
+	case NF_PHY_PKT_DISCARDED:     // a frame is discarded at the PHY layer
+		if (mpib.macTSCHenabled)
+		{ // we need this, to detect that the PHY layer finished the receiving of a frame
+			if (taskP.taskStatus(TP_TS_TX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) == 10)
+			{
+				taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 11;
+				EV << "[TSCH CCA]-Transmitter:[11] frame was dropped at the PHY layer" << endl;
+				handleTsAckWait();
+				// next step in handleTsAckWait()
+			}
+			else if (taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) == 5)
+			{
+				taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) = 6;
+				EV << "[TSCH CCA]-Receiver:[6] frame was dropped at the PHY layer" << endl;
+				handleTsRxWait();
+				// next step in handleTsRxWait()
+			}
 		}
-		else if (taskP.taskStatus(TP_TS_RX_CCA_TSCHCCA) && taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) == 5)
-		{
-			taskP.taskStep(TP_TS_RX_CCA_TSCHCCA) = 6;
-			EV << "[TSCH CCA]-Receiver:[6] frame was dropped at the PHY layer" << endl;
-			handleTsRxWait();
-			// next step in handleTsRxWait()
-		}
-	}
-	break;
+		break;
 
-default:
-	break;
+	default:
+		break;
 	}
 }
 
@@ -1002,80 +991,90 @@ bool Ieee802154eMac::handlePrimitive(int msgkind, cMessage *msg) // for MLME-SAP
 	Ieee802154eNetworkCtrlInfo *primitive = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
 	switch (msgkind)
 	{
-	case TP_MCPS_DATA_REQUEST:
-		EV << "[MAC]: this is a MCPS_DATA_REQUEST" << endl;
+		case TP_MCPS_DATA_REQUEST:
+			EV << "[MAC]: this is a MCPS_DATA_REQUEST" << endl;
 //        handle_MCPS_DATA_request(primitive->getPsduLength(), encapsulatePacket(msg));
-		break;
+			break;
 
-	case TP_MCPS_PURGE_REQUEST:
-		EV << "[MAC]: this is a MCPS_PURGE_REQUEST" << endl;
+		case TP_MCPS_PURGE_REQUEST:
+			EV << "[MAC]: this is a MCPS_PURGE_REQUEST" << endl;
 //        handle_MCPS_PURGE_request(UINT_8 channelNumber, UINT_8 channelPage, Ieee802154eAddrMode coordAddrMode,
 //                UINT_16 coordPANId, IE3ADDR coordAddress, UINT_8 capabilityInformation,
 //                UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex,
 //                UINT_64 lowLatencyNetworkInfo, UINT_16 channelOffset, UINT_8 hoppingSequenceID);
-		delete primitive;
-		break;
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_GET_REQUEST:
-		EV << "[MAC]: this is a MLME_GET_REQUEST" << endl;
-		handle_MLME_GET_request((MACPIBenum) primitive->getPibAttribute());
-		delete primitive;
-		break;
+		case TP_MLME_GET_REQUEST:
+			EV << "[MAC]: this is a MLME_GET_REQUEST" << endl;
+			handle_MLME_GET_request((MACPIBenum) primitive->getPibAttribute());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_GTS_REQUEST:
-		EV << "[MAC]: this is a MLME_GTS_REQUEST" << endl;
-		handle_MLME_GTS_request(primitive->getGtsCharacteristic(), primitive->getSecurityLevel(), primitive->getKeyIdMode(), primitive->getKeySource(), primitive->getKeyIndex());
-		delete primitive;
-		break;
+		case TP_MLME_GTS_REQUEST:
+			EV << "[MAC]: this is a MLME_GTS_REQUEST" << endl;
+			handle_MLME_GTS_request(primitive->getGtsCharacteristic(), primitive->getSecurityLevel(), primitive->getKeyIdMode(), primitive->getKeySource(), primitive->getKeyIndex());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_RESET_REQUEST:
-		EV << "[MAC]: this is a MLME_RESET_REQUEST" << endl;
-		handle_MLME_RESET_request(primitive->getSetDefaultPIB());
-		delete primitive;
-		break;
+		case TP_MLME_RESET_REQUEST:
+			EV << "[MAC]: this is a MLME_RESET_REQUEST" << endl;
+			handle_MLME_RESET_request(primitive->getSetDefaultPIB());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_RX_ENABLE_REQUEST:
-		EV << "[MAC]: this is a MLME_RX_ENABLE_REQUEST" << endl;
-		handle_MLME_RX_ENABLE_request(primitive->getDeferPermit(), primitive->getRxOnTime(), primitive->getRxOnDuration(), (RangingControl) primitive->getRangingRxControl());
-		delete primitive;
-		break;
+		case TP_MLME_RX_ENABLE_REQUEST:
+			EV << "[MAC]: this is a MLME_RX_ENABLE_REQUEST" << endl;
+			handle_MLME_RX_ENABLE_request(primitive->getDeferPermit(), primitive->getRxOnTime(), primitive->getRxOnDuration(), (RangingControl) primitive->getRangingRxControl());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_SYNC_REQUEST:
-		EV << "[MAC]: this is a MLME_SYNC_REQUEST" << endl;
-		handle_MLME_SYNC_request(primitive->getChannelNumber(), primitive->getChannelPage(), primitive->getTrackBeacon());
-		delete primitive;
-		break;
+		case TP_MLME_SYNC_REQUEST:
+			EV << "[MAC]: this is a MLME_SYNC_REQUEST" << endl;
+			handle_MLME_SYNC_request(primitive->getChannelNumber(), primitive->getChannelPage(), primitive->getTrackBeacon());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_POLL_REQUEST:
-		EV << "[MAC]: this is a MLME_POLL_REQUEST" << endl;
-		handle_MLME_POLL_request((Ieee802154eAddrMode) primitive->getCoordAddrMode(), primitive->getCoordPANId(), (IE3ADDR) primitive->getCoordAddress(), primitive->getSecurityLevel(), primitive->getKeyIdMode(), primitive->getKeySource(), primitive->getKeyIndex());
-		delete primitive;
-		break;
+		case TP_MLME_POLL_REQUEST:
+			EV << "[MAC]: this is a MLME_POLL_REQUEST" << endl;
+			handle_MLME_POLL_request((Ieee802154eAddrMode) primitive->getCoordAddrMode(), primitive->getCoordPANId(), (IE3ADDR) primitive->getCoordAddress(), primitive->getSecurityLevel(), primitive->getKeyIdMode(), primitive->getKeySource(), primitive->getKeyIndex());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_DPS_REQUEST:
-		EV << "[MAC]: this is a MLME_DPS_REQUEST" << endl;
-		handle_MLME_DPS_request(primitive->getTxDPSIndex(), primitive->getRxDPSIndex(), primitive->getDpsIndexDuration());
-		delete primitive;
-		break;
+		case TP_MLME_DPS_REQUEST:
+			EV << "[MAC]: this is a MLME_DPS_REQUEST" << endl;
+			handle_MLME_DPS_request(primitive->getTxDPSIndex(), primitive->getRxDPSIndex(), primitive->getDpsIndexDuration());
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_SOUNDING_REQUEST:
-		EV << "[MAC]: this is a MLME_SOUNDING_REQUEST" << endl;
-		handle_MLME_SOUNDING_request();
-		delete primitive;
-		break;
+		case TP_MLME_SOUNDING_REQUEST:
+			EV << "[MAC]: this is a MLME_SOUNDING_REQUEST" << endl;
+			handle_MLME_SOUNDING_request();
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	case TP_MLME_CALIBRATE_REQUEST:
-		EV << "[MAC]: this is a MLME_CALIBRATE_REQUEST - Note: UWB is not supported" << endl;
-		// handle_MLME_CALIBRATE_requeste(...); // UWB actually not supported
-		delete primitive;
-		break;
+		case TP_MLME_CALIBRATE_REQUEST:
+			EV << "[MAC]: this is a MLME_CALIBRATE_REQUEST - Note: UWB is not supported" << endl;
+			// handle_MLME_CALIBRATE_requeste(...); // UWB actually not supported
+			delete primitive;
+			primitive = NULL;
+			break;
 
-	default:
-		if (ev.isGUI())
-			EV << "[MAC]: unknown primitive received (msgkind=%d)" << msgkind;
-		//delete primitive;
-		return false;
-		break;
+		default:
+			if (ev.isGUI())
+				EV << "[MAC]: unknown primitive received (msgkind=%d)" << msgkind;
+			//delete primitive;
+			return false;
+			break;
 	}
 	return true;
 }
@@ -1119,6 +1118,7 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 		EV << "[MAC]: an " << msg->getName() << " (#" << numUpperPkt << ") received from the upper layer, but drop it due to busy MAC" << endl;
 		MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_TRANSACTION_EXPIRED, 0, 0, msg);
 		delete msg;
+		msg = NULL;
 		numUpperPktLost++;
 		reqtMsgFromIFq();
 		return;
@@ -1130,6 +1130,7 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 		EV << "[MAC]: an " << msg->getName() <<" (#" << numUpperPkt << ") received from the upper layer, but drop it due to oversize" << endl;
 		MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, msg);
 		delete msg;
+		msg = NULL;
 		numUpperPktLost++;
 		reqtMsgFromIFq();
 		return;
@@ -1157,7 +1158,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 				EV << "[MAC]: an " << msg->getName() << " destined for the coordinator received from the upper layer, but drop it due to being not associated with any coordinator yet" << endl;
 				MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_ADDRESS, 0, 0, msg);
 				delete msg;
+				msg = NULL;
 				delete cInfo;
+				cInfo = NULL;
 				numUpperPktLost++;
 				reqtMsgFromIFq();
 				return;
@@ -1171,7 +1174,10 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 					EV << "[MAC]: an " << msg->getName() << " requesting GTS transmission destined for the PAN Coordinator received from the upper layer, but drop it due to no transmit GTS allocated by the PAN coordinator yet" << endl;
 					MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_GTS, 0, 0, msg);
 					delete msg;
+
+					msg = NULL;
 					delete cInfo;
+					cInfo = NULL;
 					numUpperPktLost++;
 					reqtMsgFromIFq();
 					return;
@@ -1204,7 +1210,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 					EV << "[MAC]: an " << msg->getName() << " destined for the device with MAC address " << destAddr << " received from the upper layer, but drop it due to no device with this address found in my device list" << endl;
 					MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_ADDRESS, 0, 0, msg);
 					delete msg;
+					msg = NULL;
 					delete cInfo;
+					cInfo = NULL;
 					numUpperPktLost++;
 					reqtMsgFromIFq();
 					return;
@@ -1235,7 +1243,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 						EV << "[MAC]: an " << msg->getName() << " requesting GTS transmission destined for the device received from the upper layer, but drop it due to no valid GTS for this device found in my GTS list" << endl;
 						MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_GTS, 0, 0, msg);
 						delete msg;
+						msg = NULL;
 						delete cInfo;
+						cInfo = NULL;
 						numUpperPktLost++;
 						reqtMsgFromIFq();
 						return;
@@ -1274,7 +1284,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 				EV << "[MAC]: an " << msg->getName() << " destined for the coordinator received from the upper layer, but drop it due to being not associated with any coordinator yet" << endl;
 				MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_ADDRESS, 0, 0, msg);
 				delete msg;
+				msg = NULL;
 				delete cInfo;
+				cInfo = NULL;
 				numUpperPktLost++;
 				reqtMsgFromIFq();
 				return;
@@ -1290,7 +1302,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 					EV << "[MAC]: an " << msg->getName() << " requesting GTS transmission destined for the PAN Coordinator received from the upper layer, but drop it due to no transmit GTS allocated by the PAN coordinator yet" << endl;
 					MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_GTS, 0, 0, msg);
 					delete msg;
+					msg = NULL;
 					delete cInfo;
+					cInfo = NULL;
 					numUpperPktLost++;
 					reqtMsgFromIFq();
 					return;
@@ -1332,7 +1346,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 				MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_ADDRESS, 0, 0, msg);
 
 				delete msg;
+				msg = NULL;
 				delete cInfo;
+				cInfo = NULL;
 				numUpperPktLost++;
 				reqtMsgFromIFq();
 				return;
@@ -1366,7 +1382,9 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 					EV << "[MAC]: an " << msg->getName() << " requesting GTS transmission destined for the device received from the upper layer, but drop it due to no valid GTS for this device found in my GTS list" << endl;
 					MCPS_DATA_confirm(0, msg->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_INVALID_GTS, 0, 0, msg);
 					delete msg;
+					msg = NULL;
 					delete cInfo;
+					cInfo = NULL;
 					numUpperPktLost++;
 					reqtMsgFromIFq();
 					return;
@@ -1375,6 +1393,7 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 		}
 	}
 	delete controlInfo;
+	controlInfo = NULL;
 
 	EV << "[MAC]: an " << msg->getName() << " (#" << numUpperPkt << ", " << PK(msg)->getByteLength() << " Bytes, destined for MAC address " << destAddr << ", transfer mode " << dataTransMode << ") received from the upper layer" << endl;
 
@@ -1407,8 +1426,7 @@ void Ieee802154eMac::handleUpperMsg(cPacket* msg) // MCPS-SAP
 
 	MCPS_DATA_request((Ieee802154eAddrMode) srcAddrMode, (Ieee802154eAddrMode) (destAddr.getFlagEui64() ?
 	defFrmCtrl_AddrMode64 :
-																											defFrmCtrl_AddrMode16), destPanId, destAddr, (UINT_8) msg->getByteLength(), msg, mpib.macDSN++/*msduHandle */, ackTX, gtsTX, indirectTX, secuData/*securityLevel*/, 0/*keyIdMode*/, 0/*keySource*/, 0/*keyIndex*/, UWBPRF_PRF_OFF, RANGING_OFF, 0/*uwbPreambleSymbolRepetitions,*/, 0/*dataRate*/,
-			frameControlOptions, headerIElist, payloadIElist, false /*sendMultipurpose*/);
+	defFrmCtrl_AddrMode16), destPanId, destAddr, (UINT_8) msg->getByteLength(), msg, mpib.macDSN++/*msduHandle */, ackTX, gtsTX, indirectTX, secuData/*securityLevel*/, 0/*keyIdMode*/, 0/*keySource*/, 0/*keyIndex*/, UWBPRF_PRF_OFF, RANGING_OFF, 0/*uwbPreambleSymbolRepetitions,*/, 0/*dataRate*/, frameControlOptions, headerIElist, payloadIElist, false /*sendMultipurpose*/);
 }
 
 /**@author: 2014    Stefan Reis     (modified) */
@@ -1423,6 +1441,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 	{
 		EV << "[MAC]: message from physical layer (" << msg->getClassName() << ")" << msg->getName() << " is not a subclass of Ieee802154eFrame, drop it" << endl;
 		delete frame;
+		frame = NULL;
 		return;
 	}
 
@@ -1438,6 +1457,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 	{
 		EV << "The received frame is filtered, drop frame" << endl;
 		delete frame;
+		frame = NULL;
 		// reset the TSCH task if the pkt was dropped
 		if (mpib.macTSCHenabled)
 		{
@@ -1506,6 +1526,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 					constructACK(frame);
 				else
 				{
+					delete txAck;
 					txAck = NULL;
 
 				}
@@ -1525,7 +1546,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 				}
 				else
 				{    // old version [SR]
-					 //stop CSMA-CA if it is pending (it will be restored after the transmission of ACK)
+				     //stop CSMA-CA if it is pending (it will be restored after the transmission of ACK)
 					if (backoffStatus == 99)
 					{
 						EV << "[MAC]: CSMA-CA is pending, stop it, it will resume after sending ACK" << endl;
@@ -1571,6 +1592,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 		{
 			EV << "[MAC]: the received CMD frame is dropped, because MAC is currently processing a MAC CMD" << endl;
 			delete frame;
+			frame = NULL;
 			return;
 		}
 	}
@@ -1582,6 +1604,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 		{
 			EV << "[MAC]: the received DATA frame is dropped, because MAC is currently processing the last received DATA frame" << endl;
 			delete frame;
+			frame = NULL;
 			return;
 		}
 	}
@@ -1600,6 +1623,7 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 	{
 		EV << "[MAC]: duplication detected, drop frame" << endl;
 		delete frame;
+		frame = NULL;
 
 		if (frmType == Ieee802154e_DATA && mpib.macMetricsEnabled)
 			mpib.macDuplicateFrameCount++;
@@ -1609,60 +1633,63 @@ void Ieee802154eMac::handleLowerMsg(cPacket* msg) // PD_SAP
 
 	switch (frmType)
 	{
-	case Ieee802154e_BEACON:
-		EV << "[MAC]: continue to process received BEACON pkt" << endl;
-		handleBeacon(frame);
-		break;
+		case Ieee802154e_BEACON:
+			EV << "[MAC]: continue to process received BEACON pkt" << endl;
+			handleBeacon(frame);
+			break;
 
-	case Ieee802154e_DATA:
-		EV << "[MAC]: continue to process received DATA pkt" << endl;
-		handleData(frame);
-		break;
+		case Ieee802154e_DATA:
+			EV << "[MAC]: continue to process received DATA pkt" << endl;
+			handleData(frame);
+			break;
 
-	case Ieee802154e_ACK:
-		EV << "[MAC]: continue to process received ACK pkt" << endl;
-		handleAck(frame);
-		break;
+		case Ieee802154e_ACK:
+			EV << "[MAC]: continue to process received ACK pkt" << endl;
+			handleAck(frame);
+			break;
 
 //	case Ieee802154e_CMD:
 //	    EV << "[MAC]: continue to process received CMD pkt" << endl;
 //	    handleCommand80215(frame);
 //	    break;
 
-	case Ieee802154e_LLDN:  // LLDN (Low Latency Deterministic Network)
-		EV << "[MAC]: continue to process received LLDN pkt" << endl;
-		handleLLDN802154e(frame);
-		break;
+		case Ieee802154e_LLDN:  // LLDN (Low Latency Deterministic Network)
+			EV << "[MAC]: continue to process received LLDN pkt" << endl;
+			handleLLDN802154e(frame);
+			break;
 
-	case Ieee802154e_MULTI:  // Multipurpose
-		EV << "[MAC]: continue to process received Multipurpose pkt" << endl;
-		handleMulti802154e(frame);
-		break;
+		case Ieee802154e_MULTI:  // Multipurpose
+			EV << "[MAC]: continue to process received Multipurpose pkt" << endl;
+			handleMulti802154e(frame);
+			break;
 
-	case Ieee802154e_ASSOCIATION_REQUEST:
-		EV << "[MAC} continue to proxess received association request pkt" << endl;
-		MLME_ASSOCIATE_indication(frame);
-		break;
-	case Ieee802154e_ASSOCIATION_RESPONSE:
-		EV << "[MAC} continue to process received association response pkt" << endl;
-		MLME_ASSOCIATE_confirm(frame->dup());
-		delete frame;
-		break;
-	case Ieee802154e_DISASSOCIATION_REQUEST:
-		EV << "[MAC} continue to process received association response pkt" << endl;
-		MLME_DISASSOCIATE_indication(frame->dup());
-		delete frame;
-		break;
+		case Ieee802154e_ASSOCIATION_REQUEST:
+			EV << "[MAC} continue to proxess received association request pkt" << endl;
+			MLME_ASSOCIATE_indication(frame);
+			break;
+		case Ieee802154e_ASSOCIATION_RESPONSE:
+			EV << "[MAC} continue to process received association response pkt" << endl;
+			MLME_ASSOCIATE_confirm(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
+		case Ieee802154e_DISASSOCIATION_REQUEST:
+			EV << "[MAC} continue to process received association response pkt" << endl;
+			MLME_DISASSOCIATE_indication(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
 
-	case Ieee802154e_DISASSOCIATION_RESPONSE:
-		EV << "[MAC} continue to process received association response pkt" << endl;
-		MLME_DISASSOCIATE_confirm(frame->dup());
-		delete frame;
-		break;
+		case Ieee802154e_DISASSOCIATION_RESPONSE:
+			EV << "[MAC} continue to process received association response pkt" << endl;
+			MLME_DISASSOCIATE_confirm(frame->dup());
+			delete frame;
+			frame = NULL;
+			break;
 
-	default:
-		error("[MAC]: undefined MAC frame type: %d", frmType);
-		break;
+		default:
+			error("[MAC]: undefined MAC frame type: %d", frmType);
+			break;
 	}
 }
 
@@ -1670,91 +1697,92 @@ void Ieee802154eMac::handleSelfMsg(cMessage* msg)
 {
 	switch (msg->getKind())
 	{
-	case START_PAN_COOR_TIMER:
-		startPANCoor();
-		delete msg;     // it's a dynamic timer
-		break;
+		case START_PAN_COOR_TIMER:
+			startPANCoor();
+			delete msg;     // it's a dynamic timer
+			msg = NULL;
+			break;
 
-	case MAC_BACKOFF_TIMER:
-		handleBackoffTimer();
-		break;
+		case MAC_BACKOFF_TIMER:
+			handleBackoffTimer();
+			break;
 
-	case MAC_DEFER_CCA_TIMER:
-		handleDeferCCATimer();
-		break;
+		case MAC_DEFER_CCA_TIMER:
+			handleDeferCCATimer();
+			break;
 
-	case MAC_BCN_RX_TIMER:
-		handleBcnRxTimer();
-		break;
+		case MAC_BCN_RX_TIMER:
+			handleBcnRxTimer();
+			break;
 
-	case MAC_BCN_TX_TIMER:
-		handleBcnTxTimer();
-		break;
+		case MAC_BCN_TX_TIMER:
+			handleBcnTxTimer();
+			break;
 
-	case MAC_ACK_TIMEOUT_TIMER:
-		handleAckTimeoutTimer();
-		break;
+		case MAC_ACK_TIMEOUT_TIMER:
+			handleAckTimeoutTimer();
+			break;
 
-	case MAC_TX_ACK_BOUND_TIMER:
-		handleTxAckBoundTimer();
-		break;
+		case MAC_TX_ACK_BOUND_TIMER:
+			handleTxAckBoundTimer();
+			break;
 
-	case MAC_TX_CMD_DATA_BOUND_TIMER:
-		handleTxCmdDataBoundTimer();
-		break;
+		case MAC_TX_CMD_DATA_BOUND_TIMER:
+			handleTxCmdDataBoundTimer();
+			break;
 
-	case MAC_IFS_TIMER:
-		handleIfsTimer();
-		break;
+		case MAC_IFS_TIMER:
+			handleIfsTimer();
+			break;
 
-	case MAC_TX_SD_TIMER:
-	case MAC_RX_SD_TIMER:
-		handleSDTimer();
-		break;
+		case MAC_TX_SD_TIMER:
+		case MAC_RX_SD_TIMER:
+			handleSDTimer();
+			break;
 
-	case MAC_FINAL_CAP_TIMER:
-		handleFinalCapTimer();
-		break;
+		case MAC_FINAL_CAP_TIMER:
+			handleFinalCapTimer();
+			break;
 
-	case MAC_GTS_TIMER:
-		handleGtsTimer();
-		break;
+		case MAC_GTS_TIMER:
+			handleGtsTimer();
+			break;
 
-	case MAC_ASN_TIMER:
-		handleAsnTimer();
-		break;
+		case MAC_ASN_TIMER:
+			handleAsnTimer();
+			break;
 
-	case MAC_TS_CCA_OFFSET_TIMER:
-		handleTsCCAOffset();
-		break;
+		case MAC_TS_CCA_OFFSET_TIMER:
+			handleTsCCAOffset();
+			break;
 
-	case MAC_TS_TX_OFFSET_TIMER:
-		handleTsTxOffset();
-		break;
+		case MAC_TS_TX_OFFSET_TIMER:
+			handleTsTxOffset();
+			break;
 
-	case MAC_TS_RX_ACK_DELAY_TIMER:
-		handleTsRxAckDelay();
-		break;
+		case MAC_TS_RX_ACK_DELAY_TIMER:
+			handleTsRxAckDelay();
+			break;
 
-	case MAC_TS_ACK_WAIT_TIMER:
-		handleTsAckWait();
-		break;
+		case MAC_TS_ACK_WAIT_TIMER:
+			handleTsAckWait();
+			break;
 
-	case MAC_TS_RX_OFFSET_TIMER:
-		handleTsRxOffset();
-		break;
+		case MAC_TS_RX_OFFSET_TIMER:
+			handleTsRxOffset();
+			break;
 
-	case MAC_TS_RX_WAIT_TIMER:
-		handleTsRxWait();
-		break;
+		case MAC_TS_RX_WAIT_TIMER:
+			handleTsRxWait();
+			break;
 
-	case MAC_TS_TX_ACK_DELAY_TIMER:
-		handleTsTxAckDelay();
-		break;
+		case MAC_TS_TX_ACK_DELAY_TIMER:
+			handleTsTxAckDelay();
+			break;
 
-	default:
-		error("[MAC]: unknown MAC timer type!");
-		break;
+		default:
+			error("[MAC]: unknown MAC timer type!");
+			break;
 	}
 }
 
@@ -1825,6 +1853,7 @@ void Ieee802154eMac::handleBeacon(Ieee802154eFrame* frame)
 				tmp->setKind(TP_MLME_BEACON_NOTIFY_INDICATION);
 				MLME_BEACON_NOTIFY_indication(tmp->dup());
 				delete tmp;
+				tmp = NULL;
 			}
 		}
 
@@ -1853,6 +1882,7 @@ void Ieee802154eMac::handleEB(cMessage *msg)
 	else
 	{
 		delete msg;
+		msg = NULL;
 		duration = calDuration(rxBeacon);
 		bcnRxTime = now - duration;
 	}
@@ -1963,8 +1993,8 @@ void Ieee802154eMac::handleData(Ieee802154eFrame* frame)
 		ASSERT(rxData == NULL);
 		rxData = frame;
 
-		MCPS_DATA_indication((Ieee802154eAddrMode) rxData->getFrmCtrl().srcAddrMode, rxData->getSrcPanId(), rxData->getSrcAddr(), (Ieee802154eAddrMode) rxData->getFrmCtrl().dstAddrMode, rxData->getDstPanId(), rxData->getDstAddr(), rxData->getByteLength(), rxData, 0 /*mpduLinkQuality*/, rxData->getSeqNmbr(), (UINT_32) rxData->getTimestamp().raw(), rxData->getAuxSecHd().secLvl,
-				rxData->getAuxSecHd().keyIdentMode, rxData->getAuxSecHd().keySource, rxData->getAuxSecHd().keyIndex, 0 /*uwbPRF*/, (Ieee802154eUWBFType) 0 /*uwbPreambleSymbolRepetitions*/, 0 /*dataRate*/, (RangingControl) 0 /*rangingReceived*/, 0 /*rangingCounterStart*/, 0 /*rangingCounterStop*/, 0 /*rangingTrackingInterval*/, 0 /*rangingOffset*/, 0 /*rangingFOM*/);
+		MCPS_DATA_indication((Ieee802154eAddrMode) rxData->getFrmCtrl().srcAddrMode, rxData->getSrcPanId(), rxData->getSrcAddr(), (Ieee802154eAddrMode) rxData->getFrmCtrl().dstAddrMode, rxData->getDstPanId(), rxData->getDstAddr(), rxData->getByteLength(), rxData, 0 /*mpduLinkQuality*/, rxData->getSeqNmbr(), (UINT_32) rxData->getTimestamp().raw(), rxData->getAuxSecHd().secLvl, rxData->getAuxSecHd().keyIdentMode, rxData->getAuxSecHd().keySource, rxData->getAuxSecHd().keyIndex, 0 /*uwbPRF*/,
+		        (Ieee802154eUWBFType) 0 /*uwbPreambleSymbolRepetitions*/, 0 /*dataRate*/, (RangingControl) 0 /*rangingReceived*/, 0 /*rangingCounterStart*/, 0 /*rangingCounterStop*/, 0 /*rangingTrackingInterval*/, 0 /*rangingOffset*/, 0 /*rangingFOM*/);
 
 		rxData = NULL;
 	}
@@ -1976,14 +2006,15 @@ void Ieee802154eMac::handleData(Ieee802154eFrame* frame)
 			ASSERT(rxData == NULL);
 			rxData = frame;
 
-			MCPS_DATA_indication((Ieee802154eAddrMode) rxData->getFrmCtrl().srcAddrMode, rxData->getSrcPanId(), rxData->getSrcAddr(), (Ieee802154eAddrMode) rxData->getFrmCtrl().dstAddrMode, rxData->getDstPanId(), rxData->getDstAddr(), rxData->getByteLength(), rxData, 0 /*mpduLinkQuality*/, rxData->getSeqNmbr(), (UINT_32) rxData->getTimestamp().raw(), rxData->getAuxSecHd().secLvl,
-					rxData->getAuxSecHd().keyIdentMode, rxData->getAuxSecHd().keySource, rxData->getAuxSecHd().keyIndex, 0 /*uwbPRF*/, (Ieee802154eUWBFType) 0 /*uwbPreambleSymbolRepetitions*/, 0 /*dataRate*/, (RangingControl) 0 /*rangingReceived*/, 0 /*rangingCounterStart*/, 0 /*rangingCounterStop*/, 0 /*rangingTrackingInterval*/, 0 /*rangingOffset*/, 0 /*rangingFOM*/);
+			MCPS_DATA_indication((Ieee802154eAddrMode) rxData->getFrmCtrl().srcAddrMode, rxData->getSrcPanId(), rxData->getSrcAddr(), (Ieee802154eAddrMode) rxData->getFrmCtrl().dstAddrMode, rxData->getDstPanId(), rxData->getDstAddr(), rxData->getByteLength(), rxData, 0 /*mpduLinkQuality*/, rxData->getSeqNmbr(), (UINT_32) rxData->getTimestamp().raw(), rxData->getAuxSecHd().secLvl, rxData->getAuxSecHd().keyIdentMode, rxData->getAuxSecHd().keySource, rxData->getAuxSecHd().keyIndex, 0 /*uwbPRF*/,
+			        (Ieee802154eUWBFType) 0 /*uwbPreambleSymbolRepetitions*/, 0 /*dataRate*/, (RangingControl) 0 /*rangingReceived*/, 0 /*rangingCounterStart*/, 0 /*rangingCounterStop*/, 0 /*rangingTrackingInterval*/, 0 /*rangingOffset*/, 0 /*rangingFOM*/);
 
 			rxData = NULL;
 		}
 		else
 		{
 			delete frame;
+			frame = NULL;
 		}
 	}
 }
@@ -2010,6 +2041,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 				if (frame->getSeqNmbr() != txData->getSeqNmbr())
 				{
 					delete frame;
+					frame = NULL;
 					EV << "[TSCH CCA]-Transmitter:[11] frame was dropped at the MAC layer, the SeqNumber in the ACK does not match" << endl;
 
 					taskP.taskStep(TP_TS_TX_CCA_TSCHCCA) = 11;
@@ -2086,6 +2118,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 					}
 
 					delete frame;   // delete the ACK
+					frame = NULL;
 					if (txPkt == txData)
 					{
 						if (txData->getFrmCtrl().frameType == Ieee802154e_DISASSOCIATION_RESPONSE)
@@ -2108,6 +2141,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 			{
 				EV << "[MAC]: no pending transmission task is waiting for this ACK, drop it!" << endl;
 				delete frame;
+				frame = NULL;
 				return;
 			}
 
@@ -2116,6 +2150,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 			{
 				EV << "[MAC]: this is a late ACK received after corresponding task has failed, drop it!" << endl;
 				delete frame;
+				frame = NULL;
 				return;
 			}
 
@@ -2124,6 +2159,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 			{
 				EV << "[MAC]: the SeqNumber in the ACK does not match, drop it!" << endl;
 				delete frame;
+				frame = NULL;
 				return;
 			}
 
@@ -2149,6 +2185,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 				{
 					EV << "[MAC]: this is a late ACK, but not for a DATA pkt, drop it!" << endl;
 					delete frame;
+					frame = NULL;
 					return;
 				}
 
@@ -2174,6 +2211,7 @@ void Ieee802154eMac::handleAck(Ieee802154eFrame* frame) //
 			dispatch(phy_SUCCESS, __FUNCTION__);
 
 			delete frame;
+			frame = NULL;
 		}
 	}
 }
@@ -2393,8 +2431,8 @@ bool Ieee802154eMac::frameFilter(Ieee802154eFrame* frame)
 	if (!mpib.macPromiscuousMode)
 	{
 		//check packet type
-		if ((frmType != Ieee802154e_BEACON) && (frmType != Ieee802154e_DATA) && (frmType != Ieee802154e_ACK) && (frmType != Ieee802154e_CMD) && (frmType != Ieee802154e_LLDN) && (frmType != Ieee802154e_MULTI) && (frmType != Ieee802154e_ASSOCIATION_REQUEST) && (frmType != Ieee802154e_DISASSOCIATION_REQUEST) && (frmType != Ieee802154e_DISASSOCIATION_RESPONSE)
-				&& (frmType != Ieee802154e_ASSOCIATION_RESPONSE) && (frmType != Ieee802154e_SCHEDULER_REQUEST) && (frmType != Ieee802154e_SCHEDULER_RESPONSE))
+		if ((frmType != Ieee802154e_BEACON) && (frmType != Ieee802154e_DATA) && (frmType != Ieee802154e_ACK) && (frmType != Ieee802154e_CMD) && (frmType != Ieee802154e_LLDN) && (frmType != Ieee802154e_MULTI) && (frmType != Ieee802154e_ASSOCIATION_REQUEST) && (frmType != Ieee802154e_DISASSOCIATION_REQUEST) && (frmType != Ieee802154e_DISASSOCIATION_RESPONSE) && (frmType != Ieee802154e_ASSOCIATION_RESPONSE) && (frmType != Ieee802154e_SCHEDULER_REQUEST)
+		        && (frmType != Ieee802154e_SCHEDULER_RESPONSE))
 		{
 			return true;
 		}
@@ -2410,7 +2448,7 @@ bool Ieee802154eMac::frameFilter(Ieee802154eFrame* frame)
 			//[SR] old version
 			if ((frmType == Ieee802154e_BEACON) // enhanced beacon
 			&& (mpib.macPANId != 0xffff)       // associated
-					&& (frame->getSrcPanId() != mpib.macPANId)) // PAN id not match
+			        && (frame->getSrcPanId() != mpib.macPANId)) // PAN id not match
 			{
 				return true;
 			}
@@ -2471,9 +2509,9 @@ bool Ieee802154eMac::frameFilter(Ieee802154eFrame* frame)
 		}
 		else
 		{   // for Std 802.15.4-2006 & Std 802.15.4-2011
-			//check source PAN ID for beacon frame (802.15.4 beacon frame)
+		    //check source PAN ID for beacon frame (802.15.4 beacon frame)
 			if ((frmType == Ieee802154e_BEACON) && (mpib.macPANId != 0xffff) // associated
-					&& (frame->getSrcPanId() != mpib.macPANId)) // PAN id not match
+			        && (frame->getSrcPanId() != mpib.macPANId)) // PAN id not match
 			{
 				return true;
 			}
@@ -2693,10 +2731,8 @@ void Ieee802154eMac::constructACK(Ieee802154eFrame* rxFrame)
 		tmpEAck->setAuxSecHd(auxSecHd);
 		tmpEAck->setByteLength(calFrmByteLength(tmpEAck));
 
-		if (!txAck)
-			ASSERT(!txAck); //it's impossible to receive the second packet before the Ack has been sent out.
-		else
-			ASSERT(!txAck);
+		if (txAck) //it's impossible to receive the second packet before the Ack has been sent out.
+			delete txAck;
 		txAck = tmpEAck;
 	}
 	else
@@ -3202,196 +3238,158 @@ void Ieee802154eMac::PLME_SET_request(PHYPIBenum pibAttribute, PHY_PIB pibAttrib
 
 	switch (pibAttribute)
 	{
-	case PHY_CURRENT_CHANNEL:
-	{
-		primitive->setPibAttribute(PHY_CURRENT_CHANNEL);
-		break;
-	}
-	case PHY_CHANNELS_SUPPORTED:
-	{
-		primitive->setPibAttribute(PHY_CHANNELS_SUPPORTED);
-		break;
-	}
-	case PHY_TX_POWER_TOLERANCE:
-	{
-		primitive->setPibAttribute(PHY_TX_POWER_TOLERANCE);
-		break;
-	}
-	case PHY_TRANSMIT_POWER:
-	{
-		primitive->setPibAttribute(PHY_TRANSMIT_POWER);
-		break;
-	}
-	case PHY_TX_POWER:
-	{
-		primitive->setPibAttribute(PHY_TX_POWER);
-		break;
-	}
-	case PHY_CCA_MODE:
-	{
-		primitive->setPibAttribute(PHY_CCA_MODE);
-		break;
-	}
-	case PHY_CURRENT_PAGE:
-	{
-		primitive->setPibAttribute(PHY_CURRENT_PAGE);
-		break;
-	}
-	case PHY_MAX_FRAME_DURATION:
-	{
-		primitive->setPibAttribute(PHY_MAX_FRAME_DURATION);
-		break;
-	}
-	case PHY_SHR_DURATION:
-	{
-		primitive->setPibAttribute(PHY_SHR_DURATION);
-		break;
-	}
-	case PHY_SYMBOLS_PER_OCTET:
-	{
-		primitive->setPibAttribute(PHY_SYMBOLS_PER_OCTET);
-		break;
-	}
-	case PHY_PREAMBLE_SYMBOL_LENGTH:
-	{
-		primitive->setPibAttribute(PHY_PREAMBLE_SYMBOL_LENGTH);
-		break;
-	}
-	case PHY_UWB_DATA_RATES_SUPPORTED:
-	{
-		primitive->setPibAttribute(PHY_UWB_DATA_RATES_SUPPORTED);
-		break;
-	}
-	case PHY_CSS_LOW_DATA_RATE_SUPPORTED:
-	{
-		primitive->setPibAttribute(PHY_CSS_LOW_DATA_RATE_SUPPORTED);
-		break;
-	}
-	case PHY_UWB_COU_SUPPORTED:
-	{
-		primitive->setPibAttribute(PHY_UWB_COU_SUPPORTED);
-		break;
-	}
-	case PHY_UWB_CS_SUPPORTED:
-	{
-		primitive->setPibAttribute(PHY_UWB_CS_SUPPORTED);
-		break;
-	}
-	case PHY_UWB_LCP_SUPPORTED:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_SUPPORTED);
-		break;
-	}
-	case PHY_UWB_CURRENT_PULSE_SHAPE:
-	{
-		primitive->setPibAttribute(PHY_UWB_CURRENT_PULSE_SHAPE);
-		break;
-	}
-	case PHY_UWB_COU_PULSE:
-	{
-		primitive->setPibAttribute(PHY_UWB_COU_PULSE);
-		break;
-	}
-	case PHY_UWB_CS_PULSE:
-	{
-		primitive->setPibAttribute(PHY_UWB_CS_PULSE);
-		break;
-	}
-	case PHY_UWB_LCP_WEIGHT_1:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_1);
-		break;
-	}
-	case PHY_UWB_LCP_WEIGHT_2:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_2);
-		break;
-	}
-	case PHY_UWB_LCP_WEIGHT_3:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_3);
-		break;
-	}
-	case PHY_UWB_LCP_WEIGHT_4:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_4);
-		break;
-	}
-	case PHY_UWB_LCP_DELAY_2:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_DELAY_2);
-		break;
-	}
-	case PHY_UWB_LCP_DELAY_3:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_DELAY_3);
-		break;
-	}
-	case PHY_UWB_LCP_DELAY_4:
-	{
-		primitive->setPibAttribute(PHY_UWB_LCP_DELAY_4);
-		break;
-	}
-	case PHY_RANGING:
-	{
-		primitive->setPibAttribute(PHY_RANGING);
-		break;
-	}
-	case PHY_RANGING_CRYSTAL_OFFSET:
-	{
-		primitive->setPibAttribute(PHY_RANGING_CRYSTAL_OFFSET);
-		break;
-	}
-	case PHY_RANGING_DPS:
-	{
-		primitive->setPibAttribute(PHY_RANGING_DPS);
-		break;
-	}
-	case PHY_CURRENT_CODE:
-	{
-		primitive->setPibAttribute(PHY_CURRENT_CODE);
-		break;
-	}
-	case PHY_NATIVE_PRF:
-	{
-		primitive->setPibAttribute(PHY_NATIVE_PRF);
-		break;
-	}
-	case PHY_UWB_SCAN_BINS_PER_CHANNEL:
-	{
-		primitive->setPibAttribute(PHY_UWB_SCAN_BINS_PER_CHANNEL);
-		break;
-	}
-	case PHY_UWB_INSERTED_PREAMBLE_INTERVAL:
-	{
-		primitive->setPibAttribute(PHY_UWB_INSERTED_PREAMBLE_INTERVAL);
-		break;
-	}
-	case PHY_TX_RMARKER_OFFSET:
-	{
-		primitive->setPibAttribute(PHY_TX_RMARKER_OFFSET);
-		break;
-	}
-	case PHY_RX_RMARKER_OFFSET:
-	{
-		primitive->setPibAttribute(PHY_RX_RMARKER_OFFSET);
-		break;
-	}
-	case PHY_RFRAME_PROCESSING_TIME:
-	{
-		primitive->setPibAttribute(PHY_RFRAME_PROCESSING_TIME);
-		break;
-	}
-	case PHY_CCA_DURATION:
-	{
-		primitive->setPibAttribute(PHY_CCA_DURATION);
-		break;
-	}
-	default:
-	{
-		error("invalid PHY PIB attribute");
-		break;
-	}
+		case PHY_CURRENT_CHANNEL: {
+			primitive->setPibAttribute(PHY_CURRENT_CHANNEL);
+			break;
+		}
+		case PHY_CHANNELS_SUPPORTED: {
+			primitive->setPibAttribute(PHY_CHANNELS_SUPPORTED);
+			break;
+		}
+		case PHY_TX_POWER_TOLERANCE: {
+			primitive->setPibAttribute(PHY_TX_POWER_TOLERANCE);
+			break;
+		}
+		case PHY_TRANSMIT_POWER: {
+			primitive->setPibAttribute(PHY_TRANSMIT_POWER);
+			break;
+		}
+		case PHY_TX_POWER: {
+			primitive->setPibAttribute(PHY_TX_POWER);
+			break;
+		}
+		case PHY_CCA_MODE: {
+			primitive->setPibAttribute(PHY_CCA_MODE);
+			break;
+		}
+		case PHY_CURRENT_PAGE: {
+			primitive->setPibAttribute(PHY_CURRENT_PAGE);
+			break;
+		}
+		case PHY_MAX_FRAME_DURATION: {
+			primitive->setPibAttribute(PHY_MAX_FRAME_DURATION);
+			break;
+		}
+		case PHY_SHR_DURATION: {
+			primitive->setPibAttribute(PHY_SHR_DURATION);
+			break;
+		}
+		case PHY_SYMBOLS_PER_OCTET: {
+			primitive->setPibAttribute(PHY_SYMBOLS_PER_OCTET);
+			break;
+		}
+		case PHY_PREAMBLE_SYMBOL_LENGTH: {
+			primitive->setPibAttribute(PHY_PREAMBLE_SYMBOL_LENGTH);
+			break;
+		}
+		case PHY_UWB_DATA_RATES_SUPPORTED: {
+			primitive->setPibAttribute(PHY_UWB_DATA_RATES_SUPPORTED);
+			break;
+		}
+		case PHY_CSS_LOW_DATA_RATE_SUPPORTED: {
+			primitive->setPibAttribute(PHY_CSS_LOW_DATA_RATE_SUPPORTED);
+			break;
+		}
+		case PHY_UWB_COU_SUPPORTED: {
+			primitive->setPibAttribute(PHY_UWB_COU_SUPPORTED);
+			break;
+		}
+		case PHY_UWB_CS_SUPPORTED: {
+			primitive->setPibAttribute(PHY_UWB_CS_SUPPORTED);
+			break;
+		}
+		case PHY_UWB_LCP_SUPPORTED: {
+			primitive->setPibAttribute(PHY_UWB_LCP_SUPPORTED);
+			break;
+		}
+		case PHY_UWB_CURRENT_PULSE_SHAPE: {
+			primitive->setPibAttribute(PHY_UWB_CURRENT_PULSE_SHAPE);
+			break;
+		}
+		case PHY_UWB_COU_PULSE: {
+			primitive->setPibAttribute(PHY_UWB_COU_PULSE);
+			break;
+		}
+		case PHY_UWB_CS_PULSE: {
+			primitive->setPibAttribute(PHY_UWB_CS_PULSE);
+			break;
+		}
+		case PHY_UWB_LCP_WEIGHT_1: {
+			primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_1);
+			break;
+		}
+		case PHY_UWB_LCP_WEIGHT_2: {
+			primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_2);
+			break;
+		}
+		case PHY_UWB_LCP_WEIGHT_3: {
+			primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_3);
+			break;
+		}
+		case PHY_UWB_LCP_WEIGHT_4: {
+			primitive->setPibAttribute(PHY_UWB_LCP_WEIGHT_4);
+			break;
+		}
+		case PHY_UWB_LCP_DELAY_2: {
+			primitive->setPibAttribute(PHY_UWB_LCP_DELAY_2);
+			break;
+		}
+		case PHY_UWB_LCP_DELAY_3: {
+			primitive->setPibAttribute(PHY_UWB_LCP_DELAY_3);
+			break;
+		}
+		case PHY_UWB_LCP_DELAY_4: {
+			primitive->setPibAttribute(PHY_UWB_LCP_DELAY_4);
+			break;
+		}
+		case PHY_RANGING: {
+			primitive->setPibAttribute(PHY_RANGING);
+			break;
+		}
+		case PHY_RANGING_CRYSTAL_OFFSET: {
+			primitive->setPibAttribute(PHY_RANGING_CRYSTAL_OFFSET);
+			break;
+		}
+		case PHY_RANGING_DPS: {
+			primitive->setPibAttribute(PHY_RANGING_DPS);
+			break;
+		}
+		case PHY_CURRENT_CODE: {
+			primitive->setPibAttribute(PHY_CURRENT_CODE);
+			break;
+		}
+		case PHY_NATIVE_PRF: {
+			primitive->setPibAttribute(PHY_NATIVE_PRF);
+			break;
+		}
+		case PHY_UWB_SCAN_BINS_PER_CHANNEL: {
+			primitive->setPibAttribute(PHY_UWB_SCAN_BINS_PER_CHANNEL);
+			break;
+		}
+		case PHY_UWB_INSERTED_PREAMBLE_INTERVAL: {
+			primitive->setPibAttribute(PHY_UWB_INSERTED_PREAMBLE_INTERVAL);
+			break;
+		}
+		case PHY_TX_RMARKER_OFFSET: {
+			primitive->setPibAttribute(PHY_TX_RMARKER_OFFSET);
+			break;
+		}
+		case PHY_RX_RMARKER_OFFSET: {
+			primitive->setPibAttribute(PHY_RX_RMARKER_OFFSET);
+			break;
+		}
+		case PHY_RFRAME_PROCESSING_TIME: {
+			primitive->setPibAttribute(PHY_RFRAME_PROCESSING_TIME);
+			break;
+		}
+		case PHY_CCA_DURATION: {
+			primitive->setPibAttribute(PHY_CCA_DURATION);
+			break;
+		}
+		default: {
+			error("invalid PHY PIB attribute");
+			break;
+		}
 	}
 
 	send(primitive, mLowerLayerOut);
@@ -3420,51 +3418,58 @@ void Ieee802154eMac::handleMacPhyPrimitive(int msgkind, cMessage* msg)
 	Ieee802154eMacPhyPrimitives* primitive = check_and_cast<Ieee802154eMacPhyPrimitives *>(msg);
 	switch (msgkind)
 	{
-	if (primitive->getBitRate() > 0)
-	{
-		bitrate = primitive->getBitRate();
-		phy_bitrate = bitrate;
-	}
+		if (primitive->getBitRate() > 0)
+		{
+			bitrate = primitive->getBitRate();
+			phy_bitrate = bitrate;
+		}
 
-case PD_DATA_CONFIRM:
-	handle_PD_DATA_confirm(PHYenum(primitive->getStatus()));
-	delete primitive;
-	break;
+	case PD_DATA_CONFIRM:
+		handle_PD_DATA_confirm(PHYenum(primitive->getStatus()));
+		delete primitive;
+		primitive = NULL;
+		break;
 
-case PD_DATA_INDICATION:
-	handle_PD_DATA_indication(primitive->getPsduLength(), (cPacket*) msg, 0); //not implemented LQI (ppduLinkQuality)
-	delete primitive;
-	break;
+	case PD_DATA_INDICATION:
+		handle_PD_DATA_indication(primitive->getPsduLength(), (cPacket*) msg, 0); //not implemented LQI (ppduLinkQuality)
+		delete primitive;
+		primitive = NULL;
+		break;
 
-	// PHY management service
-case PLME_CCA_CONFIRM:
-	handle_PLME_CCA_confirm(PHYenum(primitive->getStatus()));
-	delete primitive;
-	break;
+		// PHY management service
+	case PLME_CCA_CONFIRM:
+		handle_PLME_CCA_confirm(PHYenum(primitive->getStatus()));
+		delete primitive;
+		primitive = NULL;
+		break;
 
-case PLME_ED_CONFIRM:
-	handle_PLME_ED_confirm(PHYenum(primitive->getStatus()), primitive->getEnergyLevel());
-	delete primitive;
-	break;
+	case PLME_ED_CONFIRM:
+		handle_PLME_ED_confirm(PHYenum(primitive->getStatus()), primitive->getEnergyLevel());
+		delete primitive;
+		primitive = NULL;
+		break;
 
-case PLME_GET_CONFIRM:
-	handle_PLME_GET_confirm(PHYenum(primitive->getStatus()), PHYPIBenum(primitive->getPibAttribute()), PHY_PIB(primitive->getPibAttributeValue()));
-	delete primitive;
-	break;
+	case PLME_GET_CONFIRM:
+		handle_PLME_GET_confirm(PHYenum(primitive->getStatus()), PHYPIBenum(primitive->getPibAttribute()), PHY_PIB(primitive->getPibAttributeValue()));
+		delete primitive;
+		primitive = NULL;
+		break;
 
-case PLME_SET_TRX_STATE_CONFIRM:
-	handle_PLME_SET_TRX_STATE_confirm(PHYenum(primitive->getStatus()));
-	delete primitive;
-	break;
+	case PLME_SET_TRX_STATE_CONFIRM:
+		handle_PLME_SET_TRX_STATE_confirm(PHYenum(primitive->getStatus()));
+		delete primitive;
+		primitive = NULL;
+		break;
 
-case PLME_SET_CONFIRM:
-	handle_PLME_SET_confirm(PHYenum(primitive->getStatus()), PHYPIBenum(primitive->getPibAttribute()));
-	delete primitive;
-	break;
+	case PLME_SET_CONFIRM:
+		handle_PLME_SET_confirm(PHYenum(primitive->getStatus()), PHYPIBenum(primitive->getPibAttribute()));
+		delete primitive;
+		primitive = NULL;
+		break;
 
-default:
-	error("unknown primitive (msgkind=%d)", msgkind);
-	break;
+	default:
+		error("unknown primitive (msgkind=%d)", msgkind);
+		break;
 	}
 }
 
@@ -3741,188 +3746,152 @@ void Ieee802154eMac::handle_PLME_GET_confirm(PHYenum status, PHYPIBenum pibAttri
 	{
 		switch (pibAttribute)
 		{
-		case PHY_CURRENT_CHANNEL:
-		{
-			ppib.phyCurrentChannel = pibAttributeValue.phyCurrentChannel;
-			break;
-		}
-		case PHY_CHANNELS_SUPPORTED:
-		{
-			ppib.phyChannelsSupported = pibAttributeValue.phyChannelsSupported;
-			break;
-		}
-		case PHY_TRANSMIT_POWER:
-		{
-			ppib.phyTransmitPower = pibAttributeValue.phyTransmitPower;
-			break;
-		}
-		case PHY_TX_POWER_TOLERANCE:
-		{
-			ppib.phyTXPowerTolerance = pibAttributeValue.phyTXPowerTolerance;
-			break;
-		}
-		case PHY_TX_POWER:
-		{
-			ppib.phyTXPower = pibAttributeValue.phyTXPower;
-			break;
-		}
-		case PHY_CCA_MODE:
-		{
-			ppib.phyCCAMode = pibAttributeValue.phyCCAMode;
-			break;
-		}
-		case PHY_MAX_FRAME_DURATION:
-		{
-			ppib.phyMaxFrameDuration = pibAttributeValue.phyMaxFrameDuration;
-			break;
-		}
-		case PHY_SHR_DURATION:
-		{
-			ppib.phySHRDuration = pibAttributeValue.phySHRDuration;
-			break;
-		}
-		case PHY_SYMBOLS_PER_OCTET:
-		{
-			ppib.phySymbolsPerOctet = pibAttributeValue.phySymbolsPerOctet;
-			break;
-		}
-		case PHY_PREAMBLE_SYMBOL_LENGTH:
-		{
-			ppib.phyPreambleSymbolLength = pibAttributeValue.phyPreambleSymbolLength;
-			break;
-		}
-		case PHY_UWB_DATA_RATES_SUPPORTED:
-		{
-			ppib.phyUWBDataRatesSupported = pibAttributeValue.phyUWBDataRatesSupported;
-			break;
-		}
-		case PHY_CSS_LOW_DATA_RATE_SUPPORTED:
-		{
-			ppib.phyCSSLowDataRateSupported = pibAttributeValue.phyCSSLowDataRateSupported;
-			break;
-		}
-		case PHY_UWB_COU_SUPPORTED:
-		{
-			ppib.phyUWBCoUSupported = pibAttributeValue.phyUWBCoUSupported;
-			break;
-		}
-		case PHY_UWB_CS_SUPPORTED:
-		{
-			ppib.phyUWBCSSupported = pibAttributeValue.phyUWBCSSupported;
-			break;
-		}
-		case PHY_UWB_LCP_SUPPORTED:
-		{
-			ppib.phyUWBLCPSupported = pibAttributeValue.phyUWBLCPSupported;
-			break;
-		}
-		case PHY_UWB_CURRENT_PULSE_SHAPE:
-		{
-			ppib.phyUWBCurrentPulseShape = pibAttributeValue.phyUWBCurrentPulseShape;
-			break;
-		}
-		case PHY_UWB_COU_PULSE:
-		{
-			ppib.phyUWBCoUpulse = pibAttributeValue.phyUWBCoUpulse;
-			break;
-		}
-		case PHY_UWB_CS_PULSE:
-		{
-			ppib.phyUWBCSpulse = pibAttributeValue.phyUWBCSpulse;
-			break;
-		}
-		case PHY_UWB_LCP_WEIGHT_1:
-		{
-			ppib.phyUWBLCPWeight1 = pibAttributeValue.phyUWBLCPWeight1;
-			break;
-		}
-		case PHY_UWB_LCP_WEIGHT_2:
-		{
-			ppib.phyUWBLCPWeight2 = pibAttributeValue.phyUWBLCPWeight2;
-			break;
-		}
-		case PHY_UWB_LCP_WEIGHT_3:
-		{
-			ppib.phyUWBLCPWeight3 = pibAttributeValue.phyUWBLCPWeight3;
-			break;
-		}
-		case PHY_UWB_LCP_WEIGHT_4:
-		{
-			ppib.phyUWBLCPWeight4 = pibAttributeValue.phyUWBLCPWeight4;
-			break;
-		}
-		case PHY_UWB_LCP_DELAY_2:
-		{
-			ppib.phyUWBLCPDelay2 = pibAttributeValue.phyUWBLCPDelay2;
-			break;
-		}
-		case PHY_UWB_LCP_DELAY_3:
-		{
-			ppib.phyUWBLCPDelay3 = pibAttributeValue.phyUWBLCPDelay3;
-			break;
-		}
-		case PHY_UWB_LCP_DELAY_4:
-		{
-			ppib.phyUWBLCPDelay4 = pibAttributeValue.phyUWBLCPDelay4;
-			break;
-		}
-		case PHY_RANGING:
-		{
-			ppib.phyRanging = pibAttributeValue.phyRanging;
-			break;
-		}
-		case PHY_RANGING_CRYSTAL_OFFSET:
-		{
-			ppib.phyRangingCrystalOffset = pibAttributeValue.phyRangingCrystalOffset;
-			break;
-		}
-		case PHY_RANGING_DPS:
-		{
-			ppib.phyRangingDPS = pibAttributeValue.phyRangingDPS;
-			break;
-		}
-		case PHY_CURRENT_CODE:
-		{
-			ppib.phyCurrentCode = pibAttributeValue.phyCurrentCode;
-			break;
-		}
-		case PHY_NATIVE_PRF:
-		{
-			ppib.phyNativePRF = pibAttributeValue.phyNativePRF;
-			break;
-		}
-		case PHY_UWB_SCAN_BINS_PER_CHANNEL:
-		{
-			ppib.phyUWBScanBinsPerChannel = pibAttributeValue.phyUWBScanBinsPerChannel;
-			break;
-		}
-		case PHY_UWB_INSERTED_PREAMBLE_INTERVAL:
-		{
-			ppib.phyUWBInsertedPreambleInterval = pibAttributeValue.phyUWBInsertedPreambleInterval;
-			break;
-		}
-		case PHY_TX_RMARKER_OFFSET:
-		{
-			ppib.phyTXRMARKEROffset = pibAttributeValue.phyTXRMARKEROffset;
-			break;
-		}
-		case PHY_RX_RMARKER_OFFSET:
-		{
-			ppib.phyRXRMARKEROffset = pibAttributeValue.phyRXRMARKEROffset;
-			break;
-		}
-		case PHY_RFRAME_PROCESSING_TIME:
-		{
-			ppib.phyRFRAMEProcessingTime = pibAttributeValue.phyRFRAMEProcessingTime;
-			break;
-		}
-		case PHY_CCA_DURATION:
-		{
-			ppib.phyCCADuration = pibAttributeValue.phyCCADuration;
-			break;
-		}
-		default:
-			break;
+			case PHY_CURRENT_CHANNEL: {
+				ppib.phyCurrentChannel = pibAttributeValue.phyCurrentChannel;
+				break;
+			}
+			case PHY_CHANNELS_SUPPORTED: {
+				ppib.phyChannelsSupported = pibAttributeValue.phyChannelsSupported;
+				break;
+			}
+			case PHY_TRANSMIT_POWER: {
+				ppib.phyTransmitPower = pibAttributeValue.phyTransmitPower;
+				break;
+			}
+			case PHY_TX_POWER_TOLERANCE: {
+				ppib.phyTXPowerTolerance = pibAttributeValue.phyTXPowerTolerance;
+				break;
+			}
+			case PHY_TX_POWER: {
+				ppib.phyTXPower = pibAttributeValue.phyTXPower;
+				break;
+			}
+			case PHY_CCA_MODE: {
+				ppib.phyCCAMode = pibAttributeValue.phyCCAMode;
+				break;
+			}
+			case PHY_MAX_FRAME_DURATION: {
+				ppib.phyMaxFrameDuration = pibAttributeValue.phyMaxFrameDuration;
+				break;
+			}
+			case PHY_SHR_DURATION: {
+				ppib.phySHRDuration = pibAttributeValue.phySHRDuration;
+				break;
+			}
+			case PHY_SYMBOLS_PER_OCTET: {
+				ppib.phySymbolsPerOctet = pibAttributeValue.phySymbolsPerOctet;
+				break;
+			}
+			case PHY_PREAMBLE_SYMBOL_LENGTH: {
+				ppib.phyPreambleSymbolLength = pibAttributeValue.phyPreambleSymbolLength;
+				break;
+			}
+			case PHY_UWB_DATA_RATES_SUPPORTED: {
+				ppib.phyUWBDataRatesSupported = pibAttributeValue.phyUWBDataRatesSupported;
+				break;
+			}
+			case PHY_CSS_LOW_DATA_RATE_SUPPORTED: {
+				ppib.phyCSSLowDataRateSupported = pibAttributeValue.phyCSSLowDataRateSupported;
+				break;
+			}
+			case PHY_UWB_COU_SUPPORTED: {
+				ppib.phyUWBCoUSupported = pibAttributeValue.phyUWBCoUSupported;
+				break;
+			}
+			case PHY_UWB_CS_SUPPORTED: {
+				ppib.phyUWBCSSupported = pibAttributeValue.phyUWBCSSupported;
+				break;
+			}
+			case PHY_UWB_LCP_SUPPORTED: {
+				ppib.phyUWBLCPSupported = pibAttributeValue.phyUWBLCPSupported;
+				break;
+			}
+			case PHY_UWB_CURRENT_PULSE_SHAPE: {
+				ppib.phyUWBCurrentPulseShape = pibAttributeValue.phyUWBCurrentPulseShape;
+				break;
+			}
+			case PHY_UWB_COU_PULSE: {
+				ppib.phyUWBCoUpulse = pibAttributeValue.phyUWBCoUpulse;
+				break;
+			}
+			case PHY_UWB_CS_PULSE: {
+				ppib.phyUWBCSpulse = pibAttributeValue.phyUWBCSpulse;
+				break;
+			}
+			case PHY_UWB_LCP_WEIGHT_1: {
+				ppib.phyUWBLCPWeight1 = pibAttributeValue.phyUWBLCPWeight1;
+				break;
+			}
+			case PHY_UWB_LCP_WEIGHT_2: {
+				ppib.phyUWBLCPWeight2 = pibAttributeValue.phyUWBLCPWeight2;
+				break;
+			}
+			case PHY_UWB_LCP_WEIGHT_3: {
+				ppib.phyUWBLCPWeight3 = pibAttributeValue.phyUWBLCPWeight3;
+				break;
+			}
+			case PHY_UWB_LCP_WEIGHT_4: {
+				ppib.phyUWBLCPWeight4 = pibAttributeValue.phyUWBLCPWeight4;
+				break;
+			}
+			case PHY_UWB_LCP_DELAY_2: {
+				ppib.phyUWBLCPDelay2 = pibAttributeValue.phyUWBLCPDelay2;
+				break;
+			}
+			case PHY_UWB_LCP_DELAY_3: {
+				ppib.phyUWBLCPDelay3 = pibAttributeValue.phyUWBLCPDelay3;
+				break;
+			}
+			case PHY_UWB_LCP_DELAY_4: {
+				ppib.phyUWBLCPDelay4 = pibAttributeValue.phyUWBLCPDelay4;
+				break;
+			}
+			case PHY_RANGING: {
+				ppib.phyRanging = pibAttributeValue.phyRanging;
+				break;
+			}
+			case PHY_RANGING_CRYSTAL_OFFSET: {
+				ppib.phyRangingCrystalOffset = pibAttributeValue.phyRangingCrystalOffset;
+				break;
+			}
+			case PHY_RANGING_DPS: {
+				ppib.phyRangingDPS = pibAttributeValue.phyRangingDPS;
+				break;
+			}
+			case PHY_CURRENT_CODE: {
+				ppib.phyCurrentCode = pibAttributeValue.phyCurrentCode;
+				break;
+			}
+			case PHY_NATIVE_PRF: {
+				ppib.phyNativePRF = pibAttributeValue.phyNativePRF;
+				break;
+			}
+			case PHY_UWB_SCAN_BINS_PER_CHANNEL: {
+				ppib.phyUWBScanBinsPerChannel = pibAttributeValue.phyUWBScanBinsPerChannel;
+				break;
+			}
+			case PHY_UWB_INSERTED_PREAMBLE_INTERVAL: {
+				ppib.phyUWBInsertedPreambleInterval = pibAttributeValue.phyUWBInsertedPreambleInterval;
+				break;
+			}
+			case PHY_TX_RMARKER_OFFSET: {
+				ppib.phyTXRMARKEROffset = pibAttributeValue.phyTXRMARKEROffset;
+				break;
+			}
+			case PHY_RX_RMARKER_OFFSET: {
+				ppib.phyRXRMARKEROffset = pibAttributeValue.phyRXRMARKEROffset;
+				break;
+			}
+			case PHY_RFRAME_PROCESSING_TIME: {
+				ppib.phyRFRAMEProcessingTime = pibAttributeValue.phyRFRAMEProcessingTime;
+				break;
+			}
+			case PHY_CCA_DURATION: {
+				ppib.phyCCADuration = pibAttributeValue.phyCCADuration;
+				break;
+			}
+			default:
+				break;
 		}
 	}
 }
@@ -4017,7 +3986,7 @@ void Ieee802154eMac::handle_PLME_SET_TRX_STATE_confirm(PHYenum status)
 				// the check if the msg fit in the timeslots (transmission duration <+ macTsMaxTx) is done in the MCPS_DATA_request
 				ASSERT(txData);
 				txPkt = txData;
-				PD_DATA_request(txData->getByteLength(), txData->dup());
+				PD_DATA_request(txPkt->getByteLength(), txPkt->dup());
 				return;
 				// next step will be the PD_DATA_confirm()
 			}
@@ -4027,10 +3996,10 @@ void Ieee802154eMac::handle_PLME_SET_TRX_STATE_confirm(PHYenum status)
 				EV << "[TSCH CCA]-Receiver:[9] send the Ack" << endl;
 				// check if the ack can be transmit during the macTsMaxAck
 
-				if (txAck == NULL) //TODO: Remove me after fixed
+				if (!txAck) //TODO: Remove me after fixed
 				{
 					delete txAck;
-
+					txAck = NULL;
 					resetTRX();
 					return;
 				}
@@ -4063,7 +4032,6 @@ void Ieee802154eMac::handle_PLME_SET_TRX_STATE_confirm(PHYenum status)
 
 		}
 	}
-
 
 }
 
@@ -4125,8 +4093,8 @@ void Ieee802154eMac::handle_PLME_SET_confirm(PHYenum status, PHYPIBenum pibAttri
  * note: see Std 802.15.4-2011 (6.3.1) page 116
  *
  * param[in]     "param1 Input parameter (i.e. read by this function). */
-void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, cPacket* msdu, UINT_8 msduHandle, bool ackTX, bool gtsTX, bool indirectTX, UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, Ieee802154eUWBFType uwbPRF, RangingControl ranging, UINT_16 uwbPreambleSymbolRepetitions,
-		UINT_8 dataRate, FrameCrlOptions frameControlOptions, std::vector<Ieee802154eIEHeaderType> headerIElist, std::vector<Ieee802154eIEPayloadType> payloadIElist, bool sendMultipurpose)
+void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, cPacket* msdu, UINT_8 msduHandle, bool ackTX, bool gtsTX, bool indirectTX, UINT_8 securityLevel, UINT_8 keyIdMode, UINT_64 keySource, UINT_8 keyIndex, Ieee802154eUWBFType uwbPRF, RangingControl ranging, UINT_16 uwbPreambleSymbolRepetitions, UINT_8 dataRate, FrameCrlOptions frameControlOptions,
+        std::vector<Ieee802154eIEHeaderType> headerIElist, std::vector<Ieee802154eIEPayloadType> payloadIElist, bool sendMultipurpose)
 {
 	Ieee802154eMacTaskType task = TP_MCPS_DATA_REQUEST;
 	if (!mpib.macTSCHenabled)
@@ -4152,6 +4120,7 @@ void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8021
 	if (sendMultipurpose) // see Std 802.15.4e-2012 page 168 // see packet structure Std 802.15.4e-2012 (figure 48k) page 75
 	{
 		delete tmpData; // release the unused pointer
+		tmpData = NULL;
 		frmCtrl.frameType = Ieee802154e_MULTI;  //multipurpose type
 		tmpMPData->setName("Ieee802154eMULTI");
 		mpfrmCtrl.lngFrameCtrl = true; //no default value in the Std 802.15.4e-2012
@@ -4159,6 +4128,7 @@ void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8021
 	else
 	{
 		delete tmpMPData; // release the unused pointer
+		tmpMPData = NULL;
 		frmCtrl.frameType = Ieee802154e_DATA;   //data type
 		tmpData->setName("Ieee802154DATA");
 	}
@@ -4325,127 +4295,131 @@ void Ieee802154eMac::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8021
 
 	switch (TxOption)
 	{
-	case DIRECT_TRANS: // send in the CAP or at the Link for TSCH transmission
-	{
-		// TSCH CSME-CA algorithm - Std 802.15.4e-2012 (figure 11a) page 14
-		if (mpib.macTSCHenabled)
+		case DIRECT_TRANS: // send in the CAP or at the Link for TSCH transmission
 		{
-			// check the could send in a timeslot (TSCH CCA - macTsMaxTX time)
-			simtime_t duration;
-			if (sendMultipurpose)
-				duration = calDuration(tmpMPData);
-			else
-				duration = calDuration(tmpData);
-
-			if (duration > timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl()) // delete msg and report MLME_DATA_confirm
+			// TSCH CSME-CA algorithm - Std 802.15.4e-2012 (figure 11a) page 14
+			if (mpib.macTSCHenabled)
 			{
-				EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is bigger then " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be discarded" << endl;
-
+				// check the could send in a timeslot (TSCH CCA - macTsMaxTX time)
+				simtime_t duration;
 				if (sendMultipurpose)
-					MCPS_DATA_confirm(tmpMPData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpMPData);
+					duration = calDuration(tmpMPData);
 				else
-					MCPS_DATA_confirm(tmpData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpData);
+					duration = calDuration(tmpData);
 
-				delete tmpMPData;
-				delete tmpData;
-				numUpperPktLost++;
-				reqtMsgFromIFq();
-				return;
-			}
-			else
-			{
-				EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is smaller or equal as the " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be saved and transmitted later in the Tx timeslot to the dest Addr" << endl;
+				if (duration > timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl()) // delete msg and report MLME_DATA_confirm
+				{
+					EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is bigger then " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be discarded" << endl;
 
-				if (sendMultipurpose)
-				{ // if a timeslot is linked to the device
-					if (linkTable->existLink((UINT_16) tmpMPData->getDstAddr().getInt()))
-					{
-						//send(tmpMPData, mQueueOut);
-						queueModule->insertInQueue(tmpMPData);
-					}
+					if (sendMultipurpose)
+						MCPS_DATA_confirm(tmpMPData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpMPData);
 					else
-					{
-						EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
-						delete tmpMPData;
-						numUpperPktLost++;
-					}
+						MCPS_DATA_confirm(tmpData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_FRAME_TOO_LONG, 0, 0, tmpData);
+
+					delete tmpMPData;
+					tmpMPData = NULL;
+
+					delete tmpData;
+					tmpData = NULL;
+					numUpperPktLost++;
+					reqtMsgFromIFq();
+					return;
 				}
 				else
-				{   // if a timeslot is linked to the device
-					if (linkTable->existLink((UINT_16) tmpData->getDstAddr().getInt()))
-					{
-						//send(tmpData, mQueueOut);
+				{
+					EV << "[TSCH CCA]: the estimated transmission time (" << duration << " s) is smaller or equal as the " << timeslotTable->getTemplate(useTimeslotID)->getMaxTxDbl() * 1000 << " ms, msg will be saved and transmitted later in the Tx timeslot to the dest Addr" << endl;
 
-						queueModule->insertInQueue(tmpData);
-
-						numUpperPktLost++;
+					if (sendMultipurpose)
+					{ // if a timeslot is linked to the device
+						if (linkTable->existLink((UINT_16) tmpMPData->getDstAddr().getInt()))
+						{
+							//send(tmpMPData, mQueueOut);
+							queueModule->insertInQueue(tmpMPData);
+						}
+						else
+						{
+							EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
+							delete tmpMPData;
+							tmpMPData = NULL;
+							numUpperPktLost++;
+						}
 					}
 					else
-					{
-						EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
-						delete tmpData;
-						numUpperPktLost++;
+					{   // if a timeslot is linked to the device
+						if (linkTable->existLink((UINT_16) tmpData->getDstAddr().getInt()))
+						{
+							//send(tmpData, mQueueOut);
+
+							queueModule->insertInQueue(tmpData);
+
+							numUpperPktLost++;
+						}
+						else
+						{
+							EV << "[MAC][TSCH CSMA-CA]: ERROR, no TX link available to the device!" << endl;
+							delete tmpData;
+							tmpData = NULL;
+							numUpperPktLost++;
+						}
 					}
 				}
 			}
+			else
+			{
+				// CSMA-CA algorithm - Std 802.15.4e-2012 (figure 11) page 13
+				taskP.taskStep(task)++;strcpy
+				(taskP.taskFrFunc(task), "csmacaCallBack");
+				ASSERT(txData == NULL);
+
+				if (sendMultipurpose)
+					txData = tmpMPData;
+				else
+					txData = tmpData;
+
+				csmacaEntry('d');
+			}
+			break;
 		}
-		else
+
+		case INDIRECT_TRANS:    // for the PAN to Device transmission
+			//
+			break;
+
+		case GTS_TRANS: // don't use CSMA-CA, send directly in the GTS
 		{
-			// CSMA-CA algorithm - Std 802.15.4e-2012 (figure 11) page 13
-			taskP.taskStep(task)++;strcpy
-			(taskP.taskFrFunc(task), "csmacaCallBack");
-			ASSERT(txData == NULL);
+			taskP.taskStep(task)++;
+			// waiting for GTS arriving, callback from handleGtsTimer()
+			strcpy
+			(taskP.taskFrFunc(task), "handleGtsTimer");
+
+			ASSERT(txGTS == NULL);
 
 			if (sendMultipurpose)
-				txData = tmpMPData;
+				txGTS = tmpMPData;
 			else
-				txData = tmpData;
+				txGTS = tmpData;
 
-			csmacaEntry('d');
-		}
-		break;
-	}
+			numGTSRetry = 0;
 
-	case INDIRECT_TRANS:    // for the PAN to Device transmission
-		//
-		break;
-
-	case GTS_TRANS: // don't use CSMA-CA, send directly in the GTS
-	{
-		taskP.taskStep(task)++;
-		// waiting for GTS arriving, callback from handleGtsTimer()
-		strcpy
-		(taskP.taskFrFunc(task), "handleGtsTimer");
-
-		ASSERT(txGTS == NULL);
-
-		if (sendMultipurpose)
-			txGTS = tmpMPData;
-		else
-			txGTS = tmpData;
-
-		numGTSRetry = 0;
-
-		// if i'm the PAN coordinator, should defer the transmission until the start of the receive GTS
-		// if i'm the device, should try to transmit if now is in my GTS
-		// refer to spec. 7.5.7.3
-		if (!isPANCoor && index_gtsTimer == 99)
-		{
-			ASSERT(gtsTimer->isScheduled());
-			// first check if the requested transaction can be completed before the end of current GTS
-			if (gtsCanProceed())
+			// if i'm the PAN coordinator, should defer the transmission until the start of the receive GTS
+			// if i'm the device, should try to transmit if now is in my GTS
+			// refer to spec. 7.5.7.3
+			if (!isPANCoor && index_gtsTimer == 99)
 			{
-				// directly hand over to FSM, which will go to next step, state parameters are ignored
-				FSM_MCPS_DATA_request();
+				ASSERT(gtsTimer->isScheduled());
+				// first check if the requested transaction can be completed before the end of current GTS
+				if (gtsCanProceed())
+				{
+					// directly hand over to FSM, which will go to next step, state parameters are ignored
+					FSM_MCPS_DATA_request();
+				}
 			}
+			break;
 		}
-		break;
-	}
-	default:
-	{
-		error("[MAC]: undefined txOption: %d!", TxOption);
-		break;
-	}
+		default: {
+			error("[MAC]: undefined txOption: %d!", TxOption);
+			break;
+		}
 	}
 }
 
@@ -4476,48 +4450,48 @@ void Ieee802154eMac::MCPS_DATA_confirm(UINT_8 msduHandle, UINT_64 timestamp, boo
 	string statusTxt = "";
 	switch (status)
 	{
-	case mac_SUCCESS:
-		statusTxt = "mac_SUCCESS";
-		break;
-	case mac_TRANSACTION_OVERFLOW:
-		statusTxt = "mac_TRANSACTION_OVERFLOW";
-		break;
-	case mac_TRANSACTION_EXPIRED:
-		statusTxt = "mac_TRANSACTION_EXPIRED";
-		break;
-	case mac_CHANNEL_ACCESS_FAILURE:
-		statusTxt = "mac_CHANNEL_ACCESS_FAILURE";
-		break;
-	case mac_INVALID_ADDRESS:
-		statusTxt = "mac_INVALID_ADDRESS";
-		break;
-	case mac_INVALID_GTS:
-		statusTxt = "mac_INVALID_GTS";
-		break;
-	case mac_NO_ACK:
-		statusTxt = "mac_NO_ACK";
-		break;
-	case mac_COUNTER_ERROR:
-		statusTxt = "mac_COUNTER_ERROR";
-		break;
-	case mac_FRAME_TOO_LONG:
-		statusTxt = "mac_FRAME_TOO_LONG";
-		break;
-	case mac_UNAVAILABLE_KEY:
-		statusTxt = "mac_UNAVAILABLE_KEY";
-		break;
-	case mac_UNSUPPORTED_SECURITY:
-		statusTxt = "mac_UNSUPPORTED_SECURITY";
-		break;
-	case mac_INVALID_PARAMETER:
-		statusTxt = "mac_INVALID_PARAMETER";
-		break;
-	case mac_ACK_RCVD_NODSN_NOSA:
-		statusTxt = "mac_ACK_RCVD_NODSN_NOSA";
-		break;
-	default:
-		statusTxt = "status not defined";
-		break;
+		case mac_SUCCESS:
+			statusTxt = "mac_SUCCESS";
+			break;
+		case mac_TRANSACTION_OVERFLOW:
+			statusTxt = "mac_TRANSACTION_OVERFLOW";
+			break;
+		case mac_TRANSACTION_EXPIRED:
+			statusTxt = "mac_TRANSACTION_EXPIRED";
+			break;
+		case mac_CHANNEL_ACCESS_FAILURE:
+			statusTxt = "mac_CHANNEL_ACCESS_FAILURE";
+			break;
+		case mac_INVALID_ADDRESS:
+			statusTxt = "mac_INVALID_ADDRESS";
+			break;
+		case mac_INVALID_GTS:
+			statusTxt = "mac_INVALID_GTS";
+			break;
+		case mac_NO_ACK:
+			statusTxt = "mac_NO_ACK";
+			break;
+		case mac_COUNTER_ERROR:
+			statusTxt = "mac_COUNTER_ERROR";
+			break;
+		case mac_FRAME_TOO_LONG:
+			statusTxt = "mac_FRAME_TOO_LONG";
+			break;
+		case mac_UNAVAILABLE_KEY:
+			statusTxt = "mac_UNAVAILABLE_KEY";
+			break;
+		case mac_UNSUPPORTED_SECURITY:
+			statusTxt = "mac_UNSUPPORTED_SECURITY";
+			break;
+		case mac_INVALID_PARAMETER:
+			statusTxt = "mac_INVALID_PARAMETER";
+			break;
+		case mac_ACK_RCVD_NODSN_NOSA:
+			statusTxt = "mac_ACK_RCVD_NODSN_NOSA";
+			break;
+		default:
+			statusTxt = "status not defined";
+			break;
 	}
 
 	if (useIeee802Ctrl)
@@ -4531,6 +4505,7 @@ void Ieee802154eMac::MCPS_DATA_confirm(UINT_8 msduHandle, UINT_64 timestamp, boo
 //        //send(appframe->dup(), mUpperLay+erOut); // [SR] not supported from the higher layer
 
 		delete appframe;
+		appframe = NULL;
 	}
 	else
 	{
@@ -4555,6 +4530,7 @@ void Ieee802154eMac::MCPS_DATA_confirm(UINT_8 msduHandle, UINT_64 timestamp, boo
 //                  << (int) numBackoffs << " with status=" << statusTxt << endl;
 //        send(appframe->dup(), mUpperLayerOut);
 		delete appframe;
+		appframe = NULL;
 	}
 }
 
@@ -4566,8 +4542,8 @@ void Ieee802154eMac::MCPS_DATA_confirm(UINT_8 msduHandle, UINT_64 timestamp, boo
  * note: see Std 802.15.4-2011 (6.3.3) page 119
  *
  * param[in]     "param1 Input parameter (i.e. read by this function). */
-void Ieee802154eMac::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF,
-		Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart, UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM)
+void Ieee802154eMac::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_16 srcPANId, IE3ADDR srcAddr, Ieee802154eAddrMode dstAddrMode, UINT_16 dstPANId, IE3ADDR dstAddr, UINT_8 msduLength, Ieee802154eFrame* msdu, UINT_8 mpduLinkQuality, UINT_8 dsn, UINT_32 Timestamp, UINT_8 SecurityLevel, UINT_8 KeyIdMode, UINT_64 keySource, UINT_8 keyIndex, UINT_8 uwbPRF, Ieee802154eUWBFType uwbPreambleSymbolRepetitions, UINT_8 dataRate, RangingControl rangingReceived, UINT_32 rangingCounterStart,
+        UINT_32 rangingCounterStop, UINT_32 rangingTrackingInterval, UINT_32 rangingOffset, UINT_8 rangingFOM)
 {
 	// [SR] old version
 //     if (msdu->getIsGTS())
@@ -4607,6 +4583,7 @@ void Ieee802154eMac::MCPS_DATA_indication(Ieee802154eAddrMode srcAddrMode, UINT_
 	EV << "[MAC]: sending received " << msg->getName() << " frame to upper layer" << endl;
 	send(msg, mUpperLayerOut);
 	delete msdu;
+	msdu = NULL;
 }
 
 /**@author: 2014    Stefan Reis
@@ -4746,35 +4723,31 @@ void Ieee802154eMac::csmacaStart(bool firsttime, Ieee802154eFrame* frame, bool a
 	//
 	switch (backoffMethod)
 	{
-	case EXPONENTIAL:
-	{
-		int BE = std::min(mpib.macMinBE + NB, (int) mpib.macMaxBE);
-		double d = pow((double) 2, (int) BE);
-		int v = (int) d - 1;
-		int r = intuniform(1, v, 0);
-		backoffTime = r * bPeriod.dbl();
+		case EXPONENTIAL: {
+			int BE = std::min(mpib.macMinBE + NB, (int) mpib.macMaxBE);
+			double d = pow((double) 2, (int) BE);
+			int v = (int) d - 1;
+			int r = intuniform(1, v, 0);
+			backoffTime = r * bPeriod.dbl();
 
-		EV << "(startTimer) backoffTimer value=" << backoffTime << " (BE=" << BE << ", 2^BE-1= " << v << ", r=" << r << ")" << endl;
-		break;
-	}
-	case LINEAR:
-	{
-		int slots = intuniform(1, initialCW + NB, 0);
-		backoffTime = slots * bPeriod.dbl();
-		EV << "(startTimer) backoffTimer value=" << backoffTime << endl;
-		break;
-	}
-	case CONSTANT:
-	{
-		int slots = intuniform(1, initialCW, 0);
-		backoffTime = slots * bPeriod.dbl();
-		EV << "(startTimer) backoffTimer value=" << backoffTime << endl;
-		break;
-	}
-	default:
-	{
-		error("Unknown backoff method!");
-	}
+			EV << "(startTimer) backoffTimer value=" << backoffTime << " (BE=" << BE << ", 2^BE-1= " << v << ", r=" << r << ")" << endl;
+			break;
+		}
+		case LINEAR: {
+			int slots = intuniform(1, initialCW + NB, 0);
+			backoffTime = slots * bPeriod.dbl();
+			EV << "(startTimer) backoffTimer value=" << backoffTime << endl;
+			break;
+		}
+		case CONSTANT: {
+			int slots = intuniform(1, initialCW, 0);
+			backoffTime = slots * bPeriod.dbl();
+			EV << "(startTimer) backoffTimer value=" << backoffTime << endl;
+			break;
+		}
+		default: {
+			error("Unknown backoff method!");
+		}
 	}
 
 	EV << "[CSMA-CA]: choosing random number of backoff periods: " << backoffTime / bPeriod << endl;
@@ -5491,86 +5464,86 @@ void Ieee802154eMac::handle_MLME_GET_request(MACPIBenum pibAttribute)
 
 	switch (pibAttribute)
 	{
-	case MAC_EXTENDED_ADDRESS:
-	case MAC_ACK_WAIT_DURATION:
-	case MAC_ASSOCIATED_PAN_COORD:
-	case MAC_ASSOCIATION_PERMIT:
-	case MAC_AUTO_REQUEST:
-	case MAC_BATT_LIFE_EXT:
-	case MAC_BATT_LIFE_EXT_PERIODS:
-	case MAC_BEACON_PAYLOAD:
-	case MAC_BEACON_PAYLOAD_LENGTH:
-	case MAC_BEACON_ORDER:
-	case MAC_BEACON_TX_TIME:
-	case MAC_BSN:
-	case MAC_COORD_EXTENDED_ADDRESS:
-	case MAC_COORD_SHORT_ADDRESS:
-	case MAC_DSN:
-	case MAC_GTS_PERMIT:
-	case MAC_MAX_BE:
-	case MAC_MAX_CSMA_BACKOFFS:
-	case MAC_MAX_FRAME_RETRIES:
-	case MAC_MIN_BE:
-	case MAC_LIFS_PERIOD:
-	case MAC_SIFS_PERIOD:
-	case MAC_PAN_ID:
-	case MAC_PROMISCUOUS_MODE:
-	case MAC_RESPONSE_WAIT_TIME:
-	case MAC_RX_ON_WHEN_IDLE:
-	case MAC_SECURITY_ENABLED:
-	case MAC_ENH_ACK_WAIT_DURATION:
-	case MAC_IMPLICIT_BROADCAST:
-	case MAC_SIMPLE_ADDRESS:
-	case MAC_SHORT_ADDRESS:
-	case MAC_SUPERFRAME_ORDER:
-	case MAC_SYNC_SYMBOL_OFFSET:
-	case MAC_TIMESTAMP_SUPPORTED:
-	case MAC_TRANSACTION_PERSISTENCE_TIME:
-	case MAC_TX_CONTROL_ACTIVE_DURATION:
-	case MAC_TX_CONTROL_PAUSE_DURATION:
-	case MAC_TX_TOTAL_DURATION:
-		// Security-related MAC PIB attributes - Std 802.15.4-2011 (table 60) page 142
-		//case MAC_KEY_TABLE:
-		//case MAC_DEVICE_TABLE:
-		//case MAC_SECURITY_LEVEL_TABLE:
-	case MAC_FRAME_COUNTER:
-	case MAC_AUTO_REQUEST_SECURITY_LEVEL:
-	case MAC_AUTO_REQUEST_KEY_ID_MODE:
-		//case MAC_AUTO_REQUEST_KEY_SOURCE:
-	case MAC_AUTO_REQUEST_KEY_INDEX:
-		//case MAC_DEFAULT_KEY_SOURCE:
-	case MAC_PAN_COORD_EXTENDED_ADDRESS:
-	case MAC_PAN_COORD_SHORT_ADDRESS:
+		case MAC_EXTENDED_ADDRESS:
+		case MAC_ACK_WAIT_DURATION:
+		case MAC_ASSOCIATED_PAN_COORD:
+		case MAC_ASSOCIATION_PERMIT:
+		case MAC_AUTO_REQUEST:
+		case MAC_BATT_LIFE_EXT:
+		case MAC_BATT_LIFE_EXT_PERIODS:
+		case MAC_BEACON_PAYLOAD:
+		case MAC_BEACON_PAYLOAD_LENGTH:
+		case MAC_BEACON_ORDER:
+		case MAC_BEACON_TX_TIME:
+		case MAC_BSN:
+		case MAC_COORD_EXTENDED_ADDRESS:
+		case MAC_COORD_SHORT_ADDRESS:
+		case MAC_DSN:
+		case MAC_GTS_PERMIT:
+		case MAC_MAX_BE:
+		case MAC_MAX_CSMA_BACKOFFS:
+		case MAC_MAX_FRAME_RETRIES:
+		case MAC_MIN_BE:
+		case MAC_LIFS_PERIOD:
+		case MAC_SIFS_PERIOD:
+		case MAC_PAN_ID:
+		case MAC_PROMISCUOUS_MODE:
+		case MAC_RESPONSE_WAIT_TIME:
+		case MAC_RX_ON_WHEN_IDLE:
+		case MAC_SECURITY_ENABLED:
+		case MAC_ENH_ACK_WAIT_DURATION:
+		case MAC_IMPLICIT_BROADCAST:
+		case MAC_SIMPLE_ADDRESS:
+		case MAC_SHORT_ADDRESS:
+		case MAC_SUPERFRAME_ORDER:
+		case MAC_SYNC_SYMBOL_OFFSET:
+		case MAC_TIMESTAMP_SUPPORTED:
+		case MAC_TRANSACTION_PERSISTENCE_TIME:
+		case MAC_TX_CONTROL_ACTIVE_DURATION:
+		case MAC_TX_CONTROL_PAUSE_DURATION:
+		case MAC_TX_TOTAL_DURATION:
+			// Security-related MAC PIB attributes - Std 802.15.4-2011 (table 60) page 142
+			//case MAC_KEY_TABLE:
+			//case MAC_DEVICE_TABLE:
+			//case MAC_SECURITY_LEVEL_TABLE:
+		case MAC_FRAME_COUNTER:
+		case MAC_AUTO_REQUEST_SECURITY_LEVEL:
+		case MAC_AUTO_REQUEST_KEY_ID_MODE:
+			//case MAC_AUTO_REQUEST_KEY_SOURCE:
+		case MAC_AUTO_REQUEST_KEY_INDEX:
+			//case MAC_DEFAULT_KEY_SOURCE:
+		case MAC_PAN_COORD_EXTENDED_ADDRESS:
+		case MAC_PAN_COORD_SHORT_ADDRESS:
 
-		// Security-related MAC PIB attributes - Std 802.15.4e-2012 (table 60) page 188
-	case MAC_FRAME_COUNTER_MODE:
-		// General MAC PIB attributes for functional organization - Std 802.15.4e-2012 (table 52a) page 173
-	case MAC_TSCH_CAPABLE:
-	case MAC_LL_CAPABLE:
-	case MAC_DSME_CAPABLE:
-	case MAC_LE_CAPABLE:
-	case MAC_RFID_CAPABLE:
-	case MAC_HOPPING_CAPABLE:
-	case MAC_AMCA_CAPABLE:
-	case MAC_METRICS_CAPABLE:
-	case MAC_TSCH_ENABLED:
-	case MAC_LL_ENABLED:
-	case MAC_DSME_ENABLED:
-	case MAC_LE_ENABLED:
-	case MAC_RFID_ENABLED:
-	case MAC_HOPPING_ENABLED:
-	case MAC_AMCA_ENABLED:
-	case MAC_METRCIS_ENABLED:
-		// TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
-	case MAC_DISCONNECT_TIME:
-	case MAC_JOIN_PRIORITY:
-	case MAC_ASN:
-	case MAC_NO_HL_BUFFERS:
-		t_status = mac_SUCCESS;
-		break;
-	default:
-		t_status = mac_UNSUPPORTED_ATTRIBUTE;
-		break;
+			// Security-related MAC PIB attributes - Std 802.15.4e-2012 (table 60) page 188
+		case MAC_FRAME_COUNTER_MODE:
+			// General MAC PIB attributes for functional organization - Std 802.15.4e-2012 (table 52a) page 173
+		case MAC_TSCH_CAPABLE:
+		case MAC_LL_CAPABLE:
+		case MAC_DSME_CAPABLE:
+		case MAC_LE_CAPABLE:
+		case MAC_RFID_CAPABLE:
+		case MAC_HOPPING_CAPABLE:
+		case MAC_AMCA_CAPABLE:
+		case MAC_METRICS_CAPABLE:
+		case MAC_TSCH_ENABLED:
+		case MAC_LL_ENABLED:
+		case MAC_DSME_ENABLED:
+		case MAC_LE_ENABLED:
+		case MAC_RFID_ENABLED:
+		case MAC_HOPPING_ENABLED:
+		case MAC_AMCA_ENABLED:
+		case MAC_METRCIS_ENABLED:
+			// TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
+		case MAC_DISCONNECT_TIME:
+		case MAC_JOIN_PRIORITY:
+		case MAC_ASN:
+		case MAC_NO_HL_BUFFERS:
+			t_status = mac_SUCCESS;
+			break;
+		default:
+			t_status = mac_UNSUPPORTED_ATTRIBUTE;
+			break;
 	}
 	MLME_GET_confirm(t_status, pibAttribute, &mpib);
 }
@@ -5816,484 +5789,418 @@ void Ieee802154eMac::handle_MLME_SET_request(MACPIBenum pibAttribute, MAC_PIB pi
 
 	switch (pibAttribute)
 	{
-	case MAC_EXTENDED_ADDRESS:
-	{
-		mpib.macExtendedAddress = pibAttributeValue.macExtendedAddress;
-	}
-	case MAC_ACK_WAIT_DURATION:
-	{
-		PLME_GET_request(PHY_CURRENT_CHANNEL); //value will be returned in ppib
-		if (((ppib.phyCurrentChannel <= 10) && (pibAttributeValue.macAckWaitDuration != 120)) || ((ppib.phyCurrentChannel > 10) && (pibAttributeValue.macAckWaitDuration != 54)))
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_EXTENDED_ADDRESS: {
+			mpib.macExtendedAddress = pibAttributeValue.macExtendedAddress;
 		}
-		else
-		{
-			mpib.macAckWaitDuration = pibAttributeValue.macAckWaitDuration;
+		case MAC_ACK_WAIT_DURATION: {
+			PLME_GET_request(PHY_CURRENT_CHANNEL); //value will be returned in ppib
+			if (((ppib.phyCurrentChannel <= 10) && (pibAttributeValue.macAckWaitDuration != 120)) || ((ppib.phyCurrentChannel > 10) && (pibAttributeValue.macAckWaitDuration != 54)))
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macAckWaitDuration = pibAttributeValue.macAckWaitDuration;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_ASSOCIATED_PAN_COORD:
-	{
-		mpib.macAssociatedPANCoord = pibAttributeValue.macAssociatedPANCoord;
-		break;
-	}
-	case MAC_ASSOCIATION_PERMIT:
-	{
-		mpib.macAssociationPermit = pibAttributeValue.macAssociationPermit;
-		break;
-	}
-	case MAC_AUTO_REQUEST:
-	{
-		mpib.macAutoRequest = pibAttributeValue.macAutoRequest;
-		break;
-	}
-	case MAC_BATT_LIFE_EXT:
-	{
-		mpib.macBattLifeExt = pibAttributeValue.macBattLifeExt;
-		break;
-	}
-	case MAC_BATT_LIFE_EXT_PERIODS:
-	{
-		PLME_GET_request(PHY_CURRENT_CHANNEL); //value will be returned in ppib
-		if (((ppib.phyCurrentChannel <= 10) && (pibAttributeValue.macBattLifeExtPeriods != 8)) || ((ppib.phyCurrentChannel > 10) && (pibAttributeValue.macBattLifeExtPeriods != 6)))
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_ASSOCIATED_PAN_COORD: {
+			mpib.macAssociatedPANCoord = pibAttributeValue.macAssociatedPANCoord;
+			break;
 		}
-		else
-		{
-			mpib.macBattLifeExtPeriods = pibAttributeValue.macBattLifeExtPeriods;
+		case MAC_ASSOCIATION_PERMIT: {
+			mpib.macAssociationPermit = pibAttributeValue.macAssociationPermit;
+			break;
 		}
-		break;
-	}
-	case MAC_BEACON_PAYLOAD:
-	{
-		//<macBeaconPayloadLength> should be set first
-		memcpy(mpib.macBeaconPayload, pibAttributeValue.macBeaconPayload, mpib.macBeaconPayloadLength);
-		break;
-	}
-	case MAC_BEACON_PAYLOAD_LENGTH:
-	{
-		if (pibAttributeValue.macBeaconPayloadLength > aMaxBeaconPayloadLength)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_AUTO_REQUEST: {
+			mpib.macAutoRequest = pibAttributeValue.macAutoRequest;
+			break;
 		}
-		else
-		{
-			mpib.macBeaconPayloadLength = pibAttributeValue.macBeaconPayloadLength;
+		case MAC_BATT_LIFE_EXT: {
+			mpib.macBattLifeExt = pibAttributeValue.macBattLifeExt;
+			break;
 		}
-		break;
-	}
-	case MAC_BEACON_ORDER:
-	{
-		if (pibAttributeValue.macBeaconOrder > 15)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_BATT_LIFE_EXT_PERIODS: {
+			PLME_GET_request(PHY_CURRENT_CHANNEL); //value will be returned in ppib
+			if (((ppib.phyCurrentChannel <= 10) && (pibAttributeValue.macBattLifeExtPeriods != 8)) || ((ppib.phyCurrentChannel > 10) && (pibAttributeValue.macBattLifeExtPeriods != 6)))
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macBattLifeExtPeriods = pibAttributeValue.macBattLifeExtPeriods;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macBeaconOrder = pibAttributeValue.macBeaconOrder;
+		case MAC_BEACON_PAYLOAD: {
+			//<macBeaconPayloadLength> should be set first
+			memcpy(mpib.macBeaconPayload, pibAttributeValue.macBeaconPayload, mpib.macBeaconPayloadLength);
+			break;
 		}
-		break;
-	}
-	case MAC_BEACON_TX_TIME:
-	{
-		if (pibAttributeValue.macBeaconTxTime > 0xffffff)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_BEACON_PAYLOAD_LENGTH: {
+			if (pibAttributeValue.macBeaconPayloadLength > aMaxBeaconPayloadLength)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macBeaconPayloadLength = pibAttributeValue.macBeaconPayloadLength;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macBeaconTxTime = pibAttributeValue.macBeaconTxTime;
+		case MAC_BEACON_ORDER: {
+			if (pibAttributeValue.macBeaconOrder > 15)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macBeaconOrder = pibAttributeValue.macBeaconOrder;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_BSN:
-	{
-		mpib.macBSN = pibAttributeValue.macBSN;
-		break;
-	}
-	case MAC_COORD_EXTENDED_ADDRESS:
-	{
-		mpib.macCoordExtendedAddress = pibAttributeValue.macCoordExtendedAddress;
-		break;
-	}
-	case MAC_COORD_SHORT_ADDRESS:
-	{
-		mpib.macCoordShortAddress = pibAttributeValue.macCoordShortAddress;
-		break;
-	}
-	case MAC_DSN:
-	{
-		mpib.macDSN = pibAttributeValue.macDSN;
-		break;
-	}
-	case MAC_GTS_PERMIT:
-	{
-		mpib.macGTSPermit = pibAttributeValue.macGTSPermit;
-		break;
-	}
-	case MAC_MAX_BE:
-	{
-		if (pibAttributeValue.macMaxBE < 3 || pibAttributeValue.macMaxBE > 8)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_BEACON_TX_TIME: {
+			if (pibAttributeValue.macBeaconTxTime > 0xffffff)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macBeaconTxTime = pibAttributeValue.macBeaconTxTime;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macMaxBE = pibAttributeValue.macMaxBE;
+		case MAC_BSN: {
+			mpib.macBSN = pibAttributeValue.macBSN;
+			break;
 		}
-		break;
-	}
-	case MAC_MAX_CSMA_BACKOFFS:
-	{
-		if (pibAttributeValue.macMaxCSMABackoffs > 5)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_COORD_EXTENDED_ADDRESS: {
+			mpib.macCoordExtendedAddress = pibAttributeValue.macCoordExtendedAddress;
+			break;
 		}
-		else
-		{
-			mpib.macMaxCSMABackoffs = pibAttributeValue.macMaxCSMABackoffs;
+		case MAC_COORD_SHORT_ADDRESS: {
+			mpib.macCoordShortAddress = pibAttributeValue.macCoordShortAddress;
+			break;
 		}
-		break;
-	}
-	case MAC_MAX_FRAME_RETRIES:
-	{
-		if (pibAttributeValue.macMaxFrameRetries > 7)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_DSN: {
+			mpib.macDSN = pibAttributeValue.macDSN;
+			break;
 		}
-		else
-		{
-			mpib.macMaxFrameRetries = pibAttributeValue.macMaxFrameRetries;
+		case MAC_GTS_PERMIT: {
+			mpib.macGTSPermit = pibAttributeValue.macGTSPermit;
+			break;
 		}
-		break;
-	}
-	case MAC_MIN_BE:
-	{
-		if (pibAttributeValue.macMinBE > mpib.macMaxBE)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_MAX_BE: {
+			if (pibAttributeValue.macMaxBE < 3 || pibAttributeValue.macMaxBE > 8)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macMaxBE = pibAttributeValue.macMaxBE;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macMinBE = pibAttributeValue.macMinBE;
+		case MAC_MAX_CSMA_BACKOFFS: {
+			if (pibAttributeValue.macMaxCSMABackoffs > 5)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macMaxCSMABackoffs = pibAttributeValue.macMaxCSMABackoffs;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_LIFS_PERIOD:
-	{
-		mpib.macLIFSPeriod = pibAttributeValue.macLIFSPeriod;
-		break;
-	}
-	case MAC_SIFS_PERIOD:
-	{
-		mpib.macSIFSPeriod = pibAttributeValue.macSIFSPeriod;
-		break;
-	}
-	case MAC_PAN_ID:
-	{
-		mpib.macPANId = pibAttributeValue.macPANId;
-		break;
-	}
-	case MAC_PROMISCUOUS_MODE:
-	{
-		mpib.macPromiscuousMode = pibAttributeValue.macPromiscuousMode;
+		case MAC_MAX_FRAME_RETRIES: {
+			if (pibAttributeValue.macMaxFrameRetries > 7)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macMaxFrameRetries = pibAttributeValue.macMaxFrameRetries;
+			}
+			break;
+		}
+		case MAC_MIN_BE: {
+			if (pibAttributeValue.macMinBE > mpib.macMaxBE)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macMinBE = pibAttributeValue.macMinBE;
+			}
+			break;
+		}
+		case MAC_LIFS_PERIOD: {
+			mpib.macLIFSPeriod = pibAttributeValue.macLIFSPeriod;
+			break;
+		}
+		case MAC_SIFS_PERIOD: {
+			mpib.macSIFSPeriod = pibAttributeValue.macSIFSPeriod;
+			break;
+		}
+		case MAC_PAN_ID: {
+			mpib.macPANId = pibAttributeValue.macPANId;
+			break;
+		}
+		case MAC_PROMISCUOUS_MODE: {
+			mpib.macPromiscuousMode = pibAttributeValue.macPromiscuousMode;
 
-		//
-		//some other operations (refer to sec. 7.5.6.6)
-		mpib.macRxOnWhenIdle = pibAttributeValue.macPromiscuousMode;
+			//
+			//some other operations (refer to sec. 7.5.6.6)
+			mpib.macRxOnWhenIdle = pibAttributeValue.macPromiscuousMode;
 
-		p_state = mpib.macRxOnWhenIdle ? phy_RX_ON : phy_TRX_OFF;
-		PLME_SET_TRX_STATE_request(p_state);
-		break;
-	}
-	case MAC_RESPONSE_WAIT_TIME:
-	{
-		if (pibAttributeValue.macResponseWaitTime < 2 || pibAttributeValue.macResponseWaitTime > 64)
-		{
-			t_status = mac_INVALID_PARAMETER;
+			p_state = mpib.macRxOnWhenIdle ? phy_RX_ON : phy_TRX_OFF;
+			PLME_SET_TRX_STATE_request(p_state);
+			break;
 		}
-		else
-		{
-			mpib.macResponseWaitTime = pibAttributeValue.macResponseWaitTime;
+		case MAC_RESPONSE_WAIT_TIME: {
+			if (pibAttributeValue.macResponseWaitTime < 2 || pibAttributeValue.macResponseWaitTime > 64)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macResponseWaitTime = pibAttributeValue.macResponseWaitTime;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_RX_ON_WHEN_IDLE:
-	{
-		mpib.macRxOnWhenIdle = pibAttributeValue.macRxOnWhenIdle;
-		break;
-	}
-	case MAC_SECURITY_ENABLED:
-	{
-		mpib.macSecurityEnabled = pibAttributeValue.macSecurityEnabled;
-		break;
-	}
-	case MAC_ENH_ACK_WAIT_DURATION:
-	{
-		mpib.macEnhAckWaitDuration = pibAttributeValue.macEnhAckWaitDuration;
-		break;
-	}
-	case MAC_IMPLICIT_BROADCAST:
-	{   // from Std 802.15.4e-2012 page 171
-		mpib.macImplicitBroadcast = pibAttributeValue.macImplicitBroadcast;
-		break;
-	}
-	case MAC_SIMPLE_ADDRESS:
-	{   // from Std 802.15.4e-2012 page 171
-		mpib.macSimpleAddress = pibAttributeValue.macSimpleAddress;
-		break;
-	}
-	case MAC_SHORT_ADDRESS:
-	{   // from Std 802.15.4e-2012 page 172
-		mpib.macShortAddress = pibAttributeValue.macShortAddress;
-		break;
-	}
-	case MAC_SUPERFRAME_ORDER:
-	{
-		if (pibAttributeValue.macSuperframeOrder > 15)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_RX_ON_WHEN_IDLE: {
+			mpib.macRxOnWhenIdle = pibAttributeValue.macRxOnWhenIdle;
+			break;
 		}
-		else
-		{
-			mpib.macSuperframeOrder = pibAttributeValue.macSuperframeOrder;
+		case MAC_SECURITY_ENABLED: {
+			mpib.macSecurityEnabled = pibAttributeValue.macSecurityEnabled;
+			break;
 		}
-		break;
-	}
-	case MAC_SYNC_SYMBOL_OFFSET:
-	{
-		PLME_GET_request(PHY_CURRENT_CHANNEL); //value will be returned in ppib
-		if (((ppib.phyCurrentChannel <= 10) && (pibAttributeValue.macSyncSymbolOffset > 0x400)) || ((ppib.phyCurrentChannel > 10) && (pibAttributeValue.macSyncSymbolOffset > 0x100)))
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_ENH_ACK_WAIT_DURATION: {
+			mpib.macEnhAckWaitDuration = pibAttributeValue.macEnhAckWaitDuration;
+			break;
 		}
-		else
-		{
-			mpib.macSyncSymbolOffset = pibAttributeValue.macSyncSymbolOffset;
+		case MAC_IMPLICIT_BROADCAST: {   // from Std 802.15.4e-2012 page 171
+			mpib.macImplicitBroadcast = pibAttributeValue.macImplicitBroadcast;
+			break;
 		}
-		break;
-	}
-	case MAC_TIMESTAMP_SUPPORTED:
-	{
-		mpib.macTimestampSupported = pibAttributeValue.macTimestampSupported;
-		break;
-	}
-	case MAC_TRANSACTION_PERSISTENCE_TIME:
-	{
-		mpib.macTransactionPersistenceTime = pibAttributeValue.macTransactionPersistenceTime;
-		break;
-	}
-	case MAC_TX_CONTROL_ACTIVE_DURATION:
-	{
-		if (pibAttributeValue.macTxControlActiveDuration > 100000)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_SIMPLE_ADDRESS: {   // from Std 802.15.4e-2012 page 171
+			mpib.macSimpleAddress = pibAttributeValue.macSimpleAddress;
+			break;
 		}
-		else
-		{
-			mpib.macTxControlActiveDuration = pibAttributeValue.macTxControlActiveDuration;
+		case MAC_SHORT_ADDRESS: {   // from Std 802.15.4e-2012 page 172
+			mpib.macShortAddress = pibAttributeValue.macShortAddress;
+			break;
 		}
-		break;
-	}
-	case MAC_TX_CONTROL_PAUSE_DURATION:
-	{
-		if (pibAttributeValue.macTxControlPauseDuration != 2000 || pibAttributeValue.macTxControlPauseDuration != 10000)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_SUPERFRAME_ORDER: {
+			if (pibAttributeValue.macSuperframeOrder > 15)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macSuperframeOrder = pibAttributeValue.macSuperframeOrder;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macTxControlPauseDuration = pibAttributeValue.macTxControlPauseDuration;
+		case MAC_SYNC_SYMBOL_OFFSET: {
+			PLME_GET_request(PHY_CURRENT_CHANNEL); //value will be returned in ppib
+			if (((ppib.phyCurrentChannel <= 10) && (pibAttributeValue.macSyncSymbolOffset > 0x400)) || ((ppib.phyCurrentChannel > 10) && (pibAttributeValue.macSyncSymbolOffset > 0x100)))
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macSyncSymbolOffset = pibAttributeValue.macSyncSymbolOffset;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_TX_TOTAL_DURATION:
-	{
-		mpib.macTxTotalDuration = pibAttributeValue.macTxTotalDuration;
-		break;
-	}
-		// Security-related MAC PIB attributes - Std 802.15.4-2011 (table 60) page 142
-	case MAC_FRAME_COUNTER:
-	{
-		if (((mpib.macFrameCounterMode == 0x04) && (pibAttributeValue.macFrameCounter > 0xffffffff)) || ((mpib.macFrameCounterMode == 0x05) && (pibAttributeValue.macFrameCounter > 0xffffffffff)))
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_TIMESTAMP_SUPPORTED: {
+			mpib.macTimestampSupported = pibAttributeValue.macTimestampSupported;
+			break;
 		}
-		else
-		{
-			mpib.macFrameCounter = pibAttributeValue.macFrameCounter;
+		case MAC_TRANSACTION_PERSISTENCE_TIME: {
+			mpib.macTransactionPersistenceTime = pibAttributeValue.macTransactionPersistenceTime;
+			break;
 		}
-		break;
-	}
-	case MAC_AUTO_REQUEST_SECURITY_LEVEL:
-	{
-		mpib.macAutoRequestSecurityLevel = pibAttributeValue.macAutoRequestSecurityLevel;
-		break;
-	}
-	case MAC_AUTO_REQUEST_KEY_ID_MODE:
-	{
-		if (pibAttributeValue.macAutoRequestKeyIdMode > 0x03)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_TX_CONTROL_ACTIVE_DURATION: {
+			if (pibAttributeValue.macTxControlActiveDuration > 100000)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macTxControlActiveDuration = pibAttributeValue.macTxControlActiveDuration;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macAutoRequestKeyIdMode = pibAttributeValue.macAutoRequestKeyIdMode;
+		case MAC_TX_CONTROL_PAUSE_DURATION: {
+			if (pibAttributeValue.macTxControlPauseDuration != 2000 || pibAttributeValue.macTxControlPauseDuration != 10000)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macTxControlPauseDuration = pibAttributeValue.macTxControlPauseDuration;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_AUTO_REQUEST_KEY_INDEX:
-	{
-		if (pibAttributeValue.macAutoRequestKeyIndex < 0x01)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_TX_TOTAL_DURATION: {
+			mpib.macTxTotalDuration = pibAttributeValue.macTxTotalDuration;
+			break;
 		}
-		else
-		{
-			mpib.macAutoRequestKeyIndex = pibAttributeValue.macAutoRequestKeyIndex;
+			// Security-related MAC PIB attributes - Std 802.15.4-2011 (table 60) page 142
+		case MAC_FRAME_COUNTER: {
+			if (((mpib.macFrameCounterMode == 0x04) && (pibAttributeValue.macFrameCounter > 0xffffffff)) || ((mpib.macFrameCounterMode == 0x05) && (pibAttributeValue.macFrameCounter > 0xffffffffff)))
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macFrameCounter = pibAttributeValue.macFrameCounter;
+			}
+			break;
 		}
-		break;
-	}
-	case MAC_PAN_COORD_EXTENDED_ADDRESS:
-	{
-		mpib.macPANCoordExtendedAddress = pibAttributeValue.macPANCoordExtendedAddress;
-		break;
-	}
-	case MAC_PAN_COORD_SHORT_ADDRESS:
-	{
-		mpib.macPANCoordShortAddress = pibAttributeValue.macPANCoordShortAddress;
-		break;
-	}
-		// Security-related MAC PIB attributes - Std 802.15.4e-2012 (table 60) page 188
-	case MAC_FRAME_COUNTER_MODE:
-	{
-		if (pibAttributeValue.macFrameCounterMode < 0x04 || pibAttributeValue.macFrameCounterMode > 0x05)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_AUTO_REQUEST_SECURITY_LEVEL: {
+			mpib.macAutoRequestSecurityLevel = pibAttributeValue.macAutoRequestSecurityLevel;
+			break;
 		}
-		else
-		{
-			mpib.macFrameCounterMode = pibAttributeValue.macFrameCounterMode;
+		case MAC_AUTO_REQUEST_KEY_ID_MODE: {
+			if (pibAttributeValue.macAutoRequestKeyIdMode > 0x03)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macAutoRequestKeyIdMode = pibAttributeValue.macAutoRequestKeyIdMode;
+			}
+			break;
 		}
-		break;
-	}
-		// General MAC PIB attributes for functional organization - Std 802.15.4e-2012 (table 52a) page 173
-	case MAC_TSCH_CAPABLE:
-	{
-		mpib.macTSCHcapable = pibAttributeValue.macTSCHcapable;
-		break;
-	}
-	case MAC_LL_CAPABLE:
-	{
-		mpib.macLLcapable = pibAttributeValue.macLLcapable;
-		break;
-	}
-	case MAC_DSME_CAPABLE:
-	{
-		mpib.macDSMEcapable = pibAttributeValue.macDSMEcapable;
-		break;
-	}
-	case MAC_LE_CAPABLE:
-	{
-		mpib.macLEcapable = pibAttributeValue.macLEcapable;
-		break;
-	}
-	case MAC_RFID_CAPABLE:
-	{
-		mpib.macRFIDcapable = pibAttributeValue.macRFIDcapable;
-		break;
-	}
-	case MAC_HOPPING_CAPABLE:
-	{
-		mpib.macHoppingCapable = pibAttributeValue.macHoppingCapable;
-		break;
-	}
-	case MAC_AMCA_CAPABLE:
-	{
-		mpib.macAMCACapable = pibAttributeValue.macAMCACapable;
-		break;
-	}
-	case MAC_METRICS_CAPABLE:
-	{
-		mpib.macMetricsCapable = pibAttributeValue.macMetricsCapable;
-		break;
-	}
-	case MAC_TSCH_ENABLED:
-	{
-		mpib.macTSCHenabled = pibAttributeValue.macTSCHenabled;
-		break;
-	}
-	case MAC_LL_ENABLED:
-	{
-		mpib.macLLenabled = pibAttributeValue.macLLenabled;
-		break;
-	}
-	case MAC_DSME_ENABLED:
-	{
-		mpib.macDSMEenabled = pibAttributeValue.macDSMEenabled;
-		break;
-	}
-	case MAC_LE_ENABLED:
-	{
-		mpib.macLEenabled = pibAttributeValue.macLEenabled;
-		break;
-	}
-	case MAC_RFID_ENABLED:
-	{
-		mpib.macRFIDenabled = pibAttributeValue.macRFIDenabled;
-		break;
-	}
-	case MAC_HOPPING_ENABLED:
-	{
-		mpib.macHoppingEnabled = pibAttributeValue.macHoppingEnabled;
-		break;
-	}
-	case MAC_AMCA_ENABLED:
-	{
-		mpib.macAMCAenabled = pibAttributeValue.macAMCAenabled;
-		break;
-	}
-	case MAC_METRCIS_ENABLED:
-	{
-		mpib.macMetricsEnabled = pibAttributeValue.macMetricsEnabled;
-		break;
-	}
-		// TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
-	case MAC_DISCONNECT_TIME:
-	{
-		mpib.macDisconnectTime = pibAttributeValue.macDisconnectTime;
-		break;
-	}
-	case MAC_JOIN_PRIORITY:
-	{
-		if (pibAttributeValue.macJoinPriority > 0x3f)
-		{
-			t_status = mac_INVALID_PARAMETER;
+		case MAC_AUTO_REQUEST_KEY_INDEX: {
+			if (pibAttributeValue.macAutoRequestKeyIndex < 0x01)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macAutoRequestKeyIndex = pibAttributeValue.macAutoRequestKeyIndex;
+			}
+			break;
 		}
-		else
-		{
-			mpib.macJoinPriority = pibAttributeValue.macJoinPriority;
+		case MAC_PAN_COORD_EXTENDED_ADDRESS: {
+			mpib.macPANCoordExtendedAddress = pibAttributeValue.macPANCoordExtendedAddress;
+			break;
 		}
-		break;
-	}
-	case MAC_ASN:
-	{
-		mpib.macASN = pibAttributeValue.macASN;
-		break;
-	}
-	case MAC_NO_HL_BUFFERS:
-	{
-		mpib.macNoHLBuffers = pibAttributeValue.macNoHLBuffers;
-		break;
-	}
+		case MAC_PAN_COORD_SHORT_ADDRESS: {
+			mpib.macPANCoordShortAddress = pibAttributeValue.macPANCoordShortAddress;
+			break;
+		}
+			// Security-related MAC PIB attributes - Std 802.15.4e-2012 (table 60) page 188
+		case MAC_FRAME_COUNTER_MODE: {
+			if (pibAttributeValue.macFrameCounterMode < 0x04 || pibAttributeValue.macFrameCounterMode > 0x05)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macFrameCounterMode = pibAttributeValue.macFrameCounterMode;
+			}
+			break;
+		}
+			// General MAC PIB attributes for functional organization - Std 802.15.4e-2012 (table 52a) page 173
+		case MAC_TSCH_CAPABLE: {
+			mpib.macTSCHcapable = pibAttributeValue.macTSCHcapable;
+			break;
+		}
+		case MAC_LL_CAPABLE: {
+			mpib.macLLcapable = pibAttributeValue.macLLcapable;
+			break;
+		}
+		case MAC_DSME_CAPABLE: {
+			mpib.macDSMEcapable = pibAttributeValue.macDSMEcapable;
+			break;
+		}
+		case MAC_LE_CAPABLE: {
+			mpib.macLEcapable = pibAttributeValue.macLEcapable;
+			break;
+		}
+		case MAC_RFID_CAPABLE: {
+			mpib.macRFIDcapable = pibAttributeValue.macRFIDcapable;
+			break;
+		}
+		case MAC_HOPPING_CAPABLE: {
+			mpib.macHoppingCapable = pibAttributeValue.macHoppingCapable;
+			break;
+		}
+		case MAC_AMCA_CAPABLE: {
+			mpib.macAMCACapable = pibAttributeValue.macAMCACapable;
+			break;
+		}
+		case MAC_METRICS_CAPABLE: {
+			mpib.macMetricsCapable = pibAttributeValue.macMetricsCapable;
+			break;
+		}
+		case MAC_TSCH_ENABLED: {
+			mpib.macTSCHenabled = pibAttributeValue.macTSCHenabled;
+			break;
+		}
+		case MAC_LL_ENABLED: {
+			mpib.macLLenabled = pibAttributeValue.macLLenabled;
+			break;
+		}
+		case MAC_DSME_ENABLED: {
+			mpib.macDSMEenabled = pibAttributeValue.macDSMEenabled;
+			break;
+		}
+		case MAC_LE_ENABLED: {
+			mpib.macLEenabled = pibAttributeValue.macLEenabled;
+			break;
+		}
+		case MAC_RFID_ENABLED: {
+			mpib.macRFIDenabled = pibAttributeValue.macRFIDenabled;
+			break;
+		}
+		case MAC_HOPPING_ENABLED: {
+			mpib.macHoppingEnabled = pibAttributeValue.macHoppingEnabled;
+			break;
+		}
+		case MAC_AMCA_ENABLED: {
+			mpib.macAMCAenabled = pibAttributeValue.macAMCAenabled;
+			break;
+		}
+		case MAC_METRCIS_ENABLED: {
+			mpib.macMetricsEnabled = pibAttributeValue.macMetricsEnabled;
+			break;
+		}
+			// TSCH-specific MAC PIB attributes - Std 802.15.4e-2012 (table 52b) page 174
+		case MAC_DISCONNECT_TIME: {
+			mpib.macDisconnectTime = pibAttributeValue.macDisconnectTime;
+			break;
+		}
+		case MAC_JOIN_PRIORITY: {
+			if (pibAttributeValue.macJoinPriority > 0x3f)
+			{
+				t_status = mac_INVALID_PARAMETER;
+			}
+			else
+			{
+				mpib.macJoinPriority = pibAttributeValue.macJoinPriority;
+			}
+			break;
+		}
+		case MAC_ASN: {
+			mpib.macASN = pibAttributeValue.macASN;
+			break;
+		}
+		case MAC_NO_HL_BUFFERS: {
+			mpib.macNoHLBuffers = pibAttributeValue.macNoHLBuffers;
+			break;
+		}
 
-	default:
-	{
-		t_status = mac_UNSUPPORTED_ATTRIBUTE;
-		break;
-	}
+		default: {
+			t_status = mac_UNSUPPORTED_ATTRIBUTE;
+			break;
+		}
 	}
 	MLME_SET_confirm(t_status, pibAttribute);
 }
@@ -7067,8 +6974,8 @@ void Ieee802154eMac::handleIfsTimer()
 	}
 	else if (rxData)
 	{
-		MCPS_DATA_indication((Ieee802154eAddrMode) rxData->getFrmCtrl().srcAddrMode, rxData->getSrcPanId(), rxData->getSrcAddr(), (Ieee802154eAddrMode) rxData->getFrmCtrl().dstAddrMode, rxData->getDstPanId(), rxData->getDstAddr(), rxData->getByteLength(), rxData, 0 /*mpduLinkQuality*/, rxData->getSeqNmbr(), (UINT_32) rxData->getTimestamp().raw(), rxData->getAuxSecHd().secLvl,
-				rxData->getAuxSecHd().keyIdentMode, rxData->getAuxSecHd().keySource, rxData->getAuxSecHd().keyIndex, 0 /*uwbPRF*/, (Ieee802154eUWBFType) 0 /*uwbPreambleSymbolRepetitions*/, 0 /*dataRate*/, (RangingControl) 0 /*rangingReceived*/, 0 /*rangingCounterStart*/, 0 /*rangingCounterStop*/, 0 /*rangingTrackingInterval*/, 0 /*rangingOffset*/, 0 /*rangingFOM*/);
+		MCPS_DATA_indication((Ieee802154eAddrMode) rxData->getFrmCtrl().srcAddrMode, rxData->getSrcPanId(), rxData->getSrcAddr(), (Ieee802154eAddrMode) rxData->getFrmCtrl().dstAddrMode, rxData->getDstPanId(), rxData->getDstAddr(), rxData->getByteLength(), rxData, 0 /*mpduLinkQuality*/, rxData->getSeqNmbr(), (UINT_32) rxData->getTimestamp().raw(), rxData->getAuxSecHd().secLvl, rxData->getAuxSecHd().keyIdentMode, rxData->getAuxSecHd().keySource, rxData->getAuxSecHd().keyIndex, 0 /*uwbPRF*/,
+		        (Ieee802154eUWBFType) 0 /*uwbPreambleSymbolRepetitions*/, 0 /*dataRate*/, (RangingControl) 0 /*rangingReceived*/, 0 /*rangingCounterStart*/, 0 /*rangingCounterStop*/, 0 /*rangingTrackingInterval*/, 0 /*rangingOffset*/, 0 /*rangingFOM*/);
 
 		rxData = NULL;
 	}
@@ -7235,7 +7142,7 @@ void Ieee802154eMac::taskFailed(char type, MACenum status, bool csmacaRes)
 {
 	if ((type == 'b')   //beacon
 	|| (type == 'a')    //ack.
-			|| (type == 'c'))   //command
+	        || (type == 'c'))   //command
 	{
 		ASSERT(0);  //we don't handle the above failures here
 	}
@@ -7305,80 +7212,80 @@ void Ieee802154eMac::FSM_MCPS_DATA_request(PHYenum pStatus, MACenum mStatus)
 	{
 		switch (taskP.taskStep(task))
 		{
-		case 0:
-			// impossible happen here
-			break;
+			case 0:
+				// impossible happen here
+				break;
 
-		case 1:
-			if (pStatus == phy_IDLE)        // CSMA/CA succeeds
-			{
-				taskP.taskStep(task)++;strcpy
-				(taskP.taskFrFunc(task), "handle_PD_DATA_confirm");
-				//enable the transmitter
-				PLME_SET_TRX_STATE_request(phy_TX_ON);
-			}
-			else // CSMA/CA reports channel access failure, should report to SSCS through MCPS_DATA_confirm in spec
-				 // here simply retry
-			{
-				csmacaResume();
-			}
-			break;
-
-		case 2:
-			if (txData->getFrmCtrl().ackReq)    //ack. required
-			{
-				taskP.taskStep(task)++;strcpy
-				(taskP.taskFrFunc(task), "handleAck");
-				//enable the receiver
-				PLME_SET_TRX_STATE_request(phy_RX_ON);
-				startAckTimeoutTimer();
-				waitDataAck = true;
-			}
-			else        //assume success if ack. not required
-			{
-				taskP.taskStatus(task) = false; // task ends successfully
-				EV << "[MAC-TASK-SUCCESS]: reset TP_MCPS_DATA_REQUEST" << endl;
-				resetTRX();
-				taskSuccess('d');
-			}
-			break;
-
-		case 3:
-			if (pStatus == phy_SUCCESS) //ack. received
-			{
-				EV << "[MAC]: ACK for " << txData->getName() << ":#" << (int) txData->getSeqNmbr() << " received successfully" << endl;
-				taskP.taskStatus(task) = false; // task ends successfully
-				EV << "[MAC-TASK-SUCCESS]: reset TP_MCPS_DATA_REQUEST" << endl;
-				waitDataAck = false;    // debug
-				resetTRX();
-				taskSuccess('d');
-			}
-			else                // time out when waiting for ack.
-			{
-				EV << "[MAC]: ACK timeout for " << txData->getName() << ":#" << (int) txData->getSeqNmbr() << endl;
-				numDataRetry++;
-				if (numDataRetry <= mpib.macMaxFrameRetries)
+			case 1:
+				if (pStatus == phy_IDLE)        // CSMA/CA succeeds
 				{
-					EV << "[MAC]: starting " << numDataRetry << "the retry for " << txData->getName() << ":#" << (int) txData->getSeqNmbr() << endl;
-					taskP.taskStep(task) = 1;   // go back to step 1
-					strcpy(taskP.taskFrFunc(task), "csmacaCallBack");
-					waitDataAck = false;
+					taskP.taskStep(task)++;strcpy
+					(taskP.taskFrFunc(task), "handle_PD_DATA_confirm");
+					//enable the transmitter
+					PLME_SET_TRX_STATE_request(phy_TX_ON);
+				}
+				else // CSMA/CA reports channel access failure, should report to SSCS through MCPS_DATA_confirm in spec
+				     // here simply retry
+				{
 					csmacaResume();
 				}
-				else
-				{
-					EV << "[MAC]: the max number of retries reached" << endl;
-					taskP.taskStatus(task) = false; //task fails
-					EV << "[MAC-TASK-FAIL]: reset TP_MCPS_DATA_REQUEST" << endl;
-					waitDataAck = false;        // debug
-					resetTRX();
-					taskFailed('d', mac_NO_ACK);
-				}
-			}
-			break;
+				break;
 
-		default:
-			break;
+			case 2:
+				if (txData->getFrmCtrl().ackReq)    //ack. required
+				{
+					taskP.taskStep(task)++;strcpy
+					(taskP.taskFrFunc(task), "handleAck");
+					//enable the receiver
+					PLME_SET_TRX_STATE_request(phy_RX_ON);
+					startAckTimeoutTimer();
+					waitDataAck = true;
+				}
+				else        //assume success if ack. not required
+				{
+					taskP.taskStatus(task) = false; // task ends successfully
+					EV << "[MAC-TASK-SUCCESS]: reset TP_MCPS_DATA_REQUEST" << endl;
+					resetTRX();
+					taskSuccess('d');
+				}
+				break;
+
+			case 3:
+				if (pStatus == phy_SUCCESS) //ack. received
+				{
+					EV << "[MAC]: ACK for " << txData->getName() << ":#" << (int) txData->getSeqNmbr() << " received successfully" << endl;
+					taskP.taskStatus(task) = false; // task ends successfully
+					EV << "[MAC-TASK-SUCCESS]: reset TP_MCPS_DATA_REQUEST" << endl;
+					waitDataAck = false;    // debug
+					resetTRX();
+					taskSuccess('d');
+				}
+				else                // time out when waiting for ack.
+				{
+					EV << "[MAC]: ACK timeout for " << txData->getName() << ":#" << (int) txData->getSeqNmbr() << endl;
+					numDataRetry++;
+					if (numDataRetry <= mpib.macMaxFrameRetries)
+					{
+						EV << "[MAC]: starting " << numDataRetry << "the retry for " << txData->getName() << ":#" << (int) txData->getSeqNmbr() << endl;
+						taskP.taskStep(task) = 1;   // go back to step 1
+						strcpy(taskP.taskFrFunc(task), "csmacaCallBack");
+						waitDataAck = false;
+						csmacaResume();
+					}
+					else
+					{
+						EV << "[MAC]: the max number of retries reached" << endl;
+						taskP.taskStatus(task) = false; //task fails
+						EV << "[MAC-TASK-FAIL]: reset TP_MCPS_DATA_REQUEST" << endl;
+						waitDataAck = false;        // debug
+						resetTRX();
+						taskFailed('d', mac_NO_ACK);
+					}
+				}
+				break;
+
+			default:
+				break;
 		}
 	}
 	else if (txOption == INDIRECT_TRANS)
@@ -7389,98 +7296,98 @@ void Ieee802154eMac::FSM_MCPS_DATA_request(PHYenum pStatus, MACenum mStatus)
 	{
 		switch (taskP.taskStep(task))
 		{
-		case 0:
-			// impossible happen here
-			break;
+			case 0:
+				// impossible happen here
+				break;
 
-		case 1:
-			// two possible callbacks, one from handleGtsTimer() at the starting of one GTS
-			// the other directly from MCPS_DATA_request(), only possible for devices when receiving a data from upper layer during the GTS
-			taskP.taskStep(task)++;strcpy
-			(taskP.taskFrFunc(task), "handle_PD_DATA_confirm");
-			// should transmit right now, since the timing is very strictly controlled in GTS,
-			// we can simply use phy_FORCE_TRX_OFF and then phy_TX_ON to turn on transmitter immediately
-			//PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF); // [SR] need to be test
-			PLME_SET_TRX_STATE_request(phy_TX_ON);
-			// data will be sent to PHY in handle_PLME_SET_TRX_STATE_confirm()
-			break;
-
-		case 2: // data successfully transmitted
-			if (txGTS->getFrmCtrl().ackReq) //ack. required
-			{
+			case 1:
+				// two possible callbacks, one from handleGtsTimer() at the starting of one GTS
+				// the other directly from MCPS_DATA_request(), only possible for devices when receiving a data from upper layer during the GTS
 				taskP.taskStep(task)++;strcpy
-				(taskP.taskFrFunc(task), "handleAck");
-				//enable the receiver
-				EV << "[GTS]: data successfully transmitted, turn on radio and wait for ACK" << endl;
-				PLME_SET_TRX_STATE_request(phy_RX_ON);
-				startAckTimeoutTimer();
-				waitGTSAck = true;
-			}
-			else        //assume success if ack. not required
-			{
-				EV << "[GTS]: data successfully transmitted, no ACK required, turn off radio now" << endl;
-				PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
-				EV << "[GTS]: need to delay IFS before next GTS transmission can proceed" << endl;
-				taskP.taskStep(task) = 4;
-				strcpy(taskP.taskFrFunc(task), "handleIfsTimer");
-				if (txGTS->getByteLength() <= aMaxSIFSFrameSize)
-					startIfsTimer(true);
-				else
-					startIfsTimer(false);
-			}
-			break;
+				(taskP.taskFrFunc(task), "handle_PD_DATA_confirm");
+				// should transmit right now, since the timing is very strictly controlled in GTS,
+				// we can simply use phy_FORCE_TRX_OFF and then phy_TX_ON to turn on transmitter immediately
+				//PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF); // [SR] need to be test
+				PLME_SET_TRX_STATE_request(phy_TX_ON);
+				// data will be sent to PHY in handle_PLME_SET_TRX_STATE_confirm()
+				break;
 
-		case 3:
-			if (pStatus == phy_SUCCESS) //ack. received
-			{
-				waitGTSAck = false;
-				EV << "[GTS]: ACK for " << txGTS->getName() << ":#" << (int) txGTS->getSeqNmbr() << " received successfully, turn off radio now" << endl;
-				PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
-				EV << "[GTS]: need to delay IFS before next GTS transmission can proceed" << endl;
-				taskP.taskStep(task)++;strcpy
-				(taskP.taskFrFunc(task), "handleIfsTimer");
-				if (txGTS->getByteLength() <= aMaxSIFSFrameSize)
-					startIfsTimer(true);
-				else
-					startIfsTimer(false);
-			}
-			else // time out when waiting for ack, normally impossible in GTS
-			{
-				EV << "[MAC]: ACK timeout for " << txGTS->getName() << ":#" << (int) txGTS->getSeqNmbr() << endl;
-				numGTSRetry++;
-				if (numGTSRetry <= mpib.macMaxFrameRetries)
+			case 2: // data successfully transmitted
+				if (txGTS->getFrmCtrl().ackReq) //ack. required
 				{
-					// retry in next GTS
-					EV << "[GTS]: retry in this GTS of next superframe, turn off radio now" << endl;
-					taskP.taskStep(task) = 1;   // go back to step 1
-					strcpy(taskP.taskFrFunc(task), "handleGtsTimer");
-					waitGTSAck = false;
-					// to avoid several consecutive PLME_SET_TRX_STATE_request are called at the same time, which may lead to error operation,
-					// use phy_FORCE_TRX_OFF to turn off radio, because PHY will not send back a confirm from it
-					PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
+					taskP.taskStep(task)++;strcpy
+					(taskP.taskFrFunc(task), "handleAck");
+					//enable the receiver
+					EV << "[GTS]: data successfully transmitted, turn on radio and wait for ACK" << endl;
+					PLME_SET_TRX_STATE_request(phy_RX_ON);
+					startAckTimeoutTimer();
+					waitGTSAck = true;
 				}
-				else
+				else        //assume success if ack. not required
 				{
-					EV << "[GTS]: the max num of retries reached, task failed" << endl;
-					taskP.taskStatus(task) = false; //task fails
-					EV << "[MAC-TASK-FAIL]: reset TP_MCPS_DATA_REQUEST" << endl;
-					waitGTSAck = false;
-					// to avoid several consecutive PLME_SET_TRX_STATE_request are called at the same time, which may lead to error operation,
-					// use phy_FORCE_TRX_OFF to turn off radio, because PHY will not send back a confirm from it
+					EV << "[GTS]: data successfully transmitted, no ACK required, turn off radio now" << endl;
 					PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
-					taskFailed('g', mac_NO_ACK);
+					EV << "[GTS]: need to delay IFS before next GTS transmission can proceed" << endl;
+					taskP.taskStep(task) = 4;
+					strcpy(taskP.taskFrFunc(task), "handleIfsTimer");
+					if (txGTS->getByteLength() <= aMaxSIFSFrameSize)
+						startIfsTimer(true);
+					else
+						startIfsTimer(false);
 				}
-			}
-			break;
+				break;
 
-		case 4:
-			taskP.taskStatus(task) = false; // task ends successfully
-			EV << "[GTS]: GTS transmission completes successfully, prepared for next GTS request" << endl;
-			taskSuccess('g');
-			break;
+			case 3:
+				if (pStatus == phy_SUCCESS) //ack. received
+				{
+					waitGTSAck = false;
+					EV << "[GTS]: ACK for " << txGTS->getName() << ":#" << (int) txGTS->getSeqNmbr() << " received successfully, turn off radio now" << endl;
+					PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
+					EV << "[GTS]: need to delay IFS before next GTS transmission can proceed" << endl;
+					taskP.taskStep(task)++;strcpy
+					(taskP.taskFrFunc(task), "handleIfsTimer");
+					if (txGTS->getByteLength() <= aMaxSIFSFrameSize)
+						startIfsTimer(true);
+					else
+						startIfsTimer(false);
+				}
+				else // time out when waiting for ack, normally impossible in GTS
+				{
+					EV << "[MAC]: ACK timeout for " << txGTS->getName() << ":#" << (int) txGTS->getSeqNmbr() << endl;
+					numGTSRetry++;
+					if (numGTSRetry <= mpib.macMaxFrameRetries)
+					{
+						// retry in next GTS
+						EV << "[GTS]: retry in this GTS of next superframe, turn off radio now" << endl;
+						taskP.taskStep(task) = 1;   // go back to step 1
+						strcpy(taskP.taskFrFunc(task), "handleGtsTimer");
+						waitGTSAck = false;
+						// to avoid several consecutive PLME_SET_TRX_STATE_request are called at the same time, which may lead to error operation,
+						// use phy_FORCE_TRX_OFF to turn off radio, because PHY will not send back a confirm from it
+						PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
+					}
+					else
+					{
+						EV << "[GTS]: the max num of retries reached, task failed" << endl;
+						taskP.taskStatus(task) = false; //task fails
+						EV << "[MAC-TASK-FAIL]: reset TP_MCPS_DATA_REQUEST" << endl;
+						waitGTSAck = false;
+						// to avoid several consecutive PLME_SET_TRX_STATE_request are called at the same time, which may lead to error operation,
+						// use phy_FORCE_TRX_OFF to turn off radio, because PHY will not send back a confirm from it
+						PLME_SET_TRX_STATE_request(phy_FORCE_TRX_OFF);
+						taskFailed('g', mac_NO_ACK);
+					}
+				}
+				break;
 
-		default:
-			break;
+			case 4:
+				taskP.taskStatus(task) = false; // task ends successfully
+				EV << "[GTS]: GTS transmission completes successfully, prepared for next GTS request" << endl;
+				taskSuccess('g');
+				break;
+
+			default:
+				break;
 		}
 	}
 	else
@@ -7739,45 +7646,45 @@ int Ieee802154eMac::calFrmByteLength(Ieee802154eFrame* frame) //
 		Ieee802154eCmdFrame* cmdFrm = check_and_cast<Ieee802154eCmdFrame *>(frame);
 		switch (cmdFrm->getCmdType())
 		{
-		case ASSOCIATION_REQUEST: // Fig 48: MHR (17/23) + Payload (2) + FCS (2)
-			byteLength = MHRLength + 4;
-			break;
+			case ASSOCIATION_REQUEST: // Fig 48: MHR (17/23) + Payload (2) + FCS (2)
+				byteLength = MHRLength + 4;
+				break;
 
-		case ASSOCIATION_RESPONSE:
-			byteLength = SIZE_OF_802154_ASSOCIATION_RESPONSE;
-			break;
+			case ASSOCIATION_RESPONSE:
+				byteLength = SIZE_OF_802154_ASSOCIATION_RESPONSE;
+				break;
 
-		case DISASSOCIATION_NOTIFICATION:
-			byteLength = SIZE_OF_802154_DISASSOCIATION_NOTIFICATION;
-			break;
+			case DISASSOCIATION_NOTIFICATION:
+				byteLength = SIZE_OF_802154_DISASSOCIATION_NOTIFICATION;
+				break;
 
-		case DATA_REQUEST: // Fig 52: MHR (7/11/13/17) + Payload (1) + FCS (2)
-			byteLength = MHRLength + 3;
-			break;
+			case DATA_REQUEST: // Fig 52: MHR (7/11/13/17) + Payload (1) + FCS (2)
+				byteLength = MHRLength + 3;
+				break;
 
-		case PAN_ID_CONFLICT_NOTIFICATION:
-			byteLength = SIZE_OF_802154_PANID_CONFLICT_NOTIFICATION;
-			break;
+			case PAN_ID_CONFLICT_NOTIFICATION:
+				byteLength = SIZE_OF_802154_PANID_CONFLICT_NOTIFICATION;
+				break;
 
-		case ORPHAN_NOTIFICATION:
-			byteLength = SIZE_OF_802154_ORPHAN_NOTIFICATION;
-			break;
+			case ORPHAN_NOTIFICATION:
+				byteLength = SIZE_OF_802154_ORPHAN_NOTIFICATION;
+				break;
 
-		case BEACON_REQUEST:
-			byteLength = SIZE_OF_802154_BEACON_REQUEST;
-			break;
+			case BEACON_REQUEST:
+				byteLength = SIZE_OF_802154_BEACON_REQUEST;
+				break;
 
-		case COORDINATOR_REALIGNMENT: // Fig 56: MHR (17/23) + Payload (8) + FCS (2)
-			byteLength = MHRLength + 10;
-			break;
+			case COORDINATOR_REALIGNMENT: // Fig 56: MHR (17/23) + Payload (8) + FCS (2)
+				byteLength = MHRLength + 10;
+				break;
 
-		case GTS_REQUEST:
-			byteLength = SIZE_OF_802154_GTS_REQUEST;
-			break;
+			case GTS_REQUEST:
+				byteLength = SIZE_OF_802154_GTS_REQUEST;
+				break;
 
-		default:
-			error("[MAC]: cannot calculate the size of a MAC command frame with unknown type!");
-			break;
+			default:
+				error("[MAC]: cannot calculate the size of a MAC command frame with unknown type!");
+				break;
 		}
 	}
 	else
@@ -7795,39 +7702,39 @@ int Ieee802154eMac::calMHRByteLength(uint8_t addrModeSrc, uint8_t addrModeDst)
 	int sum = 2; // frame control - see Std 802.15.4e-2012 (5.2.1.1) page 59
 	switch (addrModeSrc)
 	{
-	case 0:
-		sum += 0;
-		break;
-	case 1:
-		sum += 2 + 1;
-		break;
-	case 2:
-		sum += 2 + 2;
-		break;
-	case 3:
-		sum += 2 + 8;
-		break;
-	default:
-		error("[MAC]: impossible address src mode sum!");
-		break;
+		case 0:
+			sum += 0;
+			break;
+		case 1:
+			sum += 2 + 1;
+			break;
+		case 2:
+			sum += 2 + 2;
+			break;
+		case 3:
+			sum += 2 + 8;
+			break;
+		default:
+			error("[MAC]: impossible address src mode sum!");
+			break;
 	}
 	switch (addrModeDst)
 	{
-	case 0:
-		sum += 0;
-		break;
-	case 1:
-		sum += 2 + 1;
-		break;
-	case 2:
-		sum += 2 + 2;
-		break;
-	case 3:
-		sum += 2 + 8;
-		break;
-	default:
-		error("[MAC]: impossible address dst mode sum!");
-		break;
+		case 0:
+			sum += 0;
+			break;
+		case 1:
+			sum += 2 + 1;
+			break;
+		case 2:
+			sum += 2 + 2;
+			break;
+		case 3:
+			sum += 2 + 8;
+			break;
+		default:
+			error("[MAC]: impossible address dst mode sum!");
+			break;
 	}
 
 	return sum;
@@ -7902,8 +7809,10 @@ double Ieee802154eMac::getRate(char bitOrSymbol)
  * check if the msg goes to the PAN coordinator */
 bool Ieee802154eMac::toParent(Ieee802154eFrame* frame)
 {
-	if(frame == NULL){
+	if (frame == NULL)
+	{
 		delete frame;
+		frame = NULL;
 		return false;
 	}
 	Ieee802154eFrame* tmpFrame = check_and_cast<Ieee802154eFrame *>(frame);
@@ -8673,41 +8582,41 @@ void Ieee802154eMac::handleAsnTimer()
 
 		switch (activeLinkEntry->getLinkType())
 		{
-		case LNK_TP_NORMAL:
+			case LNK_TP_NORMAL:
 
-			tmpMsg = queueModule->requestSpcPacket((IE3ADDR) activeLinkEntry->getNodeAddress());
-			break;
-		case LNK_TP_ADVERTISING:
+				tmpMsg = queueModule->requestSpcPacket((IE3ADDR) activeLinkEntry->getNodeAddress());
+				break;
+			case LNK_TP_ADVERTISING:
 
-			tmpMsg = queueModule->requestBeaconPacket();
+				tmpMsg = queueModule->requestBeaconPacket();
 
-			if (tmpMsg == NULL)
-			{
+				if (tmpMsg == NULL)
+				{
+					tmpMsg = queueModule->requestAdvPacket();
+				}
+				if (tmpMsg == NULL && activeLinkEntry->isnextStage())
+				{
+					tmpMsg = queueModule->requestDisAssPacket(true);
+				}
+
+				if (tmpMsg == NULL)
+				{
+					tmpMsg = queueModule->requestSchdulePacket();
+				}
+
+				break;
+
+			case LNK_TP_JOIN:
+
 				tmpMsg = queueModule->requestAdvPacket();
-			}
-			if (tmpMsg == NULL && activeLinkEntry->isnextStage())
-			{
-				tmpMsg = queueModule->requestDisAssPacket(true);
-			}
 
-			if (tmpMsg == NULL)
-			{
-				tmpMsg = queueModule->requestSchdulePacket();
-			}
+				if (tmpMsg == NULL)
+					tmpMsg = queueModule->requestDisAssPacket(false);
 
-			break;
-
-		case LNK_TP_JOIN:
-
-			tmpMsg = queueModule->requestAdvPacket();
-
-			if (tmpMsg == NULL)
-				tmpMsg = queueModule->requestDisAssPacket(false);
-
-			break;
-		default:
-			tmpMsg = NULL;
-			break;
+				break;
+			default:
+				tmpMsg = NULL;
+				break;
 
 		}
 

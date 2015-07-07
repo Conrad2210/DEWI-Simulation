@@ -58,6 +58,7 @@ void RLLApp::initialize(int stage)
 		m_BurstPause = par("BurstPause").doubleValue();
 		m_AppStartTime = par("StartTime").doubleValue();
 		m_totalBurstToSend = par("numberOfBursts");
+		AssTimer = new cMessage("AssTimer");
 
 		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
 
@@ -72,7 +73,6 @@ void RLLApp::initialize(int stage)
 		receivedMSG = new DataVector(a.str(),"rxMSG");
 		if (m_isLightSwitch)
 		{
-			AssTimer = new cMessage("AssTimer");
 			scheduleAt(simTime() + 5, AssTimer);
 		}
 
@@ -227,7 +227,8 @@ void RLLApp::sendNextBurstMessage()
 		m_numberMessageSend = 0;
 		m_burstCounter++;
 		m_messageCounter = 0;
-		scheduleAt(simTime() + m_BurstPause, BurstTimer);
+		double wait = uniform(m_BurstPause, m_BurstPause + 5);
+		scheduleAt(simTime() + wait, BurstTimer);
 	}
 }
 

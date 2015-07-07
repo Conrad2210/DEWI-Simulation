@@ -196,6 +196,8 @@ class INET_API RLL : public cSimpleModule
 
 	DataCenter *dataCenter;
 
+	int nChannel10, nChannel11;
+
     private:
 	////////////////////////////////////////////////////////////////////////
 	//			Helper Functions
