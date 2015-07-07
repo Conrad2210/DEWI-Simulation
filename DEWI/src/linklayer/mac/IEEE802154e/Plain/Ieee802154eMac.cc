@@ -8158,7 +8158,7 @@ macLinkTableEntry* Ieee802154eMac::getLinkEntry(UINT_64 asnCounter)
 		// collect all links for this ASN
 		std::list<macLinkTableEntry*> tmpLinkVector;
 		macSlotframeTableEntry* tmpSlotframe;
-		macLinkTableEntry* tmpLink = new macLinkTableEntry();
+		macLinkTableEntry* tmpLink = NULL;
 		for (int i = 0; i < slotframeTable->getNumSlotframes(); i++)
 		{
 			tmpSlotframe = slotframeTable->getSlotframe(i);
@@ -8186,7 +8186,7 @@ macLinkTableEntry* Ieee802154eMac::getLinkEntry(UINT_64 asnCounter)
 		else
 		{ // filter the links - Std 802.15.4e-2012 (5.1.1.5.4 Multiple slotframes) page 18
 		  // note: transmissions take over receives, and lower slotframeHandle slotframes takes precedence over higher slotframeHandle slotframes
-			macLinkTableEntry* tmpEntry = 0;
+			macLinkTableEntry* tmpEntry = NULL;
 			for (std::list<macLinkTableEntry*>::iterator i = tmpLinkVector.begin(); i != tmpLinkVector.end(); ++i)
 			{
 				if (tmpEntry == NULL)
@@ -8496,10 +8496,16 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 								tmpHopE->setPhyConfiguration(tmpChannel->phyConfig);
 
 								if (hoppingSequenceList->getEntryById(tmpHopE->getHoppingSequenceId()) == NULL)
+									{
 									hoppingSequenceList->addEntry(tmpHopE);
+									useHoppingSequenceID = tmpHopE->getHoppingSequenceId();
+									}
 								else
+								{
 									hoppingSequenceList->editHoppingSequenceListEntry(tmpHopE);
-								useHoppingSequenceID = tmpHopE->getHoppingSequenceId();
+									useHoppingSequenceID = tmpHopE->getHoppingSequenceId();
+									delete tmpHopE;
+								}
 							}
 						}
 					}
