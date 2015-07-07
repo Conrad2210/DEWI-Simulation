@@ -110,7 +110,7 @@ void DataCenter::recordScalar(std::string Data, std::string Type, std::string In
 #ifdef WIN32
 	path << ResultPath << "\\" << Type << "\\" << Index;
 #elif linux
-	path << ResultPath << "/" << Type << "/" << Index;
+	path << ResultPath << "/" << Type << "/" << Index <<" " << Name;
 #endif
 	//Create Directories
 	if (createDirectories(path.str()))
@@ -119,7 +119,8 @@ void DataCenter::recordScalar(std::string Data, std::string Type, std::string In
 #ifdef WIN32
 		path << "\\" << Name << ".csv";
 #elif linux
-		path << "/" << Name << ".csv";
+		path << "/" << ev.getConfigEx()->getActiveConfigName() << "_"
+                << ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #endif
 
 		//open output file

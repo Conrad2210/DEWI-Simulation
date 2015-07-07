@@ -227,7 +227,7 @@ void RLLApp::sendNextBurstMessage()
 		m_numberMessageSend = 0;
 		m_burstCounter++;
 		m_messageCounter = 0;
-		double wait = uniform(m_BurstPause, m_BurstPause + 5);
+		double wait = uniform(m_BurstPause, m_BurstPause*2);
 		scheduleAt(simTime() + wait, BurstTimer);
 	}
 }
