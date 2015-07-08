@@ -8396,9 +8396,10 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 									}
 									for (int k = 0; k < tmpSlotLink->getSlotframeIE(i)->getNumLinks(); k++)
 									{
-										if (linkTable->getLinkByTimeslotSlotframe(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot(), tmpSlotLink->getSlotframeIE(i)->getSlotframeId()) == NULL)
+									    macLinkTableEntry *tmpLink = linkTable->getLinkByTimeslotSlotframe(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot(), tmpSlotLink->getSlotframeIE(i)->getSlotframeId());
+										if (tmpLink == NULL)
 										{
-											macLinkTableEntry *tmpLink = new macLinkTableEntry();
+											tmpLink = new macLinkTableEntry();
 											tmpLink->setChannelOffset(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getChannelOffset());
 											tmpLink->setLinkOption(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkOption());
 
@@ -8411,13 +8412,12 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 
 											tmpLink->setSlotframeId(tmpSlotLink->getSlotframeIE(i)->getSlotframeId());
 											tmpLink->setTimeslot(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot());
-											tmpLink->setLinkId(linkTable->getNumLinks());
+											tmpLink->setLinkId(0);
 											tmpLink->setMacLinkTable(linkTable);
 											linkTable->addLink(tmpLink);
 										}
 										else
 										{
-											macLinkTableEntry *tmpLink = new macLinkTableEntry();
 											tmpLink->setChannelOffset(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getChannelOffset());
 											tmpLink->setLinkOption(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkOption());
 											//tmpLink->setLinkType(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getLinkTyp());
@@ -8427,9 +8427,7 @@ bool Ieee802154eMac::handleIEfield(Ieee802154eFrame* frame)
 												tmpLink->setNodeAddress(getShortAddress(tmpFrame->getSrcAddr()));
 											tmpLink->setSlotframeId(tmpSlotLink->getSlotframeIE(i)->getSlotframeId());
 											tmpLink->setTimeslot(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot());
-											tmpLink->setLinkId(linkTable->getLinkByTimeslotSlotframe(tmpSlotLink->getSlotframeIE(i)->getLinkIE(k)->getTimeslot(), tmpSlotLink->getSlotframeIE(i)->getSlotframeId())->getLinkId());
-											tmpLink->setMacLinkTable(linkTable);
-											linkTable->editLink(tmpLink);
+
 										}
 
 									}

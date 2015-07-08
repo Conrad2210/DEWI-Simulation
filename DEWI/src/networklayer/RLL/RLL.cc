@@ -684,6 +684,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 			tempStr->parse("b=1.5,1.5,oval,green");
 			parentDisp->updateWith(*tempStr);
 			dataCenter->updateAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), true, nCluStage, clusterTable->getEntry(0)->getAddress(), "");
+			if(linkTable->getNumLinks() != 3)
+			    MLME_DISASSOCIATE_request(NULL);
 
 		}
 		else
@@ -1992,7 +1994,7 @@ void RLL::setScheduleChInit()
 void RLL::setScheduleCs()
 {
 	macLinkTableEntry *linkEntry = new macLinkTableEntry();
-	linkEntry->setChannelOffset(-1); //Advertisment always with channelOffset 0;
+	linkEntry->setChannelOffset(nChannel10); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
@@ -2009,7 +2011,7 @@ void RLL::setScheduleCs()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	linkEntry->setChannelOffset(-1); //Advertisment always with channelOffset 0;
+	linkEntry->setChannelOffset(nChannel11); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
