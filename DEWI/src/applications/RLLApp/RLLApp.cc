@@ -59,7 +59,8 @@ void RLLApp::initialize(int stage)
 		m_AppStartTime = par("StartTime").doubleValue();
 		m_totalBurstToSend = par("numberOfBursts");
 		AssTimer = new cMessage("AssTimer");
-
+		counterRxMsg = 0;
+		counterTxMsg = 0;
 		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
 
 		BurstTimer = new cMessage("BurstTimer");
@@ -95,6 +96,14 @@ void RLLApp::finish()
 	cancelEvent(BurstMessageTimer);
 	cancelEvent(StopTimer);
 	cancelEvent(AssTimer);
+	std::stringstream sss;
+	sss << getParentModule()->getIndex();
+	std::stringstream ss;
+	ss << counterRxMsg;
+	dataCenter->recordScalar(ss.str(),"scaRxMsg", getParentModule()->getName(), sss.str());
+	ss.str("");
+	ss << counterTxMsg;
+	dataCenter->recordScalar(ss.str(),"scaTxMsg", getParentModule()->getName(), sss.str());
 }
 
 // OPERATIONS
@@ -136,7 +145,8 @@ void RLLApp::handleLowerMsg(cMessage* msg)
 	std::stringstream ss;
 	ss << "Received: " << tmp->getName();
 	getParentModule()->bubble(ss.str().c_str());
-	E2E->record((now - tmp->getCreationTime().dbl()), tmp->getName());
+	E2E->record((now - tmp->getCreationTime().dbl()));
+	counterRxMsg++;
 	receivedMSG->record(tmp->getName());
 	delete tmp;
 }
@@ -192,7 +202,7 @@ void RLLApp::startBurst()
 
 		send(appPkt->dup(), mLowerLayerOut);
 		m_numberMessageSend++;
-
+		counterTxMsg++;
 		scheduleAt(simTime() + m_interArrivalTime, BurstMessageTimer);
 
 		delete appPkt;
@@ -218,6 +228,7 @@ void RLLApp::sendNextBurstMessage()
 		appPkt->setMessageId(m_messageCounter);
 		send(appPkt->dup(), mLowerLayerOut);
 		m_numberMessageSend++;
+		counterTxMsg++;
 		scheduleAt(simTime() + m_interArrivalTime, BurstMessageTimer);
 		delete appPkt;
 		appPkt = NULL;

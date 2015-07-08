@@ -70,6 +70,9 @@ class RLLApp : public TrafGenPar
 	double m_interArrivalTime;
 	double m_BurstPause;
 
+	int counterRxMsg;
+	int counterTxMsg;
+
 	cMessage *BurstTimer;
 	cMessage *BurstMessageTimer;
 	cMessage *StopTimer;
