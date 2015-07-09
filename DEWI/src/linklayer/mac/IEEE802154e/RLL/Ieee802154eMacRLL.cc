@@ -837,7 +837,7 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 					{
 //
 //						//send(tmpData, mQueueOut);
-						deletedMsgCounter =+ queueModule->checkForNewerControlMessage(tmpData, txData);
+						deletedMsgCounter = deletedMsgCounter + queueModule->checkForNewerControlMessage(tmpData, txData);
 						queueModule->insertInQueue(tmpData);
 					}
 					else
