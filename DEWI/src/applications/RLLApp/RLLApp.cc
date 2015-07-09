@@ -37,8 +37,8 @@ RLLApp::~RLLApp()
 	cancelAndDelete(StopTimer);
 	cancelAndDelete(AssTimer);
 
-        delete E2E;
-        delete receivedMSG;
+	delete E2E;
+	delete receivedMSG;
 }
 
 void RLLApp::initialize(int stage)
@@ -74,7 +74,7 @@ void RLLApp::initialize(int stage)
 		a << getParentModule()->getName() << " " << getParentModule()->getIndex();
 		//EndToEndDelay = new cOutVector(a.str().c_str());
 		E2E = new DataVector(a.str(), "latency");
-		receivedMSG = new DataVector(a.str(),"rxMSG");
+		receivedMSG = new DataVector(a.str(), "rxMSG");
 		if (m_isLightSwitch)
 		{
 			scheduleAt(simTime() + 5, AssTimer);
@@ -84,8 +84,8 @@ void RLLApp::initialize(int stage)
 	if (1 == stage)
 	{
 
-			E2E->registerVector();
-			receivedMSG->registerVector();
+		E2E->registerVector();
+		receivedMSG->registerVector();
 
 		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 		if (strcmp("gateWay", getParentModule()->getName()))
@@ -103,10 +103,10 @@ void RLLApp::finish()
 	sss << getParentModule()->getIndex();
 	std::stringstream ss;
 	ss << counterRxMsg;
-	dataCenter->recordScalar(ss.str(),"scaRxMsg", getParentModule()->getName(), sss.str());
+	dataCenter->recordScalar(ss.str(), "scaRxMsg", getParentModule()->getName(), sss.str());
 	ss.str("");
 	ss << counterTxMsg;
-	dataCenter->recordScalar(ss.str(),"scaTxMsg", getParentModule()->getName(), sss.str());
+	dataCenter->recordScalar(ss.str(), "scaTxMsg", getParentModule()->getName(), sss.str());
 }
 
 // OPERATIONS
@@ -167,9 +167,10 @@ void RLLApp::checkAssociation()
 
 		else
 		{
-		    std::cout<<endl<<"Run number: " <<ev.getConfigEx()->getActiveRunNumber()<<endl;
-		    std::cout<< "Ass Nodes: " << dataCenter->getNumAssNodes() << " of " << dataCenter->getNumRegisteredAssVectors() << endl;
-		    std::cout<< dataCenter->getNumAssNodes() / dataCenter->getNumRegisteredAssVectors() * 100 << "%"<<endl;
+			std::cout << endl << "Run number: " << ev.getConfigEx()->getActiveRunNumber() << endl;
+			std::cout << "Ass Nodes: " << dataCenter->getNumAssNodes() << " of " << dataCenter->getNumRegisteredAssVectors() << endl;
+			double percent = (double) dataCenter->getNumAssNodes() / (double) dataCenter->getNumRegisteredAssVectors() * 100.0;
+			std::cout << percent << "%" << endl;
 			if (AssTimer->isScheduled())
 				cancelEvent(AssTimer);
 
@@ -196,6 +197,9 @@ void RLLApp::startBurst()
 {
 	if (m_burstCounter <= m_totalBurstToSend)
 	{
+		std::cout << endl << "Run number: " << ev.getConfigEx()->getActiveRunNumber() << endl;
+		double percent = (double) m_burstCounter / (double) m_totalBurstToSend * 100.0;
+		std::cout << percent << "%" << endl;
 		char msgName[32];
 		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
 		RLLAppMsg* appPkt = new RLLAppMsg(msgName);
@@ -244,13 +248,13 @@ void RLLApp::sendNextBurstMessage()
 		m_numberMessageSend = 0;
 		m_burstCounter++;
 		m_messageCounter = 0;
-		double wait = uniform(m_BurstPause/2,m_BurstPause);
+		double wait = uniform(m_BurstPause / 2, m_BurstPause);
 		scheduleAt(simTime() + wait, BurstTimer);
 	}
 }
 
 void RLLApp::endSim()
 {
-    simulation.callFinish();
-    simulation.endRun();
+	simulation.callFinish();
+	simulation.endRun();
 }
