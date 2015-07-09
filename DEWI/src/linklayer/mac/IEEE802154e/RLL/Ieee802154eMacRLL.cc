@@ -2237,7 +2237,7 @@ void Ieee802154eMacRLL::handleAck(Ieee802154eFrame *frame)
 					MCPS_DATA_confirm(0, txData->getArrivalTime().getScale(), false, 0, 0, 0, 0, 0, mac_SUCCESS, txData->getRetries(), 0, txData);
 
 					// delete the msg from the queue
-					queueModule->deleteMsgQueue(txData->getDstAddr(), false);
+					queueModule->deleteMsgFromQueu(txData);
 
 					/**note:
 					 * A successful transmission in a shared link resets the backoff window to the minimum value.
