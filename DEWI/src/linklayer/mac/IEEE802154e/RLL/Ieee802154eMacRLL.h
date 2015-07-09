@@ -89,7 +89,8 @@ class Ieee802154eMacRLL : public Ieee802154eMac
 	cMessage* awaitingBeacon;
 	cMessage *scanTimer;
 
-
+	int deletedMsgCounter;
+	DataCenter *dataCenter;
 };
 
 #endif /* IEEE802154EMACRLL_H_ */

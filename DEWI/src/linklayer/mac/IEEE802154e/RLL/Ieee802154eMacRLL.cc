@@ -45,7 +45,8 @@ void Ieee802154eMacRLL::initialize(int stage)
 	scanTimer = new cMessage("scanTimer", MAC_SCAN_TIMER);
 	awaitingBeacon = new cMessage("awaitingBeaconTimer", MAC_AWAITING_BEACON);
 	awaitingNextBeacon = false;
-
+	deletedMsgCounter = 0;
+	dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
 }
 
 void Ieee802154eMacRLL::finish()
@@ -53,6 +54,14 @@ void Ieee802154eMacRLL::finish()
 	Ieee802154eMac::finish();
 	cancelEvent(awaitingBeacon);
 	cancelEvent(scanTimer);
+
+	std::stringstream ss;
+	std::stringstream sss;
+	sss << getParentModule()->getParentModule()->getIndex();
+
+	ss << deletedMsgCounter;
+	dataCenter->recordScalar(ss.str(), "scaDelMsg", getParentModule()->getParentModule()->getName(), sss.str());
+
 }
 
 void Ieee802154eMacRLL::handleMessage(cMessage *msg)
@@ -828,7 +837,7 @@ void Ieee802154eMacRLL::MCPS_DATA_request(Ieee802154eAddrMode srcAddrMode, Ieee8
 					{
 //
 //						//send(tmpData, mQueueOut);
-						queueModule->checkForNewerControlMessage(tmpData, txData);
+						deletedMsgCounter =+ queueModule->checkForNewerControlMessage(tmpData, txData);
 						queueModule->insertInQueue(tmpData);
 					}
 					else
