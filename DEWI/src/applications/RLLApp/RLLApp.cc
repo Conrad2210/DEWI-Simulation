@@ -167,6 +167,9 @@ void RLLApp::checkAssociation()
 
 		else
 		{
+		    std::cout<<endl<<"Run number: " <<ev.getConfigEx()->getActiveRunNumber()<<endl;
+		    std::cout<< "Ass Nodes: " << dataCenter->getNumAssNodes() << " of " << dataCenter->getNumRegisteredAssVectors() << endl;
+		    std::cout<< dataCenter->getNumAssNodes() / dataCenter->getNumRegisteredAssVectors() * 100 << "%"<<endl;
 			if (AssTimer->isScheduled())
 				cancelEvent(AssTimer);
 
