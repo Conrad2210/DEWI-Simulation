@@ -27,6 +27,7 @@
 #include "Radio80211aControlInfo_m.h"
 
 #include "DataCenter.h"
+#include "DataVector.h"
 class INET_API RLL : public cSimpleModule
 {
     public:
@@ -138,6 +139,7 @@ class INET_API RLL : public cSimpleModule
 
 	cBeaconTable *beaconTable;
 
+
 	//TIMER
     protected:
 	cMessage *StartTimer;
@@ -192,10 +194,16 @@ class INET_API RLL : public cSimpleModule
 
 	int nDistance;
 
+	int nLastBurstId;
+	int nLastMessageId;
+
 	int waitConstant;
 
 	DataCenter *dataCenter;
 
+	DataVector *dupMsg;
+
+	int nDupCounter;
 	int nChannel10, nChannel11;
 
     private:
