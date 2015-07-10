@@ -111,6 +111,8 @@ class INET_API RLL : public cSimpleModule
 
 	virtual void setCheckTimer();
 
+
+	virtual void setChannelOffset();
     protected:
 	int mLowerLayerIn;
 	int mUpperLayerIn;
@@ -204,7 +206,9 @@ class INET_API RLL : public cSimpleModule
 	DataVector *dupMsg;
 
 	int nDupCounter;
-	int nChannel10, nChannel11;
+	int nChannel1,nChannel2,nChannel3,nChannel4;
+	int nChannel5,nChannel6,nChannel7,nChannel8,nChannel10,nChannel11;
+	int nChannel10CH, nChannel11CH;
 
     private:
 	////////////////////////////////////////////////////////////////////////
@@ -229,6 +233,7 @@ class INET_API RLL : public cSimpleModule
 	{
 	    return pow(10, dBm / 10);
 	}
+
 
 	Radio80211aControlInfo getRadioControl(Radio80211aControlInfo *cntrl);
 	void updatedisplay();

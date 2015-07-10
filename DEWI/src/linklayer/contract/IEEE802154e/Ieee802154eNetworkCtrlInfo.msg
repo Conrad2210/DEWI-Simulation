@@ -212,8 +212,15 @@ message Ieee802154eNetworkCtrlInfo
 	bool txHigherCH;
 	
 	uint8_t numberCH;
-	
-	int channelOffset10;
-	int channelOffset11;
+	int nChannel1 = -1;
+	int nChannel2 = -1;
+	int nChannel3 = -1;
+	int nChannel4 = -1;
+	int nChannel5 = -1;
+	int nChannel6 = -1;
+	int nChannel7 = -1;
+	int nChannel8 = -1;
+	int nChannel10 = -1;
+	int nChannel11  = -1;
 	
 }

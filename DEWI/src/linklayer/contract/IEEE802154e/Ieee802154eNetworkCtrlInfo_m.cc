@@ -193,8 +193,16 @@ Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const char *name, int kin
     this->txLowerCH_var = 0;
     this->txHigherCH_var = 0;
     this->numberCH_var = 0;
-    this->channelOffset10_var = 0;
-    this->channelOffset11_var = 0;
+    this->nChannel1_var = -1;
+    this->nChannel2_var = -1;
+    this->nChannel3_var = -1;
+    this->nChannel4_var = -1;
+    this->nChannel5_var = -1;
+    this->nChannel6_var = -1;
+    this->nChannel7_var = -1;
+    this->nChannel8_var = -1;
+    this->nChannel10_var = -1;
+    this->nChannel11_var = -1;
 }
 
 Ieee802154eNetworkCtrlInfo::Ieee802154eNetworkCtrlInfo(const Ieee802154eNetworkCtrlInfo& other) : ::cMessage(other)
@@ -419,8 +427,16 @@ void Ieee802154eNetworkCtrlInfo::copy(const Ieee802154eNetworkCtrlInfo& other)
     this->txLowerCH_var = other.txLowerCH_var;
     this->txHigherCH_var = other.txHigherCH_var;
     this->numberCH_var = other.numberCH_var;
-    this->channelOffset10_var = other.channelOffset10_var;
-    this->channelOffset11_var = other.channelOffset11_var;
+    this->nChannel1_var = other.nChannel1_var;
+    this->nChannel2_var = other.nChannel2_var;
+    this->nChannel3_var = other.nChannel3_var;
+    this->nChannel4_var = other.nChannel4_var;
+    this->nChannel5_var = other.nChannel5_var;
+    this->nChannel6_var = other.nChannel6_var;
+    this->nChannel7_var = other.nChannel7_var;
+    this->nChannel8_var = other.nChannel8_var;
+    this->nChannel10_var = other.nChannel10_var;
+    this->nChannel11_var = other.nChannel11_var;
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
@@ -563,8 +579,16 @@ void Ieee802154eNetworkCtrlInfo::parsimPack(cCommBuffer *b)
     doPacking(b,this->txLowerCH_var);
     doPacking(b,this->txHigherCH_var);
     doPacking(b,this->numberCH_var);
-    doPacking(b,this->channelOffset10_var);
-    doPacking(b,this->channelOffset11_var);
+    doPacking(b,this->nChannel1_var);
+    doPacking(b,this->nChannel2_var);
+    doPacking(b,this->nChannel3_var);
+    doPacking(b,this->nChannel4_var);
+    doPacking(b,this->nChannel5_var);
+    doPacking(b,this->nChannel6_var);
+    doPacking(b,this->nChannel7_var);
+    doPacking(b,this->nChannel8_var);
+    doPacking(b,this->nChannel10_var);
+    doPacking(b,this->nChannel11_var);
 }
 
 void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
@@ -773,8 +797,16 @@ void Ieee802154eNetworkCtrlInfo::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->txLowerCH_var);
     doUnpacking(b,this->txHigherCH_var);
     doUnpacking(b,this->numberCH_var);
-    doUnpacking(b,this->channelOffset10_var);
-    doUnpacking(b,this->channelOffset11_var);
+    doUnpacking(b,this->nChannel1_var);
+    doUnpacking(b,this->nChannel2_var);
+    doUnpacking(b,this->nChannel3_var);
+    doUnpacking(b,this->nChannel4_var);
+    doUnpacking(b,this->nChannel5_var);
+    doUnpacking(b,this->nChannel6_var);
+    doUnpacking(b,this->nChannel7_var);
+    doUnpacking(b,this->nChannel8_var);
+    doUnpacking(b,this->nChannel10_var);
+    doUnpacking(b,this->nChannel11_var);
 }
 
 bool Ieee802154eNetworkCtrlInfo::getToParent() const
@@ -2257,24 +2289,104 @@ void Ieee802154eNetworkCtrlInfo::setNumberCH(uint8_t numberCH)
     this->numberCH_var = numberCH;
 }
 
-int Ieee802154eNetworkCtrlInfo::getChannelOffset10() const
+int Ieee802154eNetworkCtrlInfo::getNChannel1() const
 {
-    return channelOffset10_var;
+    return nChannel1_var;
 }
 
-void Ieee802154eNetworkCtrlInfo::setChannelOffset10(int channelOffset10)
+void Ieee802154eNetworkCtrlInfo::setNChannel1(int nChannel1)
 {
-    this->channelOffset10_var = channelOffset10;
+    this->nChannel1_var = nChannel1;
 }
 
-int Ieee802154eNetworkCtrlInfo::getChannelOffset11() const
+int Ieee802154eNetworkCtrlInfo::getNChannel2() const
 {
-    return channelOffset11_var;
+    return nChannel2_var;
 }
 
-void Ieee802154eNetworkCtrlInfo::setChannelOffset11(int channelOffset11)
+void Ieee802154eNetworkCtrlInfo::setNChannel2(int nChannel2)
 {
-    this->channelOffset11_var = channelOffset11;
+    this->nChannel2_var = nChannel2;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel3() const
+{
+    return nChannel3_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel3(int nChannel3)
+{
+    this->nChannel3_var = nChannel3;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel4() const
+{
+    return nChannel4_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel4(int nChannel4)
+{
+    this->nChannel4_var = nChannel4;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel5() const
+{
+    return nChannel5_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel5(int nChannel5)
+{
+    this->nChannel5_var = nChannel5;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel6() const
+{
+    return nChannel6_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel6(int nChannel6)
+{
+    this->nChannel6_var = nChannel6;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel7() const
+{
+    return nChannel7_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel7(int nChannel7)
+{
+    this->nChannel7_var = nChannel7;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel8() const
+{
+    return nChannel8_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel8(int nChannel8)
+{
+    this->nChannel8_var = nChannel8;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel10() const
+{
+    return nChannel10_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel10(int nChannel10)
+{
+    this->nChannel10_var = nChannel10;
+}
+
+int Ieee802154eNetworkCtrlInfo::getNChannel11() const
+{
+    return nChannel11_var;
+}
+
+void Ieee802154eNetworkCtrlInfo::setNChannel11(int nChannel11)
+{
+    this->nChannel11_var = nChannel11;
 }
 
 class Ieee802154eNetworkCtrlInfoDescriptor : public cClassDescriptor
@@ -2324,7 +2436,7 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getProperty(const char *proper
 int Ieee802154eNetworkCtrlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 128+basedesc->getFieldCount(object) : 128;
+    return basedesc ? 136+basedesc->getFieldCount(object) : 136;
 }
 
 unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -2464,8 +2576,16 @@ unsigned int Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeFlags(void *objec
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<128) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<136) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int field) const
@@ -2603,10 +2723,18 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldName(void *object, int
         "txLowerCH",
         "txHigherCH",
         "numberCH",
-        "channelOffset10",
-        "channelOffset11",
+        "nChannel1",
+        "nChannel2",
+        "nChannel3",
+        "nChannel4",
+        "nChannel5",
+        "nChannel6",
+        "nChannel7",
+        "nChannel8",
+        "nChannel10",
+        "nChannel11",
     };
-    return (field>=0 && field<128) ? fieldNames[field] : NULL;
+    return (field>=0 && field<136) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fieldName) const
@@ -2739,8 +2867,16 @@ int Ieee802154eNetworkCtrlInfoDescriptor::findField(void *object, const char *fi
     if (fieldName[0]=='t' && strcmp(fieldName, "txLowerCH")==0) return base+123;
     if (fieldName[0]=='t' && strcmp(fieldName, "txHigherCH")==0) return base+124;
     if (fieldName[0]=='n' && strcmp(fieldName, "numberCH")==0) return base+125;
-    if (fieldName[0]=='c' && strcmp(fieldName, "channelOffset10")==0) return base+126;
-    if (fieldName[0]=='c' && strcmp(fieldName, "channelOffset11")==0) return base+127;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel1")==0) return base+126;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel2")==0) return base+127;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel3")==0) return base+128;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel4")==0) return base+129;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel5")==0) return base+130;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel6")==0) return base+131;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel7")==0) return base+132;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel8")==0) return base+133;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel10")==0) return base+134;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nChannel11")==0) return base+135;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -2881,8 +3017,16 @@ const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldTypeString(void *objec
         "uint8_t",
         "int",
         "int",
+        "int",
+        "int",
+        "int",
+        "int",
+        "int",
+        "int",
+        "int",
+        "int",
     };
-    return (field>=0 && field<128) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<136) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eNetworkCtrlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -3065,8 +3209,16 @@ std::string Ieee802154eNetworkCtrlInfoDescriptor::getFieldAsString(void *object,
         case 123: return bool2string(pp->getTxLowerCH());
         case 124: return bool2string(pp->getTxHigherCH());
         case 125: return ulong2string(pp->getNumberCH());
-        case 126: return long2string(pp->getChannelOffset10());
-        case 127: return long2string(pp->getChannelOffset11());
+        case 126: return long2string(pp->getNChannel1());
+        case 127: return long2string(pp->getNChannel2());
+        case 128: return long2string(pp->getNChannel3());
+        case 129: return long2string(pp->getNChannel4());
+        case 130: return long2string(pp->getNChannel5());
+        case 131: return long2string(pp->getNChannel6());
+        case 132: return long2string(pp->getNChannel7());
+        case 133: return long2string(pp->getNChannel8());
+        case 134: return long2string(pp->getNChannel10());
+        case 135: return long2string(pp->getNChannel11());
         default: return "";
     }
 }
@@ -3206,8 +3358,16 @@ bool Ieee802154eNetworkCtrlInfoDescriptor::setFieldAsString(void *object, int fi
         case 123: pp->setTxLowerCH(string2bool(value)); return true;
         case 124: pp->setTxHigherCH(string2bool(value)); return true;
         case 125: pp->setNumberCH(string2ulong(value)); return true;
-        case 126: pp->setChannelOffset10(string2long(value)); return true;
-        case 127: pp->setChannelOffset11(string2long(value)); return true;
+        case 126: pp->setNChannel1(string2long(value)); return true;
+        case 127: pp->setNChannel2(string2long(value)); return true;
+        case 128: pp->setNChannel3(string2long(value)); return true;
+        case 129: pp->setNChannel4(string2long(value)); return true;
+        case 130: pp->setNChannel5(string2long(value)); return true;
+        case 131: pp->setNChannel6(string2long(value)); return true;
+        case 132: pp->setNChannel7(string2long(value)); return true;
+        case 133: pp->setNChannel8(string2long(value)); return true;
+        case 134: pp->setNChannel10(string2long(value)); return true;
+        case 135: pp->setNChannel11(string2long(value)); return true;
         default: return false;
     }
 }
