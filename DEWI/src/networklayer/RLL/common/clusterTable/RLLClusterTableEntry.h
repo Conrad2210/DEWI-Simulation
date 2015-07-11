@@ -18,6 +18,7 @@
 
 #include "INETDefs.h"
 #include "Ieee802154Def.h"
+#include "RLLUtil.h"
 
 class IRLLClusterTable;
 
@@ -39,6 +40,7 @@ class INET_API RLLClusterTableEntry : public cObject
 	char* nodeName;
 	bool isCH;
 	UINT_16 panId;
+	channelList myChannelList;
 
     public:
 
@@ -68,6 +70,9 @@ class INET_API RLLClusterTableEntry : public cObject
 
 	void setPanId(UINT16 ui){panId = ui;}
 	UINT16 getPanId(){return panId;}
+
+	void setChannelList(channelList CL) {myChannelList = CL;}
+	channelList getChannelList(){return myChannelList;}
 
 
 };

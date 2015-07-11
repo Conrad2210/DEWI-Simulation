@@ -86,7 +86,7 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
 
     virtual cMessage *requestDisAssPacket(bool response);
 
-    virtual cMessage *requestSchdulePacket();
+    virtual cMessage *requestSchdulePacket(MACTSCHLinkType tp);
 
     virtual cMessage *requestBeaconPacket();
 

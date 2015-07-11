@@ -32,7 +32,7 @@ simple RLL
 	double StartTime @unit(s) = default(0s);
 	double AssociateWaitTime @unit(s) = default(0.5s);
 	
-	int Distance = default(20);
+	int Distance = default(25);
     
     gates:
 

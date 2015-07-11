@@ -817,7 +817,6 @@ void MulHopClu::SCHEDULE_request(cMessage *msg)
     {
 	scheduleFrame->setDstAddr(neighborTable->getAddressFromCH());
 	scheduleFrame->setDstPanId(ClusterTable.getEntryByShrtAddr(neighborTable->getNeighborByEAddr(neighborTable->getAddressFromCH())->getShortAddress())->getPanId());
-	scheduleFrame->setTimeslot(linkTable->getTimeSlotByOffset(-1));
     }
     else
 	return;
@@ -833,8 +832,6 @@ void MulHopClu::SCHEDULE_response(cMessage *msg)
 
     scheduleFrame->setDstAddr(tempFrame->getSrcAddr());
     scheduleFrame->setDstPanId(tempFrame->getSrcPanId());
-    scheduleFrame->setTimeslot(tempFrame->getTimeslot());
-    scheduleFrame->setChannelOffset(tempFrame->getChannelOffset());
 
     send(scheduleFrame->dup(), outGate);
     delete scheduleFrame;
@@ -847,8 +844,6 @@ void MulHopClu::handle_SCHEDULE_confirm(cMessage *msg)
     {
 	Ieee802154eMulHoCluFrame *frame = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
 
-	macLinkTableEntry *entry = linkTable->getLinkByTimeslot(frame->getTimeslot());
-	entry->setChannelOffset(frame->getChannelOffset());
 
 	if(linkTable->getTimeSlotByOffset(-1) != -1)
 	{
@@ -866,7 +861,7 @@ void MulHopClu::handle_SCHEDULE_confirm(cMessage *msg)
 void MulHopClu::handle_SCHEDULE_indication(cMessage *msg)
 {
     Ieee802154eMulHoCluFrame *scheduleFrame = check_and_cast<Ieee802154eMulHoCluFrame *>(msg);
-    scheduleFrame->setChannelOffset(linkTable->getOffsetByTimeslot(scheduleFrame->getTimeslot()));
+
 
     SCHEDULE_response(scheduleFrame->dup());
 

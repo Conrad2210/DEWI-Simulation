@@ -2017,7 +2017,7 @@ void Ieee802154eMacScheduler::handleAsnTimer()
 
 		    if(tmpMsg == NULL)
 		    {
-			tmpMsg = queueModule->requestSchdulePacket();
+			tmpMsg = queueModule->requestSchdulePacket(LNK_TP_ADVERTISING);
 		    }
 
 		    if(tmpMsg == NULL)

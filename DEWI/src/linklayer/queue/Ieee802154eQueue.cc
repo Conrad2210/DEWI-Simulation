@@ -410,16 +410,28 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg, cMessage *txPak
 	return deleted;
 }
 
-cMessage *Ieee802154eQueue::requestSchdulePacket()
+cMessage *Ieee802154eQueue::requestSchdulePacket(MACTSCHLinkType tp)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
 		cPacket *msg = PK(queue.get(i));
-		if (msg->getKind() == TP_SCHEDULE_REQUEST || msg->getKind() == TP_SCHEDULE_RESPONSE)
+		if (tp == LNK_TP_JOIN)
 		{
-			emit(dequeuePkSignal, msg);
-			emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-			return msg;
+			if (msg->getKind() == TP_SCHEDULE_REQUEST)
+			{
+				emit(dequeuePkSignal, msg);
+				emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+				return msg;
+			}
+		}
+		else if (tp == LNK_TP_ADVERTISING)
+		{
+			if (msg->getKind() == TP_SCHEDULE_RESPONSE)
+			{
+				emit(dequeuePkSignal, msg);
+				emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+				return msg;
+			}
 		}
 	}
 	return NULL;

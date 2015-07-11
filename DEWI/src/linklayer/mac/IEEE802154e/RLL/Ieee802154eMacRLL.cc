@@ -1462,7 +1462,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 
 		IE3ADDR tmpDstAddr;
 		IE3ADDR tmpSrcAddr;
-		//UINT_16 tmpDstPanId;
+		UINT_16 tmpDstPanId;
 		UINT_16 tmpSrcPanId;
 
 		if (frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
@@ -1475,7 +1475,7 @@ void Ieee802154eMacRLL::handle_SCHEDULE_request(cMessage *msg)
 			tmpSrcPanId = mpib.macPANId;
 			tmpSrcAddr = (IE3ADDR) mpib.macExtendedAddress;
 		}
-
+		tmpSchedul->setDstPanId(mpib.macPANId);
 		tmpSchedul->setSrcPanId(tmpSrcPanId);
 		tmpSchedul->setSrcAddr(tmpSrcAddr);
 		frmCtrl.compPanID = getPANIDComp(frmCtrl, tmpSchedul->getSrcPanId(), tmpSchedul->getDstPanId());
@@ -2265,7 +2265,7 @@ void Ieee802154eMacRLL::handleAck(Ieee802154eFrame *frame)
 					{
 						if (txData->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONSE)
 						{
-							SCHEDULE_confirm(txData->dup(), true);
+							//SCHEDULE_confirm(txData->dup(), true);
 						}
 						if (txData->getFrmCtrl().frameType == Ieee802154e_DISASSOCIATION_RESPONSE)
 						{
@@ -2344,7 +2344,7 @@ void Ieee802154eMacRLL::handleAsnTimer()
 
 					if (tmpMsg == NULL)
 					{
-						tmpMsg = queueModule->requestSchdulePacket();
+						tmpMsg = queueModule->requestSchdulePacket(LNK_TP_ADVERTISING);
 					}
 				}
 				break;
@@ -2358,6 +2358,11 @@ void Ieee802154eMacRLL::handleAsnTimer()
 
 						if (tmpMsg == NULL)
 							tmpMsg = queueModule->requestDisAssPacket(false);
+
+						if (tmpMsg == NULL)
+						{
+							tmpMsg = queueModule->requestSchdulePacket(LNK_TP_JOIN);
+						}
 					}
 				}
 				break;
@@ -2547,12 +2552,12 @@ void Ieee802154eMacRLL::handleTsAckWait()
 
 			// to many retries, send MCPS-DATA.confirm with NO_ACK and delete the pkt from the queue
 			MCPS_DATA_confirm(txData->getSeqNmbr(), 0, false, 0, 0, 0, 0, 0, mac_NO_ACK, txData->getRetries(), 0, NULL);
-			queueModule->deleteMsgQueue(txData->getDstAddr(), false);
+			queueModule->deleteMsgFromQueu(txData);
 
 			if (txData->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_REQUEST)
 			{
-
-				SCHEDULE_confirm(txData->dup(), false);
+				//txData->set
+				//SCHEDULE_confirm(txData->dup(), false);
 			}
 
 			//	    if(txData->getFrmCtrl().frameType == Ieee802154e_SCHEDULER_RESPONCE)

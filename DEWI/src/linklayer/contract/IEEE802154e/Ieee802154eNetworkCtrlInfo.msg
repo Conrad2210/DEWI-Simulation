@@ -5,9 +5,11 @@ cplusplus {{
     using namespace std;
     #include "Ieee802154eField.h"
     #include "Ieee802154eEnum.h"
+    #include "RLLUtil.h"
 }}
 
 struct MAC_PIB;
+struct channelList;
 
 enum MACenum;
 
@@ -212,15 +214,6 @@ message Ieee802154eNetworkCtrlInfo
 	bool txHigherCH;
 	
 	uint8_t numberCH;
-	int nChannel1 = -1;
-	int nChannel2 = -1;
-	int nChannel3 = -1;
-	int nChannel4 = -1;
-	int nChannel5 = -1;
-	int nChannel6 = -1;
-	int nChannel7 = -1;
-	int nChannel8 = -1;
-	int nChannel10 = -1;
-	int nChannel11  = -1;
+	channelList myChannel;
 	
 }

@@ -19,10 +19,11 @@
     using namespace std;
     #include "Ieee802154eField.h"
     #include "Ieee802154eEnum.h"
+    #include "RLLUtil.h"
 // }}
 
 /**
- * Class generated from <tt>src/linklayer/contract/IEEE802154e/Ieee802154eNetworkCtrlInfo.msg:15</tt> by nedtool.
+ * Class generated from <tt>src/linklayer/contract/IEEE802154e/Ieee802154eNetworkCtrlInfo.msg:17</tt> by nedtool.
  * <pre>
  * message Ieee802154eNetworkCtrlInfo
  * {
@@ -225,16 +226,7 @@
  *     bool txHigherCH;
  * 
  *     uint8_t numberCH;
- *     int nChannel1 = -1;
- *     int nChannel2 = -1;
- *     int nChannel3 = -1;
- *     int nChannel4 = -1;
- *     int nChannel5 = -1;
- *     int nChannel6 = -1;
- *     int nChannel7 = -1;
- *     int nChannel8 = -1;
- *     int nChannel10 = -1;
- *     int nChannel11 = -1;
+ *     channelList myChannel;
  * 
  * }
  * </pre>
@@ -379,16 +371,7 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     bool txLowerCH_var;
     bool txHigherCH_var;
     uint8_t numberCH_var;
-    int nChannel1_var;
-    int nChannel2_var;
-    int nChannel3_var;
-    int nChannel4_var;
-    int nChannel5_var;
-    int nChannel6_var;
-    int nChannel7_var;
-    int nChannel8_var;
-    int nChannel10_var;
-    int nChannel11_var;
+    channelList myChannel_var;
 
   private:
     void copy(const Ieee802154eNetworkCtrlInfo& other);
@@ -682,26 +665,9 @@ class Ieee802154eNetworkCtrlInfo : public ::cMessage
     virtual void setTxHigherCH(bool txHigherCH);
     virtual uint8_t getNumberCH() const;
     virtual void setNumberCH(uint8_t numberCH);
-    virtual int getNChannel1() const;
-    virtual void setNChannel1(int nChannel1);
-    virtual int getNChannel2() const;
-    virtual void setNChannel2(int nChannel2);
-    virtual int getNChannel3() const;
-    virtual void setNChannel3(int nChannel3);
-    virtual int getNChannel4() const;
-    virtual void setNChannel4(int nChannel4);
-    virtual int getNChannel5() const;
-    virtual void setNChannel5(int nChannel5);
-    virtual int getNChannel6() const;
-    virtual void setNChannel6(int nChannel6);
-    virtual int getNChannel7() const;
-    virtual void setNChannel7(int nChannel7);
-    virtual int getNChannel8() const;
-    virtual void setNChannel8(int nChannel8);
-    virtual int getNChannel10() const;
-    virtual void setNChannel10(int nChannel10);
-    virtual int getNChannel11() const;
-    virtual void setNChannel11(int nChannel11);
+    virtual channelList& getMyChannel();
+    virtual const channelList& getMyChannel() const {return const_cast<Ieee802154eNetworkCtrlInfo*>(this)->getMyChannel();}
+    virtual void setMyChannel(const channelList& myChannel);
 };
 
 inline void doPacking(cCommBuffer *b, Ieee802154eNetworkCtrlInfo& obj) {obj.parsimPack(b);}

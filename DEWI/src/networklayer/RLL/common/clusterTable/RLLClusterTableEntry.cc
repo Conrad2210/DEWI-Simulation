@@ -30,6 +30,7 @@ RLLClusterTableEntry::RLLClusterTableEntry()
     nodeName = (char*)"";
     isCH = false;
     panId = 0x00;
+    myChannelList.init();
 
 }
 
@@ -55,7 +56,22 @@ RLLClusterTableEntry::~RLLClusterTableEntry()
     delete clusterModule;
     delete nodeName;
 }
+std::ostream& operator <<(std::ostream &o, const channelList &CL)
+{
+	o << "Channel 1: " << CL.channel1;
+	o << ", Channel 2: " << CL.channel2;
+	o << ", Channel 3: " << CL.channel3;
+	o << ", Channel 4: " << CL.channel4;
+	o << ", Channel 5: " << CL.channel5;
+	o << ", Channel 6: " << CL.channel6;
+	o << ", Channel 7: " << CL.channel7;
+	o << ", Channel 8: " << CL.channel8;
+	o << ", Channel 10: " << CL.channel10;
+	o << ", Channel 11: " << CL.channel11;
 
+	return o;
+
+}
 std::string RLLClusterTableEntry::info()const
 {
     std::stringstream out;
@@ -65,6 +81,8 @@ std::string RLLClusterTableEntry::info()const
     out << ", Address: " << address;
     out << ", isCH: " << isCH;
     out << ", panId: " << panId;
+
+    out << ", ChannelList: " << myChannelList;
     return out.str();
 }
 

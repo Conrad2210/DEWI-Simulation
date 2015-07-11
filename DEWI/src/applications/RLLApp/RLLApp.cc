@@ -199,6 +199,7 @@ void RLLApp::startBurst()
 	{
 		std::cout << endl << "Run number: " << ev.getConfigEx()->getActiveRunNumber() << endl;
 		double percent = (double) m_burstCounter / (double) m_totalBurstToSend * 100.0;
+		std::cout<<"Burst #: " << m_burstCounter << " of " << m_totalBurstToSend << endl;
 		std::cout << percent << "%" << endl;
 		char msgName[32];
 		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);

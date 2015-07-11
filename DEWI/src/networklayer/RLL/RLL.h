@@ -25,6 +25,7 @@
 #include "IMacNeighborTable.h"
 #include "cBeaconTable.h"
 #include "Radio80211aControlInfo_m.h"
+#include "RLLUtil.h"
 
 #include "DataCenter.h"
 #include "DataVector.h"
@@ -159,6 +160,8 @@ class INET_API RLL : public cSimpleModule
 	//is associated or not
 	bool bNotAssociated;
 
+	bool bIsReady;
+
 	//Is pan coor or not
 	bool bIsPANCoor;
 
@@ -206,9 +209,9 @@ class INET_API RLL : public cSimpleModule
 	DataVector *dupMsg;
 
 	int nDupCounter;
-	int nChannel1,nChannel2,nChannel3,nChannel4;
-	int nChannel5,nChannel6,nChannel7,nChannel8,nChannel10,nChannel11;
-	int nChannel10CH, nChannel11CH;
+	channelList myChannel;
+	channelList chChannel;
+
 
     private:
 	////////////////////////////////////////////////////////////////////////

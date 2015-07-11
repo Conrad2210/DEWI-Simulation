@@ -98,6 +98,9 @@ class INET_API RLLClusterTable : public cSimpleModule, public IRLLClusterTable
 
 	//deletes all entries
 	virtual void clearTable();
+
+	channelList generateChannelList(UINT_16 address,channelList CHList);
+	channelList getChannelList(UINT_16 address);
 };
 
 #endif /* RLLCLUSTERTABEL_H_ */

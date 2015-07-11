@@ -8605,7 +8605,7 @@ void Ieee802154eMac::handleAsnTimer()
 
 				if (tmpMsg == NULL)
 				{
-					tmpMsg = queueModule->requestSchdulePacket();
+					tmpMsg = queueModule->requestSchdulePacket(LNK_TP_ADVERTISING);
 				}
 
 				break;

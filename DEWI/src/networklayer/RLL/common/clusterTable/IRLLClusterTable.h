@@ -78,6 +78,9 @@ class INET_API IRLLClusterTable
 
 	//deletes all entries
 	virtual void clearTable() = 0;
+
+	virtual channelList generateChannelList(UINT_16 address,channelList CHList) = 0;
+	virtual channelList getChannelList(UINT_16 address) = 0;
 };
 
 #endif /* IRLLCLUSTERTABLE_H_ */

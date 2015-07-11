@@ -2715,8 +2715,6 @@ Ieee802154eMulHoCluFrame::Ieee802154eMulHoCluFrame(const char *name, int kind) :
     this->CoorStage_var = 0;
     this->CS_var = 0;
     this->CH_var = 0;
-    this->ChannelOffset_var = 0;
-    this->timeslot_var = 0;
     this->BO_var = 0;
     this->SO_var = 0;
     this->srcName_var = 0;
@@ -2748,8 +2746,7 @@ void Ieee802154eMulHoCluFrame::copy(const Ieee802154eMulHoCluFrame& other)
     this->CoorStage_var = other.CoorStage_var;
     this->CS_var = other.CS_var;
     this->CH_var = other.CH_var;
-    this->ChannelOffset_var = other.ChannelOffset_var;
-    this->timeslot_var = other.timeslot_var;
+    this->myChannelList_var = other.myChannelList_var;
     this->BO_var = other.BO_var;
     this->SO_var = other.SO_var;
     this->srcName_var = other.srcName_var;
@@ -2765,8 +2762,7 @@ void Ieee802154eMulHoCluFrame::parsimPack(cCommBuffer *b)
     doPacking(b,this->CoorStage_var);
     doPacking(b,this->CS_var);
     doPacking(b,this->CH_var);
-    doPacking(b,this->ChannelOffset_var);
-    doPacking(b,this->timeslot_var);
+    doPacking(b,this->myChannelList_var);
     doPacking(b,this->BO_var);
     doPacking(b,this->SO_var);
     doPacking(b,this->srcName_var);
@@ -2782,8 +2778,7 @@ void Ieee802154eMulHoCluFrame::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->CoorStage_var);
     doUnpacking(b,this->CS_var);
     doUnpacking(b,this->CH_var);
-    doUnpacking(b,this->ChannelOffset_var);
-    doUnpacking(b,this->timeslot_var);
+    doUnpacking(b,this->myChannelList_var);
     doUnpacking(b,this->BO_var);
     doUnpacking(b,this->SO_var);
     doUnpacking(b,this->srcName_var);
@@ -2832,24 +2827,14 @@ void Ieee802154eMulHoCluFrame::setCH(bool CH)
     this->CH_var = CH;
 }
 
-int Ieee802154eMulHoCluFrame::getChannelOffset() const
+channelList& Ieee802154eMulHoCluFrame::getMyChannelList()
 {
-    return ChannelOffset_var;
+    return myChannelList_var;
 }
 
-void Ieee802154eMulHoCluFrame::setChannelOffset(int ChannelOffset)
+void Ieee802154eMulHoCluFrame::setMyChannelList(const channelList& myChannelList)
 {
-    this->ChannelOffset_var = ChannelOffset;
-}
-
-int Ieee802154eMulHoCluFrame::getTimeslot() const
-{
-    return timeslot_var;
-}
-
-void Ieee802154eMulHoCluFrame::setTimeslot(int timeslot)
-{
-    this->timeslot_var = timeslot;
+    this->myChannelList_var = myChannelList;
 }
 
 int Ieee802154eMulHoCluFrame::getBO() const
@@ -2959,7 +2944,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getProperty(const char *property
 int Ieee802154eMulHoCluFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 12+basedesc->getFieldCount(object) : 12;
+    return basedesc ? 11+basedesc->getFieldCount(object) : 11;
 }
 
 unsigned int Ieee802154eMulHoCluFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -2975,8 +2960,7 @@ unsigned int Ieee802154eMulHoCluFrameDescriptor::getFieldTypeFlags(void *object,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
+        FD_ISCOMPOUND,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
@@ -2984,7 +2968,7 @@ unsigned int Ieee802154eMulHoCluFrameDescriptor::getFieldTypeFlags(void *object,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
     };
-    return (field>=0 && field<12) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<11) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Ieee802154eMulHoCluFrameDescriptor::getFieldName(void *object, int field) const
@@ -3000,8 +2984,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldName(void *object, int f
         "CoorStage",
         "CS",
         "CH",
-        "ChannelOffset",
-        "timeslot",
+        "myChannelList",
         "BO",
         "SO",
         "srcName",
@@ -3009,7 +2992,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldName(void *object, int f
         "destName",
         "destIndex",
     };
-    return (field>=0 && field<12) ? fieldNames[field] : NULL;
+    return (field>=0 && field<11) ? fieldNames[field] : NULL;
 }
 
 int Ieee802154eMulHoCluFrameDescriptor::findField(void *object, const char *fieldName) const
@@ -3020,14 +3003,13 @@ int Ieee802154eMulHoCluFrameDescriptor::findField(void *object, const char *fiel
     if (fieldName[0]=='C' && strcmp(fieldName, "CoorStage")==0) return base+1;
     if (fieldName[0]=='C' && strcmp(fieldName, "CS")==0) return base+2;
     if (fieldName[0]=='C' && strcmp(fieldName, "CH")==0) return base+3;
-    if (fieldName[0]=='C' && strcmp(fieldName, "ChannelOffset")==0) return base+4;
-    if (fieldName[0]=='t' && strcmp(fieldName, "timeslot")==0) return base+5;
-    if (fieldName[0]=='B' && strcmp(fieldName, "BO")==0) return base+6;
-    if (fieldName[0]=='S' && strcmp(fieldName, "SO")==0) return base+7;
-    if (fieldName[0]=='s' && strcmp(fieldName, "srcName")==0) return base+8;
-    if (fieldName[0]=='s' && strcmp(fieldName, "srcIndex")==0) return base+9;
-    if (fieldName[0]=='d' && strcmp(fieldName, "destName")==0) return base+10;
-    if (fieldName[0]=='d' && strcmp(fieldName, "destIndex")==0) return base+11;
+    if (fieldName[0]=='m' && strcmp(fieldName, "myChannelList")==0) return base+4;
+    if (fieldName[0]=='B' && strcmp(fieldName, "BO")==0) return base+5;
+    if (fieldName[0]=='S' && strcmp(fieldName, "SO")==0) return base+6;
+    if (fieldName[0]=='s' && strcmp(fieldName, "srcName")==0) return base+7;
+    if (fieldName[0]=='s' && strcmp(fieldName, "srcIndex")==0) return base+8;
+    if (fieldName[0]=='d' && strcmp(fieldName, "destName")==0) return base+9;
+    if (fieldName[0]=='d' && strcmp(fieldName, "destIndex")==0) return base+10;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -3044,8 +3026,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldTypeString(void *object,
         "int",
         "bool",
         "bool",
-        "int",
-        "int",
+        "channelList",
         "int",
         "int",
         "string",
@@ -3053,7 +3034,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldTypeString(void *object,
         "string",
         "int",
     };
-    return (field>=0 && field<12) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<11) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *Ieee802154eMulHoCluFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -3097,14 +3078,13 @@ std::string Ieee802154eMulHoCluFrameDescriptor::getFieldAsString(void *object, i
         case 1: return long2string(pp->getCoorStage());
         case 2: return bool2string(pp->getCS());
         case 3: return bool2string(pp->getCH());
-        case 4: return long2string(pp->getChannelOffset());
-        case 5: return long2string(pp->getTimeslot());
-        case 6: return long2string(pp->getBO());
-        case 7: return long2string(pp->getSO());
-        case 8: return oppstring2string(pp->getSrcName());
-        case 9: return long2string(pp->getSrcIndex());
-        case 10: return oppstring2string(pp->getDestName());
-        case 11: return long2string(pp->getDestIndex());
+        case 4: {std::stringstream out; out << pp->getMyChannelList(); return out.str();}
+        case 5: return long2string(pp->getBO());
+        case 6: return long2string(pp->getSO());
+        case 7: return oppstring2string(pp->getSrcName());
+        case 8: return long2string(pp->getSrcIndex());
+        case 9: return oppstring2string(pp->getDestName());
+        case 10: return long2string(pp->getDestIndex());
         default: return "";
     }
 }
@@ -3122,14 +3102,12 @@ bool Ieee802154eMulHoCluFrameDescriptor::setFieldAsString(void *object, int fiel
         case 1: pp->setCoorStage(string2long(value)); return true;
         case 2: pp->setCS(string2bool(value)); return true;
         case 3: pp->setCH(string2bool(value)); return true;
-        case 4: pp->setChannelOffset(string2long(value)); return true;
-        case 5: pp->setTimeslot(string2long(value)); return true;
-        case 6: pp->setBO(string2long(value)); return true;
-        case 7: pp->setSO(string2long(value)); return true;
-        case 8: pp->setSrcName((value)); return true;
-        case 9: pp->setSrcIndex(string2long(value)); return true;
-        case 10: pp->setDestName((value)); return true;
-        case 11: pp->setDestIndex(string2long(value)); return true;
+        case 5: pp->setBO(string2long(value)); return true;
+        case 6: pp->setSO(string2long(value)); return true;
+        case 7: pp->setSrcName((value)); return true;
+        case 8: pp->setSrcIndex(string2long(value)); return true;
+        case 9: pp->setDestName((value)); return true;
+        case 10: pp->setDestIndex(string2long(value)); return true;
         default: return false;
     }
 }
@@ -3144,6 +3122,7 @@ const char *Ieee802154eMulHoCluFrameDescriptor::getFieldStructName(void *object,
     }
     switch (field) {
         case 0: return opp_typename(typeid(Ieee802154eNetworkCtrlInfo));
+        case 4: return opp_typename(typeid(channelList));
         default: return NULL;
     };
 }
@@ -3159,6 +3138,7 @@ void *Ieee802154eMulHoCluFrameDescriptor::getFieldStructPointer(void *object, in
     Ieee802154eMulHoCluFrame *pp = (Ieee802154eMulHoCluFrame *)object; (void)pp;
     switch (field) {
         case 0: return (void *)(&pp->getCntrlInfo()); break;
+        case 4: return (void *)(&pp->getMyChannelList()); break;
         default: return NULL;
     }
 }

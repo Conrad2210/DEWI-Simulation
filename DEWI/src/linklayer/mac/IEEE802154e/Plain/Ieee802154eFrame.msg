@@ -19,12 +19,13 @@ cplusplus {{
     #include "Ieee802154eEnum.h"
     #include "Ieee802154eField.h"
     #include "Ieee802154eNetworkCtrlInfo_m.h"
+    #include "RLLUtil.h"
 }}
 
 class noncobject MACAddress;
 
 struct AuxiliarySecurityHeader;
-
+struct channelList;
 struct FrameCtrl;
 
 struct IE_Header;
@@ -141,9 +142,8 @@ message Ieee802154eMulHoCluFrame extends Ieee802154eFrame
     int CoorStage;
     bool CS;
     bool CH;
-    
-    int ChannelOffset;
-    int timeslot;
+	channelList myChannelList;
+
     int BO;
     int SO;
     
