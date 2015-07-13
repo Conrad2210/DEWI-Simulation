@@ -31,6 +31,7 @@ RLLClusterTableEntry::RLLClusterTableEntry()
     isCH = false;
     panId = 0x00;
     myChannelList.init();
+    assignedCL = false;
 
 }
 

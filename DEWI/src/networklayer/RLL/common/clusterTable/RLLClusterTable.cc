@@ -305,40 +305,58 @@ channelList RLLClusterTable::generateChannelList(UINT16 address, channelList CHL
 	channelList tempList;
 	tempList.init();
 	RLLClusterTableEntry *entry = this->getEntryByShrtAddr(address);
+	if(address==35)
+		std::cout << "TEST";
 	bool temp = false;
-
+if(!entry->getAssignedCL())
+{
 	if (entry->getStage() % 2 == 1)
 	{
+
 		do
 		{
 			temp = false;
-			tempList.channel1 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel1 > (numChannel + 1))
-				tempList.channel1 = tempList.channel1 - (numChannel + 1);
+			tempList.channel1 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel1 > (numChannel))
+				tempList.channel1 = tempList.channel1 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel1 == entryTable.at(i)->getChannelList().channel1 || tempList.channel1 == CHList.channel1)
+					if (tempList.channel1 == entryTable.at(i)->getChannelList().channel1)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel1 == CHList.channel1)
+				temp = true;
+
 
 		} while (temp);
 		do
 		{
 			temp = false;
-			tempList.channel2 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel2 > (numChannel + 1))
-				tempList.channel2 = tempList.channel2 - (numChannel + 1);
+			tempList.channel2 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel2 > (numChannel))
+				tempList.channel2 = tempList.channel2 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel2 == entryTable.at(i)->getChannelList().channel2 || tempList.channel2 == CHList.channel2)
+					if (tempList.channel2 == entryTable.at(i)->getChannelList().channel2)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel2 == CHList.channel2)
+				temp = true;
+
 
 		} while (temp);
 
@@ -348,34 +366,48 @@ channelList RLLClusterTable::generateChannelList(UINT16 address, channelList CHL
 		do
 		{
 			temp = false;
-			tempList.channel5 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel5 > (numChannel + 1))
-				tempList.channel5 = tempList.channel5 - (numChannel + 1);
+			tempList.channel5 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel5 > (numChannel))
+				tempList.channel5 = tempList.channel5 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel5 == entryTable.at(i)->getChannelList().channel5 || tempList.channel5 == CHList.channel5)
+					if (tempList.channel5 == entryTable.at(i)->getChannelList().channel5)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel5 == CHList.channel5)
+				temp = true;
+
 
 		} while (temp);
 
 		do
 		{
 			temp = false;
-			tempList.channel6 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel6 > (numChannel + 1))
-				tempList.channel6 = tempList.channel6 - (numChannel + 1);
+			tempList.channel6 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel6 > (numChannel))
+				tempList.channel6 = tempList.channel6 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel6 == entryTable.at(i)->getChannelList().channel6 || tempList.channel6 == CHList.channel6)
+					if (tempList.channel6 == entryTable.at(i)->getChannelList().channel6)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel6 == CHList.channel6)
+				temp = true;
+
 
 		} while (temp);
 
@@ -385,34 +417,48 @@ channelList RLLClusterTable::generateChannelList(UINT16 address, channelList CHL
 		do
 		{
 			temp = false;
-			tempList.channel10 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel10 > (numChannel + 1))
-				tempList.channel10 = tempList.channel10 - (numChannel + 1);
+			tempList.channel10 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel10 > (numChannel))
+				tempList.channel10 = tempList.channel10 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel10 == entryTable.at(i)->getChannelList().channel10 || tempList.channel10 == CHList.channel10)
+					if (tempList.channel10 == entryTable.at(i)->getChannelList().channel10)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel10 == CHList.channel10)
+				temp = true;
+
 
 		} while (temp);
 
 		do
 		{
 			temp = false;
-			tempList.channel11 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel11 > (numChannel + 1))
-				tempList.channel11 = tempList.channel11 - (numChannel + 1);
+			tempList.channel11 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel11 > (numChannel))
+				tempList.channel11 = tempList.channel11 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel11 == entryTable.at(i)->getChannelList().channel11 || tempList.channel11 == CHList.channel11)
+					if (tempList.channel11 == entryTable.at(i)->getChannelList().channel11)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel11 == CHList.channel11)
+				temp = true;
+
 
 		} while (temp);
 
@@ -425,34 +471,47 @@ channelList RLLClusterTable::generateChannelList(UINT16 address, channelList CHL
 		do
 		{
 			temp = false;
-			tempList.channel3 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel3 > (numChannel + 1))
-				tempList.channel3 = tempList.channel3 - (numChannel + 1);
+			tempList.channel3 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel3 > (numChannel))
+				tempList.channel3 = tempList.channel3 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel3 == entryTable.at(i)->getChannelList().channel3 || tempList.channel3 == CHList.channel3)
+					if (tempList.channel3 == entryTable.at(i)->getChannelList().channel3)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel3 == CHList.channel3)
+				temp = true;
+
 
 		} while (temp);
 
 		do
 		{
 			temp = false;
-			tempList.channel4 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel4 > (numChannel + 1))
-				tempList.channel4 = tempList.channel4 - (numChannel + 1);
+			tempList.channel4 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel4 > (numChannel))
+				tempList.channel4 = tempList.channel4 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel4 == entryTable.at(i)->getChannelList().channel4 || tempList.channel4 == CHList.channel4)
+					if (tempList.channel4 == entryTable.at(i)->getChannelList().channel4)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel4 == CHList.channel4)
+				temp = true;
 
 		} while (temp);
 
@@ -462,74 +521,106 @@ channelList RLLClusterTable::generateChannelList(UINT16 address, channelList CHL
 		do
 		{
 			temp = false;
-			tempList.channel7 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel7 > (numChannel + 1))
-				tempList.channel7 = tempList.channel7 - (numChannel + 1);
+			tempList.channel7 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel7 > (numChannel))
+				tempList.channel7 = tempList.channel7 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel7 == entryTable.at(i)->getChannelList().channel7 || tempList.channel7 == CHList.channel7)
+					if (tempList.channel7 == entryTable.at(i)->getChannelList().channel7)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel7 == CHList.channel7)
+				temp = true;
+
 
 		} while (temp);
 
 		do
 		{
 			temp = false;
-			tempList.channel8 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel8 > (numChannel + 1))
-				tempList.channel8 = tempList.channel8 - (numChannel + 1);
+			tempList.channel8 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel8 > (numChannel))
+				tempList.channel8 = tempList.channel8 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel8 == entryTable.at(i)->getChannelList().channel8 || tempList.channel8 == CHList.channel8)
+					if (tempList.channel8 == entryTable.at(i)->getChannelList().channel8)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel8 == CHList.channel8)
+				temp = true;
+
 
 		} while (temp);
 
 		do
 		{
 			temp = false;
-			tempList.channel10 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel10 > (numChannel + 1))
-				tempList.channel10 = tempList.channel10 - (numChannel + 1);
+			tempList.channel10 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel10 > (numChannel))
+				tempList.channel10 = tempList.channel10 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel10 == entryTable.at(i)->getChannelList().channel10 || tempList.channel10 == CHList.channel10)
+					if (tempList.channel10 == entryTable.at(i)->getChannelList().channel10)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel10 == CHList.channel10)
+				temp = true;
 
 		} while (temp);
 
 		do
 		{
 			temp = false;
-			tempList.channel11 = (double)(intuniform(0, 16) + intuniform(0, 16) + intuniform(0, 16)) / 3.0;
-			if (tempList.channel11 > (numChannel + 1))
-				tempList.channel11 = tempList.channel11 - (numChannel + 1);
+			tempList.channel11 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel11 > (numChannel))
+				tempList.channel11 = tempList.channel11 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel11 == entryTable.at(i)->getChannelList().channel11 || tempList.channel11 == CHList.channel11)
+					if (tempList.channel11 == entryTable.at(i)->getChannelList().channel11)
+					{
 						temp = true;
+						break;
+					}
 				}
 			}
+
+			if(tempList.channel11 == CHList.channel11)
+				temp = true;
 
 		} while (temp);
 	}
 
 	entry->setChannelList(tempList);
+	entry->setAssignedCL(true);
 	return tempList;
+}
+else
+{
+	return getChannelList(address);
+}
 
 }
 

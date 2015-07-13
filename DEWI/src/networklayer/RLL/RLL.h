@@ -193,6 +193,9 @@ class INET_API RLL : public cSimpleModule
 
 	int nAssociateCounter;
 
+	int nPanCounter;
+
+	int nDisassociateCounter;
 	//For PanCoord,
 	//after association store's the number of scans for beacon
 	int nScanCounter;

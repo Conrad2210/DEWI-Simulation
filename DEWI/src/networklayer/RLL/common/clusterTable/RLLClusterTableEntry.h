@@ -39,6 +39,7 @@ class INET_API RLLClusterTableEntry : public cObject
 	UINT_16 address;
 	char* nodeName;
 	bool isCH;
+	bool assignedCL;
 	UINT_16 panId;
 	channelList myChannelList;
 
@@ -73,6 +74,9 @@ class INET_API RLLClusterTableEntry : public cObject
 
 	void setChannelList(channelList CL) {myChannelList = CL;}
 	channelList getChannelList(){return myChannelList;}
+
+	bool getAssignedCL(){return assignedCL;}
+	void setAssignedCL(bool b){assignedCL = b;}
 
 
 };

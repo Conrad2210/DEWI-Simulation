@@ -133,7 +133,8 @@ void RLL::initialize(int stage)
 		nAssociateCounter = 0;
 		nLastBurstId = -1;
 		nLastMessageId = -1;
-
+		nPanCounter = 0;
+		nDisassociateCounter = 0;
 		nDistance = par("Distance");
 
 		WATCH(nLastSCANChannel);
@@ -446,6 +447,8 @@ void RLL::MLME_ASSOCIATE_request(cMessage *msg)
 		{
 			if (!AssociateTimer->isScheduled())
 			{
+				if(getParentModule()->getIndex() == 10)
+					std::cout<<"try to associate";
 				nAssociateCounter++;
 				Ieee802154eNetworkCtrlInfo *tmp = new Ieee802154eNetworkCtrlInfo("AssociationRequest", TP_MLME_ASSOCIATE_REQUEST);
 				tmp->setPanCoordinator(bIsPANCoor);
@@ -472,9 +475,13 @@ void RLL::handle_MLME_ASSOCIATE_indication(cMessage *msg)
 {
 	if (bIsReady || nCluStage == 0)
 	{
+
 		Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+		if(tmp->getAssocShortAddress() == 13)
+			std::cout<< "Try to associate";
 		if (tmp->getPanCoordinator() && bIsPANCoor)
 		{
+
 			clusterTable->addEntry(nCluStage + 1, tmp->getAssocShortAddress(), (char*) "", tmp->getPanCoordinator(), tmp->getPanId());
 			//tmp->getPanCoordinator(), nCluStage + 1, tmp->getAssocShortAddress(), tmp->getPanId());
 			macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
@@ -542,6 +549,8 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 {
 
 	Ieee802154eNetworkCtrlInfo *tmp = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
+	if(getParentModule()->getIndex() == 10)
+		std::cout<<"Finish associating" <<endl;
 	chChannel = tmp->getMyChannel();
 	if (AssociateWaitTimer->isScheduled())
 		cancelEvent(AssociateWaitTimer);
@@ -699,9 +708,11 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 //Dissassociation Process
 void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 {
+
 	if (DisassociateWaitTimer->isScheduled())
 		cancelEvent(DisassociateWaitTimer);
-
+	if(nDisassociateCounter < 15)
+	{
 	cDisplayString* parentDisp = &getParentModule()->getDisplayString();
 	cDisplayString* tempStr = new cDisplayString();
 	tempStr->parse("b=1.5,1.5,oval,blue");
@@ -714,6 +725,12 @@ void RLL::MLME_DISASSOCIATE_request(cMessage *msg)
 	send(cnt->dup(), mLowerLayerOut);
 	delete cnt;
 	cnt = NULL;
+	nDisassociateCounter++;
+	}
+	else
+	{
+		RESTART_request(NULL);
+	}
 }
 
 void RLL::handle_MLME_DIASSOCIATE_indication(cMessage *msg)
@@ -768,7 +785,7 @@ void RLL::MLME_BEACON_request(cMessage *msg)
 void RLL::handle_MLME_BEACON_confirm(cMessage *msg)
 {
 	Ieee802154eNetworkCtrlInfo *beaconCon = check_and_cast<Ieee802154eNetworkCtrlInfo *>(msg);
-	double time = pow(2, beaconCon->getBeaconOrder()) * beaconCon->getSuperframeOrder() * timeslotTable->getTemplate(0)->getTimeslotLengthDbl();
+	double time = uniform(pow(2, beaconCon->getBeaconOrder()) * beaconCon->getSuperframeOrder() * timeslotTable->getTemplate(0)->getTimeslotLengthDbl(),pow(2, beaconCon->getBeaconOrder()) * beaconCon->getSuperframeOrder() * timeslotTable->getTemplate(0)->getTimeslotLengthDbl()*2);
 	if (BeaconTimer->isScheduled())
 		cancelEvent(BeaconTimer);
 	scheduleAt(simTime() + time, BeaconTimer);
@@ -1184,10 +1201,14 @@ void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 	}
 	else
 	{
-		if (beaconTable->CHinDistance(nDistance))
+		if (beaconTable->CHinDistance(0))
 		{
-			bCapablePanCoor = false;
+			if(nPanCounter < 2)
+				bCapablePanCoor = true;
+			else
+				bCapablePanCoor = false;
 			MLME_DISASSOCIATE_request(NULL);
+			nPanCounter++;
 		}
 		else
 		{

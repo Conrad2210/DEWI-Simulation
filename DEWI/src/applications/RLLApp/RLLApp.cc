@@ -257,5 +257,5 @@ void RLLApp::sendNextBurstMessage()
 void RLLApp::endSim()
 {
 	simulation.callFinish();
-	simulation.endRun();
+	endSimulation();
 }
