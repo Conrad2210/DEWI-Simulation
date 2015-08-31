@@ -647,7 +647,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 				case 1: {
 					double d = tmp->getNumberCH() * 10;
 					if (d > 100)
-						d = uniform(50, 200);
+						d = uniform(0, 200);
 					scheduleAt(simTime() + d, BeaconScanTimer);
 					break;
 				}
@@ -655,14 +655,14 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 					double d = pow(2, tmp->getNumberCH());
 					if (d > 100)
 						d = 100;
-					scheduleAt(simTime() + uniform(300, 300 + d), BeaconScanTimer);
+					scheduleAt(simTime() + uniform(0, 300 + d), BeaconScanTimer);
 					break;
 				}
 				case 3: {
 					double d = pow(2, tmp->getNumberCH());
 					if (d > 100)
 						d = 100;
-					scheduleAt(simTime() + uniform(400, 400 + d), BeaconScanTimer);
+					scheduleAt(simTime() + uniform(0, 400 + d), BeaconScanTimer);
 					break;
 				}
 				default: {

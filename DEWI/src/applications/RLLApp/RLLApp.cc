@@ -84,7 +84,8 @@ void RLLApp::initialize(int stage)
 	if (1 == stage)
 	{
 
-		E2E->registerVector();
+		if (strcmp("gateWay", getParentModule()->getName()) && strcmp("lightSwitch", getParentModule()->getName()))
+			E2E->registerVector();
 		receivedMSG->registerVector();
 
 		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
@@ -148,7 +149,9 @@ void RLLApp::handleLowerMsg(cMessage* msg)
 	std::stringstream ss;
 	ss << "Received: " << tmp->getName();
 	getParentModule()->bubble(ss.str().c_str());
-	E2E->record((now - tmp->getCreationTime().dbl()));
+	//E2E->record((now - tmp->getCreationTime().dbl()));
+
+	E2E->record(now, tmp->getMessageId());
 	counterRxMsg++;
 	receivedMSG->record(tmp->getName());
 	delete tmp;
@@ -171,6 +174,7 @@ void RLLApp::checkAssociation()
 			std::cout << "Ass Nodes: " << dataCenter->getNumAssNodes() << " of " << dataCenter->getNumRegisteredAssVectors() << endl;
 			double percent = (double) dataCenter->getNumAssNodes() / (double) dataCenter->getNumRegisteredAssVectors() * 100.0;
 			std::cout << percent << "%" << endl;
+			std::cout << "elapsed: " << simTime() << endl;
 			if (AssTimer->isScheduled())
 				cancelEvent(AssTimer);
 
@@ -197,19 +201,25 @@ void RLLApp::startBurst()
 {
 	if (m_burstCounter <= m_totalBurstToSend)
 	{
+		std::stringstream sss;
+		sss << getParentModule()->getIndex();
+		std::stringstream ss;
+		ss << simTime();
+		dataCenter->recordScalar(ss.str(), "burstStart", getParentModule()->getName(), sss.str());
+
 		std::cout << endl << "Run number: " << ev.getConfigEx()->getActiveRunNumber() << endl;
 		double percent = (double) m_burstCounter / (double) m_totalBurstToSend * 100.0;
 		std::cout<<"Burst #: " << m_burstCounter << " of " << m_totalBurstToSend << endl;
 		std::cout << percent << "%" << endl;
 		char msgName[32];
-		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
+		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter);
 		RLLAppMsg* appPkt = new RLLAppMsg(msgName);
 		appPkt->setBitLength(PacketSize() * 8);
 		appPkt->setSourceName(m_moduleName);
 		appPkt->setDestName("Broadcast");
 		appPkt->setCreationTime(simTime());
 		appPkt->setBurstId(m_burstCounter);
-		appPkt->setMessageId(m_messageCounter);
+		appPkt->setMessageId(m_messageCounter++);
 
 		send(appPkt->dup(), mLowerLayerOut);
 		m_numberMessageSend++;
@@ -226,17 +236,17 @@ void RLLApp::startBurst()
 
 void RLLApp::sendNextBurstMessage()
 {
-	if (m_numberMessageSend < m_numberMessageToSend)
+	if (m_numberMessageSend < m_numberMessageToSend+1)
 	{
 		char msgName[32];
-		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
+		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter);
 		RLLAppMsg* appPkt = new RLLAppMsg(msgName);
 		appPkt->setBitLength(PacketSize() * 8);
 		appPkt->setSourceName(m_moduleName);
 		appPkt->setDestName("Broadcast");
 		appPkt->setCreationTime(simTime());
 		appPkt->setBurstId(m_burstCounter);
-		appPkt->setMessageId(m_messageCounter);
+		appPkt->setMessageId(m_messageCounter++);
 		send(appPkt->dup(), mLowerLayerOut);
 		m_numberMessageSend++;
 		counterTxMsg++;
