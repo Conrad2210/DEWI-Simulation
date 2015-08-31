@@ -21,20 +21,23 @@
 #include <fstream>
 #include "cmodule.h"
 #include <dirent.h>
+#include <limits>
+
+#include <iomanip>
 #include <ios>
 #include "DataFunctions.h"
 
 using namespace std;
 
-#ifndef WITH_LINUX
-#define WITH_LINUX
-#endif
+//#ifndef WITH_LINUX
+//#define WITH_LINUX
+//#endif
 
-#ifdef WIN32
+//#ifdef WIN32
 #ifndef WITH_WIN
 #define WITH_WIN
 #endif
-#endif
+//#endif
 
 DataVector::DataVector(std::string name, std::string type) {
 
@@ -58,6 +61,7 @@ DataVector::~DataVector() {
 void DataVector::record(double value) {
     //declare result variable
     std::stringstream a;
+    a << std::fixed << std::setprecision(6);
 
     //convert double to string
     a << value;
@@ -70,6 +74,7 @@ void DataVector::record(double value) {
 void DataVector::record(double value, std::string name) {
     //declare result variable
     std::stringstream a;
+    a << std::fixed << std::setprecision(6);
 
     //convert double to string
     a << value << "," << name;
@@ -81,6 +86,7 @@ void DataVector::record(double value, std::string name) {
 void DataVector::record(double value, const char* name) {
     //declare result variable
     std::stringstream a;
+    a << std::fixed << std::setprecision(6);
 
     //convert double to string
     a << value << "," << name;
@@ -93,7 +99,7 @@ void DataVector::record(double value, const char* name) {
 void DataVector::record(double value, int id) {
     //declare result variable
     std::stringstream a;
-
+    a << std::fixed << std::setprecision(6);
     //convert double to string
     a << value << "," << id;
 
@@ -153,6 +159,8 @@ void DataVector::saveData(std::string Path) {
         //check if output file is open
         if (fout.is_open()) {
             //write data to file
+
+        	fout << std::fixed << std::setprecision(4);
             fout << Type << ",\n";
             for (int i = 0; i < (int) Data.size(); i++) {
                 //each data value in an new row
