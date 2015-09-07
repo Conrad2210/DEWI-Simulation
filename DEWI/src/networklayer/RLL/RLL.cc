@@ -1544,7 +1544,7 @@ void RLL::setScheduleChStUn()
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
 	linkEntry->setSlotframeId(0);
-	linkEntry->setTimeslot(9);
+	linkEntry->setTimeslot(10);
 	linkEntry->setLinkId(linkTable->getNumLinks());
 	linkEntry->issameStage(true);
 	linkEntry->isnextStage(true);
@@ -1555,13 +1555,13 @@ void RLL::setScheduleChStUn()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
 	linkEntry->setSlotframeId(0);
-	linkEntry->setTimeslot(10);
+	linkEntry->setTimeslot(9);
 	linkEntry->setLinkId(linkTable->getNumLinks());
 	linkEntry->issameStage(true);
 	linkEntry->isnextStage(false);
@@ -1765,13 +1765,13 @@ void RLL::setScheduleChStZe()
 
 	linkEntry = new macLinkTableEntry();
 
-	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
 	linkEntry->setSlotframeId(0);
-	linkEntry->setTimeslot(10);
+	linkEntry->setTimeslot(9);
 	linkEntry->setLinkId(linkTable->getNumLinks());
 	linkEntry->issameStage(true);
 	linkEntry->isnextStage(false);
@@ -1821,95 +1821,16 @@ void RLL::setChannelOffset()
 		if (myChannel.channel8 > (numChannel + 1))
 			myChannel.channel8 = myChannel.channel8 - (numChannel + 1);
 
-		myChannel.channel10 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-		if (myChannel.channel10 > (numChannel + 1))
-			myChannel.channel10 = myChannel.channel10 - (numChannel + 1);
+		myChannel.channel9 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel9 > (numChannel + 1))
+			myChannel.channel9 = myChannel.channel9 - (numChannel + 1);
 
 		myChannel.channel11 = nCluStage % (numChannel + 1) + intuniform(0, 16);
 		if (myChannel.channel11 > (numChannel + 1))
 			myChannel.channel11 = myChannel.channel11 - (numChannel + 1);
 
 	}
-//	else if (nCluStage % 2 == 1)
-//	{
-//
-//		myChannel.channel1 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel1 > (numChannel + 1))
-//			myChannel.channel1 = myChannel.channel1 - (numChannel + 1);
-//
-//		myChannel.channel2 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel2 > (numChannel + 1))
-//			myChannel.channel2 = myChannel.channel2 - (numChannel + 1);
-//		myChannel.channel3 = chChannel.channel3;
-//		myChannel.channel4 = chChannel.channel4;
-//		myChannel.channel5 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel5 > (numChannel + 1))
-//			myChannel.channel5 = myChannel.channel5 - (numChannel + 1);
-//
-//		myChannel.channel6 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel6 > (numChannel + 1))
-//			myChannel.channel6 = myChannel.channel6 - (numChannel + 1);
-//		myChannel.channel7 = chChannel.channel7;
-//		myChannel.channel8 = chChannel.channel8;
-//
-//		if (myChannel.channel10 == -1)
-//		{
-//			do
-//			{
-//				myChannel.channel10 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//				if (myChannel.channel10 > (numChannel + 1))
-//					myChannel.channel10 = myChannel.channel10 - (numChannel + 1);
-//			} while (chChannel.channel10 == myChannel.channel10);
-//		}
-//
-//		if (myChannel.channel11 == -1)
-//		{
-//			do
-//			{
-//				myChannel.channel11 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//				if (myChannel.channel11 > (numChannel + 1))
-//					myChannel.channel11 = myChannel.channel11 - (numChannel + 1);
-//			} while (chChannel.channel11 == myChannel.channel11);
-//		}
-//	}
-//	else if (nCluStage % 2 == 0)
-//	{
-//		myChannel.channel3 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel3 > (numChannel + 1))
-//			myChannel.channel3 = myChannel.channel3 - (numChannel + 1);
-//
-//		myChannel.channel4 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel4 > (numChannel + 1))
-//			myChannel.channel4 = myChannel.channel4 - (numChannel + 1);
-//
-//		myChannel.channel7 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel7 > (numChannel + 1))
-//			myChannel.channel7 = myChannel.channel7 - (numChannel + 1);
-//
-//		myChannel.channel8 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//		if (myChannel.channel8 > (numChannel + 1))
-//			myChannel.channel8 = myChannel.channel8 - (numChannel + 1);
-//
-//		if (myChannel.channel10 == -1)
-//		{
-//			do
-//			{
-//				myChannel.channel10 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//				if (myChannel.channel10 > (numChannel + 1))
-//					myChannel.channel10 = myChannel.channel10 - (numChannel + 1);
-//			} while (chChannel.channel10 == myChannel.channel10);
-//		}
-//
-//		if (myChannel.channel11 == -1)
-//		{
-//			do
-//			{
-//				myChannel.channel11 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-//				if (myChannel.channel11 > (numChannel + 1))
-//					myChannel.channel11 = myChannel.channel11 - (numChannel + 1);
-//			} while (chChannel.channel11 == myChannel.channel11);
-//		}
-//	}
+
 }
 
 void RLL::setScheduleChInit()
@@ -2001,13 +1922,13 @@ void RLL::setScheduleChInit()
 	}
 
 	linkEntry = new macLinkTableEntry();
-	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
 	linkEntry->setSlotframeId(0);
-	linkEntry->setTimeslot(10);
+	linkEntry->setTimeslot(9);
 	linkEntry->setLinkId(linkTable->getNumLinks());
 	linkEntry->issameStage(true);
 	linkEntry->isnextStage(false);
@@ -2038,13 +1959,13 @@ void RLL::setScheduleChInit()
 void RLL::setScheduleCs()
 {
 	macLinkTableEntry *linkEntry = new macLinkTableEntry();
-	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
 	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
 	linkEntry->setSlotframeId(0);
-	linkEntry->setTimeslot(10);
+	linkEntry->setTimeslot(9);
 	linkEntry->setLinkId(linkTable->getNumLinks());
 	linkEntry->issameStage(true);
 	linkEntry->isnextStage(false);
@@ -2112,57 +2033,6 @@ Radio80211aControlInfo RLL::getRadioControl(Radio80211aControlInfo *cntrl)
 void RLL::GENERAL_CHECK(cMessage *msg)
 {
 
-//	if (bNotAssociated)
-//	{
-//		if (StartTimer->isScheduled() || ScanTimer->isScheduled() || AssociateTimer->isScheduled() || AssociateWaitTimer->isScheduled())
-//		{
-//			setCheckTimer();
-//			return;
-//		}
-//		else
-//		{
-//			RESTART_request(NULL);
-//			return;
-//		}
-//
-//	}
-//	else
-//	{
-//		if (bIsPANCoor)
-//		{
-//			setCheckTimer();
-//			return;
-//		}
-//		else
-//		{
-//			if (ScheduleTimer->isScheduled() || ScheduleWaitTimer->isScheduled())
-//			{
-//				setCheckTimer();
-//				return;
-//			}
-//
-//			if (DisassociateWaitTimer->isScheduled())
-//			{
-//				setCheckTimer();
-//				return;
-//			}
-//		}
-//
-//		if (linkTable->getTimeSlotByOffset(-1) == -1)
-//		{
-//			setCheckTimer();
-//			return;
-//		}
-//		else
-//		{
-//			SCHEDULE_request(NULL);
-//			setCheckTimer();
-//			return;
-//		}
-//
-//	}
-//
-//	setCheckTimer();
 
 }
 
