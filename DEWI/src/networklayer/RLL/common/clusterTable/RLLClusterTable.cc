@@ -417,14 +417,14 @@ if(!entry->getAssignedCL())
 		do
 		{
 			temp = false;
-			tempList.channel10 = entry->getStage() % numChannel+1 + intuniform(0,16);
-			if (tempList.channel10 > (numChannel))
-				tempList.channel10 = tempList.channel10 - (numChannel);
+			tempList.channel9 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel9 > (numChannel))
+				tempList.channel9 = tempList.channel9 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel10 == entryTable.at(i)->getChannelList().channel10)
+					if (tempList.channel9 == entryTable.at(i)->getChannelList().channel9)
 					{
 						temp = true;
 						break;
@@ -432,7 +432,7 @@ if(!entry->getAssignedCL())
 				}
 			}
 
-			if(tempList.channel10 == CHList.channel10)
+			if(tempList.channel9 == CHList.channel9)
 				temp = true;
 
 
@@ -569,14 +569,14 @@ if(!entry->getAssignedCL())
 		do
 		{
 			temp = false;
-			tempList.channel10 = entry->getStage() % numChannel+1 + intuniform(0,16);
-			if (tempList.channel10 > (numChannel))
-				tempList.channel10 = tempList.channel10 - (numChannel);
+			tempList.channel9 = entry->getStage() % numChannel+1 + intuniform(0,16);
+			if (tempList.channel9 > (numChannel))
+				tempList.channel9 = tempList.channel9 - (numChannel);
 			for (int i = 0; i < (int) entryTable.size(); i++)
 			{
 				if (entryTable.at(i)->getIsCH() && entryTable.at(i)->getStage() == entry->getStage() && entryTable.at(i) != entry)
 				{
-					if (tempList.channel10 == entryTable.at(i)->getChannelList().channel10)
+					if (tempList.channel9 == entryTable.at(i)->getChannelList().channel9)
 					{
 						temp = true;
 						break;
@@ -584,7 +584,7 @@ if(!entry->getAssignedCL())
 				}
 			}
 
-			if(tempList.channel10 == CHList.channel10)
+			if(tempList.channel9 == CHList.channel9)
 				temp = true;
 
 		} while (temp);

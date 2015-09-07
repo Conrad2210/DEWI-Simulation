@@ -67,7 +67,7 @@ std::ostream& operator <<(std::ostream &o, const channelList &CL)
 	o << ", Channel 6: " << CL.channel6;
 	o << ", Channel 7: " << CL.channel7;
 	o << ", Channel 8: " << CL.channel8;
-	o << ", Channel 10: " << CL.channel10;
+	o << ", Channel 9: " << CL.channel9;
 	o << ", Channel 11: " << CL.channel11;
 
 	return o;

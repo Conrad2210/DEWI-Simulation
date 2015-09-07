@@ -595,7 +595,7 @@ void RLL::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 
 			nCluStage = tmp->getStage();
 
-			myChannel.channel10 = chChannel.channel10;
+			myChannel.channel9 = chChannel.channel9;
 			myChannel.channel11 = chChannel.channel11;
 			clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*) "", tmp->getPanCoordinator(), tmp->getPanId());
 			macNeighborTableEntry* tmpEntry = neighborTable->getNeighborBySAddr(tmp->getAssocShortAddress());
@@ -1144,8 +1144,8 @@ void RLL::handle_SCHEDULE_confirm(cMessage *msg)
 				case 8:
 					linkTable->getLink(i)->setChannelOffset(myChannel.channel8);
 					break;
-				case 10:
-					linkTable->getLink(i)->setChannelOffset(myChannel.channel10);
+				case 9:
+					linkTable->getLink(i)->setChannelOffset(myChannel.channel9);
 					break;
 				case 11:
 					linkTable->getLink(i)->setChannelOffset(myChannel.channel11);
