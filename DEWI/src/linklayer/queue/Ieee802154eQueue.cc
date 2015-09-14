@@ -140,12 +140,12 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEnt
 
 					if (msg->getDstAddr() == dstAddr)
 					{
-						Ieee802154eNetworkCtrlInfo * tmp = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->removeControlInfo());
+						Ieee802154eNetworkCtrlInfo * tmp = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
 						if (tmp)
 						{
 							if (tmp->getTxCS())
 							{
-								delete tmp;
+								delete msg->removeControlInfo();
 
 								return msg;
 							}
