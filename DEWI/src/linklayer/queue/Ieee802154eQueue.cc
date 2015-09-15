@@ -43,13 +43,15 @@ void Ieee802154eQueue::initialize()
 	frameCapacity = par("frameCapacity");
 
 	std::stringstream a;
-	a << getParentModule()->getParentModule()->getName() << " " << getParentModule()->getParentModule()->getIndex();
+	a << getParentModule()->getParentModule()->getName() << " "
+			<< getParentModule()->getParentModule()->getIndex();
 	//EndToEndDelay = new cOutVector(a.str().c_str());
 	delMsg = new DataVector(a.str(), "DelMsg");
 
 	delMsg->registerVector();
 
-	dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
+	dataCenter = check_and_cast<DataCenter *>(
+			dataCenter->getModuleByPath("DataCenter"));
 
 }
 
@@ -114,7 +116,8 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr)
 	return NULL;
 }
 
-cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEntry *entry)
+cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr,
+		macLinkTableEntry *entry)
 {
 	if (entry->getLinkOption() == LNK_OP_RECEIVE)
 		return NULL;
@@ -130,85 +133,96 @@ cMessage *Ieee802154eQueue::requestSpcPacket(MACAddress dstAddr, macLinkTableEnt
 
 	switch (direction)
 	{
-		case 0: {
+	case 0:
+	{
 
-			for (int i = 0; i < queue.length(); ++i)
+		for (int i = 0; i < queue.length(); ++i)
+		{
+			Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+					queue.get(i)));
+			if (msg)
 			{
-				Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
-				if (msg)
+
+				if (msg->getDstAddr() == dstAddr)
 				{
-
-					if (msg->getDstAddr() == dstAddr)
+					Ieee802154eNetworkCtrlInfo * tmp =
+							dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
+					if (tmp)
 					{
-						Ieee802154eNetworkCtrlInfo * tmp = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
-						if (tmp)
+						if (tmp->getTxCS())
 						{
-							if (tmp->getTxCS())
-							{
-								delete msg->removeControlInfo();
+							delete msg->removeControlInfo();
 
-								return msg;
-							}
+							return msg;
 						}
 					}
 				}
 			}
-			break;
 		}
-		case 1: {
-			for (int i = 0; i < queue.length(); ++i)
+		break;
+	}
+	case 1:
+	{
+		for (int i = 0; i < queue.length(); ++i)
+		{
+			Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+					queue.get(i)));
+			if (msg)
 			{
-				Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
-				if (msg)
+
+				if (msg->getDstAddr() == dstAddr)
 				{
-
-					if (msg->getDstAddr() == dstAddr)
+					Ieee802154eNetworkCtrlInfo *tmpMsg =
+							dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
+					if (tmpMsg)
 					{
-						Ieee802154eNetworkCtrlInfo *tmpMsg = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
-						if (tmpMsg)
+						if (tmpMsg->getTxHigherCH())
 						{
-							if (tmpMsg->getTxHigherCH())
-							{
-								delete msg->removeControlInfo();
+							delete msg->removeControlInfo();
 
-								emit(dequeuePkSignal, msg);
-								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-								return msg;
-							}
+							emit(dequeuePkSignal, msg);
+							emit(queueingTimeSignal,
+									simTime() - msg->getArrivalTime());
+							return msg;
 						}
 					}
 				}
 			}
-			break;
 		}
-		case -1: {
-			for (int i = 0; i < queue.length(); ++i)
+		break;
+	}
+	case -1:
+	{
+		for (int i = 0; i < queue.length(); ++i)
+		{
+			Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+					queue.get(i)));
+			if (msg)
 			{
-				Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
-				if (msg)
+
+				if (msg->getDstAddr() == dstAddr)
 				{
-
-					if (msg->getDstAddr() == dstAddr)
+					Ieee802154eNetworkCtrlInfo *tmpMsg =
+							dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
+					if (tmpMsg)
 					{
-						Ieee802154eNetworkCtrlInfo *tmpMsg = dynamic_cast<Ieee802154eNetworkCtrlInfo *>(msg->getControlInfo());
-						if (tmpMsg)
+						if (tmpMsg->getTxLowerCH())
 						{
-							if (tmpMsg->getTxLowerCH())
-							{
-								delete msg->removeControlInfo();
+							delete msg->removeControlInfo();
 
-								emit(dequeuePkSignal, msg);
-								emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
-								return msg;
-							}
+							emit(dequeuePkSignal, msg);
+							emit(queueingTimeSignal,
+									simTime() - msg->getArrivalTime());
+							return msg;
 						}
 					}
 				}
 			}
-			break;
 		}
-		default:
-			return NULL;
+		break;
+	}
+	default:
+		return NULL;
 	}
 	return NULL;
 }
@@ -222,7 +236,8 @@ cMessage *Ieee802154eQueue::requestAdvPacket()
 		{
 			Ieee802154eFrame* tmpMsg = check_and_cast<Ieee802154eFrame *>(msg);
 
-			if ((strcmp(tmpMsg->getName(), "AssociationRequest") == 0 || strcmp(tmpMsg->getName(), "AssociationResponse") == 0))
+			if ((strcmp(tmpMsg->getName(), "AssociationRequest") == 0
+					|| strcmp(tmpMsg->getName(), "AssociationResponse") == 0))
 			{
 				emit(dequeuePkSignal, msg);
 				emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -240,7 +255,8 @@ cMessage *Ieee802154eQueue::requestDisAssPacket(bool response)
 		cPacket *msg = PK(queue.get(i));
 		if (response)
 		{
-			if (msg->getKind() == TP_MLME_DISASSOCIATE_RESPONSE || msg->getKind() == Ieee802154e_DISASSOCIATION_RESPONSE)
+			if (msg->getKind() == TP_MLME_DISASSOCIATE_RESPONSE
+					|| msg->getKind() == Ieee802154e_DISASSOCIATION_RESPONSE)
 			{
 				emit(dequeuePkSignal, msg);
 				emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -249,7 +265,8 @@ cMessage *Ieee802154eQueue::requestDisAssPacket(bool response)
 		}
 		else
 		{
-			if (msg->getKind() == TP_MLME_DISASSOCIATE_REQUEST || msg->getKind() == Ieee802154e_DISASSOCIATION_REQUEST)
+			if (msg->getKind() == TP_MLME_DISASSOCIATE_REQUEST
+					|| msg->getKind() == Ieee802154e_DISASSOCIATION_REQUEST)
 			{
 				emit(dequeuePkSignal, msg);
 				emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
@@ -282,11 +299,13 @@ bool Ieee802154eQueue::existSchedReq(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if ((msg))
 		{
 
-			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "ScheduleRequest") == 0)
+			if (msg->getDstAddr() == addr
+					&& strcmp(msg->getName(), "ScheduleRequest") == 0)
 			{
 				return true;
 			}
@@ -299,11 +318,13 @@ bool Ieee802154eQueue::existSchedRes(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if ((msg))
 		{
 
-			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "ScheduleResponse") == 0)
+			if (msg->getDstAddr() == addr
+					&& strcmp(msg->getName(), "ScheduleResponse") == 0)
 			{
 				return true;
 			}
@@ -316,11 +337,13 @@ bool Ieee802154eQueue::existAssRes(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if ((msg))
 		{
 
-			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationResponse") == 0)
+			if (msg->getDstAddr() == addr
+					&& strcmp(msg->getName(), "AssociationResponse") == 0)
 			{
 				return true;
 			}
@@ -333,11 +356,13 @@ bool Ieee802154eQueue::existAssReq(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if ((msg))
 		{
 
-			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "AssociationRequest") == 0)
+			if (msg->getDstAddr() == addr
+					&& strcmp(msg->getName(), "AssociationRequest") == 0)
 			{
 				return true;
 			}
@@ -349,11 +374,13 @@ bool Ieee802154eQueue::existDisAssReq(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if ((msg))
 		{
 
-			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "DisassociationRequest") == 0)
+			if (msg->getDstAddr() == addr
+					&& strcmp(msg->getName(), "DisassociationRequest") == 0)
 			{
 				return true;
 			}
@@ -366,11 +393,13 @@ bool Ieee802154eQueue::existDisAssRes(MACAddress addr)
 {
 	for (int i = 0; i < queue.length(); ++i)
 	{
-		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if ((msg))
 		{
 
-			if (msg->getDstAddr() == addr && strcmp(msg->getName(), "DisassociationResponse") == 0)
+			if (msg->getDstAddr() == addr
+					&& strcmp(msg->getName(), "DisassociationResponse") == 0)
 			{
 				return true;
 			}
@@ -379,21 +408,25 @@ bool Ieee802154eQueue::existDisAssRes(MACAddress addr)
 	return false;
 }
 
-int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg, cMessage *txPaket)
+int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg,
+		cMessage *txPaket)
 {
 	int i = 0;
 	int deleted = 0;
 	while (!queue.empty() && i < queue.length())
 	{
-		Ieee802154eFrame *queueMsg = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *queueMsg = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 		if (queueMsg)
 		{
-			if (queueMsg->getCreationTime() < msg->getCreationTime() && queueMsg->getKind() == msg->getKind())
+			if (queueMsg->getCreationTime() < msg->getCreationTime()
+					&& queueMsg->getKind() == msg->getKind())
 			{
 				if (queueMsg != txPaket)
 				{
 					if (queueMsg->getEncapsulatedMsg())
-						delMsg->record(queueMsg->getEncapsulatedMsg()->getName());
+						delMsg->record(
+								queueMsg->getEncapsulatedMsg()->getName());
 					delete queue.remove(queueMsg);
 					i = 0;
 					deleted++;
@@ -443,7 +476,8 @@ bool Ieee802154eQueue::deleteMsgFromQueu(cMessage *msg)
 
 	while (!queue.empty() && i < queue.length())
 	{
-		Ieee802154eFrame *msg1 = dynamic_cast<Ieee802154eFrame *>(PK(queue.get(i)));
+		Ieee802154eFrame *msg1 = dynamic_cast<Ieee802154eFrame *>(PK(
+				queue.get(i)));
 
 		if (msg1)
 		{
@@ -521,7 +555,8 @@ bool Ieee802154eQueue::deleteBCNQueue()
 		cPacket *msg = PK(queue.get(i));
 		if (dynamic_cast<Ieee802154EnhancedBeaconFrame *>(msg))
 		{
-			Ieee802154EnhancedBeaconFrame* tmpMsg = check_and_cast<Ieee802154EnhancedBeaconFrame *>(msg);
+			Ieee802154EnhancedBeaconFrame* tmpMsg = check_and_cast<
+					Ieee802154EnhancedBeaconFrame *>(msg);
 
 			if (all || !foundFirst)
 			{
@@ -578,7 +613,18 @@ void Ieee802154eQueue::insertInQueue(cMessage *msg)
 	if (ev.isGUI())
 	{
 		char buf[40];
-		sprintf(buf, "q rcvd: %d\nq dropped: %d", numQueueReceived, numQueueDropped);
+		sprintf(buf, "q rcvd: %d\nq dropped: %d", numQueueReceived,
+				numQueueDropped);
 		getDisplayString().setTagArg("t", 0, buf);
+	}
+}
+
+void Ieee802154eQueue::clearQueue()
+{
+
+	while (!queue.empty())
+	{
+
+		delete queue.remove(queue.get(0));
 	}
 }

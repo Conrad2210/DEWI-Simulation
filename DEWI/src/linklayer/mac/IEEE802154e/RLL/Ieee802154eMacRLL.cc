@@ -2018,7 +2018,7 @@ void Ieee802154eMacRLL::handle_RESTART_request(cMessage *msg)
 	rxBeacon = NULL;
 	rxData = NULL;
 	rxCmd = NULL;
-
+	queueModule->clearQueue();
 	resetTRX();
 
 	msg->setKind(TP_RESTART_CONFIRM);

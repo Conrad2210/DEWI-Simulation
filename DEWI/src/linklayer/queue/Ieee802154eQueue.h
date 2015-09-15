@@ -109,6 +109,8 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
     virtual bool deleteBCNQueue();
 
     virtual void insertInQueue(cMessage *msg);
+
+    virtual void clearQueue();
 };
 
 #endif
