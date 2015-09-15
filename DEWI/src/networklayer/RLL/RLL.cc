@@ -1060,7 +1060,7 @@ void RLL::handle_MLME_SCAN_confirm(cMessage *msg)
 				beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower,
 						&distance);
 
-		if (rssi < nDistance && bCapablePanCoor)
+		if (rssi < 25 && bCapablePanCoor)
 		{
 
 			bIsPANCoor = true;
@@ -1353,7 +1353,7 @@ void RLL::handle_BEACON_WAIT_timer(cMessage *msg)
 	}
 	else
 	{
-		if (beaconTable->CHinDistance(10))
+		if (beaconTable->CHinDistance(nDistance))
 		{
 			if (nPanCounter < 2)
 				bCapablePanCoor = true;
