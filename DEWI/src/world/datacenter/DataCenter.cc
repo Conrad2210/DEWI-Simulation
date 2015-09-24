@@ -47,6 +47,7 @@ void DataCenter::initialize(int stage)
 
 		numAssoNodes = 0;
 		numRegisteredAssVectors = 0;
+		lastAssociated = 0.0;
 	}
 }
 
@@ -59,6 +60,10 @@ void DataCenter::finish()
 		{
 			ResultVectors.at(i)->saveData(ResultPath);
 		}
+
+		std::stringstream ss;
+		ss << lastAssociated;
+		this->recordScalar(ss.str(), "clusterTime", "Network", "0");
 	}
 
 }
@@ -91,8 +96,11 @@ void DataCenter::updateAssociatedVector(int ix, const char* na, bool as, int st,
 			AssociatedVector.at(i)->setParentName(parna);
 		}
 
-		if(AssociatedVector.at(i)->getAssosicated())
+		if (AssociatedVector.at(i)->getAssosicated())
+		{
 			numAssoNodes++;
+			lastAssociated = simTime().dbl();
+		}
 	}
 }
 
@@ -120,7 +128,7 @@ void DataCenter::recordScalar(std::string Data, std::string Type, std::string In
 		path << "\\" << Name << ".csv";
 #elif linux
 		path << "/" << ev.getConfigEx()->getActiveConfigName() << "_"
-                << ev.getConfigEx()->getActiveRunNumber() << ".csv";
+		<< ev.getConfigEx()->getActiveRunNumber() << ".csv";
 #endif
 
 		//open output file

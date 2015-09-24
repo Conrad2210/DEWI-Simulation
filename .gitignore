@@ -77,3 +77,5 @@ DEWI/simulations/Testing/General.anf
 DEWI/simulations/Visualization/.tkenvrc
 *.snap
 .metadata/.plugins/org.eclipse.core.resources/.history/50/c0c7d3ee41550015188484c9962161d8
+.metadata/
+DEWI/simulations/Testing/.tkenvrc

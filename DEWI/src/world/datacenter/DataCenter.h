@@ -40,6 +40,8 @@ public:
     int getNumAssNodes(){return numAssoNodes;}
     int getNumRegisteredAssVectors(){return numRegisteredAssVectors;}
 
+
+
 private:
     //initialize datacenter
     void initialize(int stage);
@@ -47,6 +49,8 @@ private:
     //finish DataCenter
     //writes values to csv files
     void finish();
+    double lastAssociated;
+    void updateLastAssociated(double d){lastAssociated = d;}
 
 
 

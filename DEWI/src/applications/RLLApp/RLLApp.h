@@ -47,13 +47,13 @@ class RLLApp : public TrafGenPar
 	virtual void endSim();
 	virtual void checkAssociation();
 
-    private:
+    protected:
 	bool m_debug;        // debug switch
 	int mLowerLayerIn;
 	int mLowerLayerOut;
 	DataCenter *dataCenter;
-        DataVector *E2E;
-    	DataVector *receivedMSG;
+	DataVector *E2E;
+	DataVector *receivedMSG;
 
 	bool m_isLightSwitch;
 
