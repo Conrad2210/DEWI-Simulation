@@ -21,7 +21,7 @@ simple DataCenter
     parameters:
 
         bool recordValues = default(false);
-
+		bool rec_lastAssociated = default(false);
         bool visualization = default(false);
         
         @display("i=device/server2");

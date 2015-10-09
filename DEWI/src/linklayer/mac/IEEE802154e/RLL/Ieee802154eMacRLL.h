@@ -91,6 +91,7 @@ class Ieee802154eMacRLL : public Ieee802154eMac
 
 	int deletedMsgCounter;
 	DataCenter *dataCenter;
+	bool rec_scaDelMsg;
 };
 
 #endif /* IEEE802154EMACRLL_H_ */

@@ -29,7 +29,7 @@ simsignal_t Ieee802154eQueue::queueLengthSignal = SIMSIGNAL_NULL;
 void Ieee802154eQueue::initialize()
 {
 	PassiveQueueBase::initialize();
-
+	rec_delMsg = par("rec_delMsg").boolValue();
 	queue.setName(par("queueName"));
 
 	//statistics
@@ -47,8 +47,8 @@ void Ieee802154eQueue::initialize()
 			<< getParentModule()->getParentModule()->getIndex();
 	//EndToEndDelay = new cOutVector(a.str().c_str());
 	delMsg = new DataVector(a.str(), "DelMsg");
-
-	delMsg->registerVector();
+	if(rec_delMsg)
+	    delMsg->registerVector();
 
 	dataCenter = check_and_cast<DataCenter *>(
 			dataCenter->getModuleByPath("DataCenter"));
@@ -424,7 +424,7 @@ int Ieee802154eQueue::checkForNewerControlMessage(cMessage *msg,
 			{
 				if (queueMsg != txPaket)
 				{
-					if (queueMsg->getEncapsulatedMsg())
+					if (queueMsg->getEncapsulatedMsg() && rec_delMsg)
 						delMsg->record(
 								queueMsg->getEncapsulatedMsg()->getName());
 					delete queue.remove(queueMsg);

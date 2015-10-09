@@ -27,6 +27,11 @@ simple RLL
     string RLLClusterTableModule = default("^.clusterTable");
     string cBeaconTableModule = default("^.beaconTable");
     
+    
+    bool rec_dupMsg = default(false);
+    bool rec_ClusterStage = default(false);
+    bool rec_PanCoor = default(false);
+    bool rec_scaDup = default(false);
 	bool isPANCoor = default(false);
 	bool capablePanCoor = default(true);
 	double StartTime @unit(s) = default(0s);

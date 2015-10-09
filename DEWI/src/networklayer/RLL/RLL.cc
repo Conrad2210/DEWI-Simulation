@@ -104,6 +104,10 @@ void RLL::initialize(int stage)
 		mLowerLayerOut = findGate("lowerLayerOut");
 		mUpperLayerIn = findGate("upperLayerIn");
 		mUpperLayerOut = findGate("upperLayerOut");
+        rec_dupMsg = par("rec_dupMsg").boolValue();
+        rec_ClusterStage = par("rec_ClusterStage").boolValue();
+        rec_PanCoor = par("rec_PanCoor").boolValue();
+        rec_scaDup = par("rec_scaDup").boolValue();
 
 	}
 	else if (stage == 3)
@@ -170,7 +174,9 @@ void RLL::initialize(int stage)
 				<< getParentModule()->getIndex();
 		//EndToEndDelay = new cOutVector(a.str().c_str());
 		dupMsg = new DataVector(a.str(), "dupMsg");
-		dupMsg->registerVector();
+		if(rec_dupMsg)
+		    dupMsg->registerVector();
+
 		dataCenter = check_and_cast<DataCenter *>(
 				dataCenter->getModuleByPath("DataCenter"));
 		nDupCounter = 0;
@@ -182,18 +188,20 @@ void RLL::finish()
 	ss << nCluStage;
 	std::stringstream sss;
 	sss << getParentModule()->getIndex();
-
-	dataCenter->recordScalar(ss.str(), "ClusterStage",
+	if(rec_ClusterStage)
+	    dataCenter->recordScalar(ss.str(), "ClusterStage",
 			getParentModule()->getName(), sss.str());
 
 	ss.str("");
 	ss << bIsPANCoor;
-	dataCenter->recordScalar(ss.str(), "PanCoor", getParentModule()->getName(),
+	if(rec_PanCoor)
+	    dataCenter->recordScalar(ss.str(), "PanCoor", getParentModule()->getName(),
 			sss.str());
 
 	ss.str("");
 	ss << nDupCounter;
-	dataCenter->recordScalar(ss.str(), "scaDup", getParentModule()->getName(),
+	if(rec_scaDup)
+	    dataCenter->recordScalar(ss.str(), "scaDup", getParentModule()->getName(),
 			sss.str());
 
 	cancelEvent(StartTimer);

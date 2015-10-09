@@ -41,7 +41,7 @@ void Ieee802154eMacRLL::initialize(int stage)
 	Ieee802154eMac::initialize(stage);
 	if (stage != 4)
 		return;
-
+	rec_scaDelMsg = par("rec_scaDelMsg").boolValue();
 	scanTimer = new cMessage("scanTimer", MAC_SCAN_TIMER);
 	awaitingBeacon = new cMessage("awaitingBeaconTimer", MAC_AWAITING_BEACON);
 	awaitingNextBeacon = false;
@@ -60,6 +60,7 @@ void Ieee802154eMacRLL::finish()
 	sss << getParentModule()->getParentModule()->getIndex();
 
 	ss << deletedMsgCounter;
+	if(rec_scaDelMsg)
 	dataCenter->recordScalar(ss.str(), "scaDelMsg", getParentModule()->getParentModule()->getName(), sss.str());
 
 }

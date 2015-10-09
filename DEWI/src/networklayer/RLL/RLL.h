@@ -162,6 +162,11 @@ class INET_API RLL : public cSimpleModule
 
 	bool bIsReady;
 
+	bool rec_dupMsg;
+	bool rec_ClusterStage;
+	bool rec_PanCoor;
+	bool rec_scaDup;
+
 	//Is pan coor or not
 	bool bIsPANCoor;
 

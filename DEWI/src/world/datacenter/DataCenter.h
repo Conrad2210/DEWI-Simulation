@@ -65,6 +65,7 @@ private:
     bool recordValues;
     int numRegisteredAssVectors;
     int numAssoNodes;
+    bool rec_lastAssociated;
 
     std::vector<DataVector*> ResultVectors;
 

@@ -31,6 +31,7 @@ import dewi.linklayer.base.IOutputQueue;
 simple Ieee802154eQueue like IOutputQueue
 {
     parameters:
+        bool rec_delMsg = default(false);
         int frameCapacity = default(100);
         string queueName = default("l2queue"); // name of the inner cQueue object, used in the 'q' tag of the display string
         @display("i=block/queue");

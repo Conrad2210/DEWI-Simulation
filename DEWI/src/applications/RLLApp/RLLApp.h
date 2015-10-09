@@ -54,6 +54,10 @@ class RLLApp : public TrafGenPar
 	DataCenter *dataCenter;
 	DataVector *E2E;
 	DataVector *receivedMSG;
+	bool rec_scaRxMsg;
+	bool rec_scaTxMsg;
+	bool rec_E2E;
+	bool rec_receiveMsg;
 
 	bool m_isLightSwitch;
 

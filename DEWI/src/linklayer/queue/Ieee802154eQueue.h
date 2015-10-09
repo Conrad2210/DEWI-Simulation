@@ -67,6 +67,7 @@ class INET_API Ieee802154eQueue : public PassiveQueueBase
 
 	DataCenter *dataCenter;
 	DataVector *delMsg;
+	bool rec_delMsg;
 
   public:
     /**

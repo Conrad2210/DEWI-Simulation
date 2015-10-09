@@ -65,12 +65,6 @@ network Network
 
             @display("p=5.52,0.6");
         }
-        configurator: IPv4NetworkConfigurator {
-            config = xml("<config><interface hosts='*' address='10.x.x.x' netmask='255.x.x.x'/></config>");
-            //            netmask="255.255.0.0";
-            //            networkAddress="145.236.0.0";
-            @display("p=3.16,0.6");
-        }
   
 }
 

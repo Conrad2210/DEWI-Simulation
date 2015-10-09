@@ -24,7 +24,9 @@
 #include "DataFunctions.h"
 
 Define_Module(DataCenter);
-
+#ifndef linux
+        #define linux
+    #endif
 DataCenter::DataCenter()
 {
 	// TODO Auto-generated constructor stub
@@ -41,7 +43,9 @@ void DataCenter::initialize(int stage)
 {
 	if (stage == 0)
 	{
-		recordValues = par("recordValues").boolValue();
+	    recordValues = par("recordValues").boolValue();
+	    rec_lastAssociated = par("rec_lastAssociated").boolValue();
+
 		if (recordValues)
 			ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
 
@@ -60,10 +64,12 @@ void DataCenter::finish()
 		{
 			ResultVectors.at(i)->saveData(ResultPath);
 		}
-
-		std::stringstream ss;
-		ss << lastAssociated;
-		this->recordScalar(ss.str(), "clusterTime", "Network", "0");
+		if(rec_lastAssociated)
+		{
+		    std::stringstream ss;
+	        ss << lastAssociated;
+	        this->recordScalar(ss.str(), "clusterTime", "Network", "0");
+		}
 	}
 
 }
@@ -117,19 +123,20 @@ void DataCenter::recordScalar(std::string Data, std::string Type, std::string In
 	//create absolute path
 #ifdef WIN32
 	path << ResultPath << "\\" << Type << "\\" << Index;
-#elif linux
-	path << ResultPath << "/" << Type << "/" << Index <<" " << Name;
+//#elif linux
 #endif
+	path << ResultPath << "/" << Type << "/" << Index <<" " << Name;
+
 	//Create Directories
 	if (createDirectories(path.str()))
 	{
 		//Set path including file name
 #ifdef WIN32
 		path << "\\" << Name << ".csv";
-#elif linux
+#endif
 		path << "/" << ev.getConfigEx()->getActiveConfigName() << "_"
 		<< ev.getConfigEx()->getActiveRunNumber() << ".csv";
-#endif
+
 
 		//open output file
 		std::ofstream fout(path.str().c_str());

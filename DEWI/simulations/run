@@ -1,4 +1,4 @@
 #!/bin/sh
 cd `dirname $0`
-../src/ieee802154 -n .:../src $*
-# for shared lib, use: opp_run -l ../src/ieee802154 -n .:../src $*
+../src/dewi -n .:../src $*
+# for shared lib, use: opp_run -l ../src/dewi -n .:../src $*

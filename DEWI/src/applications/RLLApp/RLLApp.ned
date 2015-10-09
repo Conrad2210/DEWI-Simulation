@@ -30,4 +30,10 @@ simple RLLApp extends TrafGenPar
    double BurstPause @unit(s) = default(10s);
    double StartTime @unit(s) = default(5s);
    int numberOfBursts  = default(5000);
+   
+   bool rec_scaRxMsg = default(false);
+   bool rec_scaTxMsg = default(false);
+   bool rec_E2E = default(false);
+   bool rec_receiveMsg = default(false);
+   
 }

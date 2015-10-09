@@ -21,241 +21,233 @@
 #include <iostream>
 #include <fstream>
 Define_Module(RLLApp);
-RLLApp::RLLApp()
-{
-	BurstTimer = NULL;
-	BurstMessageTimer = NULL;
-	StopTimer = NULL;
-	dataCenter = NULL;
-	AssTimer = NULL;
+RLLApp::RLLApp() {
+    BurstTimer = NULL;
+    BurstMessageTimer = NULL;
+    StopTimer = NULL;
+    dataCenter = NULL;
+    AssTimer = NULL;
 }
 
-RLLApp::~RLLApp()
-{
-	cancelAndDelete(BurstTimer);
-	cancelAndDelete(BurstMessageTimer);
-	cancelAndDelete(StopTimer);
-	cancelAndDelete(AssTimer);
+RLLApp::~RLLApp() {
+    cancelAndDelete(BurstTimer);
+    cancelAndDelete(BurstMessageTimer);
+    cancelAndDelete(StopTimer);
+    cancelAndDelete(AssTimer);
 
-	delete E2E;
-	delete receivedMSG;
+    delete E2E;
+    delete receivedMSG;
 }
 
-void RLLApp::initialize(int stage)
-{
-	TrafGenPar::initialize(stage);
-	EV << getParentModule()->getFullName() << ": initializing RLL Test App, stage=" << stage << endl;
-	if (0 == stage)
-	{
-		m_debug = par("debug");
-		mLowerLayerIn = findGate("lowerLayerIn");
-		mLowerLayerOut = findGate("lowerLayerOut");
-		m_moduleName = getParentModule()->getFullName();
+void RLLApp::initialize(int stage) {
+    TrafGenPar::initialize(stage);
+    EV << getParentModule()->getFullName()
+              << ": initializing RLL Test App, stage=" << stage << endl;
+    if (0 == stage) {
+        m_debug = par("debug");
+        mLowerLayerIn = findGate("lowerLayerIn");
+        mLowerLayerOut = findGate("lowerLayerOut");
+        m_moduleName = getParentModule()->getFullName();
 
-		m_isLightSwitch = par("LightSwitch");
-		m_numberMessageSend = 0;
-		m_burstCounter = 0;
-		m_messageCounter = 0;
-		m_burstDuration = par("burstDuration").doubleValue();
-		m_interArrivalTime = par("interArrivalTime").doubleValue();
-		m_BurstPause = par("BurstPause").doubleValue();
-		m_AppStartTime = par("StartTime").doubleValue();
-		m_totalBurstToSend = par("numberOfBursts");
-		AssTimer = new cMessage("AssTimer");
-		counterRxMsg = 0;
-		counterTxMsg = 0;
-		m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
+        m_isLightSwitch = par("LightSwitch");
+        m_numberMessageSend = 0;
+        m_burstCounter = 0;
+        m_messageCounter = 0;
+        m_burstDuration = par("burstDuration").doubleValue();
+        m_interArrivalTime = par("interArrivalTime").doubleValue();
+        m_BurstPause = par("BurstPause").doubleValue();
+        m_AppStartTime = par("StartTime").doubleValue();
+        m_totalBurstToSend = par("numberOfBursts");
+        rec_scaRxMsg = par("rec_scaRxMsg").boolValue();
+        rec_scaTxMsg = par("rec_scaTxMsg").boolValue();
+        rec_E2E = par("rec_E2E").boolValue();
+        rec_receiveMsg = par("rec_receiveMsg").boolValue();
+        AssTimer = new cMessage("AssTimer");
+        counterRxMsg = 0;
+        counterTxMsg = 0;
+        m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
 
-		BurstTimer = new cMessage("BurstTimer");
-		BurstMessageTimer = new cMessage("BurstMessageTimer");
-		StopTimer = new cMessage("AppStopTimer");
+        BurstTimer = new cMessage("BurstTimer");
+        BurstMessageTimer = new cMessage("BurstMessageTimer");
+        StopTimer = new cMessage("AppStopTimer");
 
-		std::stringstream a;
-		a << getParentModule()->getName() << " " << getParentModule()->getIndex();
-		//EndToEndDelay = new cOutVector(a.str().c_str());
-		E2E = new DataVector(a.str(), "latency");
-		receivedMSG = new DataVector(a.str(), "rxMSG");
-		if (m_isLightSwitch)
-		{
-			scheduleAt(simTime() + 5, AssTimer);
-		}
+        std::stringstream a;
+        a << getParentModule()->getName() << " "
+                << getParentModule()->getIndex();
+        //EndToEndDelay = new cOutVector(a.str().c_str());
+        //E2E = new DataVector(a.str(), "latency");
+        //receivedMSG = new DataVector(a.str(), "rxMSG");
+        if (m_isLightSwitch) {
+            scheduleAt(simTime() + 5, AssTimer);
+        }
 
-	}
-	if (1 == stage)
-	{
+    }
+    if (1 == stage) {
+        if(rec_E2E)
+            E2E->registerVector();
 
-		E2E->registerVector();
-		receivedMSG->registerVector();
+        if(rec_receiveMsg)
+            receivedMSG->registerVector();
 
-		dataCenter = check_and_cast<DataCenter *>(dataCenter->getModuleByPath("DataCenter"));
-		if (strcmp("gateWay", getParentModule()->getName()))
-			dataCenter->registerAssociatedVector(getParentModule()->getIndex(), getParentModule()->getName(), false, -1, -1, "");
-	}
+        dataCenter = check_and_cast<DataCenter *>(
+                dataCenter->getModuleByPath("DataCenter"));
+        if (strcmp("gateWay", getParentModule()->getName()))
+            dataCenter->registerAssociatedVector(getParentModule()->getIndex(),
+                    getParentModule()->getName(), false, -1, -1, "");
+    }
 }
 
-void RLLApp::finish()
-{
-	cancelEvent(BurstTimer);
-	cancelEvent(BurstMessageTimer);
-	cancelEvent(StopTimer);
-	cancelEvent(AssTimer);
-	std::stringstream sss;
-	sss << getParentModule()->getIndex();
-	std::stringstream ss;
-	ss << counterRxMsg;
-	dataCenter->recordScalar(ss.str(), "scaRxMsg", getParentModule()->getName(), sss.str());
-	ss.str("");
-	ss << counterTxMsg;
-	dataCenter->recordScalar(ss.str(), "scaTxMsg", getParentModule()->getName(), sss.str());
+void RLLApp::finish() {
+    cancelEvent(BurstTimer);
+    cancelEvent(BurstMessageTimer);
+    cancelEvent(StopTimer);
+    cancelEvent(AssTimer);
+    std::stringstream sss;
+    sss << getParentModule()->getIndex();
+    std::stringstream ss;
+    if (rec_scaRxMsg) {
+        ss << counterRxMsg;
+        dataCenter->recordScalar(ss.str(), "scaRxMsg",
+                getParentModule()->getName(), sss.str());
+    }
+    if (rec_scaTxMsg) {
+        ss.str("");
+        ss << counterTxMsg;
+        dataCenter->recordScalar(ss.str(), "scaTxMsg",
+                getParentModule()->getName(), sss.str());
+    }
 }
 
 // OPERATIONS
-void RLLApp::handleSelfMsg(cMessage* msg)
-{
-	if (msg == BurstTimer)
-	{
-		startBurst();
-	}
-	else if (msg == BurstMessageTimer)
-	{
-		sendNextBurstMessage();
-	}
-	else if (msg == StopTimer)
-	{
-		endSim();
-	}
-	else if (msg == AssTimer)
-	{
-		checkAssociation();
-	}
+void RLLApp::handleSelfMsg(cMessage* msg) {
+    if (msg == BurstTimer) {
+        startBurst();
+    } else if (msg == BurstMessageTimer) {
+        sendNextBurstMessage();
+    } else if (msg == StopTimer) {
+        endSim();
+    } else if (msg == AssTimer) {
+        checkAssociation();
+    }
 
-	else
-	{
-		if (ev.isGUI())
-		{
-			EV << "Unrecognized self message: Do nothing" << endl;
-		}
-	}
+    else {
+        if (ev.isGUI()) {
+            EV << "Unrecognized self message: Do nothing" << endl;
+        }
+    }
 
 }
-void RLLApp::handleLowerMsg(cMessage* msg)
-{
-	double now = simTime().dbl();
+void RLLApp::handleLowerMsg(cMessage* msg) {
+    double now = simTime().dbl();
 
-	RLLAppMsg *tmp = check_and_cast<RLLAppMsg *>(msg);
-	msg = NULL;
+    RLLAppMsg *tmp = check_and_cast<RLLAppMsg *>(msg);
+    msg = NULL;
 
-	std::stringstream ss;
-	ss << "Received: " << tmp->getName();
-	getParentModule()->bubble(ss.str().c_str());
-	E2E->record((now - tmp->getCreationTime().dbl()));
-	counterRxMsg++;
-	receivedMSG->record(tmp->getName());
-	delete tmp;
+    std::stringstream ss;
+    ss << "Received: " << tmp->getName();
+    getParentModule()->bubble(ss.str().c_str());
+    if(rec_E2E)
+        E2E->record((now - tmp->getCreationTime().dbl()));
+    counterRxMsg++;
+    if(rec_receiveMsg)
+        receivedMSG->record(tmp->getName());
+    delete tmp;
 }
 
-void RLLApp::checkAssociation()
-{
-	if (m_isLightSwitch)
-	{
-		if (dataCenter->allAssociated())
-		{
+void RLLApp::checkAssociation() {
+    if (m_isLightSwitch) {
+        if (dataCenter->allAssociated()) {
 
-			scheduleAt(simTime() + 10, BurstTimer);
+            scheduleAt(simTime() + 10, BurstTimer);
 
-		}
+        }
 
-		else
-		{
-			std::cout << endl << "Run number: " << ev.getConfigEx()->getActiveRunNumber() << endl;
-			std::cout << "Ass Nodes: " << dataCenter->getNumAssNodes() << " of " << dataCenter->getNumRegisteredAssVectors() << endl;
-			double percent = (double) dataCenter->getNumAssNodes() / (double) dataCenter->getNumRegisteredAssVectors() * 100.0;
-			std::cout << percent << "%" << endl;
-			if (AssTimer->isScheduled())
-				cancelEvent(AssTimer);
+        else {
+            std::cout << endl << "Run number: "
+                    << ev.getConfigEx()->getActiveRunNumber() << endl;
+            std::cout << "Ass Nodes: " << dataCenter->getNumAssNodes() << " of "
+                    << dataCenter->getNumRegisteredAssVectors() << endl;
+            double percent = (double) dataCenter->getNumAssNodes()
+                    / (double) dataCenter->getNumRegisteredAssVectors() * 100.0;
+            std::cout << percent << "%" << endl;
+            if (AssTimer->isScheduled())
+                cancelEvent(AssTimer);
 
-			scheduleAt(simTime() + 5, AssTimer);
-		}
-	}
+            scheduleAt(simTime() + 5, AssTimer);
+        }
+    }
 }
 
-void RLLApp::SendTraf(cPacket *msg, const char* dest)
-{
-	delete msg;
+void RLLApp::SendTraf(cPacket *msg, const char* dest) {
+    delete msg;
 
-	RLLAppMsg* appPkt = new RLLAppMsg("RLLAppMsg");
-	appPkt->setBitLength(PacketSize() * 8);
-	appPkt->setSourceName(m_moduleName);
-	appPkt->setDestName("Broadcast");
-	appPkt->setCreationTime(simTime());
+    RLLAppMsg* appPkt = new RLLAppMsg("RLLAppMsg");
+    appPkt->setBitLength(PacketSize() * 8);
+    appPkt->setSourceName(m_moduleName);
+    appPkt->setDestName("Broadcast");
+    appPkt->setCreationTime(simTime());
 
-	send(appPkt->dup(), mLowerLayerOut);
-	delete appPkt;
+    send(appPkt->dup(), mLowerLayerOut);
+    delete appPkt;
 }
 
-void RLLApp::startBurst()
-{
-	if (m_burstCounter <= m_totalBurstToSend)
-	{
-		std::cout << endl << "Run number: " << ev.getConfigEx()->getActiveRunNumber() << endl;
-		double percent = (double) m_burstCounter / (double) m_totalBurstToSend * 100.0;
-		std::cout<<"Burst #: " << m_burstCounter << " of " << m_totalBurstToSend << endl;
-		std::cout << percent << "%" << endl;
-		char msgName[32];
-		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
-		RLLAppMsg* appPkt = new RLLAppMsg(msgName);
-		appPkt->setBitLength(PacketSize() * 8);
-		appPkt->setSourceName(m_moduleName);
-		appPkt->setDestName("Broadcast");
-		appPkt->setCreationTime(simTime());
-		appPkt->setBurstId(m_burstCounter);
-		appPkt->setMessageId(m_messageCounter);
+void RLLApp::startBurst() {
+    if (m_burstCounter <= m_totalBurstToSend) {
+        std::cout << endl << "Run number: "
+                << ev.getConfigEx()->getActiveRunNumber() << endl;
+        double percent = (double) m_burstCounter / (double) m_totalBurstToSend
+                * 100.0;
+        std::cout << "Burst #: " << m_burstCounter << " of "
+                << m_totalBurstToSend << endl;
+        std::cout << percent << "%" << endl;
+        char msgName[32];
+        sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
+        RLLAppMsg* appPkt = new RLLAppMsg(msgName);
+        appPkt->setBitLength(PacketSize() * 8);
+        appPkt->setSourceName(m_moduleName);
+        appPkt->setDestName("Broadcast");
+        appPkt->setCreationTime(simTime());
+        appPkt->setBurstId(m_burstCounter);
+        appPkt->setMessageId(m_messageCounter);
 
-		send(appPkt->dup(), mLowerLayerOut);
-		m_numberMessageSend++;
-		counterTxMsg++;
-		scheduleAt(simTime() + m_interArrivalTime, BurstMessageTimer);
+        send(appPkt->dup(), mLowerLayerOut);
+        m_numberMessageSend++;
+        counterTxMsg++;
+        scheduleAt(simTime() + m_interArrivalTime, BurstMessageTimer);
 
-		delete appPkt;
-	}
-	else
-	{
-		scheduleAt(simTime() + 10, StopTimer);
-	}
+        delete appPkt;
+    } else {
+        scheduleAt(simTime() + 10, StopTimer);
+    }
 }
 
-void RLLApp::sendNextBurstMessage()
-{
-	if (m_numberMessageSend < m_numberMessageToSend)
-	{
-		char msgName[32];
-		sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
-		RLLAppMsg* appPkt = new RLLAppMsg(msgName);
-		appPkt->setBitLength(PacketSize() * 8);
-		appPkt->setSourceName(m_moduleName);
-		appPkt->setDestName("Broadcast");
-		appPkt->setCreationTime(simTime());
-		appPkt->setBurstId(m_burstCounter);
-		appPkt->setMessageId(m_messageCounter);
-		send(appPkt->dup(), mLowerLayerOut);
-		m_numberMessageSend++;
-		counterTxMsg++;
-		scheduleAt(simTime() + m_interArrivalTime, BurstMessageTimer);
-		delete appPkt;
-		appPkt = NULL;
-	}
-	else
-	{
-		m_numberMessageSend = 0;
-		m_burstCounter++;
-		m_messageCounter = 0;
-		double wait = uniform(m_BurstPause / 2, m_BurstPause);
-		scheduleAt(simTime() + wait, BurstTimer);
-	}
+void RLLApp::sendNextBurstMessage() {
+    if (m_numberMessageSend < m_numberMessageToSend) {
+        char msgName[32];
+        sprintf(msgName, "RLLAppMsg-%d-%d", m_burstCounter, m_messageCounter++);
+        RLLAppMsg* appPkt = new RLLAppMsg(msgName);
+        appPkt->setBitLength(PacketSize() * 8);
+        appPkt->setSourceName(m_moduleName);
+        appPkt->setDestName("Broadcast");
+        appPkt->setCreationTime(simTime());
+        appPkt->setBurstId(m_burstCounter);
+        appPkt->setMessageId(m_messageCounter);
+        send(appPkt->dup(), mLowerLayerOut);
+        m_numberMessageSend++;
+        counterTxMsg++;
+        scheduleAt(simTime() + m_interArrivalTime, BurstMessageTimer);
+        delete appPkt;
+        appPkt = NULL;
+    } else {
+        m_numberMessageSend = 0;
+        m_burstCounter++;
+        m_messageCounter = 0;
+        double wait = uniform(m_BurstPause / 2, m_BurstPause);
+        scheduleAt(simTime() + wait, BurstTimer);
+    }
 }
 
-void RLLApp::endSim()
-{
-	simulation.callFinish();
-	endSimulation();
+void RLLApp::endSim() {
+    simulation.callFinish();
+    endSimulation();
 }

@@ -21,4 +21,5 @@ simple Ieee802154eMacRLL extends Ieee802154eMac
 {
 	@class(Ieee802154eMacRLL);
     @display("i=block/layer");
+    bool rec_scaDelMsg = default(false);
 }
