@@ -13,13 +13,43 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include <RLL.h>
+#include <cdisplaystring.h>
+#include <cenvir.h>
+#include <cmessage.h>
+#include <cmodule.h>
+#include <cnamedobject.h>
+#include <cobjectfactory.h>
+#include <cownedobject.h>
+#include <cpar.h>
+#include <cregistrationlist.h>
+#include <csimplemodule.h>
+#include <csimulation.h>
+#include <cwatch.h>
+#include <distrib.h>
+#include <Ieee802154Def.h>
+#include <Ieee802154eConst.h>
+#include <Ieee802154eEnum.h>
+#include <Ieee802154eFrame_m.h>
 #include <Ieee802154eNetworkCtrlInfo_m.h>
-#include "Ieee802Ctrl_m.h"
-#include "Ieee802154eFrame_m.h"
-#include <Radio80211aControlInfo_m.h>
-#include "RLLAppMsg_m.h"
-#include "RLLClusterTableEntry.h"
+#include <macHoppingSequenceListEntry.h>
+#include <macLinkTableEntry.h>
+#include <macNeighborTableEntry.h>
+#include <macSlotframeTableEntry.h>
+#include <macTimeslotTableEntry.h>
+#include <MACAddress.h>
+#include <regmacros.h>
+#include <RLL.h>
+#include <RLLAppMsg_m.h>
+#include <RLLClusterTableEntry.h>
+#include <simtime.h>
+#include <simutil.h>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 Define_Module(RLL);
 
