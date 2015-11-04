@@ -34,7 +34,7 @@
 #include <sstream>
 #include <vector>
 #include <list>
-#include "Ieee802154Mac.h"
+#include "Ieee802154eMac.h"
 #include "DataCenter.h"
 
 
@@ -53,10 +53,10 @@
  *
  * \image html csmaFSM.png "CSMA Mac-Layer - finite state machine"
  */
-class  csma802154 : public Ieee802154Mac
+class  csma802154 : public Ieee802154eMac
 {
 
-    Ieee802154Frame *sendPacket;
+    Ieee802154eFrame *sendPacket;
     PHYenum phystatus;
   public:
     virtual int    numInitStages    () const { return 3; }
@@ -93,7 +93,7 @@ class  csma802154 : public Ieee802154Mac
      bool isPointToPoint;
   protected:
      DataCenter *center;
-    typedef std::list<Ieee802154Frame*> MacQueue;
+    typedef std::list<Ieee802154eFrame*> MacQueue;
 
     /** @name Different tracked statistics.*/
     /*@{*/
@@ -283,7 +283,7 @@ class  csma802154 : public Ieee802154Mac
 
 
 
-    void sendNewPacketInTx(Ieee802154Frame *p)
+    void sendNewPacketInTx(Ieee802154eFrame *p)
     {
         if (sendPacket)
             error("the previous packet is not send yet");
@@ -322,8 +322,8 @@ class  csma802154 : public Ieee802154Mac
     virtual double scheduleBackoff();
     virtual void sendUp(cMessage *msg);
 
-    virtual cPacket *decapsMsg(Ieee802154Frame * macPkt);
-    Ieee802154Frame * ackMessage;
+    virtual cPacket *decapsMsg(Ieee802154eFrame * macPkt);
+    Ieee802154eFrame * ackMessage;
 
     //sequence number for sending, map for the general case with more senders
     //also in initialisation phase multiple potential parents
