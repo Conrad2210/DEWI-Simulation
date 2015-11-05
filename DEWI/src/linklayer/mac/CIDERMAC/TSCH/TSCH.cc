@@ -14,7 +14,7 @@
 // 
 
 #include <TSCH.h>
-
+Define_Module(TSCH)
 TSCH::TSCH()
 {
 	// TODO Auto-generated constructor stub
@@ -26,3 +26,6 @@ TSCH::~TSCH()
 	// TODO Auto-generated destructor stub
 }
 
+void TSCH::initialize(int stage)
+{
+}

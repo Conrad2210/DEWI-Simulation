@@ -14,7 +14,8 @@
 // 
 
 #include <CSMA.h>
-
+#include "Ieee802154eNetworkCtrlInfo_m.h"
+Define_Module(CSMA)
 CSMA::CSMA()
 {
 	// TODO Auto-generated constructor stub
@@ -26,3 +27,47 @@ CSMA::~CSMA()
 	// TODO Auto-generated destructor stub
 }
 
+void CSMA::initialize(int stage)
+{
+	if(stage == 1)
+	{
+
+	     mUpperLayerIn = findGate("upperDeciderIn");
+	     mUpperLayerOut = findGate("upperDeciderOut");
+	     mLowerLayerIn = findGate("lowereciderIn");
+	     mLowerLayerOut = findGate("lowerDeciderOut");
+	}
+}
+
+void CSMA::handleMessage(cPacket* msg)
+{
+
+}
+
+void CSMA::handleSelfMsg(cMessage* msg)
+{
+}
+
+void CSMA::handleUpperMsg(cPacket* msg)
+{
+}
+
+void CSMA::handleCommand(cMessage* msg)
+{
+}
+
+void CSMA::handleLowerMsg(cPacket* msg)
+{
+}
+
+InterfaceEntry* CSMA::createInterfaceEntry()
+{
+}
+
+void CSMA::flushQueue()
+{
+}
+
+void CSMA::clearQueue()
+{
+}

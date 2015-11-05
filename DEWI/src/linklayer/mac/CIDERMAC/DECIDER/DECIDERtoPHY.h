@@ -17,12 +17,46 @@
 #define DECIDERTOPHY_H_
 
 #include <csimplemodule.h>
+#include "INETDefs.h"
 
-class DECIDERtoPHY: public cSimpleModule
+class INET_API DECIDERtoPHY: public cSimpleModule
 {
 	public:
 		DECIDERtoPHY();
 		virtual ~DECIDERtoPHY();
+		virtual int numInitStages() const
+		{
+			return 2;
+		}
+
+		virtual void initialize(int stage);
+
+		virtual void finish();
+
+		virtual void handleMessage(cMessage *msg);
+
+		virtual void handleLowerMsg(cMessage *msg);
+
+		virtual void handleUpperMsg(cMessage *msg);
+
+		bool isTschActive() const
+		{
+			return mTSCHActive;
+		}
+
+		void setTschActive(bool tschActive)
+		{
+			mTSCHActive = tschActive;
+		}
+	protected:
+		int mLowerLayerIn; 			// from the upper layer
+		int mLowerLayerOut; 		// to the upper layer
+		int mCSMAIn; 			// from the physical layer
+		int mCSMAOut; 			// to the physical layer
+		int mTSCHIn; 			// from the physical layer
+		int mTSCHOut; 			// to the physical layer
+
+		bool mTSCHActive;
 };
 
 #endif /* DECIDERTOPHY_H_ */

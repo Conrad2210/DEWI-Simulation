@@ -26,3 +26,49 @@ DECIDERtoPHY::~DECIDERtoPHY()
 	// TODO Auto-generated destructor stub
 }
 
+void DECIDERtoPHY::initialize(int stage)
+{
+	if(stage!=1)
+		return;
+
+	mLowerLayerIn = findGate("lowerLayerIn"); 			// from the upper layer
+	mLowerLayerOut = findGate("lowerLayerOut"); 		// to the upper layer
+	mCSMAIn = findGate("CSMAIn"); 			// from the physical layer
+	mCSMAOut = findGate("CSMAOut"); 			// to the physical layer
+	mTSCHIn = findGate("TSCHIn"); 			// from the physical layer
+	mTSCHOut = findGate("TSCHOut"); 			// to the physical layer
+
+	mTSCHActive = false;
+}
+
+void DECIDERtoPHY::finish()
+{
+}
+
+void DECIDERtoPHY::handleMessage(cMessage* msg)
+{
+	if(msg->getArrivalGateId() == (mCSMAIn || mTSCHIn))
+		handleUpperMsg(msg);
+	else if(msg->getArrivalGateId() == mLowerLayerIn)
+	{
+		handleLowerMsg(msg);
+	}
+
+}
+
+void DECIDERtoPHY::handleLowerMsg(cMessage* msg)
+{
+	if(mTSCHActive)
+	{
+		send(msg,mTSCHOut);
+	}
+	else
+	{
+		send(msg,mCSMAOut);
+	}
+}
+
+void DECIDERtoPHY::handleUpperMsg(cMessage* msg)
+{
+	send(msg,mLowerLayerOut);
+}

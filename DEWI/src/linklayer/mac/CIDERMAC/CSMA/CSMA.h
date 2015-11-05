@@ -16,13 +16,49 @@
 #ifndef CSMA_H_
 #define CSMA_H_
 
-#include <csma802154.h>
-
-class CSMA: public csma802154
+#include <INETDefs.h>
+#include <WirelessMacBase.h>
+#include "InterfaceEntry.h"
+class INET_API CSMA: public WirelessMacBase
 {
 	public:
 		CSMA();
 		virtual ~CSMA();
+
+		virtual int numInitStages() const
+		{
+			return 3;
+		}
+		virtual void initialize(int stage);
+
+		int mUpperLayerIn;
+		int mUpperLayerOut;
+		int mLowerLayerIn;
+		int mLowerLayerOut;
+
+	protected:
+		void handleMessage(cPacket *msg);
+		/** @brief Handle self messages such as timers */
+		virtual void handleSelfMsg(cMessage *msg);
+
+		/** @brief Handle packets from upper layer */
+		virtual void handleUpperMsg(cPacket *msg);
+
+		/** @brief Handle commands from upper layer */
+		virtual void handleCommand(cMessage *msg);
+
+		/** @brief Handle packets from lower layer */
+		virtual void handleLowerMsg(cPacket *msg);
+		virtual InterfaceEntry *createInterfaceEntry();
+		/**
+		 * should clear queue and emit signal "dropPkFromHLIfaceDown" with entire packets
+		 */
+		virtual void flushQueue();
+
+		/**
+		 * should clear queue silently
+		 */
+		virtual void clearQueue();
 };
 
 #endif /* CSMA_H_ */

@@ -29,7 +29,7 @@
 #include "InterfaceTableAccess.h"
 #include "MACAddress.h"
 #include "Ieee802Ctrl_m.h"
-#include "Ieee802154ePhy.h"
+#include "Ieee802154Phy.h"
 #include "csma802154.h"
 
 Define_Module(csma802154);
@@ -137,9 +137,9 @@ void csma802154::initialize(int stage)
     }
     else if (stage == 2)
     {
-        if (iface && (iface->getMTU()!=Ieee802154ePhy::aMaxMACFrameSize))
+        if (iface && (iface->getMTU()!=Ieee802154Phy::aMaxMACFrameSize))
         {
-        	iface->setMtu(Ieee802154ePhy::aMaxMACFrameSize);
+        	iface->setMtu(Ieee802154Phy::aMaxMACFrameSize);
         }
         EV << "queueLength = " << queueLength
         << " bitrate = " << bitrate
@@ -238,7 +238,7 @@ void csma802154::handleUpperMsg(cPacket *msg)
 {
     //MacPkt *macPkt = encapsMsg(msg);
     reqtMsgFromIFq();
-    Ieee802154eFrame *macPkt = new Ieee802154eFrame(msg->getName());
+    Ieee802154Frame *macPkt = new Ieee802154Frame(msg->getName());
     macPkt->setBitLength(par("headerLength").doubleValue());
     cObject *controlInfo = msg->removeControlInfo();
     IE3ADDR dest;
@@ -255,7 +255,7 @@ void csma802154::handleUpperMsg(cPacket *msg)
     else
     {
         useIeee802Ctrl = false;
-        Ieee802154eNetworkCtrlInfo* cInfo = check_and_cast<Ieee802154eNetworkCtrlInfo *>(controlInfo);
+        Ieee802154NetworkCtrlInfo* cInfo = check_and_cast<Ieee802154NetworkCtrlInfo *>(controlInfo);
 
         if (cInfo->getNetwAddr()==-1)
         {
@@ -266,7 +266,7 @@ void csma802154::handleUpperMsg(cPacket *msg)
 #else
             cModule* module = simulation.getModuleByPath(cInfo->getDestName())->getModuleByRelativePath("nic.mac");
 #endif
-            Ieee802154eMac* macModule = check_and_cast<Ieee802154eMac *>(module);
+            Ieee802154Mac* macModule = check_and_cast<Ieee802154Mac *>(module);
             dest = macModule->getMacAddr();
         }
         else
@@ -310,7 +310,7 @@ void csma802154::updateStatusIdle(t_mac_event event, cMessage *msg)
     case EV_SEND_REQUEST:
         if (macQueue.size() <= queueLength)
         {
-            macQueue.push_back(static_cast<Ieee802154eFrame *> (msg));
+            macQueue.push_back(static_cast<Ieee802154Frame *> (msg));
             EV<<"(1) FSM State IDLE_1, EV_SEND_REQUEST and [TxBuff avail]: startTimerBackOff -> BACKOFF." << endl;
             updateMacState(BACKOFF_2);
             NB = 0;
@@ -346,7 +346,7 @@ void csma802154::updateStatusIdle(t_mac_event event, cMessage *msg)
 
     case EV_FRAME_RECEIVED:
         EV << "(15) FSM State IDLE_1, EV_FRAME_RECEIVED: setting up radio tx -> WAITSIFS." << endl;
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame *>(msg)));
         delete msg;
 
         if (useMACAcks)
@@ -360,7 +360,7 @@ void csma802154::updateStatusIdle(t_mac_event event, cMessage *msg)
 
     case EV_BROADCAST_RECEIVED:
         EV << "(23) FSM State IDLE_1, EV_BROADCAST_RECEIVED: Nothing to do." << endl;
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame *>(msg)));
         delete msg;
         break;
     default:
@@ -422,13 +422,13 @@ void csma802154::updateStatusBackoff(t_mac_event event, cMessage *msg)
         {
             EV << "sending frame up and resuming normal operation.";
         }
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame *>(msg)));
         delete msg;
         break;
     case EV_BROADCAST_RECEIVED:
         EV << "(29) FSM State BACKOFF, EV_BROADCAST_RECEIVED:"
         << "sending frame up and resuming normal operation." <<endl;
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame *>(msg)));
         delete msg;
         break;
     default:
@@ -451,7 +451,7 @@ void csma802154::updateStatusCCA(t_mac_event event, cMessage *msg)
             updateMacState(TRANSMITFRAME_4);
             PLME_SET_TRX_STATE_request(phy_TX_ON);
             //phy->setRadioState(Radio::TX);
-            Ieee802154eFrame * mac = check_and_cast<Ieee802154eFrame *>(macQueue.front()->dup());
+            Ieee802154Frame * mac = check_and_cast<Ieee802154Frame *>(macQueue.front()->dup());
             //sendDown(msg);
             // give time for the radio to be in Tx state before transmitting
             //sendDelayed(mac, aTurnaroundTime, mLowerLayerOut);
@@ -533,13 +533,13 @@ void csma802154::updateStatusCCA(t_mac_event event, cMessage *msg)
         {
             EV << " Nothing to do." << endl;
         }
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame *>(msg)));
         delete msg;
         break;
     case EV_BROADCAST_RECEIVED:
         EV << "(24) FSM State BACKOFF, EV_BROADCAST_RECEIVED:"
         << " Nothing to do." << endl;
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame *>(msg)));
         delete msg;
         break;
     default:
@@ -552,7 +552,7 @@ void csma802154::updateStatusTransmitFrame(t_mac_event event, cMessage *msg)
     if (event == EV_FRAME_TRANSMITTED)
     {
         //    delete msg;
-        Ieee802154eFrame * packet = macQueue.front();
+        Ieee802154Frame * packet = macQueue.front();
         PLME_SET_TRX_STATE_request(phy_RX_ON);
         //phy->setRadioState(Radio::RX);
 
@@ -620,7 +620,7 @@ void csma802154::updateStatusWaitAck(t_mac_event event, cMessage *msg)
         break;
     case EV_BROADCAST_RECEIVED:
     case EV_FRAME_RECEIVED:
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame*>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame*>(msg)));
     case EV_DUPLICATE_RECEIVED:
         EV << "Error ! Received a frame during SIFS !" << endl;
         delete msg;
@@ -683,7 +683,7 @@ void csma802154::updateStatusSIFS(t_mac_event event, cMessage *msg)
     case EV_BROADCAST_RECEIVED:
     case EV_FRAME_RECEIVED:
         EV << "Error ! Received a frame during SIFS !" << endl;
-        sendUp(decapsMsg(static_cast<Ieee802154eFrame*>(msg)));
+        sendUp(decapsMsg(static_cast<Ieee802154Frame*>(msg)));
         delete msg;
         break;
     default:
@@ -715,7 +715,7 @@ void csma802154::updateStatusNotIdle(cMessage *msg)
     EV<< "(20) FSM State NOT IDLE, EV_SEND_REQUEST. Is a TxBuffer available ?" << endl;
     if (macQueue.size() <= queueLength)
     {
-        macQueue.push_back(static_cast<Ieee802154eFrame *>(msg));
+        macQueue.push_back(static_cast<Ieee802154Frame *>(msg));
         EV << "(21) FSM State NOT IDLE, EV_SEND_REQUEST"
         <<" and [TxBuff avail]: enqueue packet and don't move." << endl;
     }
@@ -956,7 +956,7 @@ void csma802154::handleSelfMsg(cMessage *msg)
  */
 void csma802154::handleLowerMsg(cPacket *msg)
 {
-    Ieee802154eFrame *macPkt = dynamic_cast<Ieee802154eFrame *> (msg);
+    Ieee802154Frame *macPkt = dynamic_cast<Ieee802154Frame *> (msg);
     MACAddress src = macPkt->getSrcAddr();
     MACAddress dest = macPkt->getDstAddr();
     //long ExpectedNr = 0;
@@ -1011,7 +1011,7 @@ void csma802154::handleLowerMsg(cPacket *msg)
 
                 if (ackMessage != NULL)
                     delete ackMessage;
-                ackMessage = new Ieee802154eFrame("CSMA-Ack");
+                ackMessage = new Ieee802154Frame("CSMA-Ack");
                 ackMessage->setSrcAddr(getMacAddr());
                 ackMessage->setDstAddr(macPkt->getSrcAddr());
                 ackMessage->setBitLength(ackLength);
@@ -1049,7 +1049,7 @@ void csma802154::handleLowerMsg(cPacket *msg)
 
                 // message is an ack, and it is for us.
                 // Is it from the right node ?
-                Ieee802154eFrame * firstPacket = static_cast<Ieee802154eFrame *>(macQueue.front());
+                Ieee802154Frame * firstPacket = static_cast<Ieee802154Frame *>(macQueue.front());
                 if (macPkt->getSrcAddr() == firstPacket->getDstAddr())
                 {
                     nbRecvdAcks++;
@@ -1087,7 +1087,7 @@ void csma802154::handleLowerControl(cMessage *msg)
         executeMac(EV_FRAME_TRANSMITTED, msg);
     else if (msg->getKind() == PLME_SET_TRX_STATE_CONFIRM)
     {
-        Ieee802154eMacPhyPrimitives* primitive = check_and_cast<Ieee802154eMacPhyPrimitives *>(msg);
+        Ieee802154MacPhyPrimitives* primitive = check_and_cast<Ieee802154MacPhyPrimitives *>(msg);
         phystatus = PHYenum(primitive->getStatus());
         if (primitive->getStatus()==phy_TX_ON && sendPacket)
         {
@@ -1130,7 +1130,7 @@ void csma802154::handleLowerControl(cMessage *msg)
 //  }
 //}
 
-cPacket *csma802154::decapsMsg(Ieee802154eFrame * macPkt)
+cPacket *csma802154::decapsMsg(Ieee802154Frame * macPkt)
 {
     cPacket * msg = macPkt->decapsulate();
     if (useIeee802Ctrl)
@@ -1146,7 +1146,7 @@ cPacket *csma802154::decapsMsg(Ieee802154eFrame * macPkt)
     }
     else
     {
-        Ieee802154eNetworkCtrlInfo * cinfo = new Ieee802154eNetworkCtrlInfo();
+        Ieee802154NetworkCtrlInfo * cinfo = new Ieee802154NetworkCtrlInfo();
         cinfo->setNetwAddr(macPkt->getSrcAddr().getInt());
     }
     return msg;

@@ -23,6 +23,8 @@ class TSCH: public Ieee802154eMac
 	public:
 		TSCH();
 		virtual ~TSCH();
+
+		virtual void initialize(int stage);
 };
 
 #endif /* TSCH_H_ */

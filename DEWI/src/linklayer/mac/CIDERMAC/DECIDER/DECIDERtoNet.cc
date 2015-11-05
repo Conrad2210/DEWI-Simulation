@@ -13,7 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include <DECIDER/DECIDERtoNet.h>
+#include <cmessage.h>
+#include <cobjectfactory.h>
+#include <cregistrationlist.h>
+#include <DECIDERtoNet.h>
+#include <regmacros.h>
+#include <simutil.h>
+
 Define_Module(DECIDERtoNet)
 DECIDERtoNet::DECIDERtoNet()
 {
@@ -26,3 +32,59 @@ DECIDERtoNet::~DECIDERtoNet()
 	// TODO Auto-generated destructor stub
 }
 
+void DECIDERtoNet::initialize(int stage)
+{
+	if (stage != 1)
+		return;
+
+	mUpperLayerIn = findGate("upperLayerIn");
+	mUpperLayerOut = findGate("upperLayerOut");
+
+	mCSMAIn = findGate("CSMAIn");
+	mCSMAOut = findGate("CSMAOut");
+	mCSMAQueueIn = findGate("CSMAQueueIn");
+	mCSMAQueueOut = findGate("CSMAQueueOut");
+
+	mTSCHIn = findGate("TSCHIn");
+	mTSCHOut = findGate("TSCHOut");
+	mTSCHQueueIn = findGate("TSCHQueueIn");
+	mTSCHQueueOut = findGate("TSCHQueueOut");
+
+	mQueueIn = findGate("queueIn");
+	mQueueOut = findGate("queueOut");
+	mTSCHActive = false;
+
+}
+
+void DECIDERtoNet::finish()
+{
+}
+
+void DECIDERtoNet::handleMessage(cMessage* msg)
+{
+	if(msg->getArrivalGateId() == mUpperLayerIn)
+	{
+		handleUpperMsg(msg);
+	}
+	else if(msg->getArrivalGateId() == (mTSCHIn || mCSMAIn))
+	{
+		handleLowerMsg(msg);
+	}
+}
+
+void DECIDERtoNet::handleLowerMsg(cMessage* msg)
+{
+	send(msg,mUpperLayerOut);
+}
+
+void DECIDERtoNet::handleUpperMsg(cMessage* msg)
+{
+	if(mTSCHActive)
+	{
+		send(msg,mTSCHOut);
+	}
+	else
+	{
+		send(msg,mCSMAOut);
+	}
+}

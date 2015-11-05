@@ -15,43 +15,16 @@
 
 package dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA;
 
-//Includes
-//Mobility
-import dewi.mobility.models.StationaryMobility;
-import dewi.mobility.models.StationaryGrid;
-
-//NetworkLayer
-import dewi.nodes.inet.NetworkLayer;
-
-//NIC
-import dewi.nic.Ieee802154csmaNic;
-
-//Applications
-//UDPApp
 import dewi.applications.IUDPApp;
-
-//NotificationBoard
 import dewi.base.NotificationBoard;
-
-//InterfaceTable
+import dewi.mobility.models.StationaryGrid;
+import dewi.networklayer.IManetRouting;
 import dewi.networklayer.common.InterfaceTable;
-
-//RoutingTable
 import dewi.networklayer.ipv4.RoutingTable;
-
-//TransportLayer
-//UDP
+import dewi.nic.CIDERNic;
+import dewi.nodes.inet.NetworkLayer;
 import dewi.transport.udp.UDP;
 
-//Routing
-//MANETRouting
-import dewi.networklayer.IManetRouting;
-
-//Display Module
-import dewi.base.Display;
-
-//Battery Module
-import dewi.battery.models.InetSimpleBattery;
 
 module Node
 {
@@ -118,7 +91,7 @@ module Node
 
 
         //NIC
-        wlan: Ieee802154csmaNic {
+        wlan: CIDERNic {
             parameters:
                 @display("p=248,349;q=queue");
         }

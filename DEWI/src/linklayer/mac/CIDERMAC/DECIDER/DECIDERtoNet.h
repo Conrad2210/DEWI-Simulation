@@ -17,13 +17,54 @@
 #define DECIDERTONET_H_
 
 #include <csimplemodule.h>
+#include "INETDefs.h"
 
-class DECIDERtoNet: public cSimpleModule
+class INET_API DECIDERtoNet: public cSimpleModule
 {
 	public:
 		DECIDERtoNet();
 		virtual ~DECIDERtoNet();
 
+		virtual int numInitStages ()const{return 2;}
+
+		virtual void initialize(int stage);
+
+		virtual void finish();
+
+		virtual void handleMessage(cMessage *msg);
+
+		virtual void handleLowerMsg(cMessage *msg);
+
+		virtual void handleUpperMsg(cMessage *msg);
+
+		bool isTschActive() const
+		{
+			return mTSCHActive;
+		}
+
+		void setTschActive(bool tschActive)
+		{
+			mTSCHActive = tschActive;
+		}
+
+	protected:
+
+	    int mUpperLayerIn; 			// from the upper layer
+	    int mUpperLayerOut; 		// to the upper layer
+	    int mCSMAIn; 			// from the physical layer
+	    int mCSMAOut; 			// to the physical layer
+	    int mCSMAQueueIn;
+	    int mCSMAQueueOut;
+	    int mTSCHIn; 			// from the physical layer
+	    int mTSCHOut; 			// to the physical layer
+	    int mTSCHQueueIn;
+	    int mTSCHQueueOut;
+
+	    int mQueueOut;
+	    int mQueueIn;
+
+
+	    bool mTSCHActive;
 };
 
 #endif /* DECIDERTONET_H_ */
