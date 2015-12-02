@@ -14,6 +14,8 @@
 // 
 
 #include <CIDERNet/Net/SimpleNet.h>
+#include "RLLFrame_m.h"
+#include "CIDERFrame_m.h"
 Define_Module(SimpleNet);
 SimpleNet::SimpleNet() {
     // TODO Auto-generated constructor stub
@@ -25,7 +27,7 @@ SimpleNet::~SimpleNet() {
 }
 
 void SimpleNet::initialize(int stage) {
-    switch(stage){
+    switch (stage) {
     case 0:
         mRLLIn = findGate("RLLIn");
         mRLLOut = findGate("RLLOut");
@@ -45,13 +47,41 @@ void SimpleNet::finish() {
 }
 
 void SimpleNet::handleMessage(cMessage* msg) {
+
+    int ArrivalGate = msg->getArrivalGateId();
+
+    if (ArrivalGate == mLowerLayerIn) {
+        //do stuff for lower layer in
+        if (dynamic_cast<RLLFrame*>(msg)) {
+            send(msg, mRLLOut);
+        } else if (dynamic_cast<CIDERFrame*>(msg)) {
+            send(msg, mCIDEROut);
+        } else {
+
+            EV << "Nothing to do with this message";
+            delete msg;
+        }
+    } else if (ArrivalGate == mUpperLayerIn) {
+        //do stuff for upper layer in
+        handleDataMessage(msg);
+    } else if (ArrivalGate == mRLLIn) {
+        //do stuff for RLL in
+        handleRLLMessage(msg);
+    } else if (ArrivalGate == mCIDERIn) {
+        //do stuff for CIDER in
+        handleCIDERMessge(msg);
+    } else {
+
+        EV << "Nothing to do with this message";
+        delete msg;
+    }
 }
 
-void SimpleNet::handleDataMessage(cPacket* msg) {
+void SimpleNet::handleDataMessage(cMessage* msg) {
 }
 
-void SimpleNet::handleRLLMessage(cPacket* msg) {
+void SimpleNet::handleRLLMessage(cMessage* msg) {
 }
 
-void SimpleNet::handleCIDERMessge(cPacket* msg) {
+void SimpleNet::handleCIDERMessge(cMessage* msg) {
 }

@@ -33,9 +33,9 @@ public:
     virtual void finish();
 
     virtual void handleMessage(cMessage *msg);
-    virtual void handleDataMessage(cPacket *msg);
-    virtual void handleRLLMessage(cPacket *msg);
-    virtual void handleCIDERMessge(cPacket *msg);
+    virtual void handleDataMessage(cMessage *msg);
+    virtual void handleRLLMessage(cMessage *msg);
+    virtual void handleCIDERMessge(cMessage *msg);
 
 
 protected:
