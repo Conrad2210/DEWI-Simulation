@@ -62,7 +62,8 @@ simple CSMA
         double macMaxBE = default(8);
 		// debug switch
     // whether is PAN coordinator
-
+		
+		int GateWay;
 
     gates:
         input upperDeciderIn; 			// from the upper layer

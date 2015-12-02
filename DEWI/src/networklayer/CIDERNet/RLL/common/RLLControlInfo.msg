@@ -11,17 +11,16 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
-package dewi.networklayer.RLL.common.clusterTable;
-// @author: Conrad Dandelski
-// Copyright(c) 2014: Conrad Dandelski
-// Copyright(c) 2014: Nimbus Centre for Embedded Systems Research, Cork, Ireland
-// Copyright(c) 2014: Cork Institute of Technology, Cork, Ireland
+cplusplus {{
+    using namespace std;
+}}
 
-simple RLLClusterTable
+message RLLControlInfo
 {
-	parameters:
+
     
-    	@display("i=block/table");
+    
+    
 }

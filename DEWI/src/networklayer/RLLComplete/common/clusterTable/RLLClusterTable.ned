@@ -13,15 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+package dewi.networklayer.RLLComplete.common.clusterTable;
 // @author: Conrad Dandelski
 // Copyright(c) 2014: Conrad Dandelski
 // Copyright(c) 2014: Nimbus Centre for Embedded Systems Research, Cork, Ireland
 // Copyright(c) 2014: Cork Institute of Technology, Cork, Ireland
 
-package dewi.networklayer.RLL.common.beaconTable;
-
-
-simple cBeaconTable
+simple RLLClusterTable
 {
 	parameters:
     

@@ -18,6 +18,8 @@ package dewi.linklayer.mac.CIDERMAC.TSCH;
 
 simple TSCH
 {
+    parameters:
+        int GateWay;
     gates:
         input upperDeciderIn; 			// from the upper layer
         output upperDeciderOut; 		// to the upper layer

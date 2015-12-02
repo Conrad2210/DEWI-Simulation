@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.networklayer.CIDER;
+package dewi.networklayer.CIDERNet.CIDER;
 
 
 
@@ -26,12 +26,10 @@ simple CIDER
     string macNeighborTableModule = default("^.neighborTable");
     string RLLClusterTableModule = default("^.clusterTable");
     string cBeaconTableModule = default("^.beaconTable");
-      gates:
+    gates:
 
-        input lowerLayerIn;
-        input upperLayerIn;
-        output lowerLayerOut;
-        output upperLayerOut;
+        input networkLayerIn;
+        output networkLayerOut;
 
 
 }

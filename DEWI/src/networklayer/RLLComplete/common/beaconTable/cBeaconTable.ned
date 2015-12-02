@@ -11,41 +11,19 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
+// 
 
-cplusplus {{
-    using namespace std;
-    #include "Ieee802154eField.h"
-    #include "Ieee802154eEnum.h"
-}}
-enum MACenum;
-message RLLControlInfo
+// @author: Conrad Dandelski
+// Copyright(c) 2014: Conrad Dandelski
+// Copyright(c) 2014: Nimbus Centre for Embedded Systems Research, Cork, Ireland
+// Copyright(c) 2014: Cork Institute of Technology, Cork, Ireland
+
+package dewi.networklayer.RLLComplete.common.beaconTable;
+
+
+simple cBeaconTable
 {
-    bool 	 toParent;
-    string   destName;
+	parameters:
     
-   	uint8_t 	dstAddrMode; 
-   	int64_t 	dstAddr;
-   	uint8_t 	srcAddrMode; 
-   	int64_t 	srcAddr;
-   	
-   	bool panCoordinator;
-   	
-   	uint64_t deviceAddress;
-   	
-    short status  @enum(MACenum);
-    uint16_t channelOffset;
-    uint16_t assocShortAddress;
-    
-    uint8_t beaconType;
-    uint8_t channel;
-    uint8_t beaconOrder;
-    uint8_t superframeOrder;
-    
-    uint32_t startTime;
-    uint8_t scanType;
-    
-    
-    
-    
+    	@display("i=block/table");
 }

@@ -28,9 +28,10 @@ import dewi.nic.RLLNic;
 //UDPApp
 import dewi.applications.RLLApp.ClusteringRLL;
 
+import dewi.networklayer.RLLComplete.RLLComplete;
+import dewi.networklayer.RLLComplete.common.clusterTable.RLLClusterTable;
+import dewi.networklayer.RLLComplete.common.beaconTable.cBeaconTable;
 
-//RoutingTable
-import dewi.networklayer.RLL.RLL;
 
 //TransportLayer
 //UDP
@@ -39,9 +40,6 @@ import dewi.base.NotificationBoard;
 //Routing
 //MANETRouting
 import dewi.networklayer.IManetRouting;
-import dewi.networklayer.RLL.common.clusterTable.RLLClusterTable;
-import dewi.networklayer.RLL.common.beaconTable.cBeaconTable;
-
 import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
 import dewi.linklayer.common.Ieee802154e.macLinkTable.macLinkTable;
 import dewi.linklayer.common.Ieee802154e.macTimeslotTable.macTimeslotTable;
@@ -89,6 +87,11 @@ module LightSwitch
                 @display("p=60,240;i=block/table");
         }
 
+    interfaceTable: InterfaceTable {
+            parameters:
+                @display("p=60,224;i=block/table");
+        }
+
         clusterTable: RLLClusterTable {
             parameters:
                 @display("p=60,325;i=block/table");
@@ -99,12 +102,13 @@ module LightSwitch
                 @display("p=360,325");
         }
 
+
         //Routing
         app: ClusteringRLL {
             @display("p=156,68;i=abstract/penguin");
         }
 
-        networklayer: RLL {
+        networklayer: RLLComplete {
 
             @display("p=156,162;i=block/routing");
         }

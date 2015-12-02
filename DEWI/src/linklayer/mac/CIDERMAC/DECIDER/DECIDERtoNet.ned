@@ -22,14 +22,7 @@ simple DECIDERtoNet
         input upperLayerIn; 			// from the upper layer
         output upperLayerOut; 		// to the upper layer
         input CSMAIn; 			// from the physical layer
-        output CSMAOut; 			// to the physical layer
-        input CSMAQueueIn;
-        output CSMAQueueOut;
+        output CSMAOut;
         input TSCHIn; 			// from the physical layer
-        output TSCHOut; 			// to the physical layer
-        input TSCHQueueIn;
-        output TSCHQueueOut;
-        
-        output queueOut;
-        input queueIn;
+        output TSCHOut;
 }

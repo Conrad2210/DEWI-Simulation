@@ -21,7 +21,6 @@ import dewi.mobility.models.StationaryMobility;
 import dewi.networklayer.IManetRouting;
 import dewi.networklayer.common.InterfaceTable;
 import dewi.networklayer.ipv4.RoutingTable;
-import dewi.nic.CIDERNic;
 import dewi.nodes.inet.NetworkLayer;
 import dewi.transport.udp.UDP;
 
@@ -81,10 +80,10 @@ module LightSwitch
 
 
         //NIC
-        wlan: CIDERNic {
-            parameters:
-                @display("p=248,349;q=queue");
-        }
+//        wlan: CIDERNic {
+//            parameters:
+//                @display("p=248,349;q=queue");
+//        }
 
 
 
@@ -153,9 +152,9 @@ module LightSwitch
 
 
         //Connections NetworkLayer <--> World (MAC/PHY)
-        radioIn --> wlan.radioIn;
-        wlan.upperLayerOut --> networkLayer.ifIn[0];
-        wlan.upperLayerIn <-- networkLayer.ifOut[0];
+//        radioIn --> wlan.radioIn;
+//        wlan.upperLayerOut --> networkLayer.ifIn[0];
+//        wlan.upperLayerIn <-- networkLayer.ifOut[0];
 
 
 }

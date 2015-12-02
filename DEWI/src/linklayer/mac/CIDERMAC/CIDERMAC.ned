@@ -19,28 +19,32 @@ import dewi.linklayer.mac.CIDERMAC.CSMA.CSMA;
 import dewi.linklayer.mac.CIDERMAC.DECIDER.DECIDERtoNet;
 import dewi.linklayer.mac.CIDERMAC.DECIDER.DECIDERtoPHY;
 import dewi.linklayer.mac.CIDERMAC.TSCH.TSCH;
+import dewi.linklayer.queue.CIDERQueue;
 
 
 module CIDERMAC
 {
+    parameters:
+        
+        int GateWay;
     @display("bgb=681,462");
     gates:
         input upperLayerIn;
         output upperLayerOut;
         input lowerLayerIn;
         output lowerLayerOut;
-        input queueIn;
-        output queueOut;
 
     submodules:
         TSCH: TSCH {
             parameters:
-                @display("p=277,195;i=block/cogwheel;q=IFQueue");
+                GateWay = GateWay;
+                @display("p=201,195;i=block/mac;q=IFQueue");
         }
 
         CSMA: CSMA {
             parameters:
-                @display("p=355,195;i=block/cogwheel;q=IFQueue");
+                GateWay = GateWay;
+                @display("p=435,195;i=block/mac;q=IFQueue");
         }
 
         DECIDERtoNet: DECIDERtoNet {
@@ -51,6 +55,10 @@ module CIDERMAC
         DECIDERtoPHY: DECIDERtoPHY {
             parameters:
                 @display("p=316,288;i=block/dispatch;q=IFQueue");
+        }
+        Queue: CIDERQueue {
+            parameters:
+                @display("p=316,195;i=block/cogwheel;q=IFQueue");
         }
 
     connections:
@@ -64,19 +72,19 @@ module CIDERMAC
         lowerLayerIn --> DECIDERtoPHY.lowerLayerIn;
         lowerLayerOut <-- DECIDERtoPHY.lowerLayerOut;
 
-        queueIn --> DECIDERtoNet.queueIn;
-        queueOut <-- DECIDERtoNet.queueOut;
-        
-        TSCH.queueIn <-- DECIDERtoNet.TSCHQueueOut;
-        TSCH.queueOut --> DECIDERtoNet.TSCHQueueIn;
-        CSMA.queueIn <-- DECIDERtoNet.CSMAQueueOut;
-        CSMA.queueOut --> DECIDERtoNet.CSMAQueueIn;
+		
+		Queue.in <--Queue.out;
+        TSCH.queueIn <-- Queue.outTSCH;
+        TSCH.queueOut --> Queue.inTSCH;
+        CSMA.queueIn <-- Queue.outCSMA;
+        CSMA.queueOut --> Queue.inCSMA;
 
 
         CSMA.lowerDeciderIn <-- DECIDERtoPHY.CSMAOut;
         CSMA.lowerDeciderOut --> DECIDERtoPHY.CSMAIn;
         CSMA.upperDeciderIn <-- DECIDERtoNet.CSMAOut;
         CSMA.upperDeciderOut --> DECIDERtoNet.CSMAIn;
+       
 
 }
 

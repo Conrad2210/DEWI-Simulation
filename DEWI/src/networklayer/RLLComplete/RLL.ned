@@ -13,11 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.networklayer.RLL;
+package dewi.networklayer.RLLComplete;
 
 
 
-simple RLL
+simple RLLComplete
 {
     string macSlotframeTableModule = default("^.slotframeTable");
     string macLinkTableModule = default("^.linkTable");

@@ -29,11 +29,11 @@
 
 #include "DataCenter.h"
 #include "DataVector.h"
-class INET_API RLL : public cSimpleModule
+class INET_API RLLComplete : public cSimpleModule
 {
     public:
-	RLL();
-	virtual ~RLL();
+	RLLComplete();
+	virtual ~RLLComplete();
 
 	virtual int numInitStages() const
 	{

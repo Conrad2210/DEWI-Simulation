@@ -20,8 +20,8 @@ package dewi.simulations.Testing;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.nodes.Ieee802154e.ClusteringRLL.Rectangular.LampNode;
-import dewi.nodes.Ieee802154e.ClusteringRLL.Rectangular.LightSwitch;
+import dewi.nodes.CIDERNode.Rectangular.LampNode;
+import dewi.nodes.CIDERNode.Rectangular.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 
@@ -32,6 +32,7 @@ network Network
         double AreaX @unit(m) = default(80m);
         double AreaY @unit(m) = default(40m);
 
+		int GateWay = intuniform(0, numHosts);
         double nodeSeparationX = default(0);
         double nodeSeparationY = default(0);
         int maxRow = CalcMaxRow(numHosts);
@@ -43,13 +44,10 @@ network Network
             parameters:
                 @display("i=lighting/lightswitch;p=15.28,12.16");
         }
-        gateWay: LightSwitch {
-            parameters:
-                @display("i=device/accesspoint;p=25.56,6.6");
-        }
         lamp[numHosts]: LampNode {
             parameters:
                 numHosts = numHosts;
+                GateWay = GateWay;
                 maxRow = maxRow;
                 maxCol = maxCol;
                 //Hosts = numFixHosts;
