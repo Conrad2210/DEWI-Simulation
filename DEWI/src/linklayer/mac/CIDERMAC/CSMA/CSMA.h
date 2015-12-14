@@ -37,7 +37,7 @@ public:
 
     virtual int numInitStages() const
     {
-        return 3;
+        return 4;
     }
     virtual void initialize(int stage);
 
@@ -59,6 +59,8 @@ protected:
 
     /** @brief Handle packets from lower layer */
     virtual void handleLowerMsg(cPacket *msg);
+
+    virtual void handleRLLMessage(cMessage *msg);
 
 
     /** @brief Handle control messages from lower layer */

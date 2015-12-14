@@ -18,14 +18,14 @@ package dewi.linklayer.mac.CIDERMAC.CSMA;
 simple CSMA
 {
     parameters:
-        @class(csma802154);
+        @class(CSMA);
         bool debug = default(false);
         bool stats = default(true);
         bool trace = default(false);
         bool randomBackoff = default(false);
 
         string address = default("auto");
-        string queueModule;				// name of optional external queue module
+        string queueModule = default("Queue");				// name of optional external queue module
         bool useMACAcks = default(true);
         int queueLength = default(100);
         // simple interframe space. Time to wait between receiving a frame and acknowledging it.
@@ -41,7 +41,7 @@ simple CSMA
         // Clear Channel Assessment detection time		
         double ccaDetectionTime @unit(s) = default(0.000128 s); // 8 symbols
         // Time to setup radio to reception state
-        double rxSetupTime @unit(s);
+        double rxSetupTime @unit(s) = default(0s);
         // Time to switch radio from Rx to Tx state
         double aTurnaroundTime @unit(s) = default(0.000192 s);    // 12 symbols
         double aUnitBackoffPeriod @unit(s) = default(0.00032 s);

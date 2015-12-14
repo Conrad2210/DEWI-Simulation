@@ -21,7 +21,7 @@ cplusplus {{
 message CIDERControlInfo
 {
 
-    
+    bool broadcast;  
     
     
 }

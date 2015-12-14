@@ -17,11 +17,28 @@
 #define CIDER_H_
 
 #include <csimplemodule.h>
+#include "InterfaceEntry.h"
 
 class CIDER: public cSimpleModule {
 public:
     CIDER();
     ~CIDER();
+	virtual int numInitStages() const
+	{
+	    return 3;
+	}
+	virtual void initialize(int);
+	virtual void finish();
+protected:
+
+	virtual void handleMessage(cMessage *msg);
+	virtual void handleSelfMessage(cMessage *msg);
+    int networkLayerIn;
+    int networkLayerOut;
+
+protected:
+    InterfaceEntry *myInterface;
+    cMessage *timerInitialPing;
 };
 
 #endif /* CIDER_H_ */

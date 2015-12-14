@@ -16,14 +16,12 @@
 
 cplusplus {{
     using namespace std;
-    #include "CIDERControlInfo_m.h"
 }}
 
 class noncobject CIDERControlInfo;
 
 message CIDERFrame
 {
-CIDERControlInfo CntrlInfo;
     
     
     

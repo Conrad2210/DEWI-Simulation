@@ -78,29 +78,16 @@ CIDERFrame& CIDERFrame::operator=(const CIDERFrame& other)
 
 void CIDERFrame::copy(const CIDERFrame& other)
 {
-    this->CntrlInfo_var = other.CntrlInfo_var;
 }
 
 void CIDERFrame::parsimPack(cCommBuffer *b)
 {
     ::cMessage::parsimPack(b);
-    doPacking(b,this->CntrlInfo_var);
 }
 
 void CIDERFrame::parsimUnpack(cCommBuffer *b)
 {
     ::cMessage::parsimUnpack(b);
-    doUnpacking(b,this->CntrlInfo_var);
-}
-
-CIDERControlInfo& CIDERFrame::getCntrlInfo()
-{
-    return CntrlInfo_var;
-}
-
-void CIDERFrame::setCntrlInfo(const CIDERControlInfo& CntrlInfo)
-{
-    this->CntrlInfo_var = CntrlInfo;
 }
 
 class CIDERFrameDescriptor : public cClassDescriptor
@@ -150,7 +137,7 @@ const char *CIDERFrameDescriptor::getProperty(const char *propertyname) const
 int CIDERFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
+    return basedesc ? 0+basedesc->getFieldCount(object) : 0;
 }
 
 unsigned int CIDERFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -161,10 +148,7 @@ unsigned int CIDERFrameDescriptor::getFieldTypeFlags(void *object, int field) co
             return basedesc->getFieldTypeFlags(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static unsigned int fieldTypeFlags[] = {
-        FD_ISCOMPOUND,
-    };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return 0;
 }
 
 const char *CIDERFrameDescriptor::getFieldName(void *object, int field) const
@@ -175,17 +159,12 @@ const char *CIDERFrameDescriptor::getFieldName(void *object, int field) const
             return basedesc->getFieldName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldNames[] = {
-        "CntrlInfo",
-    };
-    return (field>=0 && field<1) ? fieldNames[field] : NULL;
+    return NULL;
 }
 
 int CIDERFrameDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    int base = basedesc ? basedesc->getFieldCount(object) : 0;
-    if (fieldName[0]=='C' && strcmp(fieldName, "CntrlInfo")==0) return base+0;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -197,10 +176,7 @@ const char *CIDERFrameDescriptor::getFieldTypeString(void *object, int field) co
             return basedesc->getFieldTypeString(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    static const char *fieldTypeStrings[] = {
-        "CIDERControlInfo",
-    };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
+    return NULL;
 }
 
 const char *CIDERFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -240,7 +216,6 @@ std::string CIDERFrameDescriptor::getFieldAsString(void *object, int field, int 
     }
     CIDERFrame *pp = (CIDERFrame *)object; (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getCntrlInfo(); return out.str();}
         default: return "";
     }
 }
@@ -267,10 +242,7 @@ const char *CIDERFrameDescriptor::getFieldStructName(void *object, int field) co
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    switch (field) {
-        case 0: return opp_typename(typeid(CIDERControlInfo));
-        default: return NULL;
-    };
+    return NULL;
 }
 
 void *CIDERFrameDescriptor::getFieldStructPointer(void *object, int field, int i) const
@@ -283,7 +255,6 @@ void *CIDERFrameDescriptor::getFieldStructPointer(void *object, int field, int i
     }
     CIDERFrame *pp = (CIDERFrame *)object; (void)pp;
     switch (field) {
-        case 0: return (void *)(&pp->getCntrlInfo()); break;
         default: return NULL;
     }
 }

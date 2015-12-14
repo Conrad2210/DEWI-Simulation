@@ -909,7 +909,7 @@ void csma802154::handleMessage(cMessage* msg)
         return;
     }
 
-    if (msg->getArrivalGateId() == mLowerLayerIn && !msg->isPacket())
+    if (msg->getArrivalGateId() == mLowerLayerIn && dynamic_cast<cPacket*>(msg) == NULL)
     {
         if (msg->getKind()==0)
             error("[MAC]: message '%s' with length==0 is supposed to be a primitive, but msg kind is also zero", msg->getName());

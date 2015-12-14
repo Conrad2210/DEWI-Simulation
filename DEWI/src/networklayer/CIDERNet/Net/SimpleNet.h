@@ -33,6 +33,8 @@ public:
     virtual void finish();
 
     virtual void handleMessage(cMessage *msg);
+    virtual void handleUpperLayer(cMessage *msg);
+    virtual void handleLowerLayer(cMessage *msg);
     virtual void handleDataMessage(cMessage *msg);
     virtual void handleRLLMessage(cMessage *msg);
     virtual void handleCIDERMessge(cMessage *msg);

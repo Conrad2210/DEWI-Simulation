@@ -25,12 +25,16 @@
  * <pre>
  * message CIDERControlInfo
  * {
+ *     bool broadcast;
+ * 
+ * 
  * }
  * </pre>
  */
 class CIDERControlInfo : public ::cMessage
 {
   protected:
+    bool broadcast_var;
 
   private:
     void copy(const CIDERControlInfo& other);
@@ -49,6 +53,8 @@ class CIDERControlInfo : public ::cMessage
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
+    virtual bool getBroadcast() const;
+    virtual void setBroadcast(bool broadcast);
 };
 
 inline void doPacking(cCommBuffer *b, CIDERControlInfo& obj) {obj.parsimPack(b);}

@@ -57,6 +57,7 @@ Register_Class(CIDERControlInfo);
 
 CIDERControlInfo::CIDERControlInfo(const char *name, int kind) : ::cMessage(name,kind)
 {
+    this->broadcast_var = 0;
 }
 
 CIDERControlInfo::CIDERControlInfo(const CIDERControlInfo& other) : ::cMessage(other)
@@ -78,16 +79,29 @@ CIDERControlInfo& CIDERControlInfo::operator=(const CIDERControlInfo& other)
 
 void CIDERControlInfo::copy(const CIDERControlInfo& other)
 {
+    this->broadcast_var = other.broadcast_var;
 }
 
 void CIDERControlInfo::parsimPack(cCommBuffer *b)
 {
     ::cMessage::parsimPack(b);
+    doPacking(b,this->broadcast_var);
 }
 
 void CIDERControlInfo::parsimUnpack(cCommBuffer *b)
 {
     ::cMessage::parsimUnpack(b);
+    doUnpacking(b,this->broadcast_var);
+}
+
+bool CIDERControlInfo::getBroadcast() const
+{
+    return broadcast_var;
+}
+
+void CIDERControlInfo::setBroadcast(bool broadcast)
+{
+    this->broadcast_var = broadcast;
 }
 
 class CIDERControlInfoDescriptor : public cClassDescriptor
@@ -137,7 +151,7 @@ const char *CIDERControlInfoDescriptor::getProperty(const char *propertyname) co
 int CIDERControlInfoDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 0+basedesc->getFieldCount(object) : 0;
+    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
 }
 
 unsigned int CIDERControlInfoDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -148,7 +162,10 @@ unsigned int CIDERControlInfoDescriptor::getFieldTypeFlags(void *object, int fie
             return basedesc->getFieldTypeFlags(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return 0;
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
 }
 
 const char *CIDERControlInfoDescriptor::getFieldName(void *object, int field) const
@@ -159,12 +176,17 @@ const char *CIDERControlInfoDescriptor::getFieldName(void *object, int field) co
             return basedesc->getFieldName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return NULL;
+    static const char *fieldNames[] = {
+        "broadcast",
+    };
+    return (field>=0 && field<1) ? fieldNames[field] : NULL;
 }
 
 int CIDERControlInfoDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount(object) : 0;
+    if (fieldName[0]=='b' && strcmp(fieldName, "broadcast")==0) return base+0;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -176,7 +198,10 @@ const char *CIDERControlInfoDescriptor::getFieldTypeString(void *object, int fie
             return basedesc->getFieldTypeString(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return NULL;
+    static const char *fieldTypeStrings[] = {
+        "bool",
+    };
+    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *CIDERControlInfoDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -216,6 +241,7 @@ std::string CIDERControlInfoDescriptor::getFieldAsString(void *object, int field
     }
     CIDERControlInfo *pp = (CIDERControlInfo *)object; (void)pp;
     switch (field) {
+        case 0: return bool2string(pp->getBroadcast());
         default: return "";
     }
 }
@@ -230,6 +256,7 @@ bool CIDERControlInfoDescriptor::setFieldAsString(void *object, int field, int i
     }
     CIDERControlInfo *pp = (CIDERControlInfo *)object; (void)pp;
     switch (field) {
+        case 0: pp->setBroadcast(string2bool(value)); return true;
         default: return false;
     }
 }
@@ -242,7 +269,9 @@ const char *CIDERControlInfoDescriptor::getFieldStructName(void *object, int fie
             return basedesc->getFieldStructName(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    return NULL;
+    switch (field) {
+        default: return NULL;
+    };
 }
 
 void *CIDERControlInfoDescriptor::getFieldStructPointer(void *object, int field, int i) const

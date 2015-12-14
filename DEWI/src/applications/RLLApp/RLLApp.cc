@@ -35,8 +35,10 @@ RLLApp::~RLLApp() {
     cancelAndDelete(StopTimer);
     cancelAndDelete(AssTimer);
 
-    delete E2E;
-    delete receivedMSG;
+    if(E2E)
+    	delete E2E;
+    if(receivedMSG)
+    	delete receivedMSG;
 }
 
 void RLLApp::initialize(int stage) {

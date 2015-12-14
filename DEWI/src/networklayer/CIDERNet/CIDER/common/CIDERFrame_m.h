@@ -17,25 +17,19 @@
 
 // cplusplus {{
     using namespace std;
-    #include "CIDERControlInfo_m.h"
 // }}
 
 /**
- * Class generated from <tt>src/networklayer/CIDERNet/CIDER/common/CIDERFrame.msg:25</tt> by nedtool.
+ * Class generated from <tt>src/networklayer/CIDERNet/CIDER/common/CIDERFrame.msg:24</tt> by nedtool.
  * <pre>
  * message CIDERFrame
  * {
- *     CIDERControlInfo CntrlInfo;
- * 
- * 
- * 
  * }
  * </pre>
  */
 class CIDERFrame : public ::cMessage
 {
   protected:
-    CIDERControlInfo CntrlInfo_var;
 
   private:
     void copy(const CIDERFrame& other);
@@ -54,9 +48,6 @@ class CIDERFrame : public ::cMessage
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
-    virtual CIDERControlInfo& getCntrlInfo();
-    virtual const CIDERControlInfo& getCntrlInfo() const {return const_cast<CIDERFrame*>(this)->getCntrlInfo();}
-    virtual void setCntrlInfo(const CIDERControlInfo& CntrlInfo);
 };
 
 inline void doPacking(cCommBuffer *b, CIDERFrame& obj) {obj.parsimPack(b);}
