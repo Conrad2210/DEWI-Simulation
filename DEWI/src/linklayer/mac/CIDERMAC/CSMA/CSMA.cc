@@ -18,10 +18,13 @@
 #include "Ieee802Ctrl_m.h"
 #include "Ieee802154ePhy.h"
 #include "RLLFrame_m.h"
+#include "CIDERFrame_m.h"
+#include "Radio80211aControlInfo_m.h"
+
 Define_Module(CSMA)
 CSMA::CSMA()
 {
-
+	sendPacket = NULL;
 }
 
 CSMA::~CSMA()
@@ -31,12 +34,13 @@ CSMA::~CSMA()
 
 void CSMA::initialize(int stage)
 {
+	WirelessMacBase::initialize(stage);
 	if (stage == 0)
 	{
 
 		mUpperLayerIn = findGate("upperDeciderIn");
 		mUpperLayerOut = findGate("upperDeciderOut");
-		mLowerLayerIn = findGate("lowereciderIn");
+		mLowerLayerIn = findGate("lowerDeciderIn");
 		mLowerLayerOut = findGate("lowerDeciderOut");
 		commonInitialize();
 		if (par("GateWay").longValue() == this->getParentModule()->getParentModule()->getParentModule()->getIndex())
@@ -124,14 +128,14 @@ void CSMA::initialize(int stage)
 		EV << "finished csma init stage 1." << endl;
 		center = check_and_cast<DataCenter *>(center->getModuleByPath("DataCenter"));
 	}
-	else  if(stage == 3)
+	else if (stage == 3)
 	{
 		// open radio receiver, waiting for first beacon's arrival
-	    PLME_SET_TRX_STATE_request(phy_RX_ON);
+		PLME_SET_TRX_STATE_request(phy_RX_ON);
 	}
 }
 
-void CSMA::handleMessage(cPacket* msg)
+void CSMA::handleMessage(cMessage* msg)
 {
 	if (!isOperational)
 	{
@@ -154,7 +158,7 @@ void CSMA::handleMessage(cPacket* msg)
 	{
 		handleSelfMsg(msg);
 	}
-	else
+	else if (msg->getArrivalGateId() == mUpperLayerIn)
 	{
 		handleUpperMsg(PK(msg));
 	}
@@ -181,13 +185,13 @@ void CSMA::handleSelfMsg(cMessage* msg)
 void CSMA::handleUpperMsg(cPacket* msg)
 {
 
-	if (dynamic_cast<RLLFrame *>(msg))
+	if (dynamic_cast<CIDERFrame *>(msg))
 	{
-		handleRLLMessage(msg);
+		handleCIDERMessage(msg);
 	}
 }
 
-void CSMA::handleRLLMessage(cMessage* msg)
+void CSMA::handleCIDERMessage(cMessage* msg)
 {
 	Ieee802154eFrame *newFrame = new Ieee802154eFrame("CIDER_MAC_Frame", Ieee802154e_DATA);
 
@@ -209,7 +213,6 @@ void CSMA::handleRLLMessage(cMessage* msg)
 	destAddr = (IE3ADDR) 0xffff; // broadcast address - Std 802.15.4-2006 (7.3.1.1) page 150
 	destPanId = 0xffff; // broadcast PAN ID - Std 802.15.4-2006 (7.3.1.1) page 150
 	gtsTX = false;              // send in the CAP
-
 
 	EV << "[MAC]: an " << msg->getName() << " (#" << ", " << PK(msg)->getByteLength() << " Bytes, destined for MAC address " << destAddr << " received from the upper layer" << endl;
 
@@ -237,12 +240,12 @@ void CSMA::handleRLLMessage(cMessage* msg)
 	if (frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
 	{ // 16 bit address
 		tmpDstPanId = mpib.macPANId;
-		tmpDstAddr = (IE3ADDR) mpib.macCoordShortAddress;
+		tmpDstAddr = (IE3ADDR) MACAddress::BROADCAST_ADDRESS;
 	}
 	else
 	{ // 64 bit address
 		tmpDstPanId = mpib.macPANId;
-		tmpDstAddr = (IE3ADDR) mpib.macCoordExtendedAddress;
+		tmpDstAddr = (IE3ADDR) MACAddress::BROADCAST_ADDRESS;
 	}
 
 	if (frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
@@ -272,8 +275,7 @@ void CSMA::handleRLLMessage(cMessage* msg)
 	newFrame->setFrmCtrl(frmCtrl);
 	newFrame->setAuxSecHd(auxSecHd);
 
-	send(newFrame,mLowerLayerOut);
-
+	executeMac(EV_SEND_REQUEST, newFrame);
 
 }
 
@@ -288,8 +290,6 @@ void CSMA::handleLowerMsg(cPacket* msg)
 	MACAddress dest = macPkt->getDstAddr();
 	//long ExpectedNr = 0;
 	uint8_t ExpectedNr = 0;
-	if (msg->getControlInfo())
-		delete msg->removeControlInfo();
 
 	if (macPkt->getKind() != PACKETOK)
 	{
@@ -484,7 +484,7 @@ void CSMA::updateStatusIdle(t_mac_event event, cMessage* msg)
 	switch (event)
 	{
 	case EV_SEND_REQUEST:
-		if (queueModule->getQueueSize() <= (int) queueLength)
+		if (queueModule->getQueueSize() <= (int) queueModule->getCapacity())
 		{
 			queueModule->insertInQueue(msg);
 			EV << "(1) FSM State IDLE_1, EV_SEND_REQUEST and [TxBuff avail]: startTimerBackOff -> BACKOFF." << endl;
@@ -535,9 +535,26 @@ void CSMA::updateStatusIdle(t_mac_event event, cMessage* msg)
 		break;
 
 	case EV_BROADCAST_RECEIVED:
+	{
 		EV << "(23) FSM State IDLE_1, EV_BROADCAST_RECEIVED: Nothing to do." << endl;
-		sendUp(decapsMsg(static_cast<Ieee802154eFrame *>(msg)));
+		Radio80211aControlInfo * cinfo;
+		if (msg->getControlInfo())
+			cinfo = check_and_cast<Radio80211aControlInfo *>(msg->removeControlInfo());
+
+		cPacket *msg1 = decapsMsg(static_cast<Ieee802154eFrame *>(msg));
+		if (dynamic_cast<CIDERFrame *>(msg1))
+		{
+			CIDERFrame *temp = check_and_cast<CIDERFrame*>(msg1);
+			temp->setTxPower(1);
+			temp->setRxPower(cinfo->getRecPow());
+			sendUp(temp);
+		}
+		else
+		{
+			sendUp(msg1);
+		}
 		delete msg;
+	}
 		break;
 	default:
 		fsmError(event, msg);
@@ -625,7 +642,7 @@ void CSMA::updateStatusCCA(t_mac_event event, cMessage* msg)
 			PLME_SET_TRX_STATE_request(phy_TX_ON);
 			//phy->setRadioState(Radio::TX);
 			Ieee802154eFrame * mac = check_and_cast<Ieee802154eFrame *>(queueModule->requestSpcPacket());
-			//sendDown(msg);
+			//sendDown(mac);
 			// give time for the radio to be in Tx state before transmitting
 			//sendDelayed(mac, aTurnaroundTime, mLowerLayerOut);
 			sendNewPacketInTx(mac);
@@ -720,7 +737,7 @@ void CSMA::updateStatusTransmitFrame(t_mac_event event, cMessage* msg)
 {
 	if (event == EV_FRAME_TRANSMITTED)
 	{
-		Ieee802154eFrame * packet = check_and_cast<Ieee802154eFrame *>(queueModule->requestSpcPacket());
+		Ieee802154eFrame * packet = sendPacket;
 		PLME_SET_TRX_STATE_request(phy_RX_ON);
 		//phy->setRadioState(Radio::RX);
 
@@ -746,8 +763,8 @@ void CSMA::updateStatusTransmitFrame(t_mac_event event, cMessage* msg)
 		else
 		{
 			EV << ": RadioSetupRx, manageQueue..." << endl;
-			queueModule->deleteMsgFromQueu(queueModule->requestSpcPacket());
-			delete packet;
+			sendPacket = NULL;
+			packet = NULL;
 			manageQueue();
 		}
 	}
@@ -1005,6 +1022,11 @@ void CSMA::sendUp(cMessage* msg)
 {
 	mpNb->fireChangeNotification(NF_LINK_PROMISCUOUS, msg);
 	send(msg, mUpperLayerOut);
+}
+
+void CSMA::sendDown(cMessage* msg)
+{
+	send(msg, mLowerLayerOut);
 }
 
 void CSMA::commonInitialize()
@@ -1333,10 +1355,10 @@ void CSMA::handleLowerControl(cMessage* msg)
 	{
 		Ieee802154eMacPhyPrimitives* primitive = check_and_cast<Ieee802154eMacPhyPrimitives *>(msg);
 		phystatus = PHYenum(primitive->getStatus());
-		if (primitive->getStatus() == phy_TX_ON && sendPacket)
+		if (phystatus == phy_SUCCESS && sendPacket)
 		{
+			queueModule->deleteMsgFromQueu(sendPacket);
 			sendDown(sendPacket);
-			sendPacket = NULL;
 		}
 	}
 

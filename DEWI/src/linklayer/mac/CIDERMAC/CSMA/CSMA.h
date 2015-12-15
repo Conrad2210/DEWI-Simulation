@@ -47,7 +47,7 @@ public:
     int mLowerLayerOut;
 
 protected:
-    void handleMessage(cPacket *msg);
+    virtual void handleMessage(cMessage *msg);
     /** @brief Handle self messages such as timers */
     virtual void handleSelfMsg(cMessage *msg);
 
@@ -60,8 +60,9 @@ protected:
     /** @brief Handle packets from lower layer */
     virtual void handleLowerMsg(cPacket *msg);
 
-    virtual void handleRLLMessage(cMessage *msg);
+    virtual void handleCIDERMessage(cMessage *msg);
 
+    virtual void sendDown(cMessage *msg);
 
     /** @brief Handle control messages from lower layer */
     virtual void handleLowerControl(cMessage *msg);

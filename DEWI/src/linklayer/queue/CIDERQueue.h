@@ -69,7 +69,7 @@ protected:
     /**
      * Redefined from IPassiveQueue.
      */
-
+    int getCapacity(){return frameCapacity;}
     int activeMAC;
     void setActiveMAC(int i){activeMAC = i;}
     virtual bool isEmpty();

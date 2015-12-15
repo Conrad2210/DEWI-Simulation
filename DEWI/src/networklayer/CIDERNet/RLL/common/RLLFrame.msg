@@ -21,7 +21,7 @@ cplusplus {{
 
 class noncobject RLLControlInfo;
 
-message RLLFrame
+packet RLLFrame
 {
 	RLLControlInfo CntrlInfo;
     

@@ -50,6 +50,18 @@ class INET_API macNeighborTableEntry : public cObject
         /* The 64-bit (IEEE) address of the neighbor device. */
         MACAddress ExtendedAddress;
 
+        //Number of neighbours of this node
+        int nNodeDegree;
+
+        //rssi;
+        double dRSSI;
+
+        //Distance;
+
+        double dDistance;
+
+
+        double dCurTXPw;
         /* The allocating Superframe Duration (SD) index number for beacon frame. (not use in TSCH)*/
         UINT_16 SDIndex;
 
@@ -193,5 +205,46 @@ class INET_API macNeighborTableEntry : public cObject
         virtual void isMyCH(bool is){myCH = is;}
         virtual void isMyCS(bool is){myCS = is;}
 
+	double getDistance() const
+	{
+		return dDistance;
+	}
+
+	double getRssi() const
+	{
+		return dRSSI;
+	}
+
+	void setRssi(double rssi)
+	{
+		dRSSI = rssi;
+		double lambda = SPEED_OF_LIGHT / 2.4e9;
+		double temp1 = dCurTXPw * pow(lambda, 2);
+		double temp2 = (16 * pow(3.14, 2) * dRSSI);
+		double temp3 = temp1 / temp2;
+		double temp4 = 1.0 / 3.0;
+		dDistance = pow(temp3, temp4);
+
+	}
+
+	double getCurTxPw() const
+	{
+		return dCurTXPw;
+	}
+
+	void setCurTxPw(double curTxPw)
+	{
+		dCurTXPw = curTxPw;
+	}
+
+	int getNodeDegree() const
+	{
+		return nNodeDegree;
+	}
+
+	void setNodeDegree(int nodeDegree)
+	{
+		nNodeDegree = nodeDegree;
+	}
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

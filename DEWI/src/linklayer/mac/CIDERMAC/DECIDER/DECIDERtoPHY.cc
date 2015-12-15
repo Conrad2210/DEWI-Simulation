@@ -47,8 +47,10 @@ void DECIDERtoPHY::finish()
 
 void DECIDERtoPHY::handleMessage(cMessage* msg)
 {
-	if(msg->getArrivalGateId() == (mCSMAIn || mTSCHIn))
+	if(msg->getArrivalGateId() == mCSMAIn || msg->getArrivalGateId() ==  mTSCHIn)
+	{
 		handleUpperMsg(msg);
+	}
 	else if(msg->getArrivalGateId() == mLowerLayerIn)
 	{
 		handleLowerMsg(msg);

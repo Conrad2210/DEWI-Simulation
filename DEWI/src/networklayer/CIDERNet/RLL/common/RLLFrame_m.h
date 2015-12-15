@@ -23,7 +23,7 @@
 /**
  * Class generated from <tt>src/networklayer/CIDERNet/RLL/common/RLLFrame.msg:25</tt> by nedtool.
  * <pre>
- * message RLLFrame
+ * packet RLLFrame
  * {
  *     RLLControlInfo CntrlInfo;
  * 
@@ -32,7 +32,7 @@
  * }
  * </pre>
  */
-class RLLFrame : public ::cMessage
+class RLLFrame : public ::cPacket
 {
   protected:
     RLLControlInfo CntrlInfo_var;

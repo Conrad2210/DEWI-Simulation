@@ -53,10 +53,10 @@ void ClusteringRLL::checkAssociation()
 			std::cout << "Ass Nodes: " << dataCenter->getNumAssNodes() << " of " << dataCenter->getNumRegisteredAssVectors() << endl;
 			double percent = (double) dataCenter->getNumAssNodes() / (double) dataCenter->getNumRegisteredAssVectors() * 100.0;
 			std::cout << percent << "%" << endl;
-			if (AssTimer->isScheduled())
-				cancelEvent(AssTimer);
-
-			scheduleAt(simTime() + 5, AssTimer);
+//			if (AssTimer->isScheduled())
+//				cancelEvent(AssTimer);
+//
+//			scheduleAt(simTime() + 5, AssTimer);
 		}
 	}
 }

@@ -55,11 +55,11 @@ inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
 Register_Class(RLLFrame);
 
-RLLFrame::RLLFrame(const char *name, int kind) : ::cMessage(name,kind)
+RLLFrame::RLLFrame(const char *name, int kind) : ::cPacket(name,kind)
 {
 }
 
-RLLFrame::RLLFrame(const RLLFrame& other) : ::cMessage(other)
+RLLFrame::RLLFrame(const RLLFrame& other) : ::cPacket(other)
 {
     copy(other);
 }
@@ -71,7 +71,7 @@ RLLFrame::~RLLFrame()
 RLLFrame& RLLFrame::operator=(const RLLFrame& other)
 {
     if (this==&other) return *this;
-    ::cMessage::operator=(other);
+    ::cPacket::operator=(other);
     copy(other);
     return *this;
 }
@@ -83,13 +83,13 @@ void RLLFrame::copy(const RLLFrame& other)
 
 void RLLFrame::parsimPack(cCommBuffer *b)
 {
-    ::cMessage::parsimPack(b);
+    ::cPacket::parsimPack(b);
     doPacking(b,this->CntrlInfo_var);
 }
 
 void RLLFrame::parsimUnpack(cCommBuffer *b)
 {
-    ::cMessage::parsimUnpack(b);
+    ::cPacket::parsimUnpack(b);
     doUnpacking(b,this->CntrlInfo_var);
 }
 
@@ -128,7 +128,7 @@ class RLLFrameDescriptor : public cClassDescriptor
 
 Register_ClassDescriptor(RLLFrameDescriptor);
 
-RLLFrameDescriptor::RLLFrameDescriptor() : cClassDescriptor("RLLFrame", "cMessage")
+RLLFrameDescriptor::RLLFrameDescriptor() : cClassDescriptor("RLLFrame", "cPacket")
 {
 }
 

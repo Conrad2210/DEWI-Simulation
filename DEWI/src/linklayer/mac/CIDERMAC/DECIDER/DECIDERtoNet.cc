@@ -66,7 +66,7 @@ void DECIDERtoNet::handleMessage(cMessage* msg)
 	{
 		handleUpperMsg(msg);
 	}
-	else if(msg->getArrivalGateId() == (mTSCHIn || mCSMAIn))
+	else if(msg->getArrivalGateId() == mCSMAIn || msg->getArrivalGateId() ==  mTSCHIn)
 	{
 		handleLowerMsg(msg);
 	}

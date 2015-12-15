@@ -17,19 +17,28 @@
 
 // cplusplus {{
     using namespace std;
+    #include "MACAddress.h"
 // }}
 
 /**
- * Class generated from <tt>src/networklayer/CIDERNet/CIDER/common/CIDERFrame.msg:24</tt> by nedtool.
+ * Class generated from <tt>src/networklayer/CIDERNet/CIDER/common/CIDERFrame.msg:26</tt> by nedtool.
  * <pre>
- * message CIDERFrame
+ * packet CIDERFrame
  * {
+ *     MACAddress address;
+ *     double rxPower;
+ *     int nodeDegree;
+ *     double txPower;
  * }
  * </pre>
  */
-class CIDERFrame : public ::cMessage
+class CIDERFrame : public ::cPacket
 {
   protected:
+    MACAddress address_var;
+    double rxPower_var;
+    int nodeDegree_var;
+    double txPower_var;
 
   private:
     void copy(const CIDERFrame& other);
@@ -48,6 +57,15 @@ class CIDERFrame : public ::cMessage
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
+    virtual MACAddress& getAddress();
+    virtual const MACAddress& getAddress() const {return const_cast<CIDERFrame*>(this)->getAddress();}
+    virtual void setAddress(const MACAddress& address);
+    virtual double getRxPower() const;
+    virtual void setRxPower(double rxPower);
+    virtual int getNodeDegree() const;
+    virtual void setNodeDegree(int nodeDegree);
+    virtual double getTxPower() const;
+    virtual void setTxPower(double txPower);
 };
 
 inline void doPacking(cCommBuffer *b, CIDERFrame& obj) {obj.parsimPack(b);}

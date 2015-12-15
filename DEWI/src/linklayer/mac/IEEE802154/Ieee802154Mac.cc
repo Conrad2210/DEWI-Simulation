@@ -1822,7 +1822,7 @@ void Ieee802154Mac::resetTRX()
 void Ieee802154Mac::PLME_SET_TRX_STATE_request(PHYenum state)
 {
     EV << "[MAC]: sending PLME_SET_TRX_STATE_request <" << state << "> to PHY layer" << endl;
-// construct PLME_SET_TRX_STATE_request primitive
+    // construct PLME_SET_TRX_STATE_request primitive
     Ieee802154MacPhyPrimitives *primitive = new Ieee802154MacPhyPrimitives();
     primitive->setKind(PLME_SET_TRX_STATE_REQUEST);
     primitive->setStatus(state);

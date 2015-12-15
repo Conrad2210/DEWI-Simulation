@@ -66,6 +66,10 @@ std::string macNeighborTableEntry::info() const
     out<<" NeighborSize: " << neighborSize;
     out<<" ShortAddress: "<< ShortAddress;
     out<<" ExtendedAddress: " << ExtendedAddress;
+    out<<" TxPower: " << dCurTXPw;
+    out<<" RSSI: " << dRSSI;
+    out<<" Distance: " << dDistance << "m";
+    out<<" Node Degree: " << nNodeDegree;
     out<<" SDIndex: " << (int)SDIndex;
     out<<" ChannelOffset: " << (int)ChannelOffset;
     out<<" TrackBeacon: " << TrackBeacon;

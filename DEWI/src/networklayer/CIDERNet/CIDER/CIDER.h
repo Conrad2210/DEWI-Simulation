@@ -18,6 +18,8 @@
 
 #include <csimplemodule.h>
 #include "InterfaceEntry.h"
+#include "macNeighborTable.h"
+#include "macNeighborTableAccess.h"
 
 class CIDER: public cSimpleModule {
 public:
@@ -33,11 +35,14 @@ protected:
 
 	virtual void handleMessage(cMessage *msg);
 	virtual void handleSelfMessage(cMessage *msg);
+	virtual void handleCIDERMessage(cMessage *msg);
     int networkLayerIn;
     int networkLayerOut;
 
 protected:
     InterfaceEntry *myInterface;
+    IMacNeighborTable *neighbourTable;
+
     cMessage *timerInitialPing;
 };
 
