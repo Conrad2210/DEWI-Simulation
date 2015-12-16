@@ -21,31 +21,34 @@
 #include "InterfaceTableAccess.h"
 #include "macNeighborTableEntry.h"
 Define_Module(CIDER);
-CIDER::CIDER() {
-    // TODO Auto-generated constructor stub
+CIDER::CIDER()
+{
+	// TODO Auto-generated constructor stub
 
 }
 
-CIDER::~CIDER() {
-    // TODO Auto-generated destructor stub
+CIDER::~CIDER()
+{
+	// TODO Auto-generated destructor stub
 }
 
 void CIDER::initialize(int stage)
 {
-	if(stage == 1)
+	if (stage == 1)
 	{
 		networkLayerIn = findGate("networkLayerIn");
 		networkLayerOut = findGate("networkLayerOut");
 	}
-	else if(stage == 2)
+	else if (stage == 2)
 	{
+		counterPing = 0;
 		IInterfaceTable *ift = InterfaceTableAccess().getIfExists();
 		myInterface = ift->getInterface(0);
 		neighbourTable = MacNeighborTableAccess().getIfExists();
 		uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
-		double startTime = (double)(temp % 0xFFFF) * 0.01;
-		timerInitialPing = new cMessage("Ping",500);
-		scheduleAt(startTime,timerInitialPing);
+		double startTime = (double) (temp % 0xFFFF) * 0.01;
+		timerInitialPing = new cMessage("Ping", 500);
+		scheduleAt(startTime, timerInitialPing);
 	}
 
 }
@@ -57,9 +60,9 @@ void CIDER::finish()
 
 void CIDER::handleMessage(cMessage* msg)
 {
-	if(msg->isSelfMessage())
+	if (msg->isSelfMessage())
 		handleSelfMessage(msg);
-	else if(dynamic_cast<CIDERFrame *>(msg))
+	else if (dynamic_cast<CIDERFrame *>(msg))
 	{
 		handleCIDERMessage(msg);
 	}
@@ -72,19 +75,27 @@ void CIDER::handleMessage(cMessage* msg)
 
 void CIDER::handleSelfMessage(cMessage* msg)
 {
-	if(strcmp(msg->getName(),"Ping") == 0)
+	if (strcmp(msg->getName(), "Ping") == 0)
 	{
-		CIDERFrame *newFrame= new CIDERFrame("CIDERFRAME",501);
-		CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl",502);
-		newFrame->setControlInfo(cntrl);
-		newFrame->setAddress(myInterface->getMacAddress());
-		newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
-		send(newFrame,networkLayerOut);
+		if (counterPing < 2)
+		{
+			CIDERFrame *newFrame = new CIDERFrame("CIDERFRAME", 501);
+			CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", 502);
+			newFrame->setControlInfo(cntrl);
+			newFrame->setAddress(myInterface->getMacAddress());
+			newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
+			send(newFrame, networkLayerOut);
+			counterPing++;
+		}
 	}
 }
 
 void CIDER::handleCIDERMessage(cMessage* msg)
 {
+	if (timerInitialPing->isScheduled())
+	{
+		cancelEvent(timerInitialPing);
+	}
 	CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
 
 	macNeighborTableEntry *entry = new macNeighborTableEntry();
@@ -93,4 +104,6 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 	entry->setRssi(recFrame->getRxPower());
 	entry->setNodeDegree(recFrame->getNodeDegree());
 	neighbourTable->addNeighbor(entry);
+
+	scheduleAt(uniform(1,3), timerInitialPing);
 }

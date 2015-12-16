@@ -38,7 +38,7 @@ protected:
 	virtual void handleCIDERMessage(cMessage *msg);
     int networkLayerIn;
     int networkLayerOut;
-
+    int counterPing;
 protected:
     InterfaceEntry *myInterface;
     IMacNeighborTable *neighbourTable;
