@@ -39,11 +39,38 @@ protected:
     int networkLayerIn;
     int networkLayerOut;
     int counterPing;
+    double dOwnWeight;
 protected:
     InterfaceEntry *myInterface;
     IMacNeighborTable *neighbourTable;
 
     cMessage *timerInitialPing;
+    cMessage *timerNeighUpdate;
+    cMessage *timerWeight;
+    cMessage *timerKeepAlive;
+
+    enum CIDERFrames{
+    	CIDERPingTimer = 500,
+    	CIDERNeighUpdateTimer = 501,
+    	CIDERPing = 502,
+    	CIDERNeighUpdate = 503,
+    	CIDERCntrlInfo = 504,
+    	CIDERWeightMessage = 505,
+    	CIDERKeepAlive = 506,
+    	CIDERKeepAliveTimer = 507,
+    	CIDERWeightTimer = 508
+    };
+
+private:
+	double mWTodBm(double mW)
+	{
+	    return 10 * log10(mW);
+	}
+
+	double dBmTomW(double dBm)
+	{
+	    return pow(10, dBm / 10);
+	}
 };
 
 #endif /* CIDER_H_ */

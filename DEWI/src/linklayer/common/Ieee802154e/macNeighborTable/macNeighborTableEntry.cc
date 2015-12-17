@@ -68,6 +68,7 @@ std::string macNeighborTableEntry::info() const
     out<<" ExtendedAddress: " << ExtendedAddress;
     out<<" TxPower: " << dCurTXPw;
     out<<" RSSI: " << dRSSI;
+    out << "Weight: " << dWeight;
     out<<" Distance: " << dDistance << "m";
     out<<" Node Degree: " << nNodeDegree;
     out<<" SDIndex: " << (int)SDIndex;

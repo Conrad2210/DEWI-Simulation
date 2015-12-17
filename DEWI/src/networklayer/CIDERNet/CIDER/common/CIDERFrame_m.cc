@@ -60,6 +60,7 @@ CIDERFrame::CIDERFrame(const char *name, int kind) : ::cPacket(name,kind)
     this->rxPower_var = 0;
     this->nodeDegree_var = 0;
     this->txPower_var = 0;
+    this->weight_var = 0;
 }
 
 CIDERFrame::CIDERFrame(const CIDERFrame& other) : ::cPacket(other)
@@ -85,6 +86,7 @@ void CIDERFrame::copy(const CIDERFrame& other)
     this->rxPower_var = other.rxPower_var;
     this->nodeDegree_var = other.nodeDegree_var;
     this->txPower_var = other.txPower_var;
+    this->weight_var = other.weight_var;
 }
 
 void CIDERFrame::parsimPack(cCommBuffer *b)
@@ -94,6 +96,7 @@ void CIDERFrame::parsimPack(cCommBuffer *b)
     doPacking(b,this->rxPower_var);
     doPacking(b,this->nodeDegree_var);
     doPacking(b,this->txPower_var);
+    doPacking(b,this->weight_var);
 }
 
 void CIDERFrame::parsimUnpack(cCommBuffer *b)
@@ -103,6 +106,7 @@ void CIDERFrame::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->rxPower_var);
     doUnpacking(b,this->nodeDegree_var);
     doUnpacking(b,this->txPower_var);
+    doUnpacking(b,this->weight_var);
 }
 
 MACAddress& CIDERFrame::getAddress()
@@ -143,6 +147,16 @@ double CIDERFrame::getTxPower() const
 void CIDERFrame::setTxPower(double txPower)
 {
     this->txPower_var = txPower;
+}
+
+double CIDERFrame::getWeight() const
+{
+    return weight_var;
+}
+
+void CIDERFrame::setWeight(double weight)
+{
+    this->weight_var = weight;
 }
 
 class CIDERFrameDescriptor : public cClassDescriptor
@@ -192,7 +206,7 @@ const char *CIDERFrameDescriptor::getProperty(const char *propertyname) const
 int CIDERFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
+    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
 }
 
 unsigned int CIDERFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -208,8 +222,9 @@ unsigned int CIDERFrameDescriptor::getFieldTypeFlags(void *object, int field) co
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
 }
 
 const char *CIDERFrameDescriptor::getFieldName(void *object, int field) const
@@ -225,8 +240,9 @@ const char *CIDERFrameDescriptor::getFieldName(void *object, int field) const
         "rxPower",
         "nodeDegree",
         "txPower",
+        "weight",
     };
-    return (field>=0 && field<4) ? fieldNames[field] : NULL;
+    return (field>=0 && field<5) ? fieldNames[field] : NULL;
 }
 
 int CIDERFrameDescriptor::findField(void *object, const char *fieldName) const
@@ -237,6 +253,7 @@ int CIDERFrameDescriptor::findField(void *object, const char *fieldName) const
     if (fieldName[0]=='r' && strcmp(fieldName, "rxPower")==0) return base+1;
     if (fieldName[0]=='n' && strcmp(fieldName, "nodeDegree")==0) return base+2;
     if (fieldName[0]=='t' && strcmp(fieldName, "txPower")==0) return base+3;
+    if (fieldName[0]=='w' && strcmp(fieldName, "weight")==0) return base+4;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -253,8 +270,9 @@ const char *CIDERFrameDescriptor::getFieldTypeString(void *object, int field) co
         "double",
         "int",
         "double",
+        "double",
     };
-    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *CIDERFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -298,6 +316,7 @@ std::string CIDERFrameDescriptor::getFieldAsString(void *object, int field, int 
         case 1: return double2string(pp->getRxPower());
         case 2: return long2string(pp->getNodeDegree());
         case 3: return double2string(pp->getTxPower());
+        case 4: return double2string(pp->getWeight());
         default: return "";
     }
 }
@@ -315,6 +334,7 @@ bool CIDERFrameDescriptor::setFieldAsString(void *object, int field, int i, cons
         case 1: pp->setRxPower(string2double(value)); return true;
         case 2: pp->setNodeDegree(string2long(value)); return true;
         case 3: pp->setTxPower(string2double(value)); return true;
+        case 4: pp->setWeight(string2double(value)); return true;
         default: return false;
     }
 }

@@ -29,6 +29,7 @@
  *     double rxPower;
  *     int nodeDegree;
  *     double txPower;
+ *     double weight;
  * }
  * </pre>
  */
@@ -39,6 +40,7 @@ class CIDERFrame : public ::cPacket
     double rxPower_var;
     int nodeDegree_var;
     double txPower_var;
+    double weight_var;
 
   private:
     void copy(const CIDERFrame& other);
@@ -66,6 +68,8 @@ class CIDERFrame : public ::cPacket
     virtual void setNodeDegree(int nodeDegree);
     virtual double getTxPower() const;
     virtual void setTxPower(double txPower);
+    virtual double getWeight() const;
+    virtual void setWeight(double weight);
 };
 
 inline void doPacking(cCommBuffer *b, CIDERFrame& obj) {obj.parsimPack(b);}

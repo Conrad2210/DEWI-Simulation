@@ -27,5 +27,6 @@ packet CIDERFrame
     MACAddress address;
     double rxPower;
     int nodeDegree;
-    double txPower;    
+    double txPower;   
+    double weight; 
 }

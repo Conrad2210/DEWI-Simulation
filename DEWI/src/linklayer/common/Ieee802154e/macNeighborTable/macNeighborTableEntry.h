@@ -60,6 +60,7 @@ class INET_API macNeighborTableEntry : public cObject
 
         double dDistance;
 
+        double dWeight;
 
         double dCurTXPw;
         /* The allocating Superframe Duration (SD) index number for beacon frame. (not use in TSCH)*/
@@ -210,17 +211,22 @@ class INET_API macNeighborTableEntry : public cObject
 		return dDistance;
 	}
 
-	double getRssi() const
+	double getRssimW()
+	{
+		return dBmTomW(dRSSI);
+	}
+
+	double getRssidBm()
 	{
 		return dRSSI;
 	}
 
 	void setRssi(double rssi)
 	{
-		dRSSI = rssi;
+		dRSSI = mWTodBm(rssi);
 		double lambda = SPEED_OF_LIGHT / 2.4e9;
 		double temp1 = dCurTXPw * pow(lambda, 2);
-		double temp2 = (16 * pow(3.14, 2) * dRSSI);
+		double temp2 = (16 * pow(3.14, 2) * dBmTomW(dRSSI));
 		double temp3 = temp1 / temp2;
 		double temp4 = 1.0 / 3.0;
 		dDistance = pow(temp3, temp4);
@@ -245,6 +251,26 @@ class INET_API macNeighborTableEntry : public cObject
 	void setNodeDegree(int nodeDegree)
 	{
 		nNodeDegree = nodeDegree;
+	}
+
+	double mWTodBm(double mW)
+	{
+	    return 10 * log10(mW);
+	}
+
+	double dBmTomW(double dBm)
+	{
+	    return pow(10, dBm / 10);
+	}
+
+	double getWeight() const
+	{
+		return dWeight;
+	}
+
+	void setWeight(double weight)
+	{
+		dWeight = weight;
 	}
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */
