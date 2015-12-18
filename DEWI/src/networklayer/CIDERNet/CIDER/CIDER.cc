@@ -102,6 +102,11 @@ void CIDER::handleSelfMessage(cMessage* msg)
 			newFrame->setControlInfo(cntrl);
 			newFrame->setAddress(myInterface->getMacAddress());
 			newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
+			macVector temp;
+			for(int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+				temp.push_back(neighbourTable->getNeighborByPos(i)->getExtendedAddress());
+
+			newFrame->setMacAddressesList(temp);
 			send(newFrame, networkLayerOut);
 			counterPing++;
 		}
@@ -136,6 +141,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 		entry->setRssi(recFrame->getRxPower());
 		entry->setNodeDegree(recFrame->getNodeDegree());
 		neighbourTable->addNeighbor(entry);
+		myMACList.push_back(recFrame->getAddress());
 
 		scheduleAt(uniform(simTime() + 1, simTime() + 3), timerNeighUpdate);
 	}
@@ -148,8 +154,12 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 		CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
 		macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getAddress());
 
+
+
 		if (entry != NULL)
 		{
+			macVector temp = recFrame->getMacAddressesList();
+			entry->setNewCoverage(compareMACList(temp,myMACList,recFrame->getAddress()));
 			entry->setCurTxPw(recFrame->getTxPower());
 			entry->setRssi(recFrame->getRxPower());
 			entry->setNodeDegree(recFrame->getNodeDegree());
@@ -176,4 +186,30 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 				}
 		scheduleAt(uniform(simTime() + 30, simTime() + 40), timerKeepAlive);
 	}
+}
+
+//returns number of elements (of vec1) not included in vec2
+int CIDER::compareMACList(macVector vec1, macVector vec2, MACAddress sender)
+{
+
+	int nCount = 0;
+	for(int i = 0; i < vec1.size(); i++)
+	{
+		bool isIncluded = false;
+		for(int k = 0; k< vec2.size(); k++)
+		{
+
+			if(vec1.at(i) == vec2.at(k) && vec1.at(i) != sender)
+			{
+				isIncluded = true;
+			break;
+			}
+		}
+
+		if(!isIncluded)
+			nCount++;
+	}
+
+	return nCount;
+
 }

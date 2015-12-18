@@ -82,6 +82,7 @@ CIDERFrame& CIDERFrame::operator=(const CIDERFrame& other)
 
 void CIDERFrame::copy(const CIDERFrame& other)
 {
+    this->macAddressesList_var = other.macAddressesList_var;
     this->address_var = other.address_var;
     this->rxPower_var = other.rxPower_var;
     this->nodeDegree_var = other.nodeDegree_var;
@@ -92,6 +93,7 @@ void CIDERFrame::copy(const CIDERFrame& other)
 void CIDERFrame::parsimPack(cCommBuffer *b)
 {
     ::cPacket::parsimPack(b);
+    doPacking(b,this->macAddressesList_var);
     doPacking(b,this->address_var);
     doPacking(b,this->rxPower_var);
     doPacking(b,this->nodeDegree_var);
@@ -102,11 +104,22 @@ void CIDERFrame::parsimPack(cCommBuffer *b)
 void CIDERFrame::parsimUnpack(cCommBuffer *b)
 {
     ::cPacket::parsimUnpack(b);
+    doUnpacking(b,this->macAddressesList_var);
     doUnpacking(b,this->address_var);
     doUnpacking(b,this->rxPower_var);
     doUnpacking(b,this->nodeDegree_var);
     doUnpacking(b,this->txPower_var);
     doUnpacking(b,this->weight_var);
+}
+
+macVector& CIDERFrame::getMacAddressesList()
+{
+    return macAddressesList_var;
+}
+
+void CIDERFrame::setMacAddressesList(const macVector& macAddressesList)
+{
+    this->macAddressesList_var = macAddressesList;
 }
 
 MACAddress& CIDERFrame::getAddress()
@@ -206,7 +219,7 @@ const char *CIDERFrameDescriptor::getProperty(const char *propertyname) const
 int CIDERFrameDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
+    return basedesc ? 6+basedesc->getFieldCount(object) : 6;
 }
 
 unsigned int CIDERFrameDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -219,12 +232,13 @@ unsigned int CIDERFrameDescriptor::getFieldTypeFlags(void *object, int field) co
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISCOMPOUND,
+        FD_ISCOMPOUND,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
     };
-    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<6) ? fieldTypeFlags[field] : 0;
 }
 
 const char *CIDERFrameDescriptor::getFieldName(void *object, int field) const
@@ -236,24 +250,26 @@ const char *CIDERFrameDescriptor::getFieldName(void *object, int field) const
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldNames[] = {
+        "macAddressesList",
         "address",
         "rxPower",
         "nodeDegree",
         "txPower",
         "weight",
     };
-    return (field>=0 && field<5) ? fieldNames[field] : NULL;
+    return (field>=0 && field<6) ? fieldNames[field] : NULL;
 }
 
 int CIDERFrameDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
-    if (fieldName[0]=='a' && strcmp(fieldName, "address")==0) return base+0;
-    if (fieldName[0]=='r' && strcmp(fieldName, "rxPower")==0) return base+1;
-    if (fieldName[0]=='n' && strcmp(fieldName, "nodeDegree")==0) return base+2;
-    if (fieldName[0]=='t' && strcmp(fieldName, "txPower")==0) return base+3;
-    if (fieldName[0]=='w' && strcmp(fieldName, "weight")==0) return base+4;
+    if (fieldName[0]=='m' && strcmp(fieldName, "macAddressesList")==0) return base+0;
+    if (fieldName[0]=='a' && strcmp(fieldName, "address")==0) return base+1;
+    if (fieldName[0]=='r' && strcmp(fieldName, "rxPower")==0) return base+2;
+    if (fieldName[0]=='n' && strcmp(fieldName, "nodeDegree")==0) return base+3;
+    if (fieldName[0]=='t' && strcmp(fieldName, "txPower")==0) return base+4;
+    if (fieldName[0]=='w' && strcmp(fieldName, "weight")==0) return base+5;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -266,13 +282,14 @@ const char *CIDERFrameDescriptor::getFieldTypeString(void *object, int field) co
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldTypeStrings[] = {
+        "macVector",
         "MACAddress",
         "double",
         "int",
         "double",
         "double",
     };
-    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<6) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *CIDERFrameDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -312,11 +329,12 @@ std::string CIDERFrameDescriptor::getFieldAsString(void *object, int field, int 
     }
     CIDERFrame *pp = (CIDERFrame *)object; (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getAddress(); return out.str();}
-        case 1: return double2string(pp->getRxPower());
-        case 2: return long2string(pp->getNodeDegree());
-        case 3: return double2string(pp->getTxPower());
-        case 4: return double2string(pp->getWeight());
+        case 0: {std::stringstream out; out << pp->getMacAddressesList(); return out.str();}
+        case 1: {std::stringstream out; out << pp->getAddress(); return out.str();}
+        case 2: return double2string(pp->getRxPower());
+        case 3: return long2string(pp->getNodeDegree());
+        case 4: return double2string(pp->getTxPower());
+        case 5: return double2string(pp->getWeight());
         default: return "";
     }
 }
@@ -331,10 +349,10 @@ bool CIDERFrameDescriptor::setFieldAsString(void *object, int field, int i, cons
     }
     CIDERFrame *pp = (CIDERFrame *)object; (void)pp;
     switch (field) {
-        case 1: pp->setRxPower(string2double(value)); return true;
-        case 2: pp->setNodeDegree(string2long(value)); return true;
-        case 3: pp->setTxPower(string2double(value)); return true;
-        case 4: pp->setWeight(string2double(value)); return true;
+        case 2: pp->setRxPower(string2double(value)); return true;
+        case 3: pp->setNodeDegree(string2long(value)); return true;
+        case 4: pp->setTxPower(string2double(value)); return true;
+        case 5: pp->setWeight(string2double(value)); return true;
         default: return false;
     }
 }
@@ -348,7 +366,8 @@ const char *CIDERFrameDescriptor::getFieldStructName(void *object, int field) co
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
-        case 0: return opp_typename(typeid(MACAddress));
+        case 0: return opp_typename(typeid(macVector));
+        case 1: return opp_typename(typeid(MACAddress));
         default: return NULL;
     };
 }
@@ -363,7 +382,8 @@ void *CIDERFrameDescriptor::getFieldStructPointer(void *object, int field, int i
     }
     CIDERFrame *pp = (CIDERFrame *)object; (void)pp;
     switch (field) {
-        case 0: return (void *)(&pp->getAddress()); break;
+        case 0: return (void *)(&pp->getMacAddressesList()); break;
+        case 1: return (void *)(&pp->getAddress()); break;
         default: return NULL;
     }
 }

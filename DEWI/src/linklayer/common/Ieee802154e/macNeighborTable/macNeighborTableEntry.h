@@ -63,6 +63,10 @@ class INET_API macNeighborTableEntry : public cObject
         double dWeight;
 
         double dCurTXPw;
+
+        int nNewCoverage;
+
+
         /* The allocating Superframe Duration (SD) index number for beacon frame. (not use in TSCH)*/
         UINT_16 SDIndex;
 
@@ -271,6 +275,16 @@ class INET_API macNeighborTableEntry : public cObject
 	void setWeight(double weight)
 	{
 		dWeight = weight;
+	}
+
+	int getNewCoverage() const
+	{
+		return nNewCoverage;
+	}
+
+	void setNewCoverage(int newCoverage)
+	{
+		nNewCoverage = newCoverage;
 	}
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

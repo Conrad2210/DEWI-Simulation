@@ -20,6 +20,10 @@
 #include "InterfaceEntry.h"
 #include "macNeighborTable.h"
 #include "macNeighborTableAccess.h"
+#include "vector"
+
+typedef std::vector<MACAddress> macVector;
+
 
 class CIDER: public cSimpleModule {
 public:
@@ -48,7 +52,7 @@ protected:
     cMessage *timerNeighUpdate;
     cMessage *timerWeight;
     cMessage *timerKeepAlive;
-
+    macVector myMACList;
     enum CIDERFrames{
     	CIDERPingTimer = 500,
     	CIDERNeighUpdateTimer = 501,
@@ -71,6 +75,7 @@ private:
 	{
 	    return pow(10, dBm / 10);
 	}
+	int compareMACList(macVector vec1, macVector vec2, MACAddress sender);
 };
 
 #endif /* CIDER_H_ */

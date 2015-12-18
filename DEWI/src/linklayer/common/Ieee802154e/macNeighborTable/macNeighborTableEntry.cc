@@ -51,6 +51,12 @@ macNeighborTableEntry::macNeighborTableEntry()
     prevStageCH = false;
     myCH = false;
     myCS = false;
+    this->nNewCoverage = -1;
+    this->dCurTXPw = -1;
+    this->dDistance = -1;
+    this->nNodeDegree = -1;
+    this->dRSSI = -1;
+    this->dWeight = -1;
 }
 
 macNeighborTableEntry::~macNeighborTableEntry()
@@ -68,9 +74,10 @@ std::string macNeighborTableEntry::info() const
     out<<" ExtendedAddress: " << ExtendedAddress;
     out<<" TxPower: " << dCurTXPw;
     out<<" RSSI: " << dRSSI;
-    out << "Weight: " << dWeight;
+    out << " Weight: " << dWeight;
     out<<" Distance: " << dDistance << "m";
     out<<" Node Degree: " << nNodeDegree;
+    out<< " new Coverage: " << nNewCoverage;
     out<<" SDIndex: " << (int)SDIndex;
     out<<" ChannelOffset: " << (int)ChannelOffset;
     out<<" TrackBeacon: " << TrackBeacon;
@@ -119,4 +126,10 @@ void macNeighborTableEntry::resetNeighbor()
     this -> isTimeSource = false;
     this -> RPL_OF = 0;
     this -> transDelay = 0;
+    this->nNewCoverage = -1;
+    this->dCurTXPw = -1;
+    this->dDistance = -1;
+    this->nNodeDegree = -1;
+    this->dRSSI = -1;
+    this->dWeight = -1;
 }

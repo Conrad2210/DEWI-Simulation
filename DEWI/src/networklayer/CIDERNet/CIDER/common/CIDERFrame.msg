@@ -17,13 +17,16 @@
 cplusplus {{
     using namespace std;
     #include "MACAddress.h"
+    #include "CIDER.h"
 }}
 
 class noncobject CIDERControlInfo;
 class noncobject MACAddress;
+class noncobject macVector;
 
 packet CIDERFrame
 {
+    macVector macAddressesList;
     MACAddress address;
     double rxPower;
     int nodeDegree;

@@ -18,13 +18,15 @@
 // cplusplus {{
     using namespace std;
     #include "MACAddress.h"
+    #include "CIDER.h"
 // }}
 
 /**
- * Class generated from <tt>src/networklayer/CIDERNet/CIDER/common/CIDERFrame.msg:26</tt> by nedtool.
+ * Class generated from <tt>src/networklayer/CIDERNet/CIDER/common/CIDERFrame.msg:28</tt> by nedtool.
  * <pre>
  * packet CIDERFrame
  * {
+ *     macVector macAddressesList;
  *     MACAddress address;
  *     double rxPower;
  *     int nodeDegree;
@@ -36,6 +38,7 @@
 class CIDERFrame : public ::cPacket
 {
   protected:
+    macVector macAddressesList_var;
     MACAddress address_var;
     double rxPower_var;
     int nodeDegree_var;
@@ -59,6 +62,9 @@ class CIDERFrame : public ::cPacket
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
+    virtual macVector& getMacAddressesList();
+    virtual const macVector& getMacAddressesList() const {return const_cast<CIDERFrame*>(this)->getMacAddressesList();}
+    virtual void setMacAddressesList(const macVector& macAddressesList);
     virtual MACAddress& getAddress();
     virtual const MACAddress& getAddress() const {return const_cast<CIDERFrame*>(this)->getAddress();}
     virtual void setAddress(const MACAddress& address);
