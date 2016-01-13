@@ -29,6 +29,7 @@ packet CIDERFrame
     macVector macAddressesList;
     MACAddress address;
     double rxPower;
+    int clusterDegree;
     int nodeDegree;
     double txPower;   
     double weight; 

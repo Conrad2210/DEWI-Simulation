@@ -29,6 +29,7 @@
  *     macVector macAddressesList;
  *     MACAddress address;
  *     double rxPower;
+ *     int clusterDegree;
  *     int nodeDegree;
  *     double txPower;
  *     double weight;
@@ -41,6 +42,7 @@ class CIDERFrame : public ::cPacket
     macVector macAddressesList_var;
     MACAddress address_var;
     double rxPower_var;
+    int clusterDegree_var;
     int nodeDegree_var;
     double txPower_var;
     double weight_var;
@@ -70,6 +72,8 @@ class CIDERFrame : public ::cPacket
     virtual void setAddress(const MACAddress& address);
     virtual double getRxPower() const;
     virtual void setRxPower(double rxPower);
+    virtual int getClusterDegree() const;
+    virtual void setClusterDegree(int clusterDegree);
     virtual int getNodeDegree() const;
     virtual void setNodeDegree(int nodeDegree);
     virtual double getTxPower() const;

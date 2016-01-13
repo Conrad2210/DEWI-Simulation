@@ -53,6 +53,8 @@ class INET_API macNeighborTableEntry : public cObject
         //Number of neighbours of this node
         int nNodeDegree;
 
+        int nClusterDegree;
+
         //rssi;
         double dRSSI;
 
@@ -65,6 +67,10 @@ class INET_API macNeighborTableEntry : public cObject
         double dCurTXPw;
 
         int nNewCoverage;
+
+        bool bPosCluster;
+
+        SimTime lastPktReceived;
 
 
         /* The allocating Superframe Duration (SD) index number for beacon frame. (not use in TSCH)*/
@@ -286,5 +292,35 @@ class INET_API macNeighborTableEntry : public cObject
 	{
 		nNewCoverage = newCoverage;
 	}
+
+        const SimTime& getLastPktReceived() const
+        {
+            return lastPktReceived;
+        }
+
+        void setLastPktReceived(const SimTime& lastPktReceived)
+        {
+            this->lastPktReceived = lastPktReceived;
+        }
+
+        bool isPosCluster() const
+        {
+            return bPosCluster;
+        }
+
+        void setPosCluster(bool posCluster)
+        {
+            bPosCluster = posCluster;
+        }
+
+        int getClusterDegree() const
+        {
+            return nClusterDegree;
+        }
+
+        void setClusterDegree(int clusterDegree)
+        {
+            nClusterDegree = clusterDegree;
+        }
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

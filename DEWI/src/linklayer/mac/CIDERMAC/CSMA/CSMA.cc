@@ -233,7 +233,7 @@ void CSMA::handleCIDERMessage(cMessage* msg)
 		frmCtrl.srcAddrMode = defFrmCtrl_AddrMode64;
 
 	IE3ADDR tmpDstAddr;
-	IE3ADDR tmpSrcAddr;
+	IE3ADDR tmpSrcAddr = mpib.macExtendedAddress;
 	UINT_16 tmpDstPanId;
 	UINT_16 tmpSrcPanId;
 

@@ -51,12 +51,15 @@ macNeighborTableEntry::macNeighborTableEntry()
     prevStageCH = false;
     myCH = false;
     myCS = false;
+    lastPktReceived = SimTime(0.0);
     this->nNewCoverage = -1;
     this->dCurTXPw = -1;
     this->dDistance = -1;
     this->nNodeDegree = -1;
     this->dRSSI = -1;
     this->dWeight = -1;
+    this->nClusterDegree = -1;
+    this->bPosCluster = false;
 }
 
 macNeighborTableEntry::~macNeighborTableEntry()
@@ -73,11 +76,14 @@ std::string macNeighborTableEntry::info() const
     out<<" ShortAddress: "<< ShortAddress;
     out<<" ExtendedAddress: " << ExtendedAddress;
     out<<" TxPower: " << dCurTXPw;
-    out<<" RSSI: " << dRSSI;
+    out<<" RSSI: " << dRSSI << "dB";
+    out<<" Pos Cluster:" << (bPosCluster?"True":"False");
     out << " Weight: " << dWeight;
     out<<" Distance: " << dDistance << "m";
     out<<" Node Degree: " << nNodeDegree;
+    out<<" Cluster Degree: " << nClusterDegree;
     out<< " new Coverage: " << nNewCoverage;
+    out<< " Last PKT: " << lastPktReceived << "s";
     out<<" SDIndex: " << (int)SDIndex;
     out<<" ChannelOffset: " << (int)ChannelOffset;
     out<<" TrackBeacon: " << TrackBeacon;

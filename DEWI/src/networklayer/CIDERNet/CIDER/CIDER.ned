@@ -26,6 +26,9 @@ simple CIDER
     string macNeighborTableModule = default("^.neighborTable");
     string RLLClusterTableModule = default("^.clusterTable");
     string cBeaconTableModule = default("^.beaconTable");
+    double w1 = default(0.35);
+    double w2 = default(0.45);
+    double w3 = default(0.2);
     gates:
 
         input networkLayerIn;

@@ -40,10 +40,17 @@ protected:
 	virtual void handleMessage(cMessage *msg);
 	virtual void handleSelfMessage(cMessage *msg);
 	virtual void handleCIDERMessage(cMessage *msg);
+	virtual void calcWeight();
     int networkLayerIn;
     int networkLayerOut;
     int counterPing;
     double dOwnWeight;
+    int nNodeDegree;
+    int nClusterDegree;
+    double dMeanRSSI;
+    double w1;
+    double w2;
+    double w3;
 protected:
     InterfaceEntry *myInterface;
     IMacNeighborTable *neighbourTable;
@@ -51,7 +58,7 @@ protected:
     cMessage *timerInitialPing;
     cMessage *timerNeighUpdate;
     cMessage *timerWeight;
-    cMessage *timerKeepAlive;
+    cMessage *timerFistCH;
     macVector myMACList;
     enum CIDERFrames{
     	CIDERPingTimer = 500,
@@ -60,8 +67,8 @@ protected:
     	CIDERNeighUpdate = 503,
     	CIDERCntrlInfo = 504,
     	CIDERWeightMessage = 505,
-    	CIDERKeepAlive = 506,
-    	CIDERKeepAliveTimer = 507,
+    	CIDERFirstCH = 506,
+    	CIDERFirstCHTimer = 507,
     	CIDERWeightTimer = 508
     };
 
