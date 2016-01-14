@@ -20,7 +20,7 @@
 #include "IInterfaceTable.h"
 #include "InterfaceTableAccess.h"
 #include "macNeighborTableEntry.h"
-
+#include <limits>
 Define_Module(CIDER);
 CIDER::CIDER()
 {
@@ -50,6 +50,9 @@ void CIDER::initialize(int stage)
         w1 = par("w1").doubleValue();
         w2 = par("w2").doubleValue();
         w3 = par("w3").doubleValue();
+        w4 = par("w4").doubleValue();
+        w5 = par("w5").doubleValue();
+        parent = MACAddress::UNSPECIFIED_ADDRESS;
         IInterfaceTable *ift = InterfaceTableAccess().getIfExists();
         myInterface = ift->getInterface(0);
         neighbourTable = MacNeighborTableAccess().getIfExists();
@@ -58,7 +61,10 @@ void CIDER::initialize(int stage)
         timerInitialPing = new cMessage("Ping", CIDERPingTimer);
         timerNeighUpdate = new cMessage("NeighbourUpdate", CIDERNeighUpdateTimer);
         timerWeight = new cMessage("WeightTimer", CIDERWeightTimer);
-        timerFistCH = new cMessage("KeepAliveTimer", CIDERFirstCHTimer);
+        timerCompWeight = new cMessage("CompareWeightTimer", CIDERCompareWeightTimer);
+        timerCompetition = new cMessage("CompetitionTimer", CIDERFirstCHCompetitionTimer);
+        timerAdvert = new cMessage("AdvertTimer", CIDERCHAdvertTimer);
+        timerCalcWeight = new cMessage("Calc Weight Timer", CIDERSecondCHCalcTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
@@ -97,7 +103,8 @@ void CIDER::handleSelfMessage(cMessage* msg)
             CIDERFrame *newFrame = new CIDERFrame("CIDERPing", CIDERPing);
             CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
             newFrame->setControlInfo(cntrl);
-            newFrame->setAddress(myInterface->getMacAddress());
+            newFrame->setSrcAddress(myInterface->getMacAddress());
+            newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
             newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
             {
@@ -117,7 +124,8 @@ void CIDER::handleSelfMessage(cMessage* msg)
             CIDERFrame *newFrame = new CIDERFrame("CIDERNeighUpdate", CIDERNeighUpdate);
             CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
             newFrame->setControlInfo(cntrl);
-            newFrame->setAddress(myInterface->getMacAddress());
+            newFrame->setSrcAddress(myInterface->getMacAddress());
+            newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
             macVector temp;
             newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
@@ -141,7 +149,8 @@ void CIDER::handleSelfMessage(cMessage* msg)
         CIDERFrame *newFrame = new CIDERFrame("CIDERWeightMessage", CIDERWeightMessage);
         CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
         newFrame->setControlInfo(cntrl);
-        newFrame->setAddress(myInterface->getMacAddress());
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
         newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
@@ -155,18 +164,18 @@ void CIDER::handleSelfMessage(cMessage* msg)
         counterPing++;
 
     }
-    else if (msg->getKind() == CIDERFirstCHTimer)
+    else if (msg->getKind() == CIDERCompareWeightTimer)
     {
 
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
             int temp = getParentModule()->getIndex();
-                    if (temp == 28)
-                    {
-                        int p = 0;
-                        p++;
-                    }
-                    double NeighWeight = neighbourTable->getNeighborByPos(i)->getWeight();
+            if (temp == 28)
+            {
+                int p = 0;
+                p++;
+            }
+            double NeighWeight = neighbourTable->getNeighborByPos(i)->getWeight();
             if (NeighWeight > dOwnWeight)
                 return;
         }
@@ -176,16 +185,73 @@ void CIDER::handleSelfMessage(cMessage* msg)
         tempStr->parse("b=1.5,1.5,oval,orange;i=device/accesspoint");
 
         parentDisp->updateWith(*tempStr);
-//        if (timerFistCH->isScheduled())
-//        {
-//            cancelEvent(timerFistCH);
-//        }
-//        CIDERFrame *newFrame = new CIDERFrame("CIDERKeepAliveMessage", CIDERFirstCH);
-//        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
-//        newFrame->setControlInfo(cntrl);
-//        send(newFrame, networkLayerOut);
-//
-//        scheduleAt(simTime() + 30, timerFistCH);
+
+        double waitTime = uniform(0.5, 1.5);
+
+        scheduleAt(simTime() + waitTime, timerCompetition);
+    }
+    else if (msg->getKind() == CIDERFirstCHCompetitionTimer)
+    {
+        CIDERFrame *newFrame = new CIDERFrame("CIDERFirstCHCompetition", CIDERFirstCHCompetition);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setWeight(dOwnWeight);
+        send(newFrame, networkLayerOut);
+
+        double waitTime = uniform(0.5, 1.5);
+
+        scheduleAt(simTime() + waitTime, timerAdvert);
+    }
+    else if (msg->getKind() == CIDERCHAdvertTimer)
+    {
+        CIDERFrame *newFrame = new CIDERFrame("CIDERFirstCHAdvert", CIDERCHAdvert);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setWeight(dOwnWeight);
+        send(newFrame, networkLayerOut);
+
+        for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+        {
+            if (neighbourTable->getNeighborByPos(i)->isPosCluster())
+            {
+                neighbourTable->getNeighborByPos(i)->isMyCS(true);
+                neighbourTable->getNeighborByPos(i)->setAssigndTo(myInterface->getMacAddress());
+                myCS.push_back(neighbourTable->getNeighborByPos(i)->getExtendedAddress());
+            }
+        }
+        if(parent == MACAddress::UNSPECIFIED_ADDRESS)
+            scheduleAt(simTime() + 0.2, timerCalcWeight);
+    }
+    else if (msg->getKind() == CIDERSecondCHCalcTimer)
+    {
+        double tempWeight = -DBL_MAX;
+        int index = -1;
+        for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+        {
+            macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(i);
+            if (entry->isPosCluster() == false)
+            {
+                entry->setWeightSecond(w4 * entry->getNewCoverage() + w5 * entry->getRssidBm());
+                if (entry->getWeightSecond() > tempWeight)
+                {
+                    tempWeight = entry->getWeightSecond();
+                    index = entry->getNeighborId();
+                }
+            }
+        }
+
+        CIDERFrame *newFrame = new CIDERFrame("CIDERSecondCHElect", CIDERSecondCHElect);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(neighbourTable->getNeighborById(index)->getExtendedAddress());
+        newFrame->setMacAddressesList(myCS);
+        send(newFrame, networkLayerOut);
+
     }
 }
 
@@ -200,7 +266,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
 
         macNeighborTableEntry *entry = new macNeighborTableEntry();
-        entry->setExtendedAddress(recFrame->getAddress());
+        entry->setExtendedAddress(recFrame->getSrcAddress());
         entry->setCurTxPw(recFrame->getTxPower());
         entry->setRssi(recFrame->getRxPower());
         entry->setNodeDegree(recFrame->getNodeDegree());
@@ -209,11 +275,11 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         if (entry->getRssidBm() > -80.0)
         {
             entry->setPosCluster(true);
+            myMACList.push_back(entry->getExtendedAddress());
             nClusterDegree++;
         }
         entry->setLastPktReceived(simTime());
         neighbourTable->addNeighbor(entry);
-        myMACList.push_back(recFrame->getAddress());
         uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
         double delay = (double) (temp % 0xFFFF) * 0.01 + 10;
         scheduleAt(delay, timerNeighUpdate);
@@ -226,12 +292,12 @@ void CIDER::handleCIDERMessage(cMessage* msg)
             cancelEvent(timerWeight);
         }
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-        macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getAddress());
+        macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
 
         if (entry != NULL)
         {
             macVector temp = recFrame->getMacAddressesList();
-            entry->setNewCoverage(compareMACList(temp, myMACList, recFrame->getAddress()));
+            entry->setNewCoverage(compareMACList(temp, myMACList, recFrame->getSrcAddress()));
             entry->setCurTxPw(recFrame->getTxPower());
             entry->setRssi(recFrame->getRxPower());
             entry->setNodeDegree(recFrame->getNodeDegree());
@@ -246,12 +312,12 @@ void CIDER::handleCIDERMessage(cMessage* msg)
     }
     else if (msg->getKind() == CIDERWeightMessage)
     {
-        if (timerFistCH->isScheduled())
+        if (timerCompWeight->isScheduled())
         {
-            cancelEvent(timerFistCH);
+            cancelEvent(timerCompWeight);
         }
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-        macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getAddress());
+        macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
 
         if (entry != NULL)
         {
@@ -265,18 +331,90 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         }
         uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
         double delay = (double) (temp % 0xFFFF) * 0.01 + 30;
-        scheduleAt(delay, timerFistCH);
+        scheduleAt(delay, timerCompWeight);
         delete recFrame;
     }
-    else if (msg->getKind() == CIDERFirstCH)
+    else if (msg->getKind() == CIDERFirstCHCompetition)
     {
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-//        macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getAddress());
-//
-//        if (entry != NULL)
-//        {
-//            entry->setLastPktReceived(simTime());
-//        }
+        if (recFrame->getWeight() == dOwnWeight)
+        {
+            if (timerCompetition->isScheduled())
+            {
+                cancelEvent(timerCompetition);
+            }
+            if (timerAdvert->isScheduled())
+            {
+                cancelEvent(timerAdvert);
+            }
+            cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+            cDisplayString* tempStr = new cDisplayString();
+
+            tempStr->parse("b=1.5,1.5,oval,red;i=device/bulb");
+
+            parentDisp->updateWith(*tempStr);
+        }
+        delete recFrame;
+    }
+    else if (msg->getKind() == CIDERCHAdvert)
+    {
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+
+        if (mWTodBm(recFrame->getRxPower()) > -80)
+        {
+
+            macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
+            if (entry->getAssigndTo() == MACAddress::UNSPECIFIED_ADDRESS)
+            {
+                if (entry != NULL)
+                {
+                    entry->isMyCH(true);
+                    neighbourTable->editNeighbor(entry);
+                    parent = entry->getExtendedAddress();
+                }
+                cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+                cDisplayString* tempStr = new cDisplayString();
+
+                tempStr->parse("b=1.5,1.5,oval,orange;i=device/bulb");
+
+                parentDisp->updateWith(*tempStr);
+            }
+        }
+        delete recFrame;
+    }
+    else if (msg->getKind() == CIDERSecondCHElect)
+    {
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+
+        macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
+
+        if (entry != NULL)
+        {
+            entry->isMyCH(true);
+            neighbourTable->editNeighbor(entry);
+            parent = entry->getExtendedAddress();
+        }
+        macVector temp = recFrame->getMacAddressesList();
+        for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+        {
+            entry = neighbourTable->getNeighborByPos(i);
+            for (int k = 0; k < (int) temp.size(); k++)
+            {
+                if (entry->getExtendedAddress().compareTo(temp.at(k)) == 0)
+                {
+                    entry->setAssigndTo(recFrame->getSrcAddress());
+                }
+            }
+        }
+        cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+        cDisplayString* tempStr = new cDisplayString();
+
+        tempStr->parse("b=1.5,1.5,oval,blue;i=device/accesspoint");
+
+        parentDisp->updateWith(*tempStr);
+
+        scheduleAt(simTime() + 0.2, timerAdvert);
+
         delete recFrame;
     }
 

@@ -29,6 +29,8 @@ simple CIDER
     double w1 = default(0.35);
     double w2 = default(0.45);
     double w3 = default(0.2);
+    double w4 = default(0.8);
+    double w5 = default(0.2);
     gates:
 
         input networkLayerIn;

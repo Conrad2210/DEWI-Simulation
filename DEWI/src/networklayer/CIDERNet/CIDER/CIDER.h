@@ -48,9 +48,11 @@ protected:
     int nNodeDegree;
     int nClusterDegree;
     double dMeanRSSI;
-    double w1;
-    double w2;
-    double w3;
+    double w1; //weight node degree
+    double w2; //weight cluster degree
+    double w3; //weight mean rssi
+    double w4; //weight new coverage
+    double w5; //weight rssi
 protected:
     InterfaceEntry *myInterface;
     IMacNeighborTable *neighbourTable;
@@ -58,18 +60,29 @@ protected:
     cMessage *timerInitialPing;
     cMessage *timerNeighUpdate;
     cMessage *timerWeight;
-    cMessage *timerFistCH;
+    cMessage *timerCompWeight;
+    cMessage *timerCompetition;
+    cMessage *timerAdvert;
+    cMessage *timerCalcWeight;
+
+    MACAddress parent;
     macVector myMACList;
+    macVector myCS;
     enum CIDERFrames{
     	CIDERPingTimer = 500,
     	CIDERNeighUpdateTimer = 501,
     	CIDERPing = 502,
     	CIDERNeighUpdate = 503,
     	CIDERCntrlInfo = 504,
-    	CIDERWeightMessage = 505,
-    	CIDERFirstCH = 506,
-    	CIDERFirstCHTimer = 507,
-    	CIDERWeightTimer = 508
+        CIDERWeightTimer = 505,
+    	CIDERWeightMessage = 506,
+    	CIDERCompareWeightTimer = 507,
+        CIDERCHAdvertTimer = 508,
+        CIDERFirstCHCompetitionTimer = 509,
+        CIDERFirstCHCompetition = 509,
+        CIDERCHAdvert = 510,
+        CIDERSecondCHCalcTimer = 511,
+        CIDERSecondCHElect = 512
     };
 
 private:

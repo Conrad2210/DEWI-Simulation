@@ -195,22 +195,22 @@ void CSMA::handleCIDERMessage(cMessage* msg)
 {
 	Ieee802154eFrame *newFrame = new Ieee802154eFrame("CIDER_MAC_Frame", Ieee802154e_DATA);
 
-	newFrame->encapsulate(PK(msg));
-	Ieee802154eNetworkCtrlInfo *cntrl = new Ieee802154eNetworkCtrlInfo("CntrlInfo", Ieee802154e_DATA);
-
-	newFrame->setControlInfo(cntrl);
 
 	uint16_t index;
 	IE3ADDR destAddr;
 	UINT_16 destPanId;
 	UINT_8 srcAddrMode;
+    destAddr = dynamic_cast<CIDERFrame *>(msg)->getDstAddress();
+    newFrame->encapsulate(PK(msg));
+    Ieee802154eNetworkCtrlInfo *cntrl = new Ieee802154eNetworkCtrlInfo("CntrlInfo", Ieee802154e_DATA);
 
+    newFrame->setControlInfo(cntrl);
 	/** brief:  TRUE if a GTS is to be used for transmission, FALSE indicates that the CAP will be used.
 	 *          see Std 802.15.4-2011 (6.3.1 MCPS-DATA.request) page 118 */
 	bool gtsTX = false;
-	destAddr = MACAddress(MACAddress::BROADCAST_ADDRESS);
 
-	destAddr = (IE3ADDR) 0xffff; // broadcast address - Std 802.15.4-2006 (7.3.1.1) page 150
+
+	//destAddr = (IE3ADDR) 0xffff; // broadcast address - Std 802.15.4-2006 (7.3.1.1) page 150
 	destPanId = 0xffff; // broadcast PAN ID - Std 802.15.4-2006 (7.3.1.1) page 150
 	gtsTX = false;              // send in the CAP
 
@@ -240,12 +240,12 @@ void CSMA::handleCIDERMessage(cMessage* msg)
 	if (frmCtrl.dstAddrMode == defFrmCtrl_AddrMode16)
 	{ // 16 bit address
 		tmpDstPanId = mpib.macPANId;
-		tmpDstAddr = (IE3ADDR) MACAddress::BROADCAST_ADDRESS;
+		tmpDstAddr = destAddr;
 	}
 	else
 	{ // 64 bit address
 		tmpDstPanId = mpib.macPANId;
-		tmpDstAddr = (IE3ADDR) MACAddress::BROADCAST_ADDRESS;
+		tmpDstAddr = destAddr;
 	}
 
 	if (frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)

@@ -27,7 +27,8 @@ class noncobject macVector;
 packet CIDERFrame
 {
     macVector macAddressesList;
-    MACAddress address;
+    MACAddress srcAddress;
+    MACAddress dstAddress;
     double rxPower;
     int clusterDegree;
     int nodeDegree;

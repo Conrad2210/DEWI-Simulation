@@ -48,7 +48,7 @@ macNeighborTableEntry::macNeighborTableEntry()
     transDelay = 0;
     nextStageCH = false;
     sameStageCH = false;
-    prevStageCH = false;
+    lowerStageCH = false;
     myCH = false;
     myCS = false;
     lastPktReceived = SimTime(0.0);
@@ -60,6 +60,8 @@ macNeighborTableEntry::macNeighborTableEntry()
     this->dWeight = -1;
     this->nClusterDegree = -1;
     this->bPosCluster = false;
+    this->dWeightSecond = -1;
+    this->assigndTo = MACAddress::UNSPECIFIED_ADDRESS;
 }
 
 macNeighborTableEntry::~macNeighborTableEntry()
@@ -83,21 +85,27 @@ std::string macNeighborTableEntry::info() const
     out<<" Node Degree: " << nNodeDegree;
     out<<" Cluster Degree: " << nClusterDegree;
     out<< " new Coverage: " << nNewCoverage;
-    out<< " Last PKT: " << lastPktReceived << "s";
-    out<<" SDIndex: " << (int)SDIndex;
-    out<<" ChannelOffset: " << (int)ChannelOffset;
-    out<<" TrackBeacon: " << TrackBeacon;
-    out<<" BeaconLostCount: " << (int)BeaconLostCount;
-    out<<" numTxData: " << (int)numTxData;
-    out<<" numTXDataAck: " << (int)numTxDataAck;
-    out<<" numRxData: " << (int)numRxData;
-    out<<" numRxDataAck: " << (int)numRxDataAck;
-    out<<" lastASN: " << (int)lastASN;
-    out<<" RPLrank: " << (int)RPLrank;
-    out<<" isTimeSource: " << isTimeSource;
-    out<<" RPL_OF: " << (int)RPL_OF;
-    out<<" transDelay: " << (int)transDelay;
-    out<<" CH next Stage: " << (bool)nextStageCH;
+    out<<" Second Weight: " << dWeightSecond;
+    out<<" Assigned To: " << assigndTo;
+    out<<" MyCH: " << (myCH?"True":"False");
+    out<<" MyCS: " << (myCS?"True":"False");
+    out<<" CH same Stage: " << (sameStageCH?"True":"False");
+    out<<" CH lower Stage: " << (lowerStageCH?"True":"False");
+    out<<" CH next Stage: " << (nextStageCH?"True":"False");
+    out<<" Last PKT: " << lastPktReceived << "s";
+//    out<<" SDIndex: " << (int)SDIndex;
+//    out<<" ChannelOffset: " << (int)ChannelOffset;
+//    out<<" TrackBeacon: " << TrackBeacon;
+//    out<<" BeaconLostCount: " << (int)BeaconLostCount;
+//    out<<" numTxData: " << (int)numTxData;
+//    out<<" numTXDataAck: " << (int)numTxDataAck;
+//    out<<" numRxData: " << (int)numRxData;
+//    out<<" numRxDataAck: " << (int)numRxDataAck;
+//    out<<" lastASN: " << (int)lastASN;
+//    out<<" RPLrank: " << (int)RPLrank;
+//    out<<" isTimeSource: " << isTimeSource;
+//    out<<" RPL_OF: " << (int)RPL_OF;
+//    out<<" transDelay: " << (int)transDelay;
     return out.str();
 }
 

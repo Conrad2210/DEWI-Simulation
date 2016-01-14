@@ -37,7 +37,7 @@ simple CSMA
         // maximum number of frame retransmission
         double macMaxFrameRetries = default(3);
         // time to wait for an acknowledgement after transmitting a unicast frame.
-        double macAckWaitDuration @unit(s) = default(0.00056 s);  // 1+12+10+12 symbols
+        double macAckWaitDuration @unit(s) = default(0.05 s);  // 1+12+10+12 symbols
         // Clear Channel Assessment detection time		
         double ccaDetectionTime @unit(s) = default(0.000128 s); // 8 symbols
         // Time to setup radio to reception state

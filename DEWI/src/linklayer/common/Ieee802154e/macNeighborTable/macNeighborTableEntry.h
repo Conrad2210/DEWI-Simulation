@@ -64,11 +64,15 @@ class INET_API macNeighborTableEntry : public cObject
 
         double dWeight;
 
+        double dWeightSecond;
+
         double dCurTXPw;
 
         int nNewCoverage;
 
         bool bPosCluster;
+
+        MACAddress assigndTo;
 
         SimTime lastPktReceived;
 
@@ -121,7 +125,7 @@ class INET_API macNeighborTableEntry : public cObject
 
         bool nextStageCH;
         bool sameStageCH;
-        bool prevStageCH;
+        bool lowerStageCH;
         bool myCH;
         bool myCS;
 
@@ -173,7 +177,7 @@ class INET_API macNeighborTableEntry : public cObject
 
 
         bool isNextStageCH(){return nextStageCH;}
-        bool isPrevStageCH(){return prevStageCH;}
+        bool isPrevStageCH(){return lowerStageCH;}
         bool isSameStageCH(){return sameStageCH;}
         bool isMyCH(){return myCH;}
         bool isMyCS(){return myCS;}
@@ -211,7 +215,7 @@ class INET_API macNeighborTableEntry : public cObject
         virtual void decrTransDelay() {transDelay = transDelay-1;}
 
         virtual void isNextStageCH(bool is){nextStageCH=is;}
-        virtual void isPrevStageCH(bool is){prevStageCH=is;}
+        virtual void isPrevStageCH(bool is){lowerStageCH=is;}
         virtual void isSameStageCH(bool is){sameStageCH=is;}
         virtual void isMyCH(bool is){myCH = is;}
         virtual void isMyCS(bool is){myCS = is;}
@@ -321,6 +325,26 @@ class INET_API macNeighborTableEntry : public cObject
         void setClusterDegree(int clusterDegree)
         {
             nClusterDegree = clusterDegree;
+        }
+
+        double getWeightSecond() const
+        {
+            return dWeightSecond;
+        }
+
+        void setWeightSecond(double weightSecond)
+        {
+            dWeightSecond = weightSecond;
+        }
+
+        const MACAddress& getAssigndTo() const
+        {
+            return assigndTo;
+        }
+
+        void setAssigndTo(const MACAddress& assigndTo)
+        {
+            this->assigndTo = assigndTo;
         }
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */
