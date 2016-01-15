@@ -64,7 +64,8 @@ void CIDER::initialize(int stage)
         timerCompWeight = new cMessage("CompareWeightTimer", CIDERCompareWeightTimer);
         timerCompetition = new cMessage("CompetitionTimer", CIDERFirstCHCompetitionTimer);
         timerAdvert = new cMessage("AdvertTimer", CIDERCHAdvertTimer);
-        timerCalcWeight = new cMessage("Calc Weight Timer", CIDERSecondCHCalcTimer);
+        timerElectChildCH = new cMessage("Calc Weight Timer", CIDERElectChildCHTimer);
+        timerUpdateParent = new cMessage("Update Parent", CIDERParentUpdateTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
@@ -223,17 +224,19 @@ void CIDER::handleSelfMessage(cMessage* msg)
                 myCS.push_back(neighbourTable->getNeighborByPos(i)->getExtendedAddress());
             }
         }
-        if(parent == MACAddress::UNSPECIFIED_ADDRESS)
-            scheduleAt(simTime() + 0.2, timerCalcWeight);
+        if (parent == MACAddress::UNSPECIFIED_ADDRESS)
+            scheduleAt(simTime() + 0.2, timerElectChildCH);
+        else
+            scheduleAt(simTime() + 0.05, timerUpdateParent);
     }
-    else if (msg->getKind() == CIDERSecondCHCalcTimer)
+    else if (msg->getKind() == CIDERElectChildCHTimer)
     {
         double tempWeight = -DBL_MAX;
         int index = -1;
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
             macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(i);
-            if (entry->isPosCluster() == false)
+            if (entry->isPosCluster() == false && entry->getAssigndTo() == MACAddress::UNSPECIFIED_ADDRESS)
             {
                 entry->setWeightSecond(w4 * entry->getNewCoverage() + w5 * entry->getRssidBm());
                 if (entry->getWeightSecond() > tempWeight)
@@ -244,7 +247,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
             }
         }
 
-        CIDERFrame *newFrame = new CIDERFrame("CIDERSecondCHElect", CIDERSecondCHElect);
+        CIDERFrame *newFrame = new CIDERFrame("CIDERSecondCHElect", CIDERElectChildCH);
         CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
@@ -252,6 +255,16 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setMacAddressesList(myCS);
         send(newFrame, networkLayerOut);
 
+    }
+    else if (msg->getKind() == CIDERParentUpdateTimer)
+    {
+        CIDERFrame *newFrame = new CIDERFrame("CIDERSecondCHElect", CIDERParentUpdate);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(parent);
+        newFrame->setMacAddressesList(myCS);
+        send(newFrame, networkLayerOut);
     }
 }
 
@@ -382,7 +395,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         }
         delete recFrame;
     }
-    else if (msg->getKind() == CIDERSecondCHElect)
+    else if (msg->getKind() == CIDERElectChildCH)
     {
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
 
@@ -416,6 +429,25 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         scheduleAt(simTime() + 0.2, timerAdvert);
 
         delete recFrame;
+    }
+    else if (msg->getKind() == CIDERParentUpdate)
+    {
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+        macNeighborTableEntry *entry;
+        macVector temp = recFrame->getMacAddressesList();
+        for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+        {
+            entry = neighbourTable->getNeighborByPos(i);
+            for (int k = 0; k < (int) temp.size(); k++)
+            {
+                if (entry->getExtendedAddress().compareTo(temp.at(k)) == 0)
+                {
+                    entry->setAssigndTo(recFrame->getSrcAddress());
+                }
+            }
+        }
+        scheduleAt(simTime() + 0.2, timerElectChildCH);
+
     }
 
     msg = NULL;

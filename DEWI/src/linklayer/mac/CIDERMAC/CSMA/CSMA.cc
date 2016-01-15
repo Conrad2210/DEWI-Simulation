@@ -788,6 +788,7 @@ void CSMA::updateStatusWaitAck(t_mac_event event, cMessage* msg)
 
 		queueModule->deleteMsgFromQueu(queueModule->requestSpcPacket());
 		txAttempts = 0;
+		sendPacket = NULL;
 		//      mac->setName("MAC SUCCESS");
 		//      mac->setKind(TX_OVER);
 		//      sendControlUp(mac);
@@ -855,6 +856,7 @@ void CSMA::updateStatusTransmitAck(t_mac_event event, cMessage* msg)
 		PLME_SET_TRX_STATE_request(phy_RX_ON);
 		//phy->setRadioState(Radio::RX);
 		//      delete msg;
+		sendPacket = NULL;
 		manageQueue();
 	}
 	else
@@ -1355,10 +1357,13 @@ void CSMA::handleLowerControl(cMessage* msg)
 	{
 		Ieee802154eMacPhyPrimitives* primitive = check_and_cast<Ieee802154eMacPhyPrimitives *>(msg);
 		phystatus = PHYenum(primitive->getStatus());
-		if (phystatus == phy_SUCCESS && sendPacket)
+		if (phystatus == phy_TX_ON && sendPacket)
 		{
-			queueModule->deleteMsgFromQueu(sendPacket);
-			sendDown(sendPacket);
+		    if(!rxAckTimer->isScheduled())
+		    {
+                queueModule->deleteMsgFromQueu(sendPacket);
+                sendDown(sendPacket);
+		    }
 		}
 	}
 

@@ -853,14 +853,15 @@ void Ieee802154ePhy::handleSelfMsg(cMessage *msg)
 	case PHY_TRX_TIMER:     // TRx turnaround over
 
 	{
+        // update the phyRadioState with the new state
+        phyRadioState = newState_turnaround;
 		setRadioState(RadioState::IDLE);
-		if (phyRadioState == newState_turnaround)
+		//if (phyRadioState == newState_turnaround)
 			PLME_SET_TRX_STATE_confirm(phyRadioState);      // FIXME: need to be test [SR]
-		else
+		//else
 			PLME_SET_TRX_STATE_confirm(phy_SUCCESS);        // FIXME: need to be test [SR]
 
-		// update the phyRadioState with the new state
-		phyRadioState = newState_turnaround;
+
 		break;
 	}
 	default:

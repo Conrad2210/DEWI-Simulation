@@ -63,7 +63,8 @@ protected:
     cMessage *timerCompWeight;
     cMessage *timerCompetition;
     cMessage *timerAdvert;
-    cMessage *timerCalcWeight;
+    cMessage *timerElectChildCH;
+    cMessage *timerUpdateParent;
 
     MACAddress parent;
     macVector myMACList;
@@ -81,8 +82,10 @@ protected:
         CIDERFirstCHCompetitionTimer = 509,
         CIDERFirstCHCompetition = 509,
         CIDERCHAdvert = 510,
-        CIDERSecondCHCalcTimer = 511,
-        CIDERSecondCHElect = 512
+        CIDERElectChildCHTimer = 511,
+        CIDERElectChildCH = 512,
+        CIDERParentUpdateTimer = 513,
+        CIDERParentUpdate = 514
     };
 
 private:
