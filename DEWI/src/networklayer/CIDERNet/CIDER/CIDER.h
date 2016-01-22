@@ -22,7 +22,7 @@
 #include "macNeighborTableAccess.h"
 #include "vector"
 
-typedef std::vector<MACAddress> macVector;
+typedef std::vector<int> macVector;
 
 
 class CIDER: public cSimpleModule {
@@ -41,6 +41,8 @@ protected:
 	virtual void handleSelfMessage(cMessage *msg);
 	virtual void handleCIDERMessage(cMessage *msg);
 	virtual void calcWeight();
+	virtual void updatedisplay();
+
     int networkLayerIn;
     int networkLayerOut;
     int counterPing;
@@ -66,9 +68,9 @@ protected:
     cMessage *timerElectChildCH;
     cMessage *timerUpdateParent;
 
-    MACAddress parent;
+    macNeighborTableEntry *parent;
     macVector myMACList;
-    macVector myCS;
+    macVector assignedCS;
     enum CIDERFrames{
     	CIDERPingTimer = 500,
     	CIDERNeighUpdateTimer = 501,

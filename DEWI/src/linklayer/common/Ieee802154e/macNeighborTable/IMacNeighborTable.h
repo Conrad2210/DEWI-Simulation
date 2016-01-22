@@ -78,6 +78,7 @@ class INET_API IMacNeighborTable
          virtual macNeighborTableEntry *getNeighborByPos(int pos, bool fillTmpNeighborList) = 0;
          virtual macNeighborTableEntry *getNeighborBySAddr(UINT_16 addr) = 0;
          virtual macNeighborTableEntry *getNeighborByEAddr(MACAddress addr) = 0;
+         virtual macNeighborTableEntry *getNeighborByLastBytes(int addr, int numberBytes) = 0;
          virtual macNeighborTableEntry *getNeighborById(int id) = 0;
          virtual bool isNeighborBySAddr(UINT_16 address) = 0;
          virtual bool isNeighborByEAddr(MACAddress address) = 0;

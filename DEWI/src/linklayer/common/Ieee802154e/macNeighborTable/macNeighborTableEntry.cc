@@ -61,7 +61,7 @@ macNeighborTableEntry::macNeighborTableEntry()
     this->nClusterDegree = -1;
     this->bPosCluster = false;
     this->dWeightSecond = -1;
-    this->assigndTo = MACAddress::UNSPECIFIED_ADDRESS;
+    this->nAssigndTo = -1;
 }
 
 macNeighborTableEntry::~macNeighborTableEntry()
@@ -86,7 +86,7 @@ std::string macNeighborTableEntry::info() const
     out<<" Cluster Degree: " << nClusterDegree;
     out<< " new Coverage: " << nNewCoverage;
     out<<" Second Weight: " << dWeightSecond;
-    out<<" Assigned To: " << assigndTo;
+    out<<" Assigned To: " << nAssigndTo;
     out<<" MyCH: " << (myCH?"True":"False");
     out<<" MyCS: " << (myCS?"True":"False");
     out<<" CH same Stage: " << (sameStageCH?"True":"False");

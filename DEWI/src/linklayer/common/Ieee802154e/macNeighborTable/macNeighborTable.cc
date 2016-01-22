@@ -507,6 +507,19 @@ MACAddress macNeighborTable::getAddressFromCH()
     return MACAddress::UNSPECIFIED_ADDRESS;
 }
 
+macNeighborTableEntry* macNeighborTable::getNeighborByLastBytes(int addr, int numberBytes)
+{
+    for(int i = 0; i < this->getNumNeighbors(); i++)
+    {
+        if(getNeighborByPos(i)->getExtendedAddress().getLastKBytes(numberBytes) == addr)
+        {
+            return getNeighborByPos(i);
+        }
+    }
+
+    return NULL;
+}
+
 void macNeighborTable::clearTable()
 {
     while (idToNeighbor.size() != 0)

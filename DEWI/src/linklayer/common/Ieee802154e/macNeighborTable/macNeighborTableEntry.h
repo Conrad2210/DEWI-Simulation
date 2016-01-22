@@ -29,12 +29,15 @@
 #include "Ieee802154eEnum.h"
 #include "Ieee802154eDefSlotframe.h"
 
-class  IMacNeighborTable;
+class IMacNeighborTable;
 
 class INET_API macNeighborTableEntry : public cObject
 {
     public:
-        enum State {UP, DOWN, GOING_UP, GOING_DOWN};
+        enum State
+        {
+            UP, DOWN, GOING_UP, GOING_DOWN
+        };
     protected:
         IMacNeighborTable *ownerp;
         cModule *neighborModule;
@@ -72,10 +75,9 @@ class INET_API macNeighborTableEntry : public cObject
 
         bool bPosCluster;
 
-        MACAddress assigndTo;
+        int nAssigndTo; //last 3 bytes of mac address
 
         SimTime lastPktReceived;
-
 
         /* The allocating Superframe Duration (SD) index number for beacon frame. (not use in TSCH)*/
         UINT_16 SDIndex;
@@ -137,8 +139,14 @@ class INET_API macNeighborTableEntry : public cObject
 
     protected:
         //change notification
-        virtual void configChanged() {changed(NF_INTERFACE_CONFIG_CHANGED);}
-        virtual void stateChanged() {changed(NF_INTERFACE_STATE_CHANGED);}
+        virtual void configChanged()
+        {
+            changed(NF_INTERFACE_CONFIG_CHANGED);
+        }
+        virtual void stateChanged()
+        {
+            changed(NF_INTERFACE_STATE_CHANGED);
+        }
         virtual void changed(int category);
 
     public:
@@ -150,152 +158,318 @@ class INET_API macNeighborTableEntry : public cObject
         virtual std::string getFullPath() const;
 
         //Returns the NeighborTable this Neighbor lives in, or Null
-        IMacNeighborTable *getNeighborTable() const{return ownerp;}
+        IMacNeighborTable *getNeighborTable() const
+        {
+            return ownerp;
+        }
 
         //Returns the requested State of this Neighbor
-        State getState() const{return state;}
+        State getState() const
+        {
+            return state;
+        }
 
         //Return function
-        int getNeighborId() const {return neighborId;}
-        cModule *getNeighborModule() const{return neighborModule;}
-        int getNeighborSize() const{return neighborSize;}
-        UINT_16 getShortAddress() const{return ShortAddress;}
-        MACAddress getExtendedAddress() const{return ExtendedAddress;}
-        UINT_16 getSDIndex() const{return SDIndex;}
-        UINT_16 getChannelOffset() const{return ChannelOffset;}
-        bool getTrackBeacon() const{return TrackBeacon;}
-        UINT_8 getBeaconLostCount() const{return BeaconLostCount;}
-        UINT_16 getNumTxData() const{return numTxData;}
-        UINT_16 getNumTxDataAck() const{return numTxDataAck;}
-        UINT_16 getNumRxData() const{return numRxData;}
-        UINT_16 getNumRxDataAck() const{return numRxDataAck;}
-        UINT_64 getLastASN() const{return lastASN;}
-        UINT_16 getRPLrank() const{return RPLrank;}
-        bool getIsTimeSource() const{return isTimeSource;}
-        UINT_16 getRPL_OF() const{return RPL_OF;}
-        int getTransDelay() const{return transDelay;}
+        int getNeighborId() const
+        {
+            return neighborId;
+        }
+        cModule *getNeighborModule() const
+        {
+            return neighborModule;
+        }
+        int getNeighborSize() const
+        {
+            return neighborSize;
+        }
+        UINT_16 getShortAddress() const
+        {
+            return ShortAddress;
+        }
+        MACAddress getExtendedAddress() const
+        {
+            return ExtendedAddress;
+        }
+        UINT_16 getSDIndex() const
+        {
+            return SDIndex;
+        }
+        UINT_16 getChannelOffset() const
+        {
+            return ChannelOffset;
+        }
+        bool getTrackBeacon() const
+        {
+            return TrackBeacon;
+        }
+        UINT_8 getBeaconLostCount() const
+        {
+            return BeaconLostCount;
+        }
+        UINT_16 getNumTxData() const
+        {
+            return numTxData;
+        }
+        UINT_16 getNumTxDataAck() const
+        {
+            return numTxDataAck;
+        }
+        UINT_16 getNumRxData() const
+        {
+            return numRxData;
+        }
+        UINT_16 getNumRxDataAck() const
+        {
+            return numRxDataAck;
+        }
+        UINT_64 getLastASN() const
+        {
+            return lastASN;
+        }
+        UINT_16 getRPLrank() const
+        {
+            return RPLrank;
+        }
+        bool getIsTimeSource() const
+        {
+            return isTimeSource;
+        }
+        UINT_16 getRPL_OF() const
+        {
+            return RPL_OF;
+        }
+        int getTransDelay() const
+        {
+            return transDelay;
+        }
 
+        bool isNextStageCH()
+        {
+            return nextStageCH;
+        }
+        bool isPrevStageCH()
+        {
+            return lowerStageCH;
+        }
+        bool isSameStageCH()
+        {
+            return sameStageCH;
+        }
+        bool isMyCH()
+        {
+            return myCH;
+        }
+        bool isMyCS()
+        {
+            return myCS;
+        }
 
-        bool isNextStageCH(){return nextStageCH;}
-        bool isPrevStageCH(){return lowerStageCH;}
-        bool isSameStageCH(){return sameStageCH;}
-        bool isMyCH(){return myCH;}
-        bool isMyCS(){return myCS;}
+        int getStage()
+        {
+            return stage;
+        }
 
-        int getStage(){return stage;}
-
-        void setStage(int st){stage = st;}
-
+        void setStage(int st)
+        {
+            stage = st;
+        }
 
         //Set function
-        virtual void setNeighborTable(IMacNeighborTable* t) {this->ownerp = t;}
-        virtual void setNeighborId(int id) {neighborId = id;}
-        virtual void setNeighborSize(int size) {neighborSize = size;}
-        virtual void setShortAddress(UINT_16 address) {ShortAddress = address;}
-        virtual void setExtendedAddress(MACAddress address) {ExtendedAddress = address;}
-        virtual void setSDIndex(UINT_16 index) {SDIndex = index;}
-        virtual void setChannelOffset(UINT_16 channelOffset) {ChannelOffset = channelOffset;}
-        virtual void setTrackBeacon(bool track) {TrackBeacon = track;}
-        virtual void setBeaconLostCount(UINT_8 bcnLost) {BeaconLostCount = bcnLost;}
-        virtual void setNumTxData(UINT_16 cntTXData) {numTxData = cntTXData;}
-        virtual void setNumTxDataAck(UINT_16 cntTxDataAck) {numTxDataAck = cntTxDataAck;}
-        virtual void setNumRxData(UINT_16 cntRxData) {numRxData = cntRxData;}
-        virtual void setNumRxDataAck(UINT_16 cntRxDataAck) {numRxDataAck = cntRxDataAck;}
-        virtual void setLastASN(UINT_64 lastAsn) {lastASN = lastAsn;}
-        virtual void setRPLrank(UINT_16 rplRank) {RPLrank = rplRank;}
-        virtual void setIsTimeSource(bool timeSource) {isTimeSource = timeSource;}
-        virtual void setRPL_OF(UINT_16 rplOF) {RPL_OF = rplOF;}
-        virtual void setTransDelay(int delay) {transDelay = delay;}
+        virtual void setNeighborTable(IMacNeighborTable* t)
+        {
+            this->ownerp = t;
+        }
+        virtual void setNeighborId(int id)
+        {
+            neighborId = id;
+        }
+        virtual void setNeighborSize(int size)
+        {
+            neighborSize = size;
+        }
+        virtual void setShortAddress(UINT_16 address)
+        {
+            ShortAddress = address;
+        }
+        virtual void setExtendedAddress(MACAddress address)
+        {
+            ExtendedAddress = address;
+        }
+        virtual void setSDIndex(UINT_16 index)
+        {
+            SDIndex = index;
+        }
+        virtual void setChannelOffset(UINT_16 channelOffset)
+        {
+            ChannelOffset = channelOffset;
+        }
+        virtual void setTrackBeacon(bool track)
+        {
+            TrackBeacon = track;
+        }
+        virtual void setBeaconLostCount(UINT_8 bcnLost)
+        {
+            BeaconLostCount = bcnLost;
+        }
+        virtual void setNumTxData(UINT_16 cntTXData)
+        {
+            numTxData = cntTXData;
+        }
+        virtual void setNumTxDataAck(UINT_16 cntTxDataAck)
+        {
+            numTxDataAck = cntTxDataAck;
+        }
+        virtual void setNumRxData(UINT_16 cntRxData)
+        {
+            numRxData = cntRxData;
+        }
+        virtual void setNumRxDataAck(UINT_16 cntRxDataAck)
+        {
+            numRxDataAck = cntRxDataAck;
+        }
+        virtual void setLastASN(UINT_64 lastAsn)
+        {
+            lastASN = lastAsn;
+        }
+        virtual void setRPLrank(UINT_16 rplRank)
+        {
+            RPLrank = rplRank;
+        }
+        virtual void setIsTimeSource(bool timeSource)
+        {
+            isTimeSource = timeSource;
+        }
+        virtual void setRPL_OF(UINT_16 rplOF)
+        {
+            RPL_OF = rplOF;
+        }
+        virtual void setTransDelay(int delay)
+        {
+            transDelay = delay;
+        }
 
-        virtual void incrBeaconLostCount() {BeaconLostCount = BeaconLostCount+1;}
-        virtual void incrNumTxData() {numTxData = numTxData+1;}
-        virtual void incrNumTxDataAck() {numTxDataAck = numTxDataAck+1;}
-        virtual void incrNumRxData() {numRxData = numRxData+1;}
-        virtual void incrNumRxDataAck() {numRxDataAck = numRxDataAck+1;}
-        virtual void decrTransDelay() {transDelay = transDelay-1;}
+        virtual void incrBeaconLostCount()
+        {
+            BeaconLostCount = BeaconLostCount + 1;
+        }
+        virtual void incrNumTxData()
+        {
+            numTxData = numTxData + 1;
+        }
+        virtual void incrNumTxDataAck()
+        {
+            numTxDataAck = numTxDataAck + 1;
+        }
+        virtual void incrNumRxData()
+        {
+            numRxData = numRxData + 1;
+        }
+        virtual void incrNumRxDataAck()
+        {
+            numRxDataAck = numRxDataAck + 1;
+        }
+        virtual void decrTransDelay()
+        {
+            transDelay = transDelay - 1;
+        }
 
-        virtual void isNextStageCH(bool is){nextStageCH=is;}
-        virtual void isPrevStageCH(bool is){lowerStageCH=is;}
-        virtual void isSameStageCH(bool is){sameStageCH=is;}
-        virtual void isMyCH(bool is){myCH = is;}
-        virtual void isMyCS(bool is){myCS = is;}
+        virtual void isNextStageCH(bool is)
+        {
+            nextStageCH = is;
+        }
+        virtual void isPrevStageCH(bool is)
+        {
+            lowerStageCH = is;
+        }
+        virtual void isSameStageCH(bool is)
+        {
+            sameStageCH = is;
+        }
+        virtual void isMyCH(bool is)
+        {
+            myCH = is;
+        }
+        virtual void isMyCS(bool is)
+        {
+            myCS = is;
+        }
 
-	double getDistance() const
-	{
-		return dDistance;
-	}
+        double getDistance() const
+        {
+            return dDistance;
+        }
 
-	double getRssimW()
-	{
-		return dBmTomW(dRSSI);
-	}
+        double getRssimW()
+        {
+            return dBmTomW(dRSSI);
+        }
 
-	double getRssidBm()
-	{
-		return dRSSI;
-	}
+        double getRssidBm()
+        {
+            return dRSSI;
+        }
 
-	void setRssi(double rssi)
-	{
-		dRSSI = mWTodBm(rssi);
-		double lambda = SPEED_OF_LIGHT / 2.4e9;
-		double temp1 = dCurTXPw * pow(lambda, 2);
-		double temp2 = (16 * pow(3.14, 2) * dBmTomW(dRSSI));
-		double temp3 = temp1 / temp2;
-		double temp4 = 1.0 / 3.0;
-		dDistance = pow(temp3, temp4);
+        void setRssi(double rssi)
+        {
+            dRSSI = mWTodBm(rssi);
+            double lambda = SPEED_OF_LIGHT / 2.4e9;
+            double temp1 = dCurTXPw * pow(lambda, 2);
+            double temp2 = (16 * pow(3.14, 2) * dBmTomW(dRSSI));
+            double temp3 = temp1 / temp2;
+            double temp4 = 1.0 / 3.0;
+            dDistance = pow(temp3, temp4);
 
-	}
+        }
 
-	double getCurTxPw() const
-	{
-		return dCurTXPw;
-	}
+        double getCurTxPw() const
+        {
+            return dCurTXPw;
+        }
 
-	void setCurTxPw(double curTxPw)
-	{
-		dCurTXPw = curTxPw;
-	}
+        void setCurTxPw(double curTxPw)
+        {
+            dCurTXPw = curTxPw;
+        }
 
-	int getNodeDegree() const
-	{
-		return nNodeDegree;
-	}
+        int getNodeDegree() const
+        {
+            return nNodeDegree;
+        }
 
-	void setNodeDegree(int nodeDegree)
-	{
-		nNodeDegree = nodeDegree;
-	}
+        void setNodeDegree(int nodeDegree)
+        {
+            nNodeDegree = nodeDegree;
+        }
 
-	double mWTodBm(double mW)
-	{
-	    return 10 * log10(mW);
-	}
+        double mWTodBm(double mW)
+        {
+            return 10 * log10(mW);
+        }
 
-	double dBmTomW(double dBm)
-	{
-	    return pow(10, dBm / 10);
-	}
+        double dBmTomW(double dBm)
+        {
+            return pow(10, dBm / 10);
+        }
 
-	double getWeight() const
-	{
-		return dWeight;
-	}
+        double getWeight() const
+        {
+            return dWeight;
+        }
 
-	void setWeight(double weight)
-	{
-		dWeight = weight;
-	}
+        void setWeight(double weight)
+        {
+            dWeight = weight;
+        }
 
-	int getNewCoverage() const
-	{
-		return nNewCoverage;
-	}
+        int getNewCoverage() const
+        {
+            return nNewCoverage;
+        }
 
-	void setNewCoverage(int newCoverage)
-	{
-		nNewCoverage = newCoverage;
-	}
+        void setNewCoverage(int newCoverage)
+        {
+            nNewCoverage = newCoverage;
+        }
 
         const SimTime& getLastPktReceived() const
         {
@@ -337,14 +511,14 @@ class INET_API macNeighborTableEntry : public cObject
             dWeightSecond = weightSecond;
         }
 
-        const MACAddress& getAssigndTo() const
+        int getAssigndTo()
         {
-            return assigndTo;
+            return nAssigndTo;
         }
 
-        void setAssigndTo(const MACAddress& assigndTo)
+        void setAssigndTo(int assigndTo)
         {
-            this->assigndTo = assigndTo;
+            this->nAssigndTo = assigndTo;
         }
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

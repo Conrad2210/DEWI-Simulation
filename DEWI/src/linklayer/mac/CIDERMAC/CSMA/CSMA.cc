@@ -196,10 +196,10 @@ void CSMA::handleCIDERMessage(cMessage* msg)
 	Ieee802154eFrame *newFrame = new Ieee802154eFrame("CIDER_MAC_Frame", Ieee802154e_DATA);
 
 
-	uint16_t index;
+	//uint16_t index;
 	IE3ADDR destAddr;
-	UINT_16 destPanId;
-	UINT_8 srcAddrMode;
+	//UINT_16 destPanId;
+//	UINT_8 srcAddrMode;
     destAddr = dynamic_cast<CIDERFrame *>(msg)->getDstAddress();
     newFrame->encapsulate(PK(msg));
     Ieee802154eNetworkCtrlInfo *cntrl = new Ieee802154eNetworkCtrlInfo("CntrlInfo", Ieee802154e_DATA);
@@ -207,12 +207,12 @@ void CSMA::handleCIDERMessage(cMessage* msg)
     newFrame->setControlInfo(cntrl);
 	/** brief:  TRUE if a GTS is to be used for transmission, FALSE indicates that the CAP will be used.
 	 *          see Std 802.15.4-2011 (6.3.1 MCPS-DATA.request) page 118 */
-	bool gtsTX = false;
+	//bool gtsTX = false;
 
 
 	//destAddr = (IE3ADDR) 0xffff; // broadcast address - Std 802.15.4-2006 (7.3.1.1) page 150
-	destPanId = 0xffff; // broadcast PAN ID - Std 802.15.4-2006 (7.3.1.1) page 150
-	gtsTX = false;              // send in the CAP
+	//destPanId = 0xffff; // broadcast PAN ID - Std 802.15.4-2006 (7.3.1.1) page 150
+	//gtsTX = false;              // send in the CAP
 
 	EV << "[MAC]: an " << msg->getName() << " (#" << ", " << PK(msg)->getByteLength() << " Bytes, destined for MAC address " << destAddr << " received from the upper layer" << endl;
 
@@ -251,12 +251,12 @@ void CSMA::handleCIDERMessage(cMessage* msg)
 	if (frmCtrl.srcAddrMode == defFrmCtrl_AddrMode16)
 	{ // 16 bit address
 		tmpSrcPanId = mpib.macPANId;
-		tmpSrcAddr = (IE3ADDR) mpib.macShortAddress;
+		tmpSrcAddr = (IE3ADDR) getMacAddr();
 	}
 	else
 	{ // 64 bit address
 		tmpSrcPanId = mpib.macPANId;
-		tmpSrcAddr = (IE3ADDR) mpib.macExtendedAddress;
+		tmpSrcAddr = getMacAddr();
 	}
 
 	newFrame->setDstPanId(tmpDstPanId);
@@ -379,6 +379,10 @@ void CSMA::handleLowerMsg(cPacket* msg)
 					EV << "Error! Received an ack from an unexpected source: src=" << macPkt->getSrcAddr() << ", I was expecting from node addr=" << firstPacket->getDstAddr() << endl;
 					delete macPkt;
 				}
+			}
+			else if(sendPacket != NULL)
+			{
+			    sendPacket = NULL;
 			}
 			else
 			{
