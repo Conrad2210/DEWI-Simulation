@@ -67,6 +67,7 @@ protected:
     cMessage *timerAdvert;
     cMessage *timerElectChildCH;
     cMessage *timerUpdateParent;
+    cMessage *timerCoverageUpdate;
 
     macNeighborTableEntry *parent;
     macVector myMACList;
@@ -87,7 +88,9 @@ protected:
         CIDERElectChildCHTimer = 511,
         CIDERElectChildCH = 512,
         CIDERParentUpdateTimer = 513,
-        CIDERParentUpdate = 514
+        CIDERParentUpdate = 514,
+        CIDERCoverageUpdateTimer = 515,
+        CIDERCoverageUpdate = 516
     };
 
 private:

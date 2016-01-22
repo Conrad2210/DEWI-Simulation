@@ -511,12 +511,12 @@ class INET_API macNeighborTableEntry : public cObject
             dWeightSecond = weightSecond;
         }
 
-        int getAssigndTo()
+        int getAssignedTo()
         {
             return nAssigndTo;
         }
 
-        void setAssigndTo(int assigndTo)
+        void setAssignedTo(int assigndTo)
         {
             this->nAssigndTo = assigndTo;
         }

@@ -68,8 +68,9 @@ void CIDER::initialize(int stage)
         timerCompWeight = new cMessage("CompareWeightTimer", CIDERCompareWeightTimer);
         timerCompetition = new cMessage("CompetitionTimer", CIDERFirstCHCompetitionTimer);
         timerAdvert = new cMessage("AdvertTimer", CIDERCHAdvertTimer);
-        timerElectChildCH = new cMessage("Calc Weight Timer", CIDERElectChildCHTimer);
+        timerElectChildCH = new cMessage("ElectChildCHTimer", CIDERElectChildCHTimer);
         timerUpdateParent = new cMessage("Update Parent", CIDERParentUpdateTimer);
+        timerCoverageUpdate = new cMessage("CoverageUpdate", CIDERCoverageUpdateTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
@@ -229,9 +230,9 @@ void CIDER::handleSelfMessage(cMessage* msg)
             if (neighbourTable->getNeighborByPos(i)->isPosCluster())
             {
                 neighbourTable->getNeighborByPos(i)->isMyCS(true);
-                neighbourTable->getNeighborByPos(i)->setAssigndTo(
+                neighbourTable->getNeighborByPos(i)->setAssignedTo(
                         myInterface->getMacAddress().getLastKBytes(numberOfBytes));
-                if (neighbourTable->getNeighborByPos(i)->getAssigndTo() != -1)
+                if (neighbourTable->getNeighborByPos(i)->getAssignedTo() != -1)
                     assignedCS.push_back(
                             neighbourTable->getNeighborByPos(i)->getExtendedAddress().getLastKBytes(numberOfBytes));
 
@@ -249,7 +250,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
             macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(i);
-            if (entry->isPosCluster() == false && entry->getAssigndTo() == -1)
+            if (entry->isPosCluster() == false && entry->getAssignedTo() == -1)
             {
                 entry->setWeightSecond(w4 * entry->getNewCoverage() + w5 * entry->getRssidBm());
                 if (entry->getWeightSecond() > tempWeight)
@@ -268,8 +269,12 @@ void CIDER::handleSelfMessage(cMessage* msg)
             newFrame->setDstAddress(neighbourTable->getNeighborById(index)->getExtendedAddress());
             newFrame->setMacAddressesList(assignedCS);
             send(newFrame, networkLayerOut);
-            neighbourTable->getNeighborById(index)->setAssigndTo(
+            neighbourTable->getNeighborById(index)->setAssignedTo(
                     myInterface->getMacAddress().getLastKBytes(numberOfBytes));
+        }
+        else
+        {
+            scheduleAt(simTime() + 0.2, timerCoverageUpdate);
         }
 
     }
@@ -280,6 +285,16 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(parent->getExtendedAddress());
+        newFrame->setMacAddressesList(assignedCS);
+        send(newFrame, networkLayerOut);
+    }
+    else if (msg->getKind() == CIDERCoverageUpdateTimer)
+    {
+        CIDERFrame *newFrame = new CIDERFrame("CoverageUpdate", CIDERCoverageUpdate);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
         newFrame->setMacAddressesList(assignedCS);
         send(newFrame, networkLayerOut);
     }
@@ -394,7 +409,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         {
 
             macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
-            if (entry->getAssigndTo() == -1)
+            if (entry->getAssignedTo() == -1)
             {
                 if (entry != NULL)
                 {
@@ -434,7 +449,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
             {
                 if (entry->getExtendedAddress().compareTo(temp.at(k), numberOfBytes) == 0)
                 {
-                    entry->setAssigndTo(recFrame->getSrcAddress().getLastKBytes(numberOfBytes));
+                    entry->setAssignedTo(recFrame->getSrcAddress().getLastKBytes(numberOfBytes));
                     entry->setPosCluster(false);
                     break;
                 }
@@ -457,6 +472,10 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         macNeighborTableEntry *entry;
         macVector temp = recFrame->getMacAddressesList();
         int tempSize = temp.size();
+        int assignedCSBefore = assignedCS.size();
+        while (assignedCS.size() != 0)
+            assignedCS.erase(assignedCS.begin());
+
         if (tempSize != 0)
         {
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
@@ -466,18 +485,43 @@ void CIDER::handleCIDERMessage(cMessage* msg)
                 {
                     if (entry->getExtendedAddress().compareTo(temp.at(k), numberOfBytes) == 0)
                     {
-                        entry->setAssigndTo(recFrame->getSrcAddress().getLastKBytes(numberOfBytes));
+                        entry->setAssignedTo(recFrame->getSrcAddress().getLastKBytes(numberOfBytes));
                     }
+
+                }
+                if (entry->getAssignedTo() != -1)
+                {
+                    assignedCS.push_back(entry->getExtendedAddress().getLastKBytes(numberOfBytes));
                 }
             }
+            int assignedCSafter = assignedCS.size();
             scheduleAt(simTime() + 0.2, timerElectChildCH);
         }
         else
         {
-            int i = 0;
-            i++;
+            //tell the note it become a cs;
         }
 
+    }
+    else if (msg->getKind() == CIDERCoverageUpdate)
+    {
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+        macNeighborTableEntry *entry;
+        macVector temp = recFrame->getMacAddressesList();
+        int tempSize = temp.size();
+        for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+        {
+            entry = neighbourTable->getNeighborByPos(i);
+            for (int k = 0; k < (int) temp.size(); k++)
+            {
+                if (entry->getExtendedAddress().compareTo(temp.at(k), numberOfBytes) == 0
+                        && entry->getAssignedTo() != myInterface->getMacAddress().getLastKBytes(numberOfBytes))
+                {
+                    entry->setAssignedTo(recFrame->getSrcAddress().getLastKBytes(numberOfBytes));
+                }
+
+            }
+        }
     }
 
     msg = NULL;

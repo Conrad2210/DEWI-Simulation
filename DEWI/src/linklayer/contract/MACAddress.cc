@@ -17,6 +17,8 @@
  */
 
 #include <ctype.h>
+#include "string.h"
+#include <sstream>
 #include "MACAddress.h"
 #include "InterfaceToken.h"
 
@@ -333,21 +335,23 @@ int MACAddress::getLastKBytes(int k) const
 
     int i = k;
     char *temp = new char[k];
-    int nReturn = 0;
-    while (i > 0)
+    unsigned int tempUI = 0;
+    unsigned int nReturn = 0;
+    std::string str = "";
+
+    std::string str2 = "";
+    str = this->str();
+    for (int i = 0; i < str.length(); i++)
     {
-        if (i - 1 == 0)
-        {
-            nReturn += getAddressByte1((macAddress64 ? MAC_ADDRESS_SIZE64 : MAC_ADDRESS_SIZE) - i);
-        }
-        else
-        {
-            nReturn += getAddressByte1((macAddress64 ? MAC_ADDRESS_SIZE64 : MAC_ADDRESS_SIZE) - i)*pow(2,pow(2,i-1));
-        }
-        i--;
+        if (str[i] != '-')
+            str2 += str[i];
     }
 
-
+    str = str2.substr((str2.length() - 6));
+    nReturn = strtol(str.c_str(),NULL,16);
+    //str = getAddressByte((macAddress64 ? MAC_ADDRESS_SIZE64 : MAC_ADDRESS_SIZE) - i);
+    //ss >> std::hex >> tempUI;
+    //nReturn += getAddressByte1((macAddress64 ? MAC_ADDRESS_SIZE64 : MAC_ADDRESS_SIZE) - i) * pow(2, pow(2, i - 1));
 
     return nReturn;
 }
