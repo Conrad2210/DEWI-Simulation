@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.nodes.CIDERNode.Rectangular;
+package dewi.nodes.CIDERNode.StaticGrid;
 
 //Includes
 //Mobility
@@ -97,11 +97,13 @@ module LampNode
         //Node Location
         mobility: StationaryGrid {
             parameters:
-                maxCol = maxCol;
-                maxRow = maxRow;
-                marginX = X;
-                marginY = Y;
-                marginZ = Z;
+    		maxCol = maxCol;
+    		maxRow = maxRow;
+    		marginX = X;
+    		marginY = Y;
+    		marginZ = Z;
+    		numHosts = numHosts;
+          
                 @display("p=354,385;i=block/cogwheel");
         }
 

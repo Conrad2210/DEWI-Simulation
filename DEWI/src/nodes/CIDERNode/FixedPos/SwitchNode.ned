@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package dewi.nodes.CIDERNode.Rectangular;
+package dewi.nodes.CIDERNode.FixedPos;
 
 //Includes
 //Mobility

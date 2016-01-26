@@ -20,8 +20,8 @@ package dewi.simulations.Testing;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.nodes.CIDERNode.Rectangular.LampNode;
-import dewi.nodes.CIDERNode.Rectangular.LightSwitch;
+import dewi.nodes.CIDERNode.RandomPos.LampNode;
+import dewi.nodes.CIDERNode.FixedPos.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
 
