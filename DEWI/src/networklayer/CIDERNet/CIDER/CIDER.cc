@@ -69,8 +69,9 @@ void CIDER::initialize(int stage)
         timerCompetition = new cMessage("CompetitionTimer", CIDERFirstCHCompetitionTimer);
         timerAdvert = new cMessage("AdvertTimer", CIDERCHAdvertTimer);
         timerElectChildCH = new cMessage("ElectChildCHTimer", CIDERElectChildCHTimer);
-        timerUpdateParent = new cMessage("Update Parent", CIDERParentUpdateTimer);
-        timerCoverageUpdate = new cMessage("CoverageUpdate", CIDERCoverageUpdateTimer);
+        timerUpdateParent = new cMessage("UpdateParentTimer", CIDERParentUpdateTimer);
+        timerCoverageUpdate = new cMessage("CoverageUpdateTimer", CIDERCoverageUpdateTimer);
+        timerDelectCH = new cMessage("DelectCHTimer", CIDERDelectCHTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
@@ -83,6 +84,15 @@ void CIDER::initialize(int stage)
 void CIDER::finish()
 {
     cancelAndDelete(timerInitialPing);
+    cancelAndDelete(timerNeighUpdate);
+    cancelAndDelete(timerWeight);
+    cancelAndDelete(timerCompWeight);
+    cancelAndDelete(timerCompetition);
+    cancelAndDelete(timerAdvert);
+    cancelAndDelete(timerElectChildCH);
+    cancelAndDelete(timerUpdateParent);
+    cancelAndDelete(timerCoverageUpdate);
+    cancelAndDelete(timerDelectCH);
 }
 
 void CIDER::handleMessage(cMessage* msg)
@@ -298,6 +308,50 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setMacAddressesList(assignedCS);
         send(newFrame, networkLayerOut);
     }
+    else if (msg->getKind() == CIDERDelectCHTimer)
+    {
+        CIDERFrame *newFrame = new CIDERFrame("DelectCH", CIDERDelectCH);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(delectAddr);
+        send(newFrame, networkLayerOut);
+    }
+    else if(msg->getKind() == CIDERDelectCSTimer)
+    {
+        CIDERFrame *newFrame = new CIDERFrame("DelectCH", CIDERDelectCH);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+
+        for(int i = 0; i < (int)assignedCS.size();i++)
+        {
+            for(int k = 0; k = neighbourTable->getNumNeighbors(); k++)
+            {
+                macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(k);
+                if(entry->getAssignedTo() = assignedCS.at(i))
+                {
+                    entry->setAssignedTo(-1);
+                    break;
+                }
+            }
+        }
+
+        scheduleAt(simTime() + 0.2, timerDelectCHRep);
+
+    }
+    else if (msg->getKind() == CIDERDelectCHRepTime)
+        {
+            CIDERFrame *newFrame = new CIDERFrame("DelectCHRep", CIDERDelectCHRep);
+            CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+            newFrame->setControlInfo(cntrl);
+            newFrame->setSrcAddress(myInterface->getMacAddress());
+            newFrame->setDstAddress(neighbourTable->getNeighborByLastBytes(parent,numberOfBytes)->getExtendedAddress());
+            newFrame->setMacAddressesList(assignedCS);
+            send(newFrame, networkLayerOut);
+        }
+
 }
 
 void CIDER::handleCIDERMessage(cMessage* msg)
@@ -326,7 +380,8 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         entry->setLastPktReceived(simTime());
         neighbourTable->addNeighbor(entry);
         uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
-        double delay = (double) (temp % 0xFFFF) * 0.01 + 10;
+        double delay = uniform(simTime().dbl() + 1,
+                simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
         scheduleAt(delay, timerNeighUpdate);
         delete recFrame;
     }
@@ -476,7 +531,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         while (assignedCS.size() != 0)
             assignedCS.erase(assignedCS.begin());
 
-        if (tempSize != 0)
+        if (tempSize < 5)
         {
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
             {
@@ -499,9 +554,12 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         }
         else
         {
+            delectAddr = recFrame->getSrcAddress();
             //tell the note it become a cs;
-        }
+            scheduleAt(simTime() + 0.2, timerDelectCH);
 
+        }
+        delete recFrame;
     }
     else if (msg->getKind() == CIDERCoverageUpdate)
     {
@@ -522,6 +580,47 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 
             }
         }
+    }
+    else if (msg->getKind() == CIDERDelectCH)
+    {
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+        parent = recFrame->getSrcAddress().getLastKBytes(numberOfBytes);
+        cDisplayString* parentDisp = &getParentModule()->getDisplayString();
+        cDisplayString* tempStr = new cDisplayString();
+
+        tempStr->parse("b=1.5,1.5,oval,orange;i=device/bulb");
+
+        parentDisp->updateWith(*tempStr);
+        updatedisplay();
+        scheduleAt(simTime() + 0.2, timerDelectCS);
+
+    }
+    else if (msg->getKind() == CIDERDelectCHRep)
+    {
+        delectAddr = MACAddress::UNSPECIFIED_ADDRESS;
+
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+        macNeighborTableEntry *entry;
+        entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress())->setAssignedTo(
+                myInterface->getMacAddress().getLastKBytes(numberOfBytes));
+        scheduleAt(simTime() + 0.2, timerElectChildCH);
+
+    }
+    else if (msg->getKind == CIDERDelectCS)
+    {
+        CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+        macNeighborTableEntry *entry;
+
+        if (recFrame->getSrcAddress().getLastKBytes(numberOfBytes) == parent)
+        {
+            parent = -1;
+            cDisplayString* tempStr = new cDisplayString();
+
+            tempStr->parse("b=1.5,1.5,oval,red;i=device/bulb");
+
+            parentDisp->updateWith(*tempStr);
+        }
+
     }
 
     msg = NULL;

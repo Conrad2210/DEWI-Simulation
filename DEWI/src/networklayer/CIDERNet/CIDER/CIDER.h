@@ -68,10 +68,14 @@ protected:
     cMessage *timerElectChildCH;
     cMessage *timerUpdateParent;
     cMessage *timerCoverageUpdate;
+    cMessage *timerDelectCH;
+    cMessage *timerDelectCHRep;
+    cMessage *timerDelectCS;
 
     macNeighborTableEntry *parent;
     macVector myMACList;
     macVector assignedCS;
+    MACAddress delectAddr;
     enum CIDERFrames{
     	CIDERPingTimer = 500,
     	CIDERNeighUpdateTimer = 501,
@@ -90,7 +94,13 @@ protected:
         CIDERParentUpdateTimer = 513,
         CIDERParentUpdate = 514,
         CIDERCoverageUpdateTimer = 515,
-        CIDERCoverageUpdate = 516
+        CIDERCoverageUpdate = 516,
+        CIDERDelectCHTimer = 517,
+        CIDERDelectCH = 518,
+        CIDERDelectCHRepTime = 519,
+        CIDERDelectCHRep = 520,
+        CIDERDelectCSTimer = 521,
+        CIDERDelectCS = 522,
     };
 
 private:
