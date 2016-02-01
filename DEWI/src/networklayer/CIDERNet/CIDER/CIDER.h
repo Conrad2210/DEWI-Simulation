@@ -73,7 +73,7 @@ protected:
     cMessage *timerDelectCHRep;
     cMessage *timerDelectCS;
 
-    int parent;
+    macNeighborTableEntry *parent;
     macVector myMACList;
     macVector assignedCS;
     MACAddress delectAddr;
@@ -98,7 +98,7 @@ protected:
         CIDERCoverageUpdate = 516,
         CIDERDelectCHTimer = 517,
         CIDERDelectCH = 518,
-        CIDERDelectCHRepTime = 519,
+        CIDERDelectCHRepTimer = 519,
         CIDERDelectCHRep = 520,
         CIDERDelectCSTimer = 521,
         CIDERDelectCS = 522,

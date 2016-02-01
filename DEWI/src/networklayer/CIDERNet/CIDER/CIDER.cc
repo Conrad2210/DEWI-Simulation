@@ -332,7 +332,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
             for(int k = 0; k = neighbourTable->getNumNeighbors(); k++)
             {
                 macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(k);
-                if(entry->getAssignedTo() = assignedCS.at(i))
+                if(entry->getAssignedTo() == assignedCS.at(i))
                 {
                     entry->setAssignedTo(-1);
                     break;
@@ -343,13 +343,13 @@ void CIDER::handleSelfMessage(cMessage* msg)
         scheduleAt(simTime() + 0.2, timerDelectCHRep);
 
     }
-    else if (msg->getKind() == CIDERDelectCHRepTime)
+    else if (msg->getKind() == CIDERDelectCHRepTimer)
         {
             CIDERFrame *newFrame = new CIDERFrame("DelectCHRep", CIDERDelectCHRep);
             CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
             newFrame->setControlInfo(cntrl);
             newFrame->setSrcAddress(myInterface->getMacAddress());
-            newFrame->setDstAddress(neighbourTable->getNeighborByLastBytes(parent,numberOfBytes)->getExtendedAddress());
+            newFrame->setDstAddress(parent->getExtendedAddress());
             newFrame->setMacAddressesList(assignedCS);
             send(newFrame, networkLayerOut);
         }
@@ -586,7 +586,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
     else if (msg->getKind() == CIDERDelectCH)
     {
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-        parent = recFrame->getSrcAddress().getLastKBytes(numberOfBytes);
+        parent = neighbourTable->getNeighborByLastBytes(recFrame->getSrcAddress().getLastKBytes(numberOfBytes),numberOfBytes);
         cDisplayString* parentDisp = &getParentModule()->getDisplayString();
         cDisplayString* tempStr = new cDisplayString();
 
@@ -603,19 +603,20 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
         macNeighborTableEntry *entry;
-        entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress())->setAssignedTo(
-                myInterface->getMacAddress().getLastKBytes(numberOfBytes));
+        entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
+        entry->setAssignedTo(myInterface->getMacAddress().getLastKBytes(numberOfBytes));
         scheduleAt(simTime() + 0.2, timerElectChildCH);
 
     }
-    else if (msg->getKind == CIDERDelectCS)
+    else if (msg->getKind() == CIDERDelectCS)
     {
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
         macNeighborTableEntry *entry;
 
-        if (recFrame->getSrcAddress().getLastKBytes(numberOfBytes) == parent)
+        if (recFrame->getSrcAddress().getLastKBytes(numberOfBytes) == parent->getExtendedAddress().getLastKBytes(numberOfBytes));
         {
-            parent = -1;
+            parent = NULL;
+            cDisplayString* parentDisp = &getParentModule()->getDisplayString();
             cDisplayString* tempStr = new cDisplayString();
 
             tempStr->parse("b=1.5,1.5,oval,red;i=device/bulb");
