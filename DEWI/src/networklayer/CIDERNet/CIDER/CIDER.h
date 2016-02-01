@@ -43,6 +43,7 @@ protected:
 	virtual void calcWeight();
 	virtual void updatedisplay();
 
+	bool LPDevice;
     int networkLayerIn;
     int networkLayerOut;
     int counterPing;
@@ -72,7 +73,7 @@ protected:
     cMessage *timerDelectCHRep;
     cMessage *timerDelectCS;
 
-    macNeighborTableEntry *parent;
+    int parent;
     macVector myMACList;
     macVector assignedCS;
     MACAddress delectAddr;

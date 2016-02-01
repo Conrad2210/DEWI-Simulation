@@ -31,6 +31,7 @@ simple CIDER
     double w3 = default(0.2);
     double w4 = default(0.8);
     double w5 = default(0.2);
+    bool LPDevice = default(false);
     gates:
 
         input networkLayerIn;

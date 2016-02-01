@@ -29,6 +29,7 @@
  *     macVector macAddressesList;
  *     MACAddress srcAddress;
  *     MACAddress dstAddress;
+ *     bool LPDevice;
  *     double rxPower;
  *     int clusterDegree;
  *     int nodeDegree;
@@ -43,6 +44,7 @@ class CIDERFrame : public ::cPacket
     macVector macAddressesList_var;
     MACAddress srcAddress_var;
     MACAddress dstAddress_var;
+    bool LPDevice_var;
     double rxPower_var;
     int clusterDegree_var;
     int nodeDegree_var;
@@ -75,6 +77,8 @@ class CIDERFrame : public ::cPacket
     virtual MACAddress& getDstAddress();
     virtual const MACAddress& getDstAddress() const {return const_cast<CIDERFrame*>(this)->getDstAddress();}
     virtual void setDstAddress(const MACAddress& dstAddress);
+    virtual bool getLPDevice() const;
+    virtual void setLPDevice(bool LPDevice);
     virtual double getRxPower() const;
     virtual void setRxPower(double rxPower);
     virtual int getClusterDegree() const;

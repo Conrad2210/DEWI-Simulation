@@ -75,6 +75,8 @@ class INET_API macNeighborTableEntry : public cObject
 
         bool bPosCluster;
 
+        bool bLPDevice;
+
         int nAssigndTo; //last 3 bytes of mac address
 
         SimTime lastPktReceived;
@@ -519,6 +521,16 @@ class INET_API macNeighborTableEntry : public cObject
         void setAssignedTo(int assigndTo)
         {
             this->nAssigndTo = assigndTo;
+        }
+
+        bool isLpDevice() const
+        {
+            return bLPDevice;
+        }
+
+        void setLpDevice(bool lpDevice)
+        {
+            bLPDevice = lpDevice;
         }
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

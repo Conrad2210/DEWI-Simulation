@@ -55,6 +55,7 @@ void CIDER::initialize(int stage)
         w3 = par("w3").doubleValue();
         w4 = par("w4").doubleValue();
         w5 = par("w5").doubleValue();
+        LPDevice = par("LPDevice").boolValue();
         parent = NULL;
         updatedisplay();
         IInterfaceTable *ift = InterfaceTableAccess().getIfExists();
@@ -122,6 +123,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
             newFrame->setSrcAddress(myInterface->getMacAddress());
             newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
             newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
+
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
             {
                 if (neighbourTable->getNeighborByPos(i)->isPosCluster())
