@@ -33,6 +33,7 @@ packet CIDERFrame
     double rxPower;
     int clusterDegree;
     int nodeDegree;
+    int LPDegree;
     double txPower;   
     double weight; 
 }

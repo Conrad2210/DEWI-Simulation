@@ -49,7 +49,8 @@ void CIDER::initialize(int stage)
         dOwnWeight = -1;
         nNodeDegree = 0;
         nClusterDegree = 0;
-        dMeanRSSI = 0;
+        nLPDegree = 0;
+        dNormRSSI = 0;
         w1 = par("w1").doubleValue();
         w2 = par("w2").doubleValue();
         w3 = par("w3").doubleValue();
@@ -73,11 +74,12 @@ void CIDER::initialize(int stage)
         timerUpdateParent = new cMessage("UpdateParentTimer", CIDERParentUpdateTimer);
         timerCoverageUpdate = new cMessage("CoverageUpdateTimer", CIDERCoverageUpdateTimer);
         timerDelectCH = new cMessage("DelectCHTimer", CIDERDelectCHTimer);
+        timerDelectCS = new cMessage("DelectCSTimer", CIDERDelectCSTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
         WATCH(nClusterDegree);
-        WATCH(dMeanRSSI);
+        WATCH(dNormRSSI);
     }
 
 }
@@ -122,8 +124,10 @@ void CIDER::handleSelfMessage(cMessage* msg)
             newFrame->setControlInfo(cntrl);
             newFrame->setSrcAddress(myInterface->getMacAddress());
             newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
-            newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
-
+            newFrame->setNodeDegree(nNodeDegree);
+            newFrame->setClusterDegree(nClusterDegree);
+            newFrame->setLPDegree(nLPDegree);
+            newFrame->setLPDevice(LPDevice);
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
             {
                 if (neighbourTable->getNeighborByPos(i)->isPosCluster())
@@ -137,6 +141,9 @@ void CIDER::handleSelfMessage(cMessage* msg)
     }
     else if (msg->getKind() == CIDERNeighUpdateTimer)
     {
+        if (LPDevice)
+            return;
+
         if (counterPing < 2)
         { //here also calc weight for each node;
             CIDERFrame *newFrame = new CIDERFrame("CIDERNeighUpdate", CIDERNeighUpdate);
@@ -144,15 +151,18 @@ void CIDER::handleSelfMessage(cMessage* msg)
             newFrame->setControlInfo(cntrl);
             newFrame->setSrcAddress(myInterface->getMacAddress());
             newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+            newFrame->setLPDevice(LPDevice);
             macVector temp;
-            newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
+            newFrame->setNodeDegree(nNodeDegree);
+            newFrame->setClusterDegree(nClusterDegree);
+            newFrame->setLPDegree(nLPDegree);
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
             {
                 if (neighbourTable->getNeighborByPos(i)->isPosCluster())
                 {
                     temp.push_back(
                             neighbourTable->getNeighborByPos(i)->getExtendedAddress().getLastKBytes(numberOfBytes));
-                    newFrame->setClusterDegree(newFrame->getClusterDegree() + 1);
+
                 }
             }
 
@@ -170,6 +180,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setLPDevice(LPDevice);
         newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
@@ -185,7 +196,8 @@ void CIDER::handleSelfMessage(cMessage* msg)
     }
     else if (msg->getKind() == CIDERCompareWeightTimer)
     {
-
+        if (LPDevice)
+            return;
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
             int temp = getParentModule()->getIndex();
@@ -220,6 +232,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setLPDevice(LPDevice);
         newFrame->setWeight(dOwnWeight);
         send(newFrame, networkLayerOut);
 
@@ -234,6 +247,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setLPDevice(LPDevice);
         newFrame->setWeight(dOwnWeight);
         send(newFrame, networkLayerOut);
 
@@ -262,7 +276,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
             macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(i);
-            if (entry->isPosCluster() == false && entry->getAssignedTo() == -1)
+            if (entry->isPosCluster() == false && entry->getAssignedTo() == -1 && entry->isLpDevice() == false)
             {
                 entry->setWeightSecond(w4 * entry->getNewCoverage() + w5 * entry->getRssidBm());
                 if (entry->getWeightSecond() > tempWeight)
@@ -279,6 +293,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
             newFrame->setControlInfo(cntrl);
             newFrame->setSrcAddress(myInterface->getMacAddress());
             newFrame->setDstAddress(neighbourTable->getNeighborById(index)->getExtendedAddress());
+            newFrame->setLPDevice(LPDevice);
             newFrame->setMacAddressesList(assignedCS);
             send(newFrame, networkLayerOut);
             neighbourTable->getNeighborById(index)->setAssignedTo(
@@ -297,6 +312,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(parent->getExtendedAddress());
+        newFrame->setLPDevice(LPDevice);
         newFrame->setMacAddressesList(assignedCS);
         send(newFrame, networkLayerOut);
     }
@@ -307,6 +323,7 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setLPDevice(LPDevice);
         newFrame->setMacAddressesList(assignedCS);
         send(newFrame, networkLayerOut);
     }
@@ -317,22 +334,24 @@ void CIDER::handleSelfMessage(cMessage* msg)
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(delectAddr);
+        newFrame->setLPDevice(LPDevice);
         send(newFrame, networkLayerOut);
     }
-    else if(msg->getKind() == CIDERDelectCSTimer)
+    else if (msg->getKind() == CIDERDelectCSTimer)
     {
-        CIDERFrame *newFrame = new CIDERFrame("DelectCH", CIDERDelectCH);
+        CIDERFrame *newFrame = new CIDERFrame("DelectCS", CIDERDelectCS);
         CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
         newFrame->setControlInfo(cntrl);
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+        newFrame->setLPDevice(LPDevice);
 
-        for(int i = 0; i < (int)assignedCS.size();i++)
+        for (int i = 0; i < (int) assignedCS.size(); i++)
         {
-            for(int k = 0; k = neighbourTable->getNumNeighbors(); k++)
+            for (int k = 0; k = neighbourTable->getNumNeighbors(); k++)
             {
                 macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(k);
-                if(entry->getAssignedTo() == assignedCS.at(i))
+                if (entry->getAssignedTo() == assignedCS.at(i))
                 {
                     entry->setAssignedTo(-1);
                     break;
@@ -344,15 +363,17 @@ void CIDER::handleSelfMessage(cMessage* msg)
 
     }
     else if (msg->getKind() == CIDERDelectCHRepTimer)
-        {
-            CIDERFrame *newFrame = new CIDERFrame("DelectCHRep", CIDERDelectCHRep);
-            CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
-            newFrame->setControlInfo(cntrl);
-            newFrame->setSrcAddress(myInterface->getMacAddress());
-            newFrame->setDstAddress(parent->getExtendedAddress());
-            newFrame->setMacAddressesList(assignedCS);
-            send(newFrame, networkLayerOut);
-        }
+    {
+        CIDERFrame *newFrame = new CIDERFrame("DelectCHRep", CIDERDelectCHRep);
+        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+        newFrame->setControlInfo(cntrl);
+        newFrame->setSrcAddress(myInterface->getMacAddress());
+        newFrame->setDstAddress(parent->getExtendedAddress());
+        newFrame->setLPDevice(LPDevice);
+        newFrame->setMacAddressesList(assignedCS);
+        send(newFrame, networkLayerOut);
+        parent = NULL;
+    }
 
 }
 
@@ -372,12 +393,18 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         entry->setRssi(recFrame->getRxPower());
         entry->setNodeDegree(recFrame->getNodeDegree());
         entry->setClusterDegree(recFrame->getClusterDegree());
+        entry->setLpDegree(recFrame->getLPDegree());
+        entry->setLpDevice(recFrame->getLPDevice());
         nNodeDegree++;
+
         if (entry->getRssidBm() > -80.0)
         {
             entry->setPosCluster(true);
             myMACList.push_back(entry->getExtendedAddress().getLastKBytes(numberOfBytes));
             nClusterDegree++;
+
+            if (entry->isLpDevice())
+                nLPDegree++;
         }
         entry->setLastPktReceived(simTime());
         neighbourTable->addNeighbor(entry);
@@ -404,6 +431,8 @@ void CIDER::handleCIDERMessage(cMessage* msg)
             entry->setRssi(recFrame->getRxPower());
             entry->setNodeDegree(recFrame->getNodeDegree());
             entry->setClusterDegree(recFrame->getClusterDegree());
+            entry->setLpDegree(recFrame->getLPDegree());
+            entry->setLpDevice(recFrame->getLPDevice());
             entry->setLastPktReceived(simTime());
             neighbourTable->editNeighbor(entry);
         }
@@ -429,6 +458,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
             entry->setClusterDegree(recFrame->getClusterDegree());
             entry->setWeight(recFrame->getWeight());
             entry->setLastPktReceived(simTime());
+            entry->setLpDevice(recFrame->getLPDevice());
             neighbourTable->editNeighbor(entry);
         }
         uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
@@ -451,8 +481,10 @@ void CIDER::handleCIDERMessage(cMessage* msg)
             }
             cDisplayString* parentDisp = &getParentModule()->getDisplayString();
             cDisplayString* tempStr = new cDisplayString();
-
-            tempStr->parse("b=1.5,1.5,oval,red;i=device/bulb");
+            if (!LPDevice)
+                tempStr->parse("b=1.5,1.5,oval,red;i=status/bulb");
+            else
+                tempStr->parse("b=1.5,1.5,oval,red;i=device/cellphone");
 
             parentDisp->updateWith(*tempStr);
         }
@@ -478,7 +510,10 @@ void CIDER::handleCIDERMessage(cMessage* msg)
                 cDisplayString* parentDisp = &getParentModule()->getDisplayString();
                 cDisplayString* tempStr = new cDisplayString();
 
-                tempStr->parse("b=1.5,1.5,oval,orange;i=device/bulb");
+                if (!LPDevice)
+                    tempStr->parse("b=1.5,1.5,oval,orange;i=status/bulb");
+                else
+                    tempStr->parse("b=1.5,1.5,oval,orange;i=device/cellphone");
 
                 parentDisp->updateWith(*tempStr);
             }
@@ -533,7 +568,7 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         while (assignedCS.size() != 0)
             assignedCS.erase(assignedCS.begin());
 
-        if (tempSize < 5)
+        if (tempSize != 0)
         {
             for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
             {
@@ -586,11 +621,14 @@ void CIDER::handleCIDERMessage(cMessage* msg)
     else if (msg->getKind() == CIDERDelectCH)
     {
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-        parent = neighbourTable->getNeighborByLastBytes(recFrame->getSrcAddress().getLastKBytes(numberOfBytes),numberOfBytes);
+
         cDisplayString* parentDisp = &getParentModule()->getDisplayString();
         cDisplayString* tempStr = new cDisplayString();
 
-        tempStr->parse("b=1.5,1.5,oval,orange;i=device/bulb");
+        if (!LPDevice)
+            tempStr->parse("b=1.5,1.5,oval,red;i=status/bulb");
+        else
+            tempStr->parse("b=1.5,1.5,oval,red;i=device/cellphone");
 
         parentDisp->updateWith(*tempStr);
         updatedisplay();
@@ -613,13 +651,17 @@ void CIDER::handleCIDERMessage(cMessage* msg)
         CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
         macNeighborTableEntry *entry;
 
-        if (recFrame->getSrcAddress().getLastKBytes(numberOfBytes) == parent->getExtendedAddress().getLastKBytes(numberOfBytes));
+        if (recFrame->getSrcAddress()
+                == parent->getExtendedAddress())
         {
             parent = NULL;
             cDisplayString* parentDisp = &getParentModule()->getDisplayString();
             cDisplayString* tempStr = new cDisplayString();
 
-            tempStr->parse("b=1.5,1.5,oval,red;i=device/bulb");
+            if (!LPDevice)
+                tempStr->parse("b=1.5,1.5,oval,red;i=status/bulb");
+            else
+                tempStr->parse("b=1.5,1.5,oval,red;i=device/cellphone");
 
             parentDisp->updateWith(*tempStr);
         }
@@ -631,17 +673,24 @@ void CIDER::handleCIDERMessage(cMessage* msg)
 
 void CIDER::calcWeight()
 {
-
+    double max = 0;
+    double min = 0;
     double allRSSI = 0;
 
     for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
     {
         allRSSI = allRSSI + (neighbourTable->getNeighborByPos(i)->getRssidBm());
+        if (min > neighbourTable->getNeighborByPos(i)->getRssidBm())
+            min = neighbourTable->getNeighborByPos(i)->getRssidBm();
 
     }
-    dMeanRSSI = allRSSI / nNodeDegree;
 
-    dOwnWeight = w1 * nNodeDegree + w2 * nClusterDegree + w3 * dMeanRSSI;
+    dNormRSSI = ((allRSSI / nNodeDegree) - min) / (max - min);
+    // plausibility check
+
+    dOwnWeight = w1 * nNodeDegree + w2 * nClusterDegree + w3 * nLPDegree + w4 * dNormRSSI;
+    if (dOwnWeight == NAN || dOwnWeight == -NAN)
+        dOwnWeight = 0;
 }
 
 //returns number of elements (of vec1) not included in vec2

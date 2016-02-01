@@ -65,10 +65,10 @@ module LPNode
 //        double Y @unit(m);
 //        double Z @unit(m);
         int numHosts;
-        int maxRow;
-        int maxCol;
-
-        int GateWay;
+//        int maxRow;
+//        int maxCol;
+//
+//        int GateWay;
         //Number of Hosts, to calculate the position of the nodes
         //int Hosts;
 

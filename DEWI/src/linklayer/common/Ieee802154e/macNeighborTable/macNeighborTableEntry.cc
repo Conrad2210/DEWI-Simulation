@@ -57,6 +57,7 @@ macNeighborTableEntry::macNeighborTableEntry()
     this->dCurTXPw = -1;
     this->dDistance = -1;
     this->nNodeDegree = -1;
+    this->nLPDegree = -1;
     this->dRSSI = -1;
     this->dWeight = -1;
     this->nClusterDegree = -1;
@@ -87,6 +88,7 @@ std::string macNeighborTableEntry::info() const
     out<<" Distance: " << dDistance << "m";
     out<<" Node Degree: " << nNodeDegree;
     out<<" Cluster Degree: " << nClusterDegree;
+    out<<" LP Degree: " << nLPDegree;
     out<< " new Coverage: " << nNewCoverage;
     out<<" Second Weight: " << dWeightSecond;
     out<<" MyCH: " << (myCH?"True":"False");

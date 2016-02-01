@@ -33,6 +33,7 @@
  *     double rxPower;
  *     int clusterDegree;
  *     int nodeDegree;
+ *     int LPDegree;
  *     double txPower;
  *     double weight;
  * }
@@ -48,6 +49,7 @@ class CIDERFrame : public ::cPacket
     double rxPower_var;
     int clusterDegree_var;
     int nodeDegree_var;
+    int LPDegree_var;
     double txPower_var;
     double weight_var;
 
@@ -85,6 +87,8 @@ class CIDERFrame : public ::cPacket
     virtual void setClusterDegree(int clusterDegree);
     virtual int getNodeDegree() const;
     virtual void setNodeDegree(int nodeDegree);
+    virtual int getLPDegree() const;
+    virtual void setLPDegree(int LPDegree);
     virtual double getTxPower() const;
     virtual void setTxPower(double txPower);
     virtual double getWeight() const;

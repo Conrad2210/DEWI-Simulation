@@ -20,7 +20,8 @@ package dewi.simulations.Testing;
 
 import dewi.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
 import dewi.world.radio.ChannelControl;
-import dewi.nodes.CIDERNode.RandomPos.LampNode;
+import dewi.nodes.CIDERNode.StaticGrid.LampNode;
+import dewi.nodes.CIDERNode.RandomPos.LPNode;
 import dewi.nodes.CIDERNode.FixedPos.LightSwitch;
 import dewi.world.datacenter.DataCenter;
 
@@ -29,10 +30,11 @@ network Network
 {
     parameters:
         int numHosts;
+        int numLPDevice;
         double AreaX @unit(m) = default(80m);
         double AreaY @unit(m) = default(40m);
 
-		int GateWay = intuniform(0, numHosts);
+        int GateWay = intuniform(0, numHosts);
         double nodeSeparationX = default(0);
         double nodeSeparationY = default(0);
         int maxRow = CalcMaxRow(numHosts);
@@ -52,7 +54,11 @@ network Network
                 maxCol = maxCol;
                 //Hosts = numFixHosts;
 
-                @display("b=1.5,1.5,oval,red;;i=status/bulb;p=3.68,10.84");
+                @display("b=1.5,1.5,oval,red;i=status/bulb;p=3.68,10.84");
+        }
+        lpDevice[numLPDevice]: LPNode {
+            parameters:
+                @display("b=1.5,1.5,oval,red;i=device/cellphone;p=3.68,20");
         }
 
         channelControl: ChannelControl {
@@ -69,6 +75,6 @@ network Network
             //            networkAddress="145.236.0.0";
             @display("p=3.16,0.6");
         }
-  
+
 }
 

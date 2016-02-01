@@ -58,6 +58,8 @@ class INET_API macNeighborTableEntry : public cObject
 
         int nClusterDegree;
 
+        int nLPDegree;
+
         //rssi;
         double dRSSI;
 
@@ -531,6 +533,16 @@ class INET_API macNeighborTableEntry : public cObject
         void setLpDevice(bool lpDevice)
         {
             bLPDevice = lpDevice;
+        }
+
+        int getLpDegree() const
+        {
+            return nLPDegree;
+        }
+
+        void setLpDegree(int lpDegree)
+        {
+            nLPDegree = lpDegree;
         }
 };
 #endif /* MACNEIGHBORTABLEENTRY_H_ */

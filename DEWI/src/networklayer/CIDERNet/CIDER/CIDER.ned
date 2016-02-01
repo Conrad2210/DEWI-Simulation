@@ -26,11 +26,12 @@ simple CIDER
     string macNeighborTableModule = default("^.neighborTable");
     string RLLClusterTableModule = default("^.clusterTable");
     string cBeaconTableModule = default("^.beaconTable");
-    double w1 = default(0.35);
-    double w2 = default(0.45);
-    double w3 = default(0.2);
-    double w4 = default(0.8);
-    double w5 = default(0.2);
+    double w1 = default(0.2); //Node degree
+    double w2 = default(0.3); //Cluster degree
+    double w3 = default(0.4); //LP degree
+    double w4 = default(0.1); //RSSI
+    double w5 = default(0.8);
+    double w6 = default(0.2);
     bool LPDevice = default(false);
     gates:
 

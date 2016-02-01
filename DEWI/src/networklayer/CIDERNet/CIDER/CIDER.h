@@ -50,7 +50,8 @@ protected:
     double dOwnWeight;
     int nNodeDegree;
     int nClusterDegree;
-    double dMeanRSSI;
+    int nLPDegree;
+    double dNormRSSI;
     double w1; //weight node degree
     double w2; //weight cluster degree
     double w3; //weight mean rssi
