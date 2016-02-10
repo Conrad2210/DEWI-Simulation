@@ -93,6 +93,8 @@ class CIDER : public cSimpleModule
         double w3; //weight mean rssi
         double w4; //weight new coverage
         double w5; //weight rssi
+        double transmitterPower;
+        double txDistance;
 
 
     protected:
@@ -163,6 +165,8 @@ class CIDER : public cSimpleModule
             return pow(10, dBm / 10);
         }
         int compareMACList(macVector vec1, macVector vec2, MACAddress sender);
+
+        double calcDistance(double txPower,double rxPower);
 };
 
 #endif /* CIDER_H_ */

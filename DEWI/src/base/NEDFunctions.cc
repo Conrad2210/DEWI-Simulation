@@ -23,6 +23,38 @@ static cNEDValue calcPositionY(cComponent *context, cNEDValue argv[], int argc)
 
 Define_NED_Function(calcPositionY,"double PositionY(int nIndexHost, quantity fAreaX, quantity fAreaY)");
 
+static cNEDValue nedf_GetTXPower(cComponent *context, cNEDValue argv[], int argc)
+{
+
+    int array[] = {0,-1,-3,-5,-7,-9,-11,-13,-15,-24};
+
+    int txpowerdBm = array[intuniform(3,10)];
+
+
+    cNEDValue Value(pow(10,(double)txpowerdBm/10.0));
+    Value.setUnit("mW");
+
+    return Value;
+}
+
+Define_NED_Function(nedf_GetTXPower,"double GetTxPower()");
+
+static cNEDValue nedf_GetTXPowerdBm(cComponent *context, cNEDValue argv[], int argc)
+{
+
+
+
+    int txpowerdBm = argv[0];
+
+
+    cNEDValue Value(pow(10,(double)txpowerdBm/10.0));
+    Value.setUnit("mW");
+
+    return Value;
+}
+
+Define_NED_Function(nedf_GetTXPowerdBm,"double GetTxPowerdBm(int TxPowerdBm)");
+
 cNEDValue nedf_moduleListByPath(cComponent *context, cNEDValue argv[], int argc)
 {
     std::string modulenames;

@@ -549,7 +549,6 @@ void CSMA::updateStatusIdle(t_mac_event event, cMessage* msg)
 		if (dynamic_cast<CIDERFrame *>(msg1))
 		{
 			CIDERFrame *temp = check_and_cast<CIDERFrame*>(msg1);
-			temp->setTxPower(1);
 			temp->setRxPower(cinfo->getRecPow());
 			sendUp(temp);
 		}

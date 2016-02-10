@@ -33,6 +33,7 @@ simple CIDER
     double w5 = default(0.8);
     double w6 = default(0.2);
     bool LPDevice = default(false);
+    double transmitterPower @unit(mW);
     gates:
 
         input networkLayerIn;

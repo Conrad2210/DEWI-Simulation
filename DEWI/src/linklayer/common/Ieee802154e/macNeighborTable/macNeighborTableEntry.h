@@ -417,11 +417,11 @@ class INET_API macNeighborTableEntry : public cObject
         {
             dRSSI = mWTodBm(rssi);
             double lambda = SPEED_OF_LIGHT / 2.4e9;
-            double temp1 = dCurTXPw * pow(lambda, 2);
-            double temp2 = (16 * pow(3.14, 2) * dBmTomW(dRSSI));
-            double temp3 = temp1 / temp2;
-            double temp4 = 1.0 / 3.0;
-            dDistance = pow(temp3, temp4);
+                        double temp1 = dCurTXPw * pow(lambda, 2);
+                        double temp2 = (16 * pow(3.14, 2) * dBmTomW(dRSSI));
+                        double temp3 = temp1 / temp2;
+                        double temp4 = 1.0 / 3.0;
+                        dDistance = pow(temp3, temp4);
 
         }
 

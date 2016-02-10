@@ -235,7 +235,7 @@ macNeighborTableEntry *macNeighborTable::getNeighborByEAddr(MACAddress address)
 {
   //  if (!tmpNeighborList)
   //  {
-        for (int i = 0; idToNeighbor.size(); i++)
+        for (int i = 0; i < (int)idToNeighbor.size(); i++)
         {
             if(idToNeighbor[i]->getExtendedAddress().compareTo(address) == 0)
             {

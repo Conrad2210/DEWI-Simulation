@@ -25,6 +25,7 @@
 Define_Module(CIDER);
 
 const static int numberOfBytes = 3;
+const static double sensitivity = -90.0;
 CIDER::CIDER()
 {
     // TODO Auto-generated constructor stub
@@ -56,6 +57,9 @@ void CIDER::initialize(int stage)
         w3 = par("w3").doubleValue();
         w4 = par("w4").doubleValue();
         w5 = par("w5").doubleValue();
+        transmitterPower = par("transmitterPower").doubleValue();
+
+        txDistance = calcDistance(transmitterPower, dBmTomW(sensitivity));
         if (par("LPDevice").boolValue())
             NodeOperationMode = CIDERMode::LP;
         else
@@ -236,30 +240,30 @@ void CIDER::calcWeight()
 
 void CIDER::CIDERPingMessage(cMessage* msg)
 {
-    if (counterPing < 2)
+
+    CIDERFrame *newFrame = new CIDERFrame("CIDERPing", CIDERPing);
+    CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+    newFrame->setControlInfo(cntrl);
+    newFrame->setSrcAddress(myInterface->getMacAddress());
+    newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+    newFrame->setNodeDegree(nNodeDegree);
+    newFrame->setClusterDegree(nClusterDegree);
+    newFrame->setLPDegree(nLPDegree);
+    newFrame->setTxPower(transmitterPower);
+    if (NodeOperationMode == CIDERMode::LP)
+        newFrame->setLPDevice(true);
+    else
+        newFrame->setLPDevice(false);
+    for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
     {
-        CIDERFrame *newFrame = new CIDERFrame("CIDERPing", CIDERPing);
-        CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
-        newFrame->setControlInfo(cntrl);
-        newFrame->setSrcAddress(myInterface->getMacAddress());
-        newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
-        newFrame->setNodeDegree(nNodeDegree);
-        newFrame->setClusterDegree(nClusterDegree);
-        newFrame->setLPDegree(nLPDegree);
-        if (NodeOperationMode == CIDERMode::LP)
-            newFrame->setLPDevice(true);
-        else
-            newFrame->setLPDevice(false);
-        for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
+        if (neighbourTable->getNeighborByPos(i)->isPosCluster())
         {
-            if (neighbourTable->getNeighborByPos(i)->isPosCluster())
-            {
-                newFrame->setClusterDegree(newFrame->getClusterDegree() + 1);
-            }
+            newFrame->setClusterDegree(newFrame->getClusterDegree() + 1);
         }
-        send(newFrame, networkLayerOut);
-        counterPing++;
     }
+    send(newFrame, networkLayerOut);
+    counterPing++;
+
 }
 
 void CIDER::handle_CIDERPingMessage(cMessage* msg)
@@ -270,27 +274,31 @@ void CIDER::handle_CIDERPingMessage(cMessage* msg)
     }
     CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
 
-    macNeighborTableEntry *entry = new macNeighborTableEntry();
-    entry->setExtendedAddress(recFrame->getSrcAddress());
-    entry->setCurTxPw(recFrame->getTxPower());
-    entry->setRssi(recFrame->getRxPower());
-    entry->setNodeDegree(recFrame->getNodeDegree());
-    entry->setClusterDegree(recFrame->getClusterDegree());
-    entry->setLpDegree(recFrame->getLPDegree());
-    entry->setLpDevice(recFrame->getLPDevice());
-    nNodeDegree++;
-
-    if (entry->getRssidBm() > -80.0)
+    double rxDistance = calcDistance(recFrame->getTxPower(),recFrame->getRxPower());
+    if (txDistance > rxDistance)
     {
-        entry->setPosCluster(true);
-        myMACList.push_back(entry->getExtendedAddress().getLastKBytes(numberOfBytes));
-        nClusterDegree++;
+        macNeighborTableEntry *entry = new macNeighborTableEntry();
+        entry->setExtendedAddress(recFrame->getSrcAddress());
+        entry->setCurTxPw(recFrame->getTxPower());
+        entry->setRssi(recFrame->getRxPower());
+        entry->setNodeDegree(recFrame->getNodeDegree());
+        entry->setClusterDegree(recFrame->getClusterDegree());
+        entry->setLpDegree(recFrame->getLPDegree());
+        entry->setLpDevice(recFrame->getLPDevice());
+        nNodeDegree++;
 
-        if (entry->isLpDevice())
-            nLPDegree++;
+        if (entry->getRssidBm() > -80.0)
+        {
+            entry->setPosCluster(true);
+            myMACList.push_back(entry->getExtendedAddress().getLastKBytes(numberOfBytes));
+            nClusterDegree++;
+
+            if (entry->isLpDevice())
+                nLPDegree++;
+        }
+        entry->setLastPktReceived(simTime());
+        neighbourTable->addNeighbor(entry);
     }
-    entry->setLastPktReceived(simTime());
-    neighbourTable->addNeighbor(entry);
     uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
     double delay = uniform(simTime().dbl() + 1,
             simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
@@ -320,6 +328,7 @@ void CIDER::CIDERNeighbourUpdate(cMessage* msg)
         newFrame->setNodeDegree(nNodeDegree);
         newFrame->setClusterDegree(nClusterDegree);
         newFrame->setLPDegree(nLPDegree);
+        newFrame->setTxPower(transmitterPower);
         for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
         {
             if (neighbourTable->getNeighborByPos(i)->isPosCluster())
@@ -358,7 +367,8 @@ void CIDER::handle_CIDERNeighbourUpdate(cMessage* msg)
         neighbourTable->editNeighbor(entry);
     }
     uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
-    double delay = (double) (temp % 0xFFFF) * 0.01 + 20;
+    double delay = uniform(simTime().dbl() + 1,
+            simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
     scheduleAt(delay, timerWeight);
     delete recFrame;
     recFrame = NULL;
@@ -377,6 +387,8 @@ void CIDER::CIDERWeightUpdate(cMessage* msg)
         newFrame->setLPDevice(true);
     else
         newFrame->setLPDevice(false);
+
+    newFrame->setTxPower(transmitterPower);
     newFrame->setNodeDegree(neighbourTable->getNumNeighbors());
     for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
     {
@@ -411,7 +423,8 @@ void CIDER::handle_CIDERWeightUpdate(cMessage* msg)
         neighbourTable->editNeighbor(entry);
     }
     uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
-    double delay = (double) (temp % 0xFFFF) * 0.01 + 30;
+    double delay = uniform(simTime().dbl() + 1,
+            simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
     scheduleAt(delay, timerCompWeight);
     delete recFrame;
     recFrame = NULL;
@@ -441,13 +454,10 @@ void CIDER::CIDERCompWeight(cMessage* msg)
     tempStr->parse("b=1.5,1.5,oval,orange;i=device/accesspoint");
 
     parentDisp->updateWith(*tempStr);
-    double waitTime = 0.0;
-    if (nNodeDegree / 100.0 < 0.5)
-        waitTime = uniform(0.5, 1.5);
-    else
-        waitTime = uniform(nNodeDegree / 100.0, 2 * (nNodeDegree / 100.0));
+    double delay = uniform(simTime().dbl() + 1,
+            simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
 
-    scheduleAt(simTime() + waitTime, timerCompetition);
+    scheduleAt(delay, timerCompetition);
 }
 
 void CIDER::handle_CIDERCompWeight(cMessage* msg)
@@ -466,11 +476,13 @@ void CIDER::CIDERCHCompetition(cMessage* msg)
     else
         newFrame->setLPDevice(false);
     newFrame->setWeight(dOwnWeight);
+    newFrame->setTxPower(transmitterPower);
     send(newFrame, networkLayerOut);
 
-    double waitTime = uniform(0.5, 1.5);
+    double delay = uniform(simTime().dbl() + 1,
+            simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
 
-    scheduleAt(simTime() + waitTime, timerAdvert);
+    scheduleAt(delay, timerAdvert);
 }
 
 void CIDER::handle_CIDERCHCompetition(cMessage* msg)
@@ -507,6 +519,7 @@ void CIDER::CIDERClusterAdvert(cMessage* msg)
     newFrame->setControlInfo(cntrl);
     newFrame->setSrcAddress(myInterface->getMacAddress());
     newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+    newFrame->setTxPower(transmitterPower);
     if (NodeOperationMode == CIDERMode::LP)
         newFrame->setLPDevice(true);
     else
@@ -539,15 +552,18 @@ void CIDER::CIDERClusterAdvert(cMessage* msg)
 void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
 {
     CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-    NodeOperationMode = CIDERMode::CS;
+    if (NodeOperationMode != CIDERMode::LP)
+        NodeOperationMode = CIDERMode::CS;
+
     if (mWTodBm(recFrame->getRxPower()) > -80 && parent == NULL)
     {
 
         macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
-        if (entry->getAssignedTo() == -1)
+        if (entry != NULL)
         {
-            if (entry != NULL)
+            if (entry->getAssignedTo() == -1)
             {
+
                 entry->isMyCH(true);
                 neighbourTable->editNeighbor(entry);
                 parent = entry;
@@ -556,7 +572,7 @@ void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
             cDisplayString* parentDisp = &getParentModule()->getDisplayString();
             cDisplayString* tempStr = new cDisplayString();
 
-            if (!LPDevice)
+            if (NodeOperationMode != CIDERMode::LP)
                 tempStr->parse("b=1.5,1.5,oval,orange;i=status/bulb");
             else
                 tempStr->parse("b=1.5,1.5,oval,orange;i=device/cellphone");
@@ -594,6 +610,7 @@ void CIDER::CIDERCHElection(cMessage* msg)
         newFrame->setSrcAddress(myInterface->getMacAddress());
         newFrame->setDstAddress(neighbourTable->getNeighborById(index)->getExtendedAddress());
         newFrame->setLPDevice(LPDevice);
+        newFrame->setTxPower(transmitterPower);
         newFrame->setMacAddressesList(assignedCS);
         send(newFrame, networkLayerOut);
         neighbourTable->getNeighborById(index)->setAssignedTo(
@@ -655,6 +672,7 @@ void CIDER::CIDERParentUpdater(cMessage* msg)
     newFrame->setSrcAddress(myInterface->getMacAddress());
     newFrame->setDstAddress(parent->getExtendedAddress());
     newFrame->setLPDevice(LPDevice);
+    newFrame->setTxPower(transmitterPower);
     newFrame->setMacAddressesList(assignedCS);
     send(newFrame, networkLayerOut);
 }
@@ -710,6 +728,7 @@ void CIDER::CIDERCoverageUpdater(cMessage* msg)
     newFrame->setSrcAddress(myInterface->getMacAddress());
     newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
     newFrame->setLPDevice(LPDevice);
+    newFrame->setTxPower(transmitterPower);
     newFrame->setMacAddressesList(assignedCS);
     send(newFrame, networkLayerOut);
 }
@@ -746,6 +765,7 @@ void CIDER::CIDERCHDelection(cMessage* msg)
     newFrame->setSrcAddress(myInterface->getMacAddress());
     newFrame->setDstAddress(delectAddr);
     newFrame->setLPDevice(LPDevice);
+    newFrame->setTxPower(transmitterPower);
     send(newFrame, networkLayerOut);
 }
 
@@ -757,7 +777,7 @@ void CIDER::handle_CIDERCHDelection(cMessage* msg)
     cDisplayString* parentDisp = &getParentModule()->getDisplayString();
     cDisplayString* tempStr = new cDisplayString();
 
-    if (!LPDevice)
+    if (NodeOperationMode != CIDERMode::LP)
         tempStr->parse("b=1.5,1.5,oval,red;i=status/bulb");
     else
         tempStr->parse("b=1.5,1.5,oval,red;i=device/cellphone");
@@ -778,6 +798,7 @@ void CIDER::CIDERCSDelection(cMessage* msg)
     newFrame->setSrcAddress(myInterface->getMacAddress());
     newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
     newFrame->setLPDevice(LPDevice);
+    newFrame->setTxPower(transmitterPower);
 
     for (int i = 0; i < (int) assignedCS.size(); i++)
     {
@@ -797,7 +818,8 @@ void CIDER::CIDERCSDelection(cMessage* msg)
 
 void CIDER::handle_CIDERCSDelection(cMessage* msg)
 {
-    NodeOperationMode = CIDERMode::undefined;
+    if (NodeOperationMode != CIDERMode::LP)
+        NodeOperationMode = CIDERMode::undefined;
     CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
     macNeighborTableEntry *entry;
 
@@ -807,7 +829,7 @@ void CIDER::handle_CIDERCSDelection(cMessage* msg)
         cDisplayString* parentDisp = &getParentModule()->getDisplayString();
         cDisplayString* tempStr = new cDisplayString();
 
-        if (!LPDevice)
+        if (NodeOperationMode != CIDERMode::LP)
             tempStr->parse("b=1.5,1.5,oval,red;i=status/bulb");
         else
             tempStr->parse("b=1.5,1.5,oval,red;i=device/cellphone");
@@ -827,6 +849,7 @@ void CIDER::CIDERDelectionUpdate(cMessage* msg)
     newFrame->setSrcAddress(myInterface->getMacAddress());
     newFrame->setDstAddress(parent->getExtendedAddress());
     newFrame->setLPDevice(LPDevice);
+    newFrame->setTxPower(transmitterPower);
     newFrame->setMacAddressesList(assignedCS);
     send(newFrame, networkLayerOut);
     parent = NULL;
@@ -883,4 +906,15 @@ void CIDER::updatedisplay()
     else
         sprintf(buf, "-1");
     parentDisp->setTagArg("t", 0, buf);
+}
+
+double CIDER::calcDistance(double txPower, double rxPower)
+{
+
+    double lambda = SPEED_OF_LIGHT / 2.4e9;
+    double temp1 = txPower * pow(lambda, 2);
+    double temp2 = (16 * pow(3.14, 2) * rxPower);
+    double temp3 = temp1 / temp2;
+    double temp4 = 1.0 / 3.0;
+    return pow(temp3, temp4);
 }
