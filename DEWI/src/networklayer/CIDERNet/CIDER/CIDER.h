@@ -79,6 +79,9 @@ class CIDER : public cSimpleModule
         virtual void CIDERDelectionUpdate(cMessage *msg);
         virtual void handle_CIDERDelectionUpdate(cMessage *msg);
 
+        virtual void CIDERLPPingMessage(cMessage *msg);
+        virtual void handle_CIDERLPPingMessage(cMessage *msg);
+
         bool LPDevice;
         int networkLayerIn;
         int networkLayerOut;
@@ -120,6 +123,7 @@ class CIDER : public cSimpleModule
         cMessage *timerDelectCH;
         cMessage *timerDelectCHRep;
         cMessage *timerDelectCS;
+        cMessage *timerLPPing;
 
         macNeighborTableEntry *parent;
         macVector myMACList;
@@ -152,6 +156,8 @@ class CIDER : public cSimpleModule
             CIDERDelectCHRep = 520,
             CIDERDelectCSTimer = 521,
             CIDERDelectCS = 522,
+            CIDERLPPingTimer = 523,
+            CIDERLPPing = 524
         };
 
     private:

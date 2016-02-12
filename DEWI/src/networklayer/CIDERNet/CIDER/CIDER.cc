@@ -82,6 +82,7 @@ void CIDER::initialize(int stage)
         timerCoverageUpdate = new cMessage("CoverageUpdateTimer", CIDERCoverageUpdateTimer);
         timerDelectCH = new cMessage("DelectCHTimer", CIDERDelectCHTimer);
         timerDelectCS = new cMessage("DelectCSTimer", CIDERDelectCSTimer);
+        timerLPPing = new cMessage("LPPing", CIDERLPPingTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
@@ -160,6 +161,9 @@ void CIDER::handleSelfMessage(cMessage* msg)
             break;
         case CIDERDelectCHRepTimer:
             CIDERDelectionUpdate(NULL);
+            break;
+        case CIDERLPPingTimer:
+            CIDERLPPingMessage(NULL);
             break;
         default:
             EV << "unknown timer, nothing to do, yet";
@@ -274,7 +278,7 @@ void CIDER::handle_CIDERPingMessage(cMessage* msg)
     }
     CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
 
-    double rxDistance = calcDistance(recFrame->getTxPower(),recFrame->getRxPower());
+    double rxDistance = calcDistance(recFrame->getTxPower(), recFrame->getRxPower());
     if (txDistance > rxDistance)
     {
         macNeighborTableEntry *entry = new macNeighborTableEntry();
@@ -310,8 +314,6 @@ void CIDER::handle_CIDERPingMessage(cMessage* msg)
 
 void CIDER::CIDERNeighbourUpdate(cMessage* msg)
 {
-    if (NodeOperationMode == CIDERMode::LP)
-        return;
 
     if (counterPing < 2)
     { //here also calc weight for each node;
@@ -377,7 +379,11 @@ void CIDER::handle_CIDERNeighbourUpdate(cMessage* msg)
 
 void CIDER::CIDERWeightUpdate(cMessage* msg)
 {
+
     calcWeight();
+    if (NodeOperationMode == CIDERMode::LP)
+        return;
+
     CIDERFrame *newFrame = new CIDERFrame("CIDERWeightMessage", CIDERWeightMessage);
     CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
     newFrame->setControlInfo(cntrl);
@@ -434,7 +440,10 @@ void CIDER::handle_CIDERWeightUpdate(cMessage* msg)
 void CIDER::CIDERCompWeight(cMessage* msg)
 {
     if (NodeOperationMode == CIDERMode::LP)
+    {
+        scheduleAt(simTime() + uniform(5, 10), timerLPPing);
         return;
+    }
     for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
     {
         int temp = getParentModule()->getIndex();
@@ -555,12 +564,16 @@ void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
     if (NodeOperationMode != CIDERMode::LP)
         NodeOperationMode = CIDERMode::CS;
 
+
+
     if (mWTodBm(recFrame->getRxPower()) > -80 && parent == NULL)
     {
 
         macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
         if (entry != NULL)
         {
+            if (timerLPPing->isScheduled())
+                    cancelEvent(timerLPPing);
             if (entry->getAssignedTo() == -1)
             {
 
@@ -578,7 +591,14 @@ void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
                 tempStr->parse("b=1.5,1.5,oval,orange;i=device/cellphone");
 
             parentDisp->updateWith(*tempStr);
+        }else
+        {
+            if (NodeOperationMode == CIDERMode::LP)
+            {
+                scheduleAt(simTime() + uniform(5,10),timerLPPing);
+            }
         }
+
     }
     delete recFrame;
     recFrame = NULL;
@@ -906,6 +926,14 @@ void CIDER::updatedisplay()
     else
         sprintf(buf, "-1");
     parentDisp->setTagArg("t", 0, buf);
+}
+
+void CIDER::CIDERLPPingMessage(cMessage* msg)
+{
+}
+
+void CIDER::handle_CIDERLPPingMessage(cMessage* msg)
+{
 }
 
 double CIDER::calcDistance(double txPower, double rxPower)
