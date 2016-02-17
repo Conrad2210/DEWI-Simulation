@@ -52,7 +52,7 @@ macNeighborTableEntry::macNeighborTableEntry()
     myCH = false;
     myCS = false;
     bLPDevice = false;
-    lastPktReceived = SimTime(0.0);
+    lastPktReceived = 0;
     this->nNewCoverage = -1;
     this->dCurTXPw = -1;
     this->dDistance = -1;

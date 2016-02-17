@@ -82,6 +82,11 @@ class CIDER : public cSimpleModule
         virtual void CIDERLPPingMessage(cMessage *msg);
         virtual void handle_CIDERLPPingMessage(cMessage *msg);
 
+        virtual void CIDERLPCHMessage(cMessage *msg);
+
+        virtual void CIDERLPCHElectionMessage(cMessage *msg);
+        virtual void handle_CIDERLPCHElectionMessage(cMessage *msg);
+
         bool LPDevice;
         int networkLayerIn;
         int networkLayerOut;
@@ -124,10 +129,13 @@ class CIDER : public cSimpleModule
         cMessage *timerDelectCHRep;
         cMessage *timerDelectCS;
         cMessage *timerLPPing;
+        cMessage *timerLPCH;
+        cMessage *timerLPCHElection;
 
         macNeighborTableEntry *parent;
         macVector myMACList;
         macVector assignedCS;
+        macVector lpCH;
         MACAddress delectAddr;
 
         enum CIDERFrames
@@ -157,10 +165,16 @@ class CIDER : public cSimpleModule
             CIDERDelectCSTimer = 521,
             CIDERDelectCS = 522,
             CIDERLPPingTimer = 523,
-            CIDERLPPing = 524
+            CIDERLPPing = 524,
+            CIDERLPCHTimer = 525,
+            CIDERLPCHElectionTimer = 526,
+            CIDERLPCHElection = 527
         };
 
     private:
+        void cleanNeighbourTable();
+        int checkForLPDevices();
+
         double mWTodBm(double mW)
         {
             return 10 * log10(mW);

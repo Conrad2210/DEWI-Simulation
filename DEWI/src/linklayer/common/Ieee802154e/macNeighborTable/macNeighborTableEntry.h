@@ -81,7 +81,7 @@ class INET_API macNeighborTableEntry : public cObject
 
         int nAssigndTo; //last 3 bytes of mac address
 
-        SimTime lastPktReceived;
+        double lastPktReceived;
 
         /* The allocating Superframe Duration (SD) index number for beacon frame. (not use in TSCH)*/
         UINT_16 SDIndex;
@@ -475,12 +475,12 @@ class INET_API macNeighborTableEntry : public cObject
             nNewCoverage = newCoverage;
         }
 
-        const SimTime& getLastPktReceived() const
+        const double& getLastPktReceived() const
         {
             return lastPktReceived;
         }
 
-        void setLastPktReceived(const SimTime& lastPktReceived)
+        void setLastPktReceived(const double& lastPktReceived)
         {
             this->lastPktReceived = lastPktReceived;
         }

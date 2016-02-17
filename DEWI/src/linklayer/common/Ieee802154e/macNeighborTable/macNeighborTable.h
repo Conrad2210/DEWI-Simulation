@@ -49,7 +49,7 @@ class INET_API macNeighborTable: public cSimpleModule, public IMacNeighborTable,
         //fields to support getNumNeighbors() and getNeighbor(pos)
         int tmpNumNeighbors; //caches number of non-NULL elements of idToNeighbor; -1 if invalid
         macNeighborTableEntry **tmpNeighborList; // caches non-NULL elements of idToNeighbor; NULL if invalid
-
+        int id;
     protected:
         //display summary above icon
         virtual void updateDisplayString();

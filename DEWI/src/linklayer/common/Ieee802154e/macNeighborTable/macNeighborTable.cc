@@ -53,6 +53,7 @@ macNeighborTable::macNeighborTable()
     nb = NULL;
     tmpNumNeighbors = -1;
     tmpNeighborList = NULL;
+    id = NEIGHBORIDS_START;
 }
 
 macNeighborTable::~macNeighborTable()
@@ -233,25 +234,30 @@ macNeighborTableEntry *macNeighborTable::getNeighborBySAddr(UINT_16 address)
 
 macNeighborTableEntry *macNeighborTable::getNeighborByEAddr(MACAddress address)
 {
-  //  if (!tmpNeighborList)
-  //  {
-        for (int i = 0; i < (int)idToNeighbor.size(); i++)
+    //  if (!tmpNeighborList)
+    //  {
+    for (int i = 0; i < (int) idToNeighbor.size(); i++)
+    {
+        if (idToNeighbor[i]->getExtendedAddress().compareTo(address) == 0)
         {
-            if(idToNeighbor[i]->getExtendedAddress().compareTo(address) == 0)
-            {
-                return idToNeighbor[i];
-            }
+            return idToNeighbor[i];
+        }
 //            if (idToNeighbor[i]->getExtendedAddress().getInt() == address.getInt())
 //                return idToNeighbor[i];
-        }
+    }
     //}
     return NULL;
 }
 
 macNeighborTableEntry *macNeighborTable::getNeighborById(int id)
 {
-    id -= NEIGHBORIDS_START;
-    return (id < 0 || id >= (int) idToNeighbor.size()) ? NULL : idToNeighbor[id];
+    for (int i = 0; i < (int) idToNeighbor.size(); i++)
+    {
+        if (idToNeighbor.at(i)->getNeighborId() == id)
+            return idToNeighbor.at(i);
+    }
+
+    return NULL;
 }
 
 bool macNeighborTable::isNeighborBySAddr(UINT_16 address)
@@ -280,9 +286,9 @@ bool macNeighborTable::addNeighbor(macNeighborTableEntry *entry)
     if (!nb)
         throw cRuntimeError("NeighborTable must precede all node Neighbors");
 
-    entry->setNeighborId(NEIGHBORIDS_START + idToNeighbor.size());
+    entry->setNeighborId(id++);
 
-    //check name is unique
+//check name is unique
     if (getNeighborById(entry->getNeighborId()) != NULL)
         throw cRuntimeError("addNeighbor(): Neighbor '%d' not found in Neighbor table", entry->getNeighborId());
 
@@ -301,18 +307,25 @@ bool macNeighborTable::deleteNeighbor(macNeighborTableEntry *entry)
     if (entry != getNeighborById(id))
         throw cRuntimeError("deleteNeighbor(): Neighbor '%d' not found in Neighbor table", entry->getNeighborId());
 
-    nb->fireChangeNotification(NF_NEIGHBOR_DELETED, entry);
-    idToNeighbor.erase(idToNeighbor.begin() + (id - NEIGHBORIDS_START));
-    delete entry;
-    invalidTmpNeighborList();
-    return true;
+    for (int i = 0; i < (int)idToNeighbor.size(); i++)
+    {
+        if (idToNeighbor.at(i) == entry)
+        {
+            nb->fireChangeNotification(NF_NEIGHBOR_DELETED, entry);
+            idToNeighbor.erase(idToNeighbor.begin() + i);
+            delete entry;
+            invalidTmpNeighborList();
+            return true;
+        }
+    }
+    return false;
 }
 
 void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
 {
     std::string nodename = getParentModule()->getFullName();
     bool tmp = false; //variable for checking if something changed
-    //check if Neighbor exists
+//check if Neighbor exists
     if (getNeighborById(entry->getNeighborId()) == NULL)
     {
         if (ev.isGUI())
@@ -322,10 +335,10 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         return;
     }
 
-    //Neighbor before
+//Neighbor before
     nb->fireChangeNotification(NF_NEIGHBOR_CONFIG_CHANGED, getNeighborById(entry->getNeighborId()));
 
-    //change NeighborSize if different and != -1
+//change NeighborSize if different and != -1
     if (entry->getNeighborSize() != getNeighborById(entry->getNeighborId())->getNeighborSize()
             && entry->getNeighborSize() != -1)
     {
@@ -335,7 +348,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change ShortAddress if different
+//change ShortAddress if different
     if (entry->getShortAddress() != getNeighborById(entry->getNeighborId())->getShortAddress())
     {
         if (ev.isGUI())
@@ -344,7 +357,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change ExtendedAddress if different
+//change ExtendedAddress if different
     if (entry->getExtendedAddress() != getNeighborById(entry->getNeighborId())->getExtendedAddress())
     {
         if (ev.isGUI())
@@ -353,7 +366,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change SD-Index if different
+//change SD-Index if different
     if (entry->getSDIndex() != getNeighborById(entry->getNeighborId())->getSDIndex())
     {
         if (ev.isGUI())
@@ -362,7 +375,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change ChannelOffset if different
+//change ChannelOffset if different
     if (entry->getChannelOffset() != getNeighborById(entry->getNeighborId())->getChannelOffset())
     {
         if (ev.isGUI())
@@ -371,7 +384,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change TrackBeacon if different
+//change TrackBeacon if different
     if (entry->getTrackBeacon() != getNeighborById(entry->getNeighborId())->getTrackBeacon())
     {
         if (ev.isGUI())
@@ -380,7 +393,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change BeaconLostCount if different
+//change BeaconLostCount if different
     if (entry->getBeaconLostCount() != getNeighborById(entry->getNeighborId())->getBeaconLostCount())
     {
         if (ev.isGUI())
@@ -389,7 +402,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change NumTxData if different
+//change NumTxData if different
     if (entry->getNumTxData() != getNeighborById(entry->getNeighborId())->getNumTxData())
     {
         if (ev.isGUI())
@@ -398,7 +411,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change NumTxDataAck if different
+//change NumTxDataAck if different
     if (entry->getNumTxDataAck() != getNeighborById(entry->getNeighborId())->getNumTxDataAck())
     {
         if (ev.isGUI())
@@ -407,7 +420,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change NumRxData if different
+//change NumRxData if different
     if (entry->getNumRxData() != getNeighborById(entry->getNeighborId())->getNumRxData())
     {
         if (ev.isGUI())
@@ -416,7 +429,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change NumRxDataAck if different
+//change NumRxDataAck if different
     if (entry->getNumRxDataAck() != getNeighborById(entry->getNeighborId())->getNumRxDataAck())
     {
         if (ev.isGUI())
@@ -425,7 +438,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change LastASN if different
+//change LastASN if different
     if (entry->getLastASN() != getNeighborById(entry->getNeighborId())->getLastASN())
     {
         if (ev.isGUI())
@@ -434,7 +447,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change RPLrank if different
+//change RPLrank if different
     if (entry->getRPLrank() != getNeighborById(entry->getNeighborId())->getRPLrank())
     {
         if (ev.isGUI())
@@ -443,7 +456,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change IsTimeSource if different
+//change IsTimeSource if different
     if (entry->getIsTimeSource() != getNeighborById(entry->getNeighborId())->getIsTimeSource())
     {
         if (ev.isGUI())
@@ -452,7 +465,7 @@ void macNeighborTable::editNeighbor(macNeighborTableEntry *entry)
         tmp = true;
     }
 
-    //change RPL_OF if different
+//change RPL_OF if different
     if (entry->getRPL_OF() != getNeighborById(entry->getNeighborId())->getRPL_OF())
     {
         if (ev.isGUI())
@@ -509,9 +522,9 @@ MACAddress macNeighborTable::getAddressFromCH()
 
 macNeighborTableEntry* macNeighborTable::getNeighborByLastBytes(int addr, int numberBytes)
 {
-    for(int i = 0; i < this->getNumNeighbors(); i++)
+    for (int i = 0; i < this->getNumNeighbors(); i++)
     {
-        if(getNeighborByPos(i)->getExtendedAddress().getLastKBytes(numberBytes) == addr)
+        if (getNeighborByPos(i)->getExtendedAddress().getLastKBytes(numberBytes) == addr)
         {
             return getNeighborByPos(i);
         }

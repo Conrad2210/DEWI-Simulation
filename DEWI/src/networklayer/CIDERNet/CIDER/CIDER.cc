@@ -83,6 +83,8 @@ void CIDER::initialize(int stage)
         timerDelectCH = new cMessage("DelectCHTimer", CIDERDelectCHTimer);
         timerDelectCS = new cMessage("DelectCSTimer", CIDERDelectCSTimer);
         timerLPPing = new cMessage("LPPing", CIDERLPPingTimer);
+        timerLPCH = new cMessage("LPCHCheck",CIDERLPCHTimer);
+        timerLPCHElection = new cMessage("LPCHElectionTimer",CIDERLPCHElectionTimer);
         scheduleAt(startTime, timerInitialPing);
         WATCH(dOwnWeight);
         WATCH(nNodeDegree);
@@ -165,6 +167,9 @@ void CIDER::handleSelfMessage(cMessage* msg)
         case CIDERLPPingTimer:
             CIDERLPPingMessage(NULL);
             break;
+        case CIDERLPCHTimer:
+            CIDERLPCHMessage(NULL);
+            break;
         default:
             EV << "unknown timer, nothing to do, yet";
             break;
@@ -210,6 +215,9 @@ void CIDER::handleCIDERMessage(cMessage* msg)
             break;
         case CIDERDelectCS:
             handle_CIDERCSDelection(msg);
+            break;
+        case CIDERLPPing:
+            handle_CIDERLPPingMessage(msg);
             break;
         default:
             EV << "[CIDER]: Unknown message type, nothing to do, yet";
@@ -300,7 +308,7 @@ void CIDER::handle_CIDERPingMessage(cMessage* msg)
             if (entry->isLpDevice())
                 nLPDegree++;
         }
-        entry->setLastPktReceived(simTime());
+        entry->setLastPktReceived(simTime().dbl());
         neighbourTable->addNeighbor(entry);
     }
     uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
@@ -365,7 +373,7 @@ void CIDER::handle_CIDERNeighbourUpdate(cMessage* msg)
         entry->setClusterDegree(recFrame->getClusterDegree());
         entry->setLpDegree(recFrame->getLPDegree());
         entry->setLpDevice(recFrame->getLPDevice());
-        entry->setLastPktReceived(simTime());
+        entry->setLastPktReceived(simTime().dbl());
         neighbourTable->editNeighbor(entry);
     }
     uint64_t temp = myInterface->getMacAddress().getInt() - 0xaaa00feff000000;
@@ -424,7 +432,7 @@ void CIDER::handle_CIDERWeightUpdate(cMessage* msg)
         entry->setNodeDegree(recFrame->getNodeDegree());
         entry->setClusterDegree(recFrame->getClusterDegree());
         entry->setWeight(recFrame->getWeight());
-        entry->setLastPktReceived(simTime());
+        entry->setLastPktReceived(simTime().dbl());
         entry->setLpDevice(recFrame->getLPDevice());
         neighbourTable->editNeighbor(entry);
     }
@@ -441,8 +449,7 @@ void CIDER::CIDERCompWeight(cMessage* msg)
 {
     if (NodeOperationMode == CIDERMode::LP)
     {
-        scheduleAt(simTime() + uniform(5, 10), timerLPPing);
-        return;
+      return;
     }
     for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
     {
@@ -550,6 +557,8 @@ void CIDER::CIDERClusterAdvert(cMessage* msg)
 
         }
     }
+
+
     if (parent == NULL)
         scheduleAt(simTime() + 0.2, timerElectChildCH);
     else
@@ -560,10 +569,13 @@ void CIDER::CIDERClusterAdvert(cMessage* msg)
 
 void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
 {
+
     CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
     if (NodeOperationMode != CIDERMode::LP)
         NodeOperationMode = CIDERMode::CS;
 
+    if (timerLPPing->isScheduled())
+            cancelEvent(timerLPPing);
 
 
     if (mWTodBm(recFrame->getRxPower()) > -80 && parent == NULL)
@@ -572,8 +584,6 @@ void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
         macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
         if (entry != NULL)
         {
-            if (timerLPPing->isScheduled())
-                    cancelEvent(timerLPPing);
             if (entry->getAssignedTo() == -1)
             {
 
@@ -591,10 +601,12 @@ void CIDER::handle_CIDERClusterAdvert(cMessage* msg)
                 tempStr->parse("b=1.5,1.5,oval,orange;i=device/cellphone");
 
             parentDisp->updateWith(*tempStr);
+
         }else
         {
             if (NodeOperationMode == CIDERMode::LP)
             {
+
                 scheduleAt(simTime() + uniform(5,10),timerLPPing);
             }
         }
@@ -635,10 +647,6 @@ void CIDER::CIDERCHElection(cMessage* msg)
         send(newFrame, networkLayerOut);
         neighbourTable->getNeighborById(index)->setAssignedTo(
                 myInterface->getMacAddress().getLastKBytes(numberOfBytes));
-    }
-    else
-    {
-        scheduleAt(simTime() + 0.2, timerCoverageUpdate);
     }
 }
 
@@ -742,39 +750,32 @@ void CIDER::handle_CIDERParentUpdater(cMessage* msg)
 
 void CIDER::CIDERCoverageUpdater(cMessage* msg)
 {
-    CIDERFrame *newFrame = new CIDERFrame("CoverageUpdate", CIDERCoverageUpdate);
+    nLPDegree = checkForLPDevices();
+    CIDERFrame *newFrame = new CIDERFrame("DelectCH", CIDERCoverageUpdate);
     CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
     newFrame->setControlInfo(cntrl);
     newFrame->setSrcAddress(myInterface->getMacAddress());
-    newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+    newFrame->setDstAddress(parent->getExtendedAddress());
     newFrame->setLPDevice(LPDevice);
     newFrame->setTxPower(transmitterPower);
-    newFrame->setMacAddressesList(assignedCS);
+    newFrame->setLPDegree(nLPDegree);
     send(newFrame, networkLayerOut);
+
 }
 
 void CIDER::handle_CIDERCoverageUpdater(cMessage* msg)
 {
+    //do Something
     CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
-    macNeighborTableEntry *entry;
-    macVector temp = recFrame->getMacAddressesList();
-    int tempSize = temp.size();
-    for (int i = 0; i < neighbourTable->getNumNeighbors(); i++)
-    {
-        entry = neighbourTable->getNeighborByPos(i);
-        for (int k = 0; k < (int) temp.size(); k++)
-        {
-            if (entry->getExtendedAddress().compareTo(temp.at(k), numberOfBytes) == 0
-                    && entry->getAssignedTo() != myInterface->getMacAddress().getLastKBytes(numberOfBytes))
-            {
-                entry->setAssignedTo(recFrame->getSrcAddress().getLastKBytes(numberOfBytes));
-            }
 
-        }
-    }
-    delete recFrame;
-    recFrame = NULL;
-    msg = NULL;
+    macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
+    entry->setLpDegree(recFrame->getLPDegree());
+    entry->setLastPktReceived(simTime().dbl());
+
+    lpCH.push_back(entry->getExtendedAddress().getLastKBytes(numberOfBytes));
+    double delay = uniform(simTime().dbl() + 1,simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
+    scheduleAt(delay, timerLPCH);
+
 }
 
 void CIDER::CIDERCHDelection(cMessage* msg)
@@ -930,9 +931,140 @@ void CIDER::updatedisplay()
 
 void CIDER::CIDERLPPingMessage(cMessage* msg)
 {
+    //Sent LP Ping
+
+    CIDERFrame *newFrame = new CIDERFrame("DelectCHRep", CIDERLPPing);
+    CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+    newFrame->setControlInfo(cntrl);
+    newFrame->setSrcAddress(myInterface->getMacAddress());
+    newFrame->setDstAddress(MACAddress::BROADCAST_ADDRESS);
+    newFrame->setLPDevice(LPDevice);
+    newFrame->setTxPower(transmitterPower);
+    newFrame->setMacAddressesList(assignedCS);
+    send(newFrame, networkLayerOut);
+    parent = NULL;
+
+
+    if(timerLPPing->isScheduled())
+        cancelEvent(timerLPPing);
+
+    scheduleAt(simTime()+60,timerLPPing);
 }
 
 void CIDER::handle_CIDERLPPingMessage(cMessage* msg)
+{
+    if(timerCoverageUpdate->isScheduled())
+        cancelEvent(timerCoverageUpdate);
+
+    CIDERFrame *recFrame = check_and_cast<CIDERFrame *>(msg);
+    bool newNeigh = false;
+        double rxDistance = calcDistance(recFrame->getTxPower(), recFrame->getRxPower());
+        if (txDistance > rxDistance)
+        {
+            macNeighborTableEntry *entry = neighbourTable->getNeighborByEAddr(recFrame->getSrcAddress());
+            if(entry == NULL)
+            {
+                entry = new macNeighborTableEntry();
+                newNeigh = true;
+            }
+            entry->setExtendedAddress(recFrame->getSrcAddress());
+            entry->setCurTxPw(recFrame->getTxPower());
+            entry->setRssi(recFrame->getRxPower());
+            entry->setNodeDegree(recFrame->getNodeDegree());
+            entry->setClusterDegree(recFrame->getClusterDegree());
+            entry->setLpDegree(recFrame->getLPDegree());
+            entry->setLpDevice(recFrame->getLPDevice());
+
+
+            entry->setPosCluster(true);
+
+
+
+            entry->setLastPktReceived(simTime().dbl());
+            if(newNeigh)
+                neighbourTable->addNeighbor(entry);
+            else
+                neighbourTable->editNeighbor(entry);
+
+            if(NodeOperationMode == CIDERMode::CS)
+            {
+                double delay = uniform(simTime().dbl() + 1,simTime().dbl() + 1 + (double) neighbourTable->getNumNeighbors() / 10.0);
+
+                scheduleAt(delay, timerCoverageUpdate);
+            }
+        }
+        delete recFrame;
+        recFrame = NULL;
+        msg = NULL;
+
+
+
+
+}
+
+void CIDER::cleanNeighbourTable()
+{
+    int i = 0;
+    int myMac = myInterface->getMacAddress().getLastKBytes(numberOfBytes) ;
+    while(i < neighbourTable->getNumNeighbors())
+    {
+        macNeighborTableEntry *entry = neighbourTable->getNeighborByPos(i);
+        if(entry->getAssignedTo() == -1 && !entry->isLpDevice() && !entry->isMyCH())
+        {
+            neighbourTable->deleteNeighbor(entry);
+            entry = NULL;
+        }else
+        {
+            i++;
+        }
+
+    }
+
+}
+
+int CIDER::checkForLPDevices()
+{
+    int temp = 0;
+    for(int i = 0; i < (int)neighbourTable->getNumNeighbors(); i++)
+        if(neighbourTable->getNeighborByPos(i)->isLpDevice() && neighbourTable->getNeighborByPos(i)->isPosCluster())
+            temp++;
+
+    return temp;
+}
+
+void CIDER::CIDERLPCHMessage(cMessage* msg)
+{
+    int num = lpCH.size();
+    bool first = true;
+    macNeighborTableEntry *entryMax, *entry;
+    for(int i = 0 ; i < num; i++)
+    {
+
+        if(first)
+        {
+            entry = entryMax = neighbourTable->getNeighborByLastBytes(lpCH.at(i),numberOfBytes);
+        }
+        else
+        {
+            entry = neighbourTable->getNeighborByLastBytes(lpCH.at(i),numberOfBytes);
+        }
+
+        if(entry->getLpDegree() > entryMax->getLpDegree())
+            entryMax = entry;
+
+    }
+
+    //Elect entryMax as CH
+
+    CIDERFrame *newFrame = new CIDERFrame("DelectCHRep", CIDERLPCHElection);
+    CIDERControlInfo *cntrl = new CIDERControlInfo("CiderContrl", CIDERCntrlInfo);
+}
+
+void CIDER::CIDERLPCHElectionMessage(cMessage* msg)
+{
+}
+
+void CIDER::handle_CIDERLPCHElectionMessage(cMessage* msg)
 {
 }
 
