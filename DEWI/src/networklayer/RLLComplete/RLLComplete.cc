@@ -1478,637 +1478,618 @@ void RLLComplete::createInitialEntries()
     hoppingSequenceList->addEntry(hoppingEntry);
 }
 
-void RLLComplete::setSchedule()
-{
-    if (bIsPANCoor)
-    {
-        setChannelOffset();
-        if (nCluStage % 2 == 1)
-        {
-            setScheduleChStUn();
-        }
-        else if (nCluStage % 2 == 0 && nCluStage != 0)
-        {
-            setScheduleChStZe();
-        }
-        else
-        {
-            setScheduleChInit();
-        }
-    }
-    else
-    {
-        setScheduleCs();
-    }
-}
-
 void RLLComplete::setScheduleChStUn()
 {
-    //first step: Update initial entry received by beacon from previous stage
-    macLinkTableEntry *linkEntry = linkTable->getLink(0);
-    linkEntry->isprevStage(true);
-    linkEntry->setLinkType(LNK_TP_JOIN);
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
+	//first step: Update initial entry received by beacon from previous stage
+	macLinkTableEntry *linkEntry = linkTable->getLink(0);
+	linkEntry->isprevStage(true);
+	linkEntry->setLinkType(LNK_TP_JOIN);
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
 //    if(!linkTable->editLink(linkEntry))
 //    {
 //	EV << "Coudlnt add link table entry" << endl;
 //    }
 
-    //new links
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel1); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(1);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	//new links
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel2); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(2);
-    linkEntry->setLinkId(linkTable->getNumLinks());
 
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_ADVERTISING);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(1);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel2); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(2);
+	linkEntry->setLinkId(linkTable->getNumLinks());
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel3); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(3);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
 
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel4); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(4);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel3); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(3);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel5); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(5);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel6); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(6);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel4); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(4);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel7); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(7);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel5); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(5);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel8); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(8);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel6); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(6);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset((nCluStage) % (numChannel + 1)); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_ADVERTISING);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(10);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel7); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(7);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(9);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel8); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(8);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(11);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(9);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
+
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(10);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
+
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(11);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
 }
 
 void RLLComplete::setScheduleChStZe()
 {
-    macLinkTableEntry *linkEntry = linkTable->getLink(0);
-    linkEntry->isprevStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->issameStage(false);
-    linkEntry->setLinkType(LNK_TP_JOIN);
+	macLinkTableEntry *linkEntry = linkTable->getLink(0);
+	linkEntry->isprevStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->issameStage(false);
+	linkEntry->setLinkType(LNK_TP_JOIN);
 //    if(!linkTable->addLink(linkEntry))
 //    {
 //	EV << "Coudlnt add link table entry" << endl;
 //    }
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_ADVERTISING);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(0);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(nCluStage % (numChannel + 1)); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_ADVERTISING);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(0);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset(myChannel.channel1); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(1);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(true);
+	linkEntry->setChannelOffset(myChannel.channel2); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(2);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset(myChannel.channel2); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(2);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(false);
+	linkEntry->setChannelOffset(myChannel.channel3); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(3);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset(myChannel.channel3); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(3);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(false);
+	linkEntry->setChannelOffset(myChannel.channel4); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(4);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset(myChannel.channel4); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(4);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(true);
+	linkEntry->setChannelOffset(myChannel.channel5); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(5);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset(myChannel.channel5); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(5);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(true);
+	linkEntry->setChannelOffset(myChannel.channel6); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(6);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(true);
-    linkEntry->setChannelOffset(myChannel.channel6); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(6);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(true);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(false);
+	linkEntry->setChannelOffset(myChannel.channel7); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(7);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset(myChannel.channel7); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(7);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->isprevStage(false);
+	linkEntry->setChannelOffset(myChannel.channel8); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(8);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(true);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->isprevStage(false);
-    linkEntry->setChannelOffset(myChannel.channel8); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(8);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
 
-    linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(9);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(9);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
 
-    linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(10);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(11);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+
+	linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(11);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 }
 
 void RLLComplete::setChannelOffset()
 {
-    if (nCluStage == 0)
-    {
+	if (nCluStage == 0)
+	{
+		myChannel.channel2 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel2 > (numChannel + 1))
+			myChannel.channel2 = myChannel.channel2 - (numChannel + 1);
 
-        myChannel.channel3 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-        if (myChannel.channel3 > (numChannel + 1))
-            myChannel.channel3 = myChannel.channel3 - (numChannel + 1);
+		myChannel.channel5 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel5 > (numChannel + 1))
+			myChannel.channel5 = myChannel.channel5 - (numChannel + 1);
 
-        myChannel.channel4 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-        if (myChannel.channel4 > (numChannel + 1))
-            myChannel.channel4 = myChannel.channel4 - (numChannel + 1);
+		myChannel.channel6 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel6 > (numChannel + 1))
+			myChannel.channel6 = myChannel.channel6 - (numChannel + 1);
 
-        myChannel.channel7 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-        if (myChannel.channel7 > (numChannel + 1))
-            myChannel.channel7 = myChannel.channel7 - (numChannel + 1);
+		myChannel.channel8 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel8 > (numChannel + 1))
+			myChannel.channel8 = myChannel.channel8 - (numChannel + 1);
 
-        myChannel.channel8 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-        if (myChannel.channel8 > (numChannel + 1))
-            myChannel.channel8 = myChannel.channel8 - (numChannel + 1);
+		myChannel.channel9 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel9 > (numChannel + 1))
+			myChannel.channel9 = myChannel.channel9 - (numChannel + 1);
 
-        myChannel.channel9 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-        if (myChannel.channel9 > (numChannel + 1))
-            myChannel.channel9 = myChannel.channel9 - (numChannel + 1);
+		myChannel.channel10 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel10 > (numChannel + 1))
+			myChannel.channel10 = myChannel.channel10 - (numChannel + 1);
 
-        myChannel.channel11 = nCluStage % (numChannel + 1) + intuniform(0, 16);
-        if (myChannel.channel11 > (numChannel + 1))
-            myChannel.channel11 = myChannel.channel11 - (numChannel + 1);
+		myChannel.channel11 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel11 > (numChannel + 1))
+			myChannel.channel11 = myChannel.channel11 - (numChannel + 1);
 
-    }
+	}
 
 }
 
 void RLLComplete::setScheduleChInit()
 {
 
-    macLinkTableEntry *linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_ADVERTISING);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(0);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	macLinkTableEntry *linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(nCluStage % numChannel); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_SHARED_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_ADVERTISING);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(0);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel3); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(3);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel2); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(2);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel4); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(4);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel5); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(5);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel7); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(7);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel6); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(6);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel8); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(8);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(false);
-    linkEntry->isnextStage(true);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(9);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(9);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel10); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(10);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(false);
+	linkEntry->isnextStage(true);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(11);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(11);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 }
 
 void RLLComplete::setScheduleCs()
 {
-    macLinkTableEntry *linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(9);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	macLinkTableEntry *linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(9);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 
-    linkEntry = new macLinkTableEntry();
-    linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
-    linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
-    linkEntry->setLinkType(LNK_TP_NORMAL);
-    linkEntry->setMacLinkTable(linkTable);
-    linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
-    linkEntry->setSlotframeId(0);
-    linkEntry->setTimeslot(11);
-    linkEntry->setLinkId(linkTable->getNumLinks());
-    linkEntry->issameStage(true);
-    linkEntry->isnextStage(false);
-    linkEntry->isprevStage(false);
-    if (!linkTable->addLink(linkEntry))
-    {
-        EV << "Coudlnt add link table entry" << endl;
-    }
+	linkEntry = new macLinkTableEntry();
+	linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkType(LNK_TP_NORMAL);
+	linkEntry->setMacLinkTable(linkTable);
+	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
+	linkEntry->setSlotframeId(0);
+	linkEntry->setTimeslot(11);
+	linkEntry->setLinkId(linkTable->getNumLinks());
+	linkEntry->issameStage(true);
+	linkEntry->isnextStage(false);
+	linkEntry->isprevStage(false);
+	if (!linkTable->addLink(linkEntry))
+	{
+		EV << "Coudlnt add link table entry" << endl;
+	}
 }
 
 double RLLComplete::calcDistance(double transPowmW, double minRecvPowermW)
