@@ -29,9 +29,9 @@ import dewi.applications.RLLApp.ClusteringRLL;
 
 
 //RoutingTable
-import dewi.networklayer.RLL.RLL;
-import dewi.networklayer.RLL.common.clusterTable.RLLClusterTable;
-import dewi.networklayer.RLL.common.beaconTable.cBeaconTable;
+import dewi.networklayer.RLLComplete.RLLComplete;
+import dewi.networklayer.RLLComplete.common.clusterTable.RLLClusterTable;
+import dewi.networklayer.RLLComplete.common.beaconTable.cBeaconTable;
 
 //TransportLayer
 //UDP
@@ -123,7 +123,7 @@ module LampNode
             @display("p=156,68;i=abstract/penguin");
         }
 
-        networklayer: RLL {
+        networklayer: RLLComplete {
 
             @display("p=156,162;i=block/routing");
         }

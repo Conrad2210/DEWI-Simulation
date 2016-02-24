@@ -162,7 +162,7 @@ class INET_API InterfaceEntry : public cNamedObject
     bool isPointToPoint() const       {return pointToPoint;}
     bool isLoopback() const           {return loopback;}
     double getDatarate() const        {return datarate;}
-    const MACAddress& getMacAddress() const  {return macAddr;}
+    const MACAddress& getMacAddress() const {return macAddr;}
     const InterfaceToken& getInterfaceToken() const {return token;}
     //@}
 

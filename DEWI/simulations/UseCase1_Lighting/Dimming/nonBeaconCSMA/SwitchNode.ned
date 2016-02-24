@@ -15,42 +15,15 @@
 
 package dewi.simulations.UseCase1_Lighting.Dimming.nonBeaconCSMA;
 
-//Includes
-//Mobility
-import dewi.mobility.models.StationaryMobility;
-
-//NetworkLayer
-import dewi.nodes.inet.NetworkLayer;
-
-//NIC
-import dewi.nic.Ieee802154csmaNic;
-
-//Applications
-//UDPApp
 import dewi.applications.IUDPApp;
-
-//NotificationBoard
 import dewi.base.NotificationBoard;
-
-//InterfaceTable
+import dewi.mobility.models.StationaryMobility;
+import dewi.networklayer.IManetRouting;
 import dewi.networklayer.common.InterfaceTable;
-
-//RoutingTable
 import dewi.networklayer.ipv4.RoutingTable;
-
-//TransportLayer
-//UDP
+import dewi.nodes.inet.NetworkLayer;
 import dewi.transport.udp.UDP;
 
-//Routing
-//MANETRouting
-import dewi.networklayer.IManetRouting;
-
-//Display Module
-import dewi.base.Display;
-
-//Battery Module
-import dewi.battery.models.InetSimpleBattery;
 
 module LightSwitch
 {
@@ -107,10 +80,10 @@ module LightSwitch
 
 
         //NIC
-        wlan: Ieee802154csmaNic {
-            parameters:
-                @display("p=248,349;q=queue");
-        }
+//        wlan: CIDERNic {
+//            parameters:
+//                @display("p=248,349;q=queue");
+//        }
 
 
 
@@ -179,9 +152,9 @@ module LightSwitch
 
 
         //Connections NetworkLayer <--> World (MAC/PHY)
-        radioIn --> wlan.radioIn;
-        wlan.upperLayerOut --> networkLayer.ifIn[0];
-        wlan.upperLayerIn <-- networkLayer.ifOut[0];
+//        radioIn --> wlan.radioIn;
+//        wlan.upperLayerOut --> networkLayer.ifIn[0];
+//        wlan.upperLayerIn <-- networkLayer.ifOut[0];
 
 
 }

@@ -30,7 +30,7 @@ import dewi.applications.RLLApp.RLLApp;
 
 
 //RoutingTable
-import dewi.networklayer.RLL.RLL;
+import dewi.networklayer.RLLComplete.RLLComplete;
 
 //TransportLayer
 //UDP
@@ -39,8 +39,8 @@ import dewi.base.NotificationBoard;
 //Routing
 //MANETRouting
 import dewi.networklayer.IManetRouting;
-import dewi.networklayer.RLL.common.clusterTable.RLLClusterTable;
-import dewi.networklayer.RLL.common.beaconTable.cBeaconTable;
+import dewi.networklayer.RLLComplete.common.clusterTable.RLLClusterTable;
+import dewi.networklayer.RLLComplete.common.beaconTable.cBeaconTable;
 
 import dewi.linklayer.common.Ieee802154e.macSlotframeTable.macSlotframeTable;
 import dewi.linklayer.common.Ieee802154e.macLinkTable.macLinkTable;
@@ -104,7 +104,7 @@ module LightSwitch
             @display("p=156,68;i=abstract/penguin");
         }
 
-        networklayer: RLL {
+        networklayer: RLLComplete {
 
             @display("p=156,162;i=block/routing");
         }

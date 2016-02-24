@@ -47,7 +47,12 @@ void DataCenter::initialize(int stage)
 	    rec_lastAssociated = par("rec_lastAssociated").boolValue();
 
 		if (recordValues)
-			ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
+		{
+			if(ev.getConfigEx()->getConfigValue("result-dir") != NULL)
+			{
+				ResultPath = ev.getConfigEx()->getConfigValue("result-dir");
+			}
+		}
 
 		numAssoNodes = 0;
 		numRegisteredAssVectors = 0;

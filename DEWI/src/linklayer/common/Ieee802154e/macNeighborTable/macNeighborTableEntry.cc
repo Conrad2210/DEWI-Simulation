@@ -48,9 +48,22 @@ macNeighborTableEntry::macNeighborTableEntry()
     transDelay = 0;
     nextStageCH = false;
     sameStageCH = false;
-    prevStageCH = false;
+    lowerStageCH = false;
     myCH = false;
     myCS = false;
+    bLPDevice = false;
+    lastPktReceived = 0;
+    this->nNewCoverage = -1;
+    this->dCurTXPw = -1;
+    this->dDistance = -1;
+    this->nNodeDegree = -1;
+    this->nLPDegree = -1;
+    this->dRSSI = -1;
+    this->dWeight = -1;
+    this->nClusterDegree = -1;
+    this->bPosCluster = false;
+    this->dWeightSecond = -1;
+    this->nAssigndTo = -1;
 }
 
 macNeighborTableEntry::~macNeighborTableEntry()
@@ -66,20 +79,37 @@ std::string macNeighborTableEntry::info() const
     out<<" NeighborSize: " << neighborSize;
     out<<" ShortAddress: "<< ShortAddress;
     out<<" ExtendedAddress: " << ExtendedAddress;
-    out<<" SDIndex: " << (int)SDIndex;
-    out<<" ChannelOffset: " << (int)ChannelOffset;
-    out<<" TrackBeacon: " << TrackBeacon;
-    out<<" BeaconLostCount: " << (int)BeaconLostCount;
-    out<<" numTxData: " << (int)numTxData;
-    out<<" numTXDataAck: " << (int)numTxDataAck;
-    out<<" numRxData: " << (int)numRxData;
-    out<<" numRxDataAck: " << (int)numRxDataAck;
-    out<<" lastASN: " << (int)lastASN;
-    out<<" RPLrank: " << (int)RPLrank;
-    out<<" isTimeSource: " << isTimeSource;
-    out<<" RPL_OF: " << (int)RPL_OF;
-    out<<" transDelay: " << (int)transDelay;
-    out<<" CH next Stage: " << (bool)nextStageCH;
+    out<<" Assigned To: " << nAssigndTo;
+    out<<" TxPower: " << dCurTXPw;
+    out<<" RSSI: " << dRSSI << "dB";
+    out<<" Pos Cluster:" << (bPosCluster?"True":"False");
+    out<<" LPDevice: " << (bLPDevice?"True":"False");
+    out << " Weight: " << dWeight;
+    out<<" Distance: " << dDistance << "m";
+    out<<" Node Degree: " << nNodeDegree;
+    out<<" Cluster Degree: " << nClusterDegree;
+    out<<" LP Degree: " << nLPDegree;
+    out<< " new Coverage: " << nNewCoverage;
+    out<<" Second Weight: " << dWeightSecond;
+    out<<" MyCH: " << (myCH?"True":"False");
+    out<<" MyCS: " << (myCS?"True":"False");
+    out<<" CH same Stage: " << (sameStageCH?"True":"False");
+    out<<" CH lower Stage: " << (lowerStageCH?"True":"False");
+    out<<" CH next Stage: " << (nextStageCH?"True":"False");
+    out<<" Last PKT: " << lastPktReceived << "s";
+//    out<<" SDIndex: " << (int)SDIndex;
+//    out<<" ChannelOffset: " << (int)ChannelOffset;
+//    out<<" TrackBeacon: " << TrackBeacon;
+//    out<<" BeaconLostCount: " << (int)BeaconLostCount;
+//    out<<" numTxData: " << (int)numTxData;
+//    out<<" numTXDataAck: " << (int)numTxDataAck;
+//    out<<" numRxData: " << (int)numRxData;
+//    out<<" numRxDataAck: " << (int)numRxDataAck;
+//    out<<" lastASN: " << (int)lastASN;
+//    out<<" RPLrank: " << (int)RPLrank;
+//    out<<" isTimeSource: " << isTimeSource;
+//    out<<" RPL_OF: " << (int)RPL_OF;
+//    out<<" transDelay: " << (int)transDelay;
     return out.str();
 }
 
@@ -114,4 +144,10 @@ void macNeighborTableEntry::resetNeighbor()
     this -> isTimeSource = false;
     this -> RPL_OF = 0;
     this -> transDelay = 0;
+    this->nNewCoverage = -1;
+    this->dCurTXPw = -1;
+    this->dDistance = -1;
+    this->nNodeDegree = -1;
+    this->dRSSI = -1;
+    this->dWeight = -1;
 }

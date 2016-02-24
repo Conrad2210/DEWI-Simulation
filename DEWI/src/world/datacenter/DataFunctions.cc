@@ -7,16 +7,16 @@
 
 #include "DataFunctions.h"
 
-    #ifndef WITH_LINUX
-        #define WITH_LINUX
+//    #ifndef WITH_LINUX
+//        #define WITH_LINUX
+//    #endif
+
+
+#ifdef WIN32
+    #ifndef WITH_WIN
+        #define WITH_WIN
     #endif
-
-
-//#ifdef WIN32
- //   #ifndef WITH_WIN
-//        /#define WITH_WIN
- //   #endif
-//#endif
+#endif
 
 bool createDirectories(std::string path)
 {

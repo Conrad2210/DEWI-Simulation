@@ -757,7 +757,7 @@ void Ieee802154eMac::finish()
 //	recordScalar("num of frames sent successfully three retry", numRetryThree);
 //	recordScalar("num of frames sent successfully four retry", numRetryFour);
 
-	cancelEvent(backoffTimer);
+	//cancelEvent(backoffTimer);
 
 	/** @brief timer for locating backoff boundary before sending a CCA request */
 	cancelEvent(deferCCATimer);

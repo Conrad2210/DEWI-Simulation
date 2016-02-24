@@ -14,12 +14,13 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #include <ctype.h>
+#include "string.h"
+#include <sstream>
 #include "MACAddress.h"
 #include "InterfaceToken.h"
-
 
 unsigned int MACAddress::autoAddressCtr;
 
@@ -29,20 +30,39 @@ const MACAddress MACAddress::BROADCAST_ADDRESS64("ff:ff:ff:ff:ff:ff:ff:ff");
 const MACAddress MACAddress::MULTICAST_PAUSE_ADDRESS("01:80:C2:00:00:01");
 const MACAddress MACAddress::STP_MULTICAST_ADDRESS("01:80:C2:00:00:00");
 
-
 unsigned char MACAddress::getAddressByte(unsigned int k) const
 {
     if (macAddress64)
     {
-        if (k>=MAC_ADDRESS_SIZE64) throw cRuntimeError("Array of size 8 indexed with %d", k);
-        int offset = (MAC_ADDRESS_SIZE64-k-1)*8;
-        return 0xff&(address>>offset);
+        if (k >= MAC_ADDRESS_SIZE64)
+            throw cRuntimeError("Array of size 8 indexed with %d", k);
+        int offset = (MAC_ADDRESS_SIZE64 - k - 1) * 8;
+        return 0xff & (address >> offset);
     }
     else
     {
-        if (k>=MAC_ADDRESS_SIZE) throw cRuntimeError("Array of size 6 indexed with %d", k);
-        int offset = (MAC_ADDRESS_SIZE-k-1)*8;
-        return 0xff&(address>>offset);
+        if (k >= MAC_ADDRESS_SIZE)
+            throw cRuntimeError("Array of size 6 indexed with %d", k);
+        int offset = (MAC_ADDRESS_SIZE - k - 1) * 8;
+        return 0xff & (address >> offset);
+    }
+}
+
+unsigned int MACAddress::getAddressByte1(unsigned int k) const
+{
+    if (macAddress64)
+    {
+        if (k >= MAC_ADDRESS_SIZE64)
+            throw cRuntimeError("Array of size 8 indexed with %d", k);
+        int offset = (MAC_ADDRESS_SIZE64 - k - 1) * 8;
+        return 0xff & (address >> offset);
+    }
+    else
+    {
+        if (k >= MAC_ADDRESS_SIZE)
+            throw cRuntimeError("Array of size 6 indexed with %d", k);
+        int offset = (MAC_ADDRESS_SIZE - k - 1) * 8;
+        return 0xff & (address >> offset);
     }
 }
 
@@ -50,15 +70,17 @@ void MACAddress::setAddressByte(unsigned int k, unsigned char addrbyte)
 {
     if (macAddress64)
     {
-        if (k>=MAC_ADDRESS_SIZE64) throw cRuntimeError("Array of size 6 indexed with %d", k);
-        int offset = (MAC_ADDRESS_SIZE64-k-1)*8;
-        address = (address&(~(((uint64)0xff)<<offset)))|(((uint64)addrbyte)<<offset);
+        if (k >= MAC_ADDRESS_SIZE64)
+            throw cRuntimeError("Array of size 6 indexed with %d", k);
+        int offset = (MAC_ADDRESS_SIZE64 - k - 1) * 8;
+        address = (address & (~(((uint64) 0xff) << offset))) | (((uint64) addrbyte) << offset);
     }
     else
     {
-        if (k>=MAC_ADDRESS_SIZE) throw cRuntimeError("Array of size 6 indexed with %d", k);
-        int offset = (MAC_ADDRESS_SIZE-k-1)*8;
-        address = (address&(~(((uint64)0xff)<<offset)))|(((uint64)addrbyte)<<offset);
+        if (k >= MAC_ADDRESS_SIZE)
+            throw cRuntimeError("Array of size 6 indexed with %d", k);
+        int offset = (MAC_ADDRESS_SIZE - k - 1) * 8;
+        address = (address & (~(((uint64) 0xff) << offset))) | (((uint64) addrbyte) << offset);
     }
 }
 
@@ -69,15 +91,16 @@ bool MACAddress::tryParse(const char *hexstr)
 
     // check syntax
     int numHexDigits = 0;
-    for (const char *s = hexstr; *s; s++) {
+    for (const char *s = hexstr; *s; s++)
+    {
         if (isxdigit(*s))
             numHexDigits++;
-        else if (*s!=' ' && *s!=':' && *s!='-')
+        else if (*s != ' ' && *s != ':' && *s != '-')
             return false; // wrong syntax
     }
-    if (numHexDigits == 2*MAC_ADDRESS_SIZE)
+    if (numHexDigits == 2 * MAC_ADDRESS_SIZE)
         macAddress64 = false;
-    else if (numHexDigits == 2*MAC_ADDRESS_SIZE64)
+    else if (numHexDigits == 2 * MAC_ADDRESS_SIZE64)
         macAddress64 = true;
     else
         return false;
@@ -90,7 +113,7 @@ bool MACAddress::tryParse(const char *hexstr)
     const char *s = hexstr;
     if (macAddress64)
     {
-        for (int pos=0; pos<MAC_ADDRESS_SIZE64; pos++)
+        for (int pos = 0; pos < MAC_ADDRESS_SIZE64; pos++)
         {
             if (!s || !*s)
             {
@@ -98,15 +121,25 @@ bool MACAddress::tryParse(const char *hexstr)
             }
             else
             {
-                while (*s && !isxdigit(*s)) s++;
-                if (!*s) {setAddressByte(pos, 0); continue;}
-                unsigned char d = isdigit(*s) ? (*s-'0') : islower(*s) ? (*s-'a'+10) : (*s-'A'+10);
-                d = d<<4;
+                while (*s && !isxdigit(*s))
+                    s++;
+                if (!*s)
+                {
+                    setAddressByte(pos, 0);
+                    continue;
+                }
+                unsigned char d = isdigit(*s) ? (*s - '0') : islower(*s) ? (*s - 'a' + 10) : (*s - 'A' + 10);
+                d = d << 4;
                 s++;
 
-                while (*s && !isxdigit(*s)) s++;
-                if (!*s) {setAddressByte(pos, 0); continue;}
-                d += isdigit(*s) ? (*s-'0') : islower(*s) ? (*s-'a'+10) : (*s-'A'+10);
+                while (*s && !isxdigit(*s))
+                    s++;
+                if (!*s)
+                {
+                    setAddressByte(pos, 0);
+                    continue;
+                }
+                d += isdigit(*s) ? (*s - '0') : islower(*s) ? (*s - 'a' + 10) : (*s - 'A' + 10);
                 s++;
 
                 setAddressByte(pos, d);
@@ -116,7 +149,7 @@ bool MACAddress::tryParse(const char *hexstr)
     }
     else
     {
-        for (int pos=0; pos<MAC_ADDRESS_SIZE; pos++)
+        for (int pos = 0; pos < MAC_ADDRESS_SIZE; pos++)
         {
             if (!s || !*s)
             {
@@ -124,15 +157,25 @@ bool MACAddress::tryParse(const char *hexstr)
             }
             else
             {
-                while (*s && !isxdigit(*s)) s++;
-                if (!*s) {setAddressByte(pos, 0); continue;}
-                unsigned char d = isdigit(*s) ? (*s-'0') : islower(*s) ? (*s-'a'+10) : (*s-'A'+10);
-                d = d<<4;
+                while (*s && !isxdigit(*s))
+                    s++;
+                if (!*s)
+                {
+                    setAddressByte(pos, 0);
+                    continue;
+                }
+                unsigned char d = isdigit(*s) ? (*s - '0') : islower(*s) ? (*s - 'a' + 10) : (*s - 'A' + 10);
+                d = d << 4;
                 s++;
 
-                while (*s && !isxdigit(*s)) s++;
-                if (!*s) {setAddressByte(pos, 0); continue;}
-                d += isdigit(*s) ? (*s-'0') : islower(*s) ? (*s-'a'+10) : (*s-'A'+10);
+                while (*s && !isxdigit(*s))
+                    s++;
+                if (!*s)
+                {
+                    setAddressByte(pos, 0);
+                    continue;
+                }
+                d += isdigit(*s) ? (*s - '0') : islower(*s) ? (*s - 'a' + 10) : (*s - 'A' + 10);
                 s++;
 
                 setAddressByte(pos, d);
@@ -146,7 +189,9 @@ bool MACAddress::tryParse(const char *hexstr)
 void MACAddress::setAddress(const char *hexstr)
 {
     if (!tryParse(hexstr))
-        throw cRuntimeError("MACAddress: wrong address syntax '%s': 12 hex digits expected, with optional embedded spaces, hyphens or colons", hexstr);
+        throw cRuntimeError(
+                "MACAddress: wrong address syntax '%s': 12 hex digits expected, with optional embedded spaces, hyphens or colons",
+                hexstr);
 }
 
 void MACAddress::getAddressBytes(unsigned char *addrbytes) const
@@ -178,22 +223,21 @@ void MACAddress::setAddressBytes(unsigned char *addrbytes)
     }
 }
 
-
 std::string MACAddress::str() const
 {
     char buf[30];
     char *s = buf;
     if (macAddress64)
     {
-        for (int i=0; i<MAC_ADDRESS_SIZE64; i++, s += 3)
+        for (int i = 0; i < MAC_ADDRESS_SIZE64; i++, s += 3)
             sprintf(s, "%2.2X-", getAddressByte(i));
-        *(s-1) = '\0';
+        *(s - 1) = '\0';
     }
     else
     {
-        for (int i=0; i<MAC_ADDRESS_SIZE; i++, s += 3)
+        for (int i = 0; i < MAC_ADDRESS_SIZE; i++, s += 3)
             sprintf(s, "%2.2X-", getAddressByte(i));
-        *(s-1) = '\0';
+        *(s - 1) = '\0';
     }
     return std::string(buf);
 }
@@ -207,14 +251,14 @@ InterfaceToken MACAddress::formInterfaceIdentifier() const
 {
     if (macAddress64)
     {
-        uint32 high = (address>>32);
-        uint32 low =  (address&0xffffffff);
+        uint32 high = (address >> 32);
+        uint32 low = (address & 0xffffffff);
         return InterfaceToken(low, high, 64);
     }
     else
     {
-        uint32 high = (address>>16)|0xff;
-        uint32 low = (0xfe<<24)|(address&0xffffff);
+        uint32 high = (address >> 16) | 0xff;
+        uint32 low = (0xfe << 24) | (address & 0xffffff);
         return InterfaceToken(low, high, 64);
     }
 }
@@ -227,7 +271,6 @@ MACAddress MACAddress::generateAutoAddress()
     MACAddress addr(intAddr);
     return addr;
 }
-
 
 void MACAddress::convert64()
 {
@@ -250,7 +293,7 @@ void MACAddress::convert64()
 
 MACAddress MACAddress::getEui64()
 {
-    MACAddress addr=*this;
+    MACAddress addr = *this;
     addr.convert64();
     return addr;
 }
@@ -262,7 +305,7 @@ void MACAddress::convert48()
     unsigned char addrbytes64[MAC_ADDRESS_SIZE64];
     unsigned char addrbytes[MAC_ADDRESS_SIZE];
     getAddressBytes(addrbytes64);
-    if (addrbytes64[3] != 0xfe ||  addrbytes64[4] != 0xff)
+    if (addrbytes64[3] != 0xfe || addrbytes64[4] != 0xff)
         throw cRuntimeError("MACAddress: conversion EUI-64 to EUI-48 impossible");
     macAddress64 = false;
     addrbytes[0] = addrbytes64[0];
@@ -275,13 +318,40 @@ void MACAddress::convert48()
     setAddressBytes(addrbytes);
 }
 
+int MACAddress::compareTo(int other, int numberBytes)
+{
+    return (getLastKBytes(numberBytes) < other) ? -1 : (getLastKBytes(numberBytes) == other) ? 0 : 1;
+}
+
 MACAddress MACAddress::getEui48()
 {
-    MACAddress addr=*this;
+    MACAddress addr = *this;
     addr.convert48();
     return addr;
 }
 
+int MACAddress::getLastKBytes(int k) const
+{
 
+    int i = k;
+    char *temp = new char[k];
+    unsigned int tempUI = 0;
+    unsigned int nReturn = 0;
+    std::string str = "";
 
+    std::string str2 = "";
+    str = this->str();
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (str[i] != '-')
+            str2 += str[i];
+    }
 
+    str = str2.substr((str2.length() - 6));
+    nReturn = strtol(str.c_str(),NULL,16);
+    //str = getAddressByte((macAddress64 ? MAC_ADDRESS_SIZE64 : MAC_ADDRESS_SIZE) - i);
+    //ss >> std::hex >> tempUI;
+    //nReturn += getAddressByte1((macAddress64 ? MAC_ADDRESS_SIZE64 : MAC_ADDRESS_SIZE) - i) * pow(2, pow(2, i - 1));
+
+    return nReturn;
+}

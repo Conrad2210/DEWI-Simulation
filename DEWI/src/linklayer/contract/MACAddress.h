@@ -106,14 +106,15 @@ class INET_API MACAddress
      * Returns the kth byte of the address.
      */
     unsigned char getAddressByte(unsigned int k) const;
-
+    unsigned int getAddressByte1(unsigned int k) const;
+    int getLastKBytes(int k) const;
     /**
      * Sets the kth byte of the address.
      */
     void setAddressByte(unsigned int k, unsigned char addrbyte);
 
     /**
-     * Sets the address and returns true if the syntax of the string
+     *nNodeDegree/100.0eturns true if the syntax of the string
      * is correct. (See setAddress() for the syntax.)
      */
     bool tryParse(const char *hexstr);
@@ -185,7 +186,7 @@ class INET_API MACAddress
      * Returns -1, 0 or 1 as result of comparison of 2 addresses.
      */
     int compareTo(const MACAddress& other) const;
-
+    int compareTo(int other,int numberBytes);
     /**
      * Create interface identifier (IEEE EUI-64) which can be used by IPv6
      * stateless address autoconfiguration.

@@ -26,17 +26,19 @@ RLLApp::RLLApp() {
     BurstMessageTimer = NULL;
     StopTimer = NULL;
     dataCenter = NULL;
-    AssTimer = NULL;
+//    AssTimer = NULL;
 }
 
 RLLApp::~RLLApp() {
     cancelAndDelete(BurstTimer);
     cancelAndDelete(BurstMessageTimer);
     cancelAndDelete(StopTimer);
-    cancelAndDelete(AssTimer);
+//    cancelAndDelete(AssTimer);
 
-    delete E2E;
-    delete receivedMSG;
+//    if(E2E)
+//    	delete E2E;
+//    if(receivedMSG)
+//    	delete receivedMSG;
 }
 
 void RLLApp::initialize(int stage) {
@@ -75,8 +77,8 @@ void RLLApp::initialize(int stage) {
         a << getParentModule()->getName() << " "
                 << getParentModule()->getIndex();
         //EndToEndDelay = new cOutVector(a.str().c_str());
-        //E2E = new DataVector(a.str(), "latency");
-        //receivedMSG = new DataVector(a.str(), "rxMSG");
+        E2E = new DataVector(a.str(), "latency");
+        receivedMSG = new DataVector(a.str(), "rxMSG");
         if (m_isLightSwitch) {
             scheduleAt(simTime() + 5, AssTimer);
         }
@@ -126,7 +128,8 @@ void RLLApp::handleSelfMsg(cMessage* msg) {
         sendNextBurstMessage();
     } else if (msg == StopTimer) {
         endSim();
-    } else if (msg == AssTimer) {
+    }
+    else if (msg == AssTimer) {
         checkAssociation();
     }
 
