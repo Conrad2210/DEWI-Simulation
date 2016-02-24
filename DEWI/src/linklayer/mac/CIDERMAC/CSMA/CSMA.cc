@@ -317,7 +317,7 @@ void CSMA::handleLowerMsg(cPacket* msg)
 		{
 			//long SeqNr = macPkt->getSequenceId();
 			//long SeqNr = macPkt->getBdsn();
-			uint8_t SeqNr = macPkt->getBdsn();
+			uint8_t SeqNr = macPkt->getSeqNmbr();
 
 			if (strcmp(macPkt->getName(), "CSMA-Ack") != 0)
 			{
@@ -496,6 +496,7 @@ void CSMA::updateStatusIdle(t_mac_event event, cMessage* msg)
 			NB = 0;
 			//BE = macMinBE;
 			startTimer(TIMER_BACKOFF);
+
 		}
 		else
 		{

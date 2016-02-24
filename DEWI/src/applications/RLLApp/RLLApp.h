@@ -80,7 +80,7 @@ class RLLApp : public TrafGenPar
 	cMessage *BurstTimer;
 	cMessage *BurstMessageTimer;
 	cMessage *StopTimer;
-	//cMessage *AssTimer;
+	cMessage *AssTimer;
 };
 
 #endif /* RLLAPP_H_ */

@@ -59,7 +59,6 @@ RLLClusterTableEntry::~RLLClusterTableEntry()
 }
 std::ostream& operator <<(std::ostream &o, const channelList &CL)
 {
-	o << "Channel 1: " << CL.channel1;
 	o << ", Channel 2: " << CL.channel2;
 	o << ", Channel 3: " << CL.channel3;
 	o << ", Channel 4: " << CL.channel4;
@@ -68,7 +67,8 @@ std::ostream& operator <<(std::ostream &o, const channelList &CL)
 	o << ", Channel 7: " << CL.channel7;
 	o << ", Channel 8: " << CL.channel8;
 	o << ", Channel 9: " << CL.channel9;
-	o << ", Channel 11: " << CL.channel11;
+    o << ", Channel 10: " << CL.channel10;
+    o << ", Channel 11: " << CL.channel11;
 
 	return o;
 

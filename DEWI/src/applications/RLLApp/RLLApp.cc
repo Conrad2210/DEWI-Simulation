@@ -64,7 +64,7 @@ void RLLApp::initialize(int stage) {
         rec_scaTxMsg = par("rec_scaTxMsg").boolValue();
         rec_E2E = par("rec_E2E").boolValue();
         rec_receiveMsg = par("rec_receiveMsg").boolValue();
-//        AssTimer = new cMessage("AssTimer");
+        AssTimer = new cMessage("AssTimer");
         counterRxMsg = 0;
         counterTxMsg = 0;
         m_numberMessageToSend = (int) (m_burstDuration / m_interArrivalTime);
@@ -77,11 +77,11 @@ void RLLApp::initialize(int stage) {
         a << getParentModule()->getName() << " "
                 << getParentModule()->getIndex();
         //EndToEndDelay = new cOutVector(a.str().c_str());
-        //E2E = new DataVector(a.str(), "latency");
-        //receivedMSG = new DataVector(a.str(), "rxMSG");
-//        if (m_isLightSwitch) {
-//            scheduleAt(simTime() + 5, AssTimer);
-//        }
+        E2E = new DataVector(a.str(), "latency");
+        receivedMSG = new DataVector(a.str(), "rxMSG");
+        if (m_isLightSwitch) {
+            scheduleAt(simTime() + 5, AssTimer);
+        }
 
     }
     if (1 == stage) {
@@ -103,7 +103,7 @@ void RLLApp::finish() {
     cancelEvent(BurstTimer);
     cancelEvent(BurstMessageTimer);
     cancelEvent(StopTimer);
-//    cancelEvent(AssTimer);
+    cancelEvent(AssTimer);
     std::stringstream sss;
     sss << getParentModule()->getIndex();
     std::stringstream ss;
@@ -129,9 +129,9 @@ void RLLApp::handleSelfMsg(cMessage* msg) {
     } else if (msg == StopTimer) {
         endSim();
     }
-//    else if (msg == AssTimer) {
-//        checkAssociation();
-//    }
+    else if (msg == AssTimer) {
+        checkAssociation();
+    }
 
     else {
         if (ev.isGUI()) {
@@ -173,10 +173,10 @@ void RLLApp::checkAssociation() {
             double percent = (double) dataCenter->getNumAssNodes()
                     / (double) dataCenter->getNumRegisteredAssVectors() * 100.0;
             std::cout << percent << "%" << endl;
-//            if (AssTimer->isScheduled())
-//                cancelEvent(AssTimer);
-//
-//            scheduleAt(simTime() + 5, AssTimer);
+            if (AssTimer->isScheduled())
+                cancelEvent(AssTimer);
+
+            scheduleAt(simTime() + 5, AssTimer);
         }
     }
 }

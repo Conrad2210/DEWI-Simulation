@@ -661,7 +661,7 @@ void RLLComplete::handle_MLME_ASSOCIATE_confirm(cMessage *msg)
 
             nCluStage = tmp->getStage();
 
-            myChannel.channel9 = chChannel.channel9;
+            myChannel.channel2 = chChannel.channel2;
             myChannel.channel11 = chChannel.channel11;
             clusterTable->addEntry(nCluStage, tmp->getAssocShortAddress(), (char*) "", tmp->getPanCoordinator(),
                     tmp->getPanId());
@@ -1207,9 +1207,6 @@ void RLLComplete::handle_SCHEDULE_confirm(cMessage *msg)
         {
             switch (linkTable->getLink(i)->getTimeslot())
             {
-                case 1:
-                    linkTable->getLink(i)->setChannelOffset(myChannel.channel1);
-                    break;
                 case 2:
                     linkTable->getLink(i)->setChannelOffset(myChannel.channel2);
                     break;
@@ -1233,6 +1230,9 @@ void RLLComplete::handle_SCHEDULE_confirm(cMessage *msg)
                     break;
                 case 9:
                     linkTable->getLink(i)->setChannelOffset(myChannel.channel9);
+                    break;
+                case 10:
+                    linkTable->getLink(i)->setChannelOffset(myChannel.channel11);
                     break;
                 case 11:
                     linkTable->getLink(i)->setChannelOffset(myChannel.channel11);
@@ -1433,6 +1433,30 @@ void RLLComplete::handle_RESTART_confirm(cMessage *msg)
 ///		Helper Functions
 //
 ////////////////////////////////////////////////////////////////
+
+void RLLComplete::setSchedule()
+{
+    if(bIsPANCoor)
+    {
+        setChannelOffset();
+        if(nCluStage%2 ==1)
+        {
+            setScheduleChStUn();
+        }
+        else if(nCluStage%2 == 0 && nCluStage !=0)
+        {
+            setScheduleChStZe();
+        }
+        else
+        {
+            setScheduleChInit();
+        }
+    }
+    else
+    {
+        setScheduleCs();
+    }
+}
 
 void RLLComplete::createInitialEntries()
 {
@@ -2058,13 +2082,13 @@ void RLLComplete::setScheduleChInit()
 void RLLComplete::setScheduleCs()
 {
 	macLinkTableEntry *linkEntry = new macLinkTableEntry();
-	linkEntry->setChannelOffset(myChannel.channel9); //Advertisment always with channelOffset 0;
-	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setChannelOffset(myChannel.channel2); //Advertisment always with channelOffset 0;
+	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address
 	linkEntry->setSlotframeId(0);
-	linkEntry->setTimeslot(9);
+	linkEntry->setTimeslot(2);
 	linkEntry->setLinkId(linkTable->getNumLinks());
 	linkEntry->issameStage(true);
 	linkEntry->isnextStage(false);
@@ -2076,7 +2100,7 @@ void RLLComplete::setScheduleCs()
 
 	linkEntry = new macLinkTableEntry();
 	linkEntry->setChannelOffset(myChannel.channel11); //Advertisment always with channelOffset 0;
-	linkEntry->setLinkOption(LNK_OP_TRANSMIT); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
+	linkEntry->setLinkOption(LNK_OP_RECEIVE); // always shared receive (Coordinator is able to receive Acc requests and transmit beacons
 	linkEntry->setLinkType(LNK_TP_NORMAL);
 	linkEntry->setMacLinkTable(linkTable);
 	linkEntry->setNodeAddress(0xffff); //Transmit Beacons always to Broadcast Address

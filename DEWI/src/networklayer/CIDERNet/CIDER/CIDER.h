@@ -23,6 +23,7 @@
 #include "vector"
 
 typedef std::vector<int> macVector;
+typedef std::map<MACAddress,macVector> lpMap;
 
 class CIDER : public cSimpleModule
 {
@@ -137,7 +138,8 @@ class CIDER : public cSimpleModule
         macVector assignedCS;
         macVector lpCH;
         MACAddress delectAddr;
-
+        macVector posLPDev;
+        lpMap lpDevices;
         enum CIDERFrames
         {
             CIDERPingTimer = 500,

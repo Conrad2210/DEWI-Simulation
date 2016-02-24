@@ -11,10 +11,10 @@
 struct channelList
 {
 
-		int channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8, channel9, channel11;
+		int channel2, channel3, channel4, channel5, channel6, channel7, channel8, channel9, channel10,channel11;
 		void init()
 		{
-			channel1 = channel2 = channel3 = channel4 = channel5 = channel6 = channel7 = channel8 = channel9 = channel11 = -1;
+			channel2 = channel3 = channel4 = channel5 = channel6 = channel7 = channel8 = channel9 = channel10 = channel11 = -1;
 		}
 		;
 

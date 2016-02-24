@@ -280,7 +280,11 @@ protected:
     void sendNewPacketInTx(Ieee802154eFrame *p)
     {
         if (sendPacket)
-            error("the previous packet is not send yet");
+        {
+            EV << "the previous packet is not send yet";
+
+
+        }
         if (phystatus==phy_TX_ON)
             sendDown(p);
         else
