@@ -31,9 +31,9 @@ simple RLLApp extends TrafGenPar
    double StartTime @unit(s) = default(5s);
    int numberOfBursts  = default(5000);
    
-   bool rec_scaRxMsg = default(false);
-   bool rec_scaTxMsg = default(false);
-   bool rec_E2E = default(false);
-   bool rec_receiveMsg = default(false);
+   bool rec_scaRxMsg = default(true);
+   bool rec_scaTxMsg = default(true);
+   bool rec_E2E = default(true);
+   bool rec_receiveMsg = default(true);
    
 }
