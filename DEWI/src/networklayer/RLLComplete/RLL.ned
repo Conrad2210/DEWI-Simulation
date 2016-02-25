@@ -28,10 +28,10 @@ simple RLLComplete
     string cBeaconTableModule = default("^.beaconTable");
     
     
-    bool rec_dupMsg = default(false);
-    bool rec_ClusterStage = default(false);
-    bool rec_PanCoor = default(false);
-    bool rec_scaDup = default(false);
+    bool rec_dupMsg = default(true);
+    bool rec_ClusterStage = default(true);
+    bool rec_PanCoor = default(true);
+    bool rec_scaDup = default(true);
 	bool isPANCoor = default(false);
 	bool capablePanCoor = default(true);
 	double StartTime @unit(s) = default(0s);

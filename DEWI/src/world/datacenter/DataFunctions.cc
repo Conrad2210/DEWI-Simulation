@@ -7,9 +7,9 @@
 
 #include "DataFunctions.h"
 
-//    #ifndef WITH_LINUX
-//        #define WITH_LINUX
-//    #endif
+    #ifndef WITH_LINUX
+        #define WITH_LINUX
+    #endif
 
 
 #ifdef WIN32
