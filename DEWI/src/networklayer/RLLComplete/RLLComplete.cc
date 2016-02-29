@@ -1040,7 +1040,7 @@ void RLLComplete::handle_MLME_SCAN_confirm(cMessage *msg)
         double rxpower, rssi, txPower, distance;
         Ieee802154EnhancedBeaconFrame *tmpBcn = beaconTable->returnBestBeaconMsg(&rssi, &rxpower, &txPower, &distance);
 
-        if (rssi < 25 && bCapablePanCoor)
+        if (rssi < nDistance && bCapablePanCoor)
         {
 
             bIsPANCoor = true;
