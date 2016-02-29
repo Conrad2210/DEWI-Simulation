@@ -1232,7 +1232,7 @@ void RLLComplete::handle_SCHEDULE_confirm(cMessage *msg)
                     linkTable->getLink(i)->setChannelOffset(myChannel.channel9);
                     break;
                 case 10:
-                    linkTable->getLink(i)->setChannelOffset(myChannel.channel11);
+                    linkTable->getLink(i)->setChannelOffset(myChannel.channel10);
                     break;
                 case 11:
                     linkTable->getLink(i)->setChannelOffset(myChannel.channel11);
@@ -1928,6 +1928,14 @@ void RLLComplete::setChannelOffset()
 		if (myChannel.channel2 > (numChannel + 1))
 			myChannel.channel2 = myChannel.channel2 - (numChannel + 1);
 
+		myChannel.channel3 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel3 > (numChannel + 1))
+			myChannel.channel3 = myChannel.channel3 - (numChannel + 1);
+
+		myChannel.channel4 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel4 > (numChannel + 1))
+			myChannel.channel4 = myChannel.channel4 - (numChannel + 1);
+
 		myChannel.channel5 = nCluStage % (numChannel + 1) + intuniform(0, 16);
 		if (myChannel.channel5 > (numChannel + 1))
 			myChannel.channel5 = myChannel.channel5 - (numChannel + 1);
@@ -1935,6 +1943,10 @@ void RLLComplete::setChannelOffset()
 		myChannel.channel6 = nCluStage % (numChannel + 1) + intuniform(0, 16);
 		if (myChannel.channel6 > (numChannel + 1))
 			myChannel.channel6 = myChannel.channel6 - (numChannel + 1);
+
+		myChannel.channel7 = nCluStage % (numChannel + 1) + intuniform(0, 16);
+		if (myChannel.channel7 > (numChannel + 1))
+			myChannel.channel7 = myChannel.channel7 - (numChannel + 1);
 
 		myChannel.channel8 = nCluStage % (numChannel + 1) + intuniform(0, 16);
 		if (myChannel.channel8 > (numChannel + 1))

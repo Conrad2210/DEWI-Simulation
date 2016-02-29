@@ -97,19 +97,19 @@ std::string macNeighborTableEntry::info() const
     out<<" CH lower Stage: " << (lowerStageCH?"True":"False");
     out<<" CH next Stage: " << (nextStageCH?"True":"False");
     out<<" Last PKT: " << lastPktReceived << "s";
-//    out<<" SDIndex: " << (int)SDIndex;
-//    out<<" ChannelOffset: " << (int)ChannelOffset;
-//    out<<" TrackBeacon: " << TrackBeacon;
-//    out<<" BeaconLostCount: " << (int)BeaconLostCount;
-//    out<<" numTxData: " << (int)numTxData;
-//    out<<" numTXDataAck: " << (int)numTxDataAck;
-//    out<<" numRxData: " << (int)numRxData;
-//    out<<" numRxDataAck: " << (int)numRxDataAck;
-//    out<<" lastASN: " << (int)lastASN;
-//    out<<" RPLrank: " << (int)RPLrank;
-//    out<<" isTimeSource: " << isTimeSource;
-//    out<<" RPL_OF: " << (int)RPL_OF;
-//    out<<" transDelay: " << (int)transDelay;
+    out<<" SDIndex: " << (int)SDIndex;
+    out<<" ChannelOffset: " << (int)ChannelOffset;
+    out<<" TrackBeacon: " << TrackBeacon;
+    out<<" BeaconLostCount: " << (int)BeaconLostCount;
+    out<<" numTxData: " << (int)numTxData;
+    out<<" numTXDataAck: " << (int)numTxDataAck;
+    out<<" numRxData: " << (int)numRxData;
+    out<<" numRxDataAck: " << (int)numRxDataAck;
+    out<<" lastASN: " << (int)lastASN;
+    out<<" RPLrank: " << (int)RPLrank;
+    out<<" isTimeSource: " << isTimeSource;
+    out<<" RPL_OF: " << (int)RPL_OF;
+    out<<" transDelay: " << (int)transDelay;
     return out.str();
 }
 
