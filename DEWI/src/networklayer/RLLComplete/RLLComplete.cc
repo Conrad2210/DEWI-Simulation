@@ -1315,7 +1315,7 @@ void RLLComplete::handle_BEACON_WAIT_timer(cMessage *msg)
     }
     else
     {
-        if (beaconTable->CHinDistance(nDistance))
+        if (beaconTable->CHinDistance(0))
         {
             if (nPanCounter < 2)
                 bCapablePanCoor = true;
